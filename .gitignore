@@ -1,0 +1,39 @@
+# Ignore environment config
+.env
+
+# Ignore Composer's vendor directory
+/vendor/
+
+# Ignore system files
+Thumbs.db
+.DS_Store
+*.bak
+*.swp
+
+# Ignore writable generated files
+/writable/cache/*
+/writable/debugbar/*
+/writable/logs/*
+/writable/session/*
+/writable/uploads/*
+/writable/tmp/*
+writable/logs/*.log
+
+
+# Optional: ignore coverage & testing files
+/build/
+/coverage/
+/.phpunit.result.cache
+
+# Ignore node modules if you're using npm
+/node_modules/
+
+# Ignore IDE/editor settings
+.vscode/
+.idea/
+
+# Ignore git merge conflict files
+*.orig
+
+# Ignore all log files
+*.log
