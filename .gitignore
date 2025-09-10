@@ -1,0 +1,43 @@
+# ----------------------------------------
+# CodeIgniter 4 .gitignore
+# ----------------------------------------
+
+# OS & Editor junk
+.DS_Store
+Thumbs.db
+*.log
+*.bak
+*.tmp
+*.swp
+
+# Node (if using npm)
+node_modules/
+
+# Composer
+/vendor/
+/composer.lock
+
+# CI4 writable directory
+/writable/cache/*
+/writable/debugbar/*
+/writable/logs/*
+/writable/session/*
+/writable/uploads/*
+!writable/index.html
+
+# CI4 environment files
+.env
+.env.*
+
+# IDEs
+.vscode/
+.idea/
+
+# PHPUnit test results
+.phpunit.result.cache
+
+# Database backups or local SQL dumps
+*.sql
+
+# Git keep files (optional)
+!.gitkeep
