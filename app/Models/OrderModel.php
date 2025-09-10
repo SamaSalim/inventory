@@ -8,7 +8,7 @@ use App\Entities\Role;
 
 class OrderModel extends Model
 {
-    protected $table         = 'Order';
+    protected $table         = 'order';
     protected $primaryKey    = 'order_id ';
     protected $useAutoIncrement = true;
     protected $returnType    = Order::class;

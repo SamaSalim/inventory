@@ -44,26 +44,21 @@ class login extends BaseController
         }
 
         session()->set([
-            'employee_id' => $employee->emp_id, 
+            'employee_id' => $employee->emp_id,
             'name'        => $employee->name,
             'role'        => $role->name,
             'isLoggedIn'  => true
         ]);
 
         if ($role->name === 'warehouse') {
-            return redirect()->to('/warehouse/dashboard');
-
+            return redirect()->to('/InventoryController/warehouseDashboard');
         } elseif ($role->name === 'assets') {
             return redirect()->to('/assets/dashboard');
-            
-        }
-        elseif ($role->name === 'admin') {
+        } elseif ($role->name === 'admin') {
             return redirect()->to('/admin/dashboard');
-            
         } else {
             return redirect()->back()->with('error', 'Unknown role');
         }
-        
     }
 
     public function logout()
