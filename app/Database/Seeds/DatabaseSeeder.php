@@ -14,9 +14,10 @@ class DatabaseSeeder extends Seeder
         // 1. جدول role - مع التحقق من وجود البيانات
         if ($this->db->table('role')->countAllResults() == 0) {
             $this->db->table('role')->insertBatch([
-                ['name' => 'مدير النظام'],
-                ['name' => 'موظف المستودع'],
-                ['name' => 'مشرف القسم'],
+                ['name' => ' admin'],
+                ['name' => 'warehouse '],
+                ['name' => ' assets '],
+                ['name' => 'employee '],
                 ['name' => 'موظف عادي'],
             ]);
         }
