@@ -47,9 +47,12 @@ class InventoryController extends BaseController
         $this->minorCategoryModel = new \App\Models\MinorCategoryModel();
     }
 
+
+
     public function store()
     {
         try {
+            // التحقق من البيانات المطلوبة
             $requiredFields = ['to_employee_id', 'item', 'quantity', 'room'];
             foreach ($requiredFields as $field) {
                 if (!$this->request->getPost($field)) {
@@ -60,9 +63,10 @@ class InventoryController extends BaseController
                 }
             }
 
-            $db = \Config\Database::connect();
+            $db = \Config\Database::connect();  //لازم ينحذف
             $db->transStart();
 
+            // إنشاء الطلب الرئيسي
             $orderData = [
                 'from_employee_id' => $this->request->getPost('from_employee_id'),
                 'to_employee_id' => $this->request->getPost('to_employee_id'),
@@ -215,242 +219,213 @@ class InventoryController extends BaseController
         }
     }
 
-    public function updateOrder($orderId)
-    {
-        if (!$orderId) {
-            return $this->response->setJSON(['success' => false, 'message' => 'رقم الطلب غير محدد.']);
+public function storeMultipleItems()
+{
+    try {
+        // التحقق من البيانات المطلوبة
+        $requiredFields = ['to_employee_id', 'room'];
+        foreach ($requiredFields as $field) {
+            if (!$this->request->getPost($field)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "الحقل {$field} مطلوب"
+                ]);
+            }
         }
 
-        $db = \Config\Database::connect();
+        $multipleItems = $this->request->getPost('multiple_items');
+        if (!$multipleItems) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'يجب إضافة صنف واحد على الأقل'
+            ]);
+        }
+
+        $itemsData = json_decode($multipleItems, true);
+        if (!$itemsData || empty($itemsData)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'بيانات الأصناف غير صحيحة'
+            ]);
+        }
+
+        $db = \Config\Database::connect(); // لازم ينحذف
         $db->transStart();
 
-        try {
-            $postData = $this->request->getPost();
-
-            // التحقق من الحقول المطلوبة الأساسية فقط (بدون item و quantity)
-            $requiredFields = ['to_employee_id', 'room'];
-            foreach ($requiredFields as $field) {
-                if (empty($postData[$field])) {
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "الحقل {$field} مطلوب"
-                    ]);
-                }
-            }
-
-            // تحديث بيانات الطلب الأساسية
-            $orderMainData = [
-                'from_employee_id' => $postData['from_employee_id'],
-                'to_employee_id' => $postData['to_employee_id'],
-                'note' => $postData['notes'] ?? '',
-            ];
-
-            $this->orderModel->update($orderId, $orderMainData);
-
-            // تحديث العناصر الموجودة - التعامل مع البيانات المرسلة مباشرة من النموذج
-            $existingItems = $this->itemOrderModel->where('order_id', $orderId)->findAll();
-
-            foreach ($existingItems as $item) {
-                $itemId = $item->item_order_id;
-
-                // البحث عن البيانات الجديدة للعنصر الحالي بالطريقة الصحيحة من النموذج
-                $assetNumField = "existing_asset_num[{$itemId}]";
-                $serialNumField = "existing_serial_num[{$itemId}]";
-                $notesField = "existing_notes[{$itemId}]";
-
-                if (isset($postData[$assetNumField]) && isset($postData[$serialNumField])) {
-                    $newAssetNum = trim($postData[$assetNumField]);
-                    $newSerialNum = trim($postData[$serialNumField]);
-
-                    if (empty($newAssetNum) || empty($newSerialNum)) {
-                        $db->transRollback();
-                        return $this->response->setJSON(['success' => false, 'message' => 'يجب ملء جميع حقول العناصر الموجودة.']);
-                    }
-
-                    // التحقق من عدم التكرار (باستثناء العنصر الحالي)
-                    $this->validateItemUniqueness($newAssetNum, $newSerialNum, $itemId);
-
-                    // تحديث بيانات العنصر
-                    $this->itemOrderModel->update($itemId, [
-                        'asset_num' => $newAssetNum,
-                        'serial_num' => $newSerialNum,
-                        'room_id' => $postData['room'],
-                        'note' => $postData[$notesField] ?? ''
-                    ]);
-                }
-            }
-
-            // إضافة العناصر الجديدة (اختياري تماماً) - تحقق من النموذج مباشرة
-            $newItemName = trim($postData['new_item'] ?? '');
-            $newAssetNum = trim($postData['new_asset_num'] ?? '');
-            $newSerialNum = trim($postData['new_serial_num'] ?? '');
-            $newItemNotes = trim($postData['new_item_notes'] ?? '');
-
-            // فقط إذا تم إدخال بيانات العنصر الجديد
-            if ($newItemName || $newAssetNum || $newSerialNum) {
-                // إذا تم إدخال أي بياناتـ يجب أن تكون كاملة
-                if (empty($newItemName) || empty($newAssetNum) || empty($newSerialNum)) {
-                    $db->transRollback();
-                    return $this->response->setJSON(['success' => false, 'message' => 'يجب ملء جميع حقول العناصر الجديدة (الصنف، رقم الأصول، الرقم التسلسلي) أو تركها فارغة تماماً.']);
-                }
-
-                $itemInfo = $this->itemModel->where('name', $newItemName)->first();
-                if (!$itemInfo) {
-                    $db->transRollback();
-                    return $this->response->setJSON(['success' => false, 'message' => 'الصنف الجديد غير موجود.']);
-                }
-
-                $this->validateItemUniqueness($newAssetNum, $newSerialNum);
-                $this->itemOrderModel->insert([
-                    'order_id' => $orderId,
-                    'item_id' => $itemInfo->id,
-                    'asset_num' => $newAssetNum,
-                    'serial_num' => $newSerialNum,
-                    'room_id' => $postData['room'],
-                    'assets_type' => 'عهدة عامة',
-                    'created_by' => session()->get('employee_id'),
-                    'usage_status_id' => 1,
-                    'quantity' => 1,
-                    'note' => $newItemNotes
-                ]);
-            }
-
-            $db->transComplete();
-            if ($db->transStatus() === FALSE) {
-                return $this->response->setJSON(['success' => false, 'message' => 'فشل في حفظ البيانات.']);
-            }
-            return $this->response->setJSON(['success' => true, 'message' => 'تم تحديث الطلب بنجاح!', 'order_id' => $orderId]);
-        } catch (\Exception $e) {
-            $db->transRollback();
-            return $this->response->setJSON(['success' => false, 'message' => 'خطأ في تحديث الطلب: ' . $e->getMessage()]);
-        }
-    }
-    // باقي الدوال تبقى كما هي...
-    public function warehouseDashboard()
-    {
-        // تم تحديث ترتيب البيانات للحصول على آخر الطلبات أولاً
-        $itemOrders = $this->itemOrderModel->select('
-                item_order.*, 
-                item_order.order_id,
-                items.name as item_name,
-                minor_category.name as category_name,
-                major_category.name as major_category_name,
-                usage_status.usage_status,
-                room.code as room_code,
-                employee.name as created_by_name
-            ')
-            ->join('items', 'items.id = item_order.item_id', 'left')
-            ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-            ->join('room', 'room.id = item_order.room_id', 'left')
-            ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
-            ->orderBy('item_order.item_order_id', 'DESC')
-            ->findAll();
-
-        $categories = $this->minorCategoryModel->select('minor_category.*, major_category.name as major_category_name')
-            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-            ->findAll();
-
-        $stats = $this->getWarehouseStats();
-
-        $statuses = $this->orderStatusModel->findAll();
-        $usageStatuses = $this->usageStatusModel->findAll();
-
-        return view('warehouseView', [
-            'categories' => $categories,
-            'items' => $itemOrders,
-            'stats' => $stats,
-            'statuses' => $statuses,
-            'usage_statuses' => $usageStatuses,
-        ]);
-    }
-
-    public function editOrder($orderId)
-    {
-        if (!$orderId) {
-            return redirect()->back()->with('error', 'رقم الطلب غير محدد.');
-        }
-
-        $orderData = $this->orderModel->where('order_id', $orderId)->first();
-        if (!$orderData) {
-            return redirect()->back()->with('error', 'الطلب غير موجود.');
-        }
-
-        $orderItems = $this->itemOrderModel
-            ->select('item_order.*, items.name as item_name')
-            ->join('items', 'items.id = item_order.item_id')
-            ->where('order_id', $orderId)
-            ->findAll();
-
-        $employee = $this->employeeModel->where('emp_id', $orderData->from_employee_id)->first();
-
-        $viewData = [
-            'mode' => 'edit',
-            'order' => $orderData,
-            'orderItems' => $orderItems,
-            'employee' => $employee,
+        // إنشاء الطلب الرئيسي
+        $orderData = [
+            'from_employee_id' => $this->request->getPost('from_employee_id'),
+            'to_employee_id' => $this->request->getPost('to_employee_id'),
+            'order_status_id' => 1, // جديد
+            'note' => $this->request->getPost('notes') ?? ''
         ];
 
-        return view('order_form', $viewData);
-    }
+        $orderId = $this->orderModel->insert($orderData);
 
-    public function addItemToWarehouse()
-    {
-        $postData = $this->request->getPost();
-        $postData['created_by'] = session()->get('employee_id');
-        $itemType = $this->request->getPost('item_type');
-
-        try {
-            if ($itemType === 'new_item') {
-                $itemEntity = new \App\Entities\Items([
-                    'name' => $postData['name'],
-                    'minor_category_id' => $postData['minor_category_id']
-                ]);
-                $this->itemModel->insert($itemEntity);
-                return redirect()->to('/warehouse')->with('success', 'تمت إضافة الصنف الجديد بنجاح');
-            } else {
-                $itemOrderEntity = new \App\Entities\ItemOrder([
-                    'order_id' => $postData['order_id'] ?? null,
-                    'item_id' => $postData['item_id'],
-                    'brand' => $postData['brand'] ?? null,
-                    'quantity' => $postData['quantity'] ?? 1,
-                    'model_num' => $postData['model_num'] ?? null,
-                    'asset_num' => $postData['asset_num'],
-                    'serial_num' => $postData['serial_num'],
-                    'old_asset_num' => $postData['old_asset_num'] ?? null,
-                    'room_id' => $postData['room_id'],
-                    'assets_type' => $postData['assets_type'] ?? 'غير محدد',
-                    'created_by' => $postData['created_by'],
-                    'usage_status_id' => $postData['usage_status_id'] ?? 1,
-                    'note' => $postData['note'] ?? null
-                ]);
-                $this->itemOrderModel->insert($itemOrderEntity);
-                return redirect()->to('/warehouse')->with('success', 'تمت إضافة طلب الصنف بنجاح');
-            }
-        } catch (\CodeIgniter\Database\Exceptions\DatabaseException $e) {
-            return redirect()->back()->with('error', 'حدث خطأ في قاعدة البيانات: ' . $e->getMessage());
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطأ غير متوقع');
+        if (!$orderId) {
+            $db->transRollback();
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'فشل في إنشاء الطلب'
+            ]);
         }
-    }
 
-    public function editWarehouseItem($id)
-    {
-        $data['item'] = $this->itemModel->find($id);
-        $data['categories'] = $this->minorCategoryModel->select('minor_category.*, major_category.name as major_category_name')
-            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-            ->findAll();
-        return view('editItemView', $data);
-    }
+        // جمع جميع أرقام الأصول والأرقام التسلسلية للتحقق من التكرار
+        $allAssetNumbers = [];
+        $allSerialNumbers = [];
 
-    public function updateWarehouseItem($id)
-    {
-        $postData = $this->request->getPost();
-        $entity = new \App\Entities\Items($postData);
-        $entity->id = $id;
-        $this->itemModel->save($entity);
-        return redirect()->to('/warehouse')->with('success', 'تم تحديث العنصر بنجاح');
+        foreach ($itemsData as $index => $itemInfo) {
+            // التحقق من وجود جميع الحقول المطلوبة
+            $requiredItemFields = ['asset_num', 'serial_num', 'item', 'major_category_id', 'minor_category_id'];
+            foreach ($requiredItemFields as $field) {
+                if (!isset($itemInfo[$field]) || empty(trim($itemInfo[$field]))) {
+                    $db->transRollback();
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => "الحقل {$field} مطلوب للصنف رقم " . ($index + 1)
+                    ]);
+                }
+            }
+
+            $assetNum = trim($itemInfo['asset_num']);
+            $serialNum = trim($itemInfo['serial_num']);
+
+            // التحقق من عدم تكرار أرقام الأصول
+            if (in_array($assetNum, $allAssetNumbers)) {
+                $db->transRollback();
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "رقم الأصول {$assetNum} مكرر. يجب أن يكون كل رقم أصول فريد."
+                ]);
+            }
+
+            // التحقق من عدم تكرار الأرقام التسلسلية
+            if (in_array($serialNum, $allSerialNumbers)) {
+                $db->transRollback();
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "الرقم التسلسلي {$serialNum} مكرر. يجب أن يكون كل رقم تسلسلي فريد."
+                ]);
+            }
+
+            // التحقق من عدم وجود رقم الأصول في قاعدة البيانات
+            $existingAsset = $this->itemOrderModel->where('asset_num', $assetNum)->first();
+            if ($existingAsset) {
+                $db->transRollback();
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "رقم الأصول {$assetNum} موجود مسبقاً في النظام."
+                ]);
+            }
+
+            // التحقق من عدم وجود الرقم التسلسلي في قاعدة البيانات
+            $existingSerial = $this->itemOrderModel->where('serial_num', $serialNum)->first();
+            if ($existingSerial) {
+                $db->transRollback();
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "الرقم التسلسلي {$serialNum} موجود مسبقاً في النظام."
+                ]);
+            }
+
+            $allAssetNumbers[] = $assetNum;
+            $allSerialNumbers[] = $serialNum;
+        }
+
+        // إدراج البيانات بعد التحقق من صحتها
+        foreach ($itemsData as $index => $itemInfo) {
+            $itemName = trim($itemInfo['item']);
+            
+            // البحث عن الصنف أو إنشاؤه إذا لم يكن موجوداً
+            $item = $this->itemModel->where('name', $itemName)->first();
+            
+            if (!$item) {
+                // إنشاء صنف جديد
+                $newItemData = [
+                    'name' => $itemName,
+                    'minor_category_id' => $itemInfo['minor_category_id']
+                ];
+                
+                $itemId = $this->itemModel->insert($newItemData);
+                if (!$itemId) {
+                    $db->transRollback();
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => "فشل في إنشاء الصنف: {$itemName}"
+                    ]);
+                }
+            } else {
+                $itemId = $item->id;
+            }
+
+            $itemOrderData = [
+                'order_id' => $orderId,
+                'item_id' => $itemId,
+                'brand' => $itemInfo['brand'] ?? 'غير محدد',
+                'quantity' => 1,
+                'model_num' => $itemInfo['model_num'] ?? null,
+                'asset_num' => trim($itemInfo['asset_num']),
+                'serial_num' => trim($itemInfo['serial_num']),
+                'room_id' => $this->request->getPost('room'),
+                'assets_type' => 'عهدة عامة',
+                'created_by' => session()->get('employee_id'),
+                'usage_status_id' => 1, // متاح
+                'note' => $itemInfo['note'] ?? ''
+            ];
+
+            $itemOrderId = $this->itemOrderModel->insert($itemOrderData);
+
+            if (!$itemOrderId) {
+                $db->transRollback();
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "فشل في إضافة الصنف: {$itemName}"
+                ]);
+            }
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === FALSE) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'فشل في حفظ البيانات'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => "تم إنشاء الطلب بنجاح لعدد " . count($itemsData) . " صنف",
+            'order_id' => $orderId
+        ]);
+    } catch (\Exception $e) {
+        log_message('error', 'Error in storeMultipleItems: ' . $e->getMessage());
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'خطأ في حفظ الطلب: ' . $e->getMessage()
+        ]);
+    }
+}
+    // public function editWarehouseItem($id)
+    // {
+    //     $data['item'] = $this->itemModel->find($id);
+    //     $data['categories'] = $this->minorCategoryModel->select('minor_category.*, major_category.name as major_category_name')
+    //         ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+    //         ->findAll();
+    //     return view('editItemView', $data);
+    // }
+
+    // public function updateWarehouseItem($id)
+    // {
+    //     $postData = $this->request->getPost();
+    //     $entity = new \App\Entities\Items($postData);
+    //     $entity->id = $id;
+    //     $this->itemModel->save($entity);
+    //     return redirect()->to('/warehouse')->with('success', 'تم تحديث العنصر بنجاح');
+    // }
+
+    public function editOrder($orderid){
+        return view ("edit_order_form");
     }
 
     private function getWarehouseStats(): array
@@ -539,6 +514,18 @@ class InventoryController extends BaseController
         }
     }
 
+public function getminorcategoriesbymajor($majorCategoryId = null)
+{
+    try {
+        if (!$majorCategoryId) {
+            return $this->response->setJSON(['success' => false, 'message' => 'رقم التصنيف الرئيسي مطلوب', 'data' => []]);
+        }
+        $minorCategories = $this->minorCategoryModel->where('major_category_id', $majorCategoryId)->findAll();
+        return $this->response->setJSON(['success' => true, 'data' => $minorCategories]);
+    } catch (\Exception $e) {
+        return $this->response->setJSON(['success' => false, 'message' => 'خطأ في تحميل التصنيفات الفرعية: ' . $e->getMessage(), 'data' => []]);
+    }
+}
     public function getsectionsbyfloor($floorId = null)
     {
         try {
