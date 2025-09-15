@@ -50,7 +50,6 @@ class InventoryController extends BaseController
     public function store()
     {
         try {
-            // التحقق من البيانات المطلوبة
             $requiredFields = ['to_employee_id', 'item', 'quantity', 'room'];
             foreach ($requiredFields as $field) {
                 if (!$this->request->getPost($field)) {
@@ -64,7 +63,6 @@ class InventoryController extends BaseController
             $db = \Config\Database::connect();
             $db->transStart();
 
-            // إنشاء الطلب الرئيسي
             $orderData = [
                 'from_employee_id' => $this->request->getPost('from_employee_id'),
                 'to_employee_id' => $this->request->getPost('to_employee_id'),
