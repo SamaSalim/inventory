@@ -1,0 +1,257 @@
+DEBUG - 2025-09-15 00:15:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:15:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:15:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:16:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:16:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:16:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:16:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:16:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:16:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:22:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:22:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:22:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:23:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:24:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:28:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:29:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:37:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:38:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:38:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:38:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:39:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:39:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 00:39:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 01:33:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-15 02:09:17 --> mysqli_sql_exception: Table 'inventory6.rooms' doesn't exist in C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `item_or...', 0)
+#1 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `item_or...')
+#2 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `item_or...')
+#3 C:\xampp\htdocs\inventory\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `item_or...', Array, false)
+#4 C:\xampp\htdocs\inventory\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory\system\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\inventory\app\Controllers\InventoryController.php(465): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\inventory\system\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+#8 C:\xampp\htdocs\inventory\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+#9 C:\xampp\htdocs\inventory\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+ERROR - 2025-09-15 02:09:17 --> Error in editOrder: Table 'inventory6.rooms' doesn't exist
+DEBUG - 2025-09-15 02:09:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:09:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-15 02:09:19 --> mysqli_sql_exception: Table 'inventory6.rooms' doesn't exist in C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `item_or...', 0)
+#1 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `item_or...')
+#2 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `item_or...')
+#3 C:\xampp\htdocs\inventory\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `item_or...', Array, false)
+#4 C:\xampp\htdocs\inventory\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory\system\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\inventory\app\Controllers\InventoryController.php(465): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\inventory\system\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+#8 C:\xampp\htdocs\inventory\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+#9 C:\xampp\htdocs\inventory\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+ERROR - 2025-09-15 02:09:19 --> Error in editOrder: Table 'inventory6.rooms' doesn't exist
+DEBUG - 2025-09-15 02:09:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:09:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-15 02:09:23 --> mysqli_sql_exception: Table 'inventory6.rooms' doesn't exist in C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `item_or...', 0)
+#1 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `item_or...')
+#2 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `item_or...')
+#3 C:\xampp\htdocs\inventory\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `item_or...', Array, false)
+#4 C:\xampp\htdocs\inventory\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory\system\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\inventory\app\Controllers\InventoryController.php(465): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\inventory\system\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+#8 C:\xampp\htdocs\inventory\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+#9 C:\xampp\htdocs\inventory\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+ERROR - 2025-09-15 02:09:23 --> Error in editOrder: Table 'inventory6.rooms' doesn't exist
+DEBUG - 2025-09-15 02:09:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:09:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:09:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-15 02:09:51 --> mysqli_sql_exception: Table 'inventory6.rooms' doesn't exist in C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `item_or...', 0)
+#1 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `item_or...')
+#2 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `item_or...')
+#3 C:\xampp\htdocs\inventory\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `item_or...', Array, false)
+#4 C:\xampp\htdocs\inventory\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory\system\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\inventory\app\Controllers\InventoryController.php(465): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\inventory\system\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+#8 C:\xampp\htdocs\inventory\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+#9 C:\xampp\htdocs\inventory\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+ERROR - 2025-09-15 02:09:51 --> Error in editOrder: Table 'inventory6.rooms' doesn't exist
+DEBUG - 2025-09-15 02:09:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:09:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:12:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-15 02:12:10 --> mysqli_sql_exception: Table 'inventory6.rooms' doesn't exist in C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `item_or...', 0)
+#1 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `item_or...')
+#2 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `item_or...')
+#3 C:\xampp\htdocs\inventory\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `item_or...', Array, false)
+#4 C:\xampp\htdocs\inventory\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory\system\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\inventory\app\Controllers\InventoryController.php(465): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\inventory\system\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+#8 C:\xampp\htdocs\inventory\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+#9 C:\xampp\htdocs\inventory\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+ERROR - 2025-09-15 02:12:10 --> Error in editOrder: Table 'inventory6.rooms' doesn't exist
+DEBUG - 2025-09-15 02:12:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:12:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-15 02:12:14 --> mysqli_sql_exception: Table 'inventory6.rooms' doesn't exist in C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `item_or...', 0)
+#1 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `item_or...')
+#2 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `item_or...')
+#3 C:\xampp\htdocs\inventory\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `item_or...', Array, false)
+#4 C:\xampp\htdocs\inventory\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory\system\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\inventory\app\Controllers\InventoryController.php(465): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\inventory\system\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+#8 C:\xampp\htdocs\inventory\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+#9 C:\xampp\htdocs\inventory\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+ERROR - 2025-09-15 02:12:14 --> Error in editOrder: Table 'inventory6.rooms' doesn't exist
+DEBUG - 2025-09-15 02:12:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:12:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-15 02:15:29 --> mysqli_sql_exception: Table 'inventory6.rooms' doesn't exist in C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `item_or...', 0)
+#1 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `item_or...')
+#2 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `item_or...')
+#3 C:\xampp\htdocs\inventory\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `item_or...', Array, false)
+#4 C:\xampp\htdocs\inventory\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory\system\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\inventory\app\Controllers\InventoryController.php(465): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\inventory\system\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('5')
+#8 C:\xampp\htdocs\inventory\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+#9 C:\xampp\htdocs\inventory\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+ERROR - 2025-09-15 02:15:29 --> Error in editOrder: Table 'inventory6.rooms' doesn't exist
+DEBUG - 2025-09-15 02:15:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:15:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-15 02:15:49 --> mysqli_sql_exception: Table 'inventory6.rooms' doesn't exist in C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `item_or...', 0)
+#1 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `item_or...')
+#2 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `item_or...')
+#3 C:\xampp\htdocs\inventory\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `item_or...', Array, false)
+#4 C:\xampp\htdocs\inventory\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory\system\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\inventory\app\Controllers\InventoryController.php(465): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\inventory\system\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+#8 C:\xampp\htdocs\inventory\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+#9 C:\xampp\htdocs\inventory\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+ERROR - 2025-09-15 02:15:49 --> Error in editOrder: Table 'inventory6.rooms' doesn't exist
+DEBUG - 2025-09-15 02:15:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:15:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:15:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-15 02:15:58 --> mysqli_sql_exception: Table 'inventory6.rooms' doesn't exist in C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `item_or...', 0)
+#1 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `item_or...')
+#2 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `item_or...')
+#3 C:\xampp\htdocs\inventory\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `item_or...', Array, false)
+#4 C:\xampp\htdocs\inventory\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory\system\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\inventory\app\Controllers\InventoryController.php(465): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\inventory\system\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('5')
+#8 C:\xampp\htdocs\inventory\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+#9 C:\xampp\htdocs\inventory\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+ERROR - 2025-09-15 02:15:58 --> Error in editOrder: Table 'inventory6.rooms' doesn't exist
+DEBUG - 2025-09-15 02:15:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:15:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-15 02:16:03 --> mysqli_sql_exception: Table 'inventory6.rooms' doesn't exist in C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `item_or...', 0)
+#1 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `item_or...')
+#2 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `item_or...')
+#3 C:\xampp\htdocs\inventory\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `item_or...', Array, false)
+#4 C:\xampp\htdocs\inventory\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory\system\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\inventory\app\Controllers\InventoryController.php(465): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\inventory\system\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('1')
+#8 C:\xampp\htdocs\inventory\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+#9 C:\xampp\htdocs\inventory\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+ERROR - 2025-09-15 02:16:03 --> Error in editOrder: Table 'inventory6.rooms' doesn't exist
+DEBUG - 2025-09-15 02:16:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:16:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:23:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:23:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:23:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:23:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:24:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 02:25:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-15 02:25:53 --> ErrorException: Undefined variable $order
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 19.
+ 1 APPPATH\Views\edit_order_form.php(19): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $order', 'C:\\xampp\\htdocs\\inventory\\app\\Views\\edit_order_form.php', 19)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(428): view('edit_order_form')
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-15 02:26:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 05:37:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 05:37:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 05:37:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-15 05:37:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-15 05:39:00 --> ErrorException: Undefined variable $order
+[Method: GET, Route: InventoryController/editOrder/1]
+in APPPATH\Views\edit_order_form.php on line 19.
+ 1 APPPATH\Views\edit_order_form.php(19): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $order', 'C:\\xampp\\htdocs\\inventory\\app\\Views\\edit_order_form.php', 19)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(428): view('edit_order_form')
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('1')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-15 05:39:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
