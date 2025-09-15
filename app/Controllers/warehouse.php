@@ -21,92 +21,52 @@ class warehouse extends BaseController
         return $this->index();
     }
 
-    public function index()
-    {
-        // جلب بيانات item_order مع الربط مع الجداول المرتبطة
-        $itemOrderModel = new \App\Models\ItemOrderModel();
-        
-        // جلب البيانات مع الربط (JOIN) مع الجداول الأخرى
-        $itemOrders = $itemOrderModel->select('
-                item_order.*, 
-                items.name as item_name,
-                minor_category.name as category_name,
-                major_category.name as major_category_name,
-                usage_status.usage_status,
-                room.code as room_code,
-                employee.name as created_by_name
-            ')
-            ->join('items', 'items.id = item_order.item_id', 'left')
-            ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-            ->join('room', 'room.id = item_order.room_id', 'left')
-            ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
-            ->orderBy('item_order.created_at', 'DESC')
-            ->findAll();
+public function index()
+{
+    $itemOrderModel = new \App\Models\ItemOrderModel();
 
-        // جلب التصنيفات الفرعية
-        $minorCategoryModel = new \App\Models\MinorCategoryModel();
-        $categories = $minorCategoryModel->select('minor_category.*, major_category.name as major_category_name')
-            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-            ->findAll();
 
-        // حساب الإحصائيات
-        $stats = $this->getWarehouseStats();
+    $itemOrders = $itemOrderModel
+        ->distinct()
+        ->select(
+            'item_order.order_id, 
+             item_order.created_at, 
+             item_order.created_by, 
+             room.code AS room_code, 
+             employee.name AS created_by_name, 
+             employee.emp_id AS employee_id, 
+             employee.emp_ext AS extension'
+        )
+        ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
+        ->join('room', 'room.id = item_order.room_id', 'left')
+        ->groupBy('item_order.order_id') // Prevent duplicate rows
+        ->orderBy('item_order.created_at', 'DESC')
+        ->findAll();
 
-        // جلب حالات الطلب وحالات الاستخدام
-        $orderStatusModel = new \App\Models\OrderStatusModel();
-        $usageStatusModel = new \App\Models\UsageStatusModel();
-        $statuses = $orderStatusModel->findAll();
-        $usageStatuses = $usageStatusModel->findAll();
+    // Other data
+    $minorCategoryModel = new \App\Models\MinorCategoryModel();
+    $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
+        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+        ->findAll();
 
-        return view('warehouseView', [
-            'categories' => $categories,
-            'items' => $itemOrders, // إرسال بيانات item_order بدلاً من items
-            'stats' => $stats,
-            'statuses' => $statuses,
-            'usage_statuses' => $usageStatuses,
-        ]);
-    }
+    $stats = $this->getWarehouseStats();
 
-    public function create()
-    {
-        // جلب التصنيفات مع الربط
-        $minorCategoryModel = new \App\Models\MinorCategoryModel();
-        $categories = $minorCategoryModel->select('minor_category.*, major_category.name as major_category_name')
-            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-            ->findAll();
+    $orderStatusModel = new \App\Models\OrderStatusModel();
+    $statuses = $orderStatusModel->findAll();
 
-        // جلب الأصناف المتاحة
-        $itemModel = new ItemModel();
-        $items = $itemModel->select('items.*, minor_category.name as category_name')
-            ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-            ->findAll();
+    $usageStatusModel = new \App\Models\UsageStatusModel();
+    $usageStatuses = $usageStatusModel->findAll();
 
-        // جلب الغرف مع معلومات كاملة
-        $roomModel = new \App\Models\RoomModel();
-        $rooms = $roomModel->select('
-                room.*, 
-                section.code as section_code,
-                floor.code as floor_code,
-                building.code as building_code
-            ')
-            ->join('section', 'section.id = room.section_id', 'left')
-            ->join('floor', 'floor.id = section.floor_id', 'left')
-            ->join('building', 'building.id = floor.building_id', 'left')
-            ->findAll();
+    return view('warehouseView', [
+        'categories' => $categories,
+        'orders' => $itemOrders, 
+        'stats' => $stats,
+        'statuses' => $statuses,
+        'usage_statuses' => $usageStatuses,
+    ]);
+}
 
-        // جلب حالات الاستخدام
-        $usageStatusModel = new \App\Models\UsageStatusModel();
-        $usageStatuses = $usageStatusModel->findAll();
 
-        return view('addItemView', [
-            'categories' => $categories,
-            'items' => $items,
-            'rooms' => $rooms,
-            'usage_statuses' => $usageStatuses
-        ]);
-    }
 
     public function addNewItem()
     {

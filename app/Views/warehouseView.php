@@ -9,7 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
+* {
             font-family: 'Cairo', sans-serif;
             margin: 0;
             padding: 0;
@@ -731,6 +731,129 @@
         .custom-table tbody tr {
             cursor: pointer;
         }
+        .view-btn {
+            background: linear-gradient(135deg, #3AC0C3, #2aa8ab);
+            color: white;
+            box-shadow: 0 2px 8px rgba(58, 192, 195, 0.3);
+        }
+
+        .view-btn:hover {
+            background: linear-gradient(135deg, #2aa8ab, #259a9d);
+            color: white;
+            box-shadow: 0 4px 12px rgba(58, 192, 195, 0.4);
+        }
+
+        /* Edit Button - Dark blue theme */
+        .edit-btn {
+            background: linear-gradient(135deg, #057590, #046073);
+            color: white;
+            box-shadow: 0 2px 8px rgba(5, 117, 144, 0.3);
+        }
+
+        .edit-btn:hover {
+            background: linear-gradient(135deg, #046073, #035a6b);
+            color: white;
+            box-shadow: 0 4px 12px rgba(5, 117, 144, 0.4);
+        }
+
+        /* Alternative button styles with icons */
+        .btn-with-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-icon {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        /* Action buttons styling */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 16px;
+            border: none;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 70px;
+            justify-content: center;
+        }
+
+        /* View Button - Teal gradient */
+        .view-btn {
+            background: linear-gradient(135deg, #3AC0C3, #2aa8ab);
+            color: white;
+            box-shadow: 0 2px 6px rgba(58, 192, 195, 0.25);
+        }
+
+        .view-btn:hover {
+            background: linear-gradient(135deg, #2aa8ab, #259a9d);
+            color: white;
+            box-shadow: 0 4px 10px rgba(58, 192, 195, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Edit Button - Dark blue gradient */
+        .edit-btn {
+            background: linear-gradient(135deg, #057590, #046073);
+            color: white;
+            box-shadow: 0 2px 6px rgba(5, 117, 144, 0.25);
+        }
+
+        .edit-btn:hover {
+            background: linear-gradient(135deg, #046073, #035a6b);
+            color: white;
+            box-shadow: 0 4px 10px rgba(5, 117, 144, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Icons for buttons */
+        .btn-icon {
+            width: 12px;
+            height: 12px;
+            fill: currentColor;
+        }
+
+        /* Responsive adjustments for action buttons */
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .action-btn {
+                min-width: 60px;
+                padding: 6px 12px;
+                font-size: 10px;
+            }
+
+            .btn-icon {
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .action-btn {
+                padding: 5px 10px;
+                font-size: 9px;
+                min-width: 50px;
+            }
+        }
     </style>
 </head>
 
@@ -846,50 +969,57 @@
         </div>
     </div>
 
-            <div class="table-container">
-                <table class="custom-table">
-                    <thead>
-                        <tr>
-                            <th>رقم الطلب</th>
-                            <th>الصنف</th>
-                            <th>التصنيف</th>
-                            <th>رقم الأصول</th>
-                            <th>الرقم التسلسلي</th>
-                            <!-- <th>الرقم الوظيفي</th> -->
-                            <th>الموقع</th>
-                            <th>بواسطة</th>
-                            <th>الملاحظات</th>
-                            <th>العمليات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (isset($items) && !empty($items)): ?>
-                            <?php foreach ($items as $item): ?>
-                                <tr>
-                                    <td><?= esc($item->order_id ?? '-') ?></td>
-                                    <td><?= esc($item->item_name ?? 'غير محدد') ?></td>
-                                    <td><?= esc($item->category_name ?? 'غير محدد') ?></td>
-                                    <td><?= esc($item->asset_num ?? '-') ?></td>
-                                    <td><?= esc($item->serial_num ?? '-') ?></td>
-                                    <!-- <td><?= esc($item->created_by_name ?? '-') ?></td> -->
-                                    <td><?= esc($item->room_code ?? '-') ?></td>
-                                    <td><?= esc($item->created_by_name ?? '-') ?></td>
-                                    <td><?= esc($item->note ?? '-') ?></td>
-                                    <td>
-                                        <a href="<?= site_url('InventoryController/editOrder/' . $item->order_id) ?>" class="edit-btn">تحديث</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="8">لا توجد بيانات متاحة</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+<div class="table-container">
+    <table class="custom-table" id="datatable-orders">
+        <thead>
+            <tr class="text-center">
+                <th>رقم الطلب</th>
+                <th>الرقم الوظيفي</th>
+                <th>التحويلة</th>
+                <th>تاريخ الطلب</th>
+                <th>رمز الموقع</th>
+                <th>مدخل البيانات</th>
+                <th>عمليات</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (isset($orders) && !empty($orders)): ?>
+                <?php foreach ($orders as $order): ?>
+                    <tr class="text-center align-middle">
+                        <td><?= esc($order->order_id ?? '-') ?></td>
+                        <td><?= esc($order->employee_id ?? '-') ?></td>
+                        <td><?= esc($order->extension ?? 'na') ?></td>
+                        <td><?= esc($order->created_at ?? '-') ?></td>
+                        <td><?= esc($order->room_code ?? '---') ?></td>
+                        <td><?= esc($order->created_by_name ?? '-') ?></td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="<?= site_url('InventoryController/showOrder/' . $order->order_id) ?>" class="action-btn view-btn">
+                                    <svg class="btn-icon" viewBox="0 0 24 24">
+                                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                    </svg>
+                                    عرض
+                                </a>
+                                <a href="<?= site_url('InventoryController/editOrder/' . $order->order_id) ?>" class="action-btn edit-btn">
+                                    <svg class="btn-icon" viewBox="0 0 24 24">
+                                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                    </svg>
+                                    تعديل
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="7" class="text-center">لا توجد بيانات متاحة</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
+
+
 
     <!-- النافذة المنبثقة للطلبات -->
     <div class="form-modal" id="orderModal">
