@@ -1,3 +1,6 @@
+writable/logs/
+writable/debugbar/
+writable/cache/
+writable/session/
+writable/uploads/
 .env
-writable/logs/*.log
-
