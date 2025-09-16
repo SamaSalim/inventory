@@ -571,4 +571,56 @@ public function getminorcategoriesbymajor($majorCategoryId = null)
             throw new \Exception("الرقم التسلسلي {$serialNum} موجود مسبقاً في النظام.");
         }
     }
+public function showOrder($id)
+{
+    $orderModel = new \App\Models\OrderModel();
+    $itemOrderModel = new \App\Models\ItemOrderModel();
+
+
+    $order = $orderModel
+        ->select('
+            `order`.*,
+            from_emp.name AS from_name,
+            to_emp.name AS to_name,
+            order_status.status AS status_name
+        ')
+        ->join('employee as from_emp', 'from_emp.emp_id = `order`.from_employee_id', 'left')
+        ->join('employee as to_emp', 'to_emp.emp_id = `order`.to_employee_id', 'left')
+        ->join('order_status', 'order_status.id = `order`.order_status_id', 'left')
+        ->where('order.order_id', $id)
+        ->first();
+
+    if (!$order) {
+        return redirect()->back()->with('error', 'الطلب غير موجود');
+    }
+
+
+    $items = $itemOrderModel
+        ->select('
+            item_order.*,
+            items.name AS item_name,
+            minor_category.name AS minor_category_name,
+            major_category.name AS major_category_name,
+            room.code AS room_code,
+            usage_status.usage_status AS usage_status_name,
+            creator.name AS created_by_name
+        ')
+        ->join('items', 'items.id = item_order.item_id', 'left')
+        ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+        ->join('room', 'room.id = item_order.room_id', 'left')
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+        ->join('employee as creator', 'creator.emp_id = item_order.created_by', 'left')
+        ->where('item_order.order_id', $id)
+        ->findAll();
+
+    $itemCount = count($items);
+
+    return view('show_order', [
+        'order' => $order,
+        'items' => $items,
+        'item_count' => $itemCount
+    ]);
+}
+
 }
