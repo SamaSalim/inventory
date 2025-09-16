@@ -25,9 +25,7 @@ public function index()
 {
     $itemOrderModel = new \App\Models\ItemOrderModel();
 
-
     $itemOrders = $itemOrderModel
-        ->distinct()
         ->select(
             'item_order.order_id, 
              item_order.created_at, 
@@ -39,30 +37,29 @@ public function index()
         )
         ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
         ->join('room', 'room.id = item_order.room_id', 'left')
-        ->groupBy('item_order.order_id') // Prevent duplicate rows
         ->orderBy('item_order.created_at', 'DESC')
-        ->findAll();
+        ->paginate(5, 'orders');
 
-    // Other data
-    $minorCategoryModel = new \App\Models\MinorCategoryModel();
-    $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
+    $pager = \Config\Services::pager();
+    $pager->setPath(site_url('warehouse/index'));
+
+
+    $categories = (new \App\Models\MinorCategoryModel())
+        ->select('minor_category.*, major_category.name AS major_category_name')
         ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
         ->findAll();
 
     $stats = $this->getWarehouseStats();
-
-    $orderStatusModel = new \App\Models\OrderStatusModel();
-    $statuses = $orderStatusModel->findAll();
-
-    $usageStatusModel = new \App\Models\UsageStatusModel();
-    $usageStatuses = $usageStatusModel->findAll();
+    $statuses = (new \App\Models\OrderStatusModel())->findAll();
+    $usageStatuses = (new \App\Models\UsageStatusModel())->findAll();
 
     return view('warehouseView', [
+        'orders' => $itemOrders,
         'categories' => $categories,
-        'orders' => $itemOrders, 
         'stats' => $stats,
         'statuses' => $statuses,
         'usage_statuses' => $usageStatuses,
+        'pager' => $pager,
     ]);
 }
 

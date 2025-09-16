@@ -8,6 +8,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="<?= base_url('public/assets/css/pagination_style.css') ?>">
+
     <style>
         * {
             font-family: 'Cairo', sans-serif;
@@ -110,7 +113,7 @@
 
         .content-area {
             padding: 25px;
-            background-color: #EFF8FA;
+            background-color: #f1f7f8ff;
             min-height: calc(100vh - 70px);
         }
 
@@ -1017,6 +1020,10 @@
             <?php endif; ?>
         </tbody>
     </table>
+</div>
+
+<div class="d-flex justify-content-end mt-3">
+    <?= $pager->links('orders', 'custom_arabic') ?>
 </div>
 
 
