@@ -90,6 +90,7 @@ body {
 
 .form-group {
   margin-bottom: 1.5rem;
+
 }
 
 .form-label {
@@ -97,6 +98,10 @@ body {
   font-weight: 500;
   margin-bottom: 0.5rem;
   display: block;
+  text-align: right;
+  /* لضبط النص إلى اليمين */
+  direction: rtl;
+  /* لتوجيه النص من اليمين لليسار */
 }
 
 .form-control {
@@ -105,6 +110,7 @@ body {
   padding: 0.8rem 1rem;
   font-size: 1rem;
   transition: border-color 0.3s ease;
+  text-align: right;
 }
 
 .form-control:focus {
@@ -176,6 +182,7 @@ body {
   .login-form-container {
     padding: 2rem;
   }
+
   .logo img {
     max-width: 100%;
     max-height: 100%;

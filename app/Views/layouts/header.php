@@ -14,21 +14,26 @@
 
     <!-- إدارة المستودعات: فقط للـ admin أو موظف المستودع -->
     <?php if ($role === 'admin' || $role === 'warehouse'): ?>
-      <div class="sidebar-icon" onclick="location.href='<?= base_url('warehouse/dashboard') ?>'" title="إدارة المستودعات">
+      <div class="sidebar-icon" onclick="location.href='<?= base_url('inventoryController/index') ?>'" title="إدارة المستودعات">
          🗂️
       </div>
    <?php endif; ?>
 
    <!-- إدارة العهد: فقط للـ admin أو موظف العهد -->
    <?php if ($role === 'admin' || $role === 'assets'): ?>
-      <div class="sidebar-icon" onclick="location.href='<?= base_url('assets/dashboard') ?>'" title="إدارة العهد">
+      <div class="sidebar-icon" onclick="location.href='<?= base_url('AssetsController/dashboard') ?>'" title="إدارة العهد">
          📋
       </div>
    <?php endif; ?>
-    
+      <!-- الموظفين العاديين : فقط للـ admin أو موظف العهد -->
+       <?php if ($role === 'admin' || $role === 'user'): ?>
+      <div class="sidebar-icon" onclick="location.href='<?= base_url('UserController/dashboard') ?>'" title=" الموظفين العاديين">
+         👤
+      </div>
+   <?php endif; ?>
    <!-- الادمن  -->
     <?php if ($role === 'admin'): ?>
-      <div class="sidebar-icon" onclick="location.href='<?= base_url('admin/dashboard') ?>'" title="لوحة التحكم">
+      <div class="sidebar-icon" onclick="location.href='<?= base_url('AdminController/dashboard') ?>'" title="لوحة التحكم">
          👨‍💼
       </div>
    <?php endif; ?>
