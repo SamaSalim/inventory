@@ -11,7 +11,7 @@ class HistoryModel extends Model
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = History::class;
-    protected $allowedFields = ['item_order_id'];
+    protected $allowedFields = ['item_order_id', 'action'];
 
 
 
@@ -21,13 +21,17 @@ class HistoryModel extends Model
 
     // Validation
     protected $validationRules = [
-        'item_order_id' => 'required|integer|is_not_unique[item_order.item_order_id]'
+        'item_order_id' => 'required|integer|is_not_unique[item_order.item_order_id]',
+        'action' => 'permit_empty|max_length[255]'
     ];
     protected $validationMessages = [
         'item_order_id' => [
             'required' => 'رقم طلب الصنف مطلوب',
             'integer' => 'رقم طلب الصنف يجب أن يكون رقم صحيح',
             'is_not_unique' => 'رقم طلب الصنف المحدد غير موجود'
-        ]
+        ],
+        'action' => [
+        'max_length' => 'الإجراء المدخل لا يمكن أن يزيد عن 255 حرف'
+    ],
     ];
 }

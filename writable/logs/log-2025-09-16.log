@@ -1,0 +1,1027 @@
+DEBUG - 2025-09-16 01:16:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 01:17:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 01:17:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 01:17:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 01:17:16 --> ErrorException: Undefined variable $title
+[Method: GET, Route: InventoryController/editOrder/5]
+in APPPATH\Views\edit_order_form.php on line 6.
+ 1 APPPATH\Views\edit_order_form.php(6): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $title', 'C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php', 6)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(367): view('edit_order_form', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('5')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-16 01:18:27 --> ErrorException: Undefined variable $title
+[Method: GET, Route: InventoryController/editOrder/5]
+in APPPATH\Views\edit_order_form.php on line 7.
+ 1 APPPATH\Views\edit_order_form.php(7): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $title', 'C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php', 7)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(367): view('edit_order_form', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('5')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 01:18:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 01:18:31 --> ErrorException: Undefined variable $title
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 7.
+ 1 APPPATH\Views\edit_order_form.php(7): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $title', 'C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php', 7)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(367): view('edit_order_form', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-16 01:19:45 --> Error: Cannot use object of type App\Entities\Order as array
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 20.
+ 1 SYSTEMPATH\View\View.php(224): include()
+ 2 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 3 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 4 APPPATH\Controllers\InventoryController.php(366): view('edit_order_form', [...])
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-16 01:19:46 --> Error: Cannot use object of type App\Entities\Order as array
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 20.
+ 1 SYSTEMPATH\View\View.php(224): include()
+ 2 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 3 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 4 APPPATH\Controllers\InventoryController.php(366): view('edit_order_form', [...])
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-16 01:21:31 --> Error: Cannot use object of type App\Entities\Order as array
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 21.
+ 1 SYSTEMPATH\View\View.php(224): include()
+ 2 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 3 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 4 APPPATH\Controllers\InventoryController.php(366): view('edit_order_form', [...])
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-16 01:22:40 --> ErrorException: Undefined variable $buildings
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 82.
+ 1 APPPATH\Views\edit_order_form.php(82): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $buildings', 'C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php', 82)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(366): view('edit_order_form', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-16 01:26:27 --> Error: Cannot use object of type App\Entities\Building as array
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 83.
+ 1 SYSTEMPATH\View\View.php(224): include()
+ 2 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 3 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 4 APPPATH\Controllers\InventoryController.php(389): view('edit_order_form', [...])
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-16 01:26:29 --> Error: Cannot use object of type App\Entities\Building as array
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 83.
+ 1 SYSTEMPATH\View\View.php(224): include()
+ 2 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 3 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 4 APPPATH\Controllers\InventoryController.php(389): view('edit_order_form', [...])
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-16 01:28:26 --> Error: Cannot use object of type App\Entities\Floor as array
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 95.
+ 1 SYSTEMPATH\View\View.php(224): include()
+ 2 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 3 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 4 APPPATH\Controllers\InventoryController.php(389): view('edit_order_form', [...])
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-16 01:31:40 --> Error: Cannot use object of type App\Entities\Building as array
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 126.
+ 1 SYSTEMPATH\View\View.php(224): include()
+ 2 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 3 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 4 APPPATH\Controllers\InventoryController.php(389): view('edit_order_form', [...])
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-16 01:34:31 --> Error: Cannot use object of type App\Entities\ItemOrder as array
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 173.
+ 1 SYSTEMPATH\View\View.php(224): include()
+ 2 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 3 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 4 APPPATH\Controllers\InventoryController.php(389): view('edit_order_form', [...])
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-16 01:35:44 --> Error: Cannot use object of type App\Entities\ItemOrder as array
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 194.
+ 1 SYSTEMPATH\View\View.php(224): include()
+ 2 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 3 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 4 APPPATH\Controllers\InventoryController.php(389): view('edit_order_form', [...])
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-16 01:38:00 --> Error: Cannot use object of type App\Entities\ItemOrder as array
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 243.
+ 1 SYSTEMPATH\View\View.php(224): include()
+ 2 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 3 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 4 APPPATH\Controllers\InventoryController.php(389): view('edit_order_form', [...])
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 01:50:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 01:50:18 --> ErrorException: Attempt to read property "emp_id" on null
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 429.
+ 1 APPPATH\Views\edit_order_form.php(429): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Attempt to read property "emp_id" on null', 'C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php', 429)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(389): view('edit_order_form', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 01:51:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 01:51:58 --> ErrorException: Attempt to read property "emp_id" on null
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 436.
+ 1 APPPATH\Views\edit_order_form.php(436): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Attempt to read property "emp_id" on null', 'C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php', 436)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(389): view('edit_order_form', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 01:51:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 01:51:59 --> ErrorException: Attempt to read property "emp_id" on null
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 436.
+ 1 APPPATH\Views\edit_order_form.php(436): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Attempt to read property "emp_id" on null', 'C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php', 436)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(389): view('edit_order_form', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 01:52:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 01:52:05 --> ErrorException: Attempt to read property "emp_id" on null
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 436.
+ 1 APPPATH\Views\edit_order_form.php(436): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Attempt to read property "emp_id" on null', 'C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php', 436)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(389): view('edit_order_form', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 01:52:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 01:52:41 --> ErrorException: Attempt to read property "emp_id" on null
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 433.
+ 1 APPPATH\Views\edit_order_form.php(433): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Attempt to read property "emp_id" on null', 'C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php', 433)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(389): view('edit_order_form', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 01:52:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 01:52:45 --> ErrorException: Attempt to read property "emp_id" on null
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 433.
+ 1 APPPATH\Views\edit_order_form.php(433): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Attempt to read property "emp_id" on null', 'C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php', 433)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(389): view('edit_order_form', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 01:53:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 01:53:27 --> ErrorException: Attempt to read property "emp_id" on null
+[Method: GET, Route: InventoryController/editOrder/4]
+in APPPATH\Views\edit_order_form.php on line 436.
+ 1 APPPATH\Views\edit_order_form.php(436): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Attempt to read property "emp_id" on null', 'C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php', 436)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(389): view('edit_order_form', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('4')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 01:53:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 01:54:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 01:54:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 01:56:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 01:56:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 01:56:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 01:58:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 01:58:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:01:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:01:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:01:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:05:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:05:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:11:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:11:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:12:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:24:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:24:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 02:24:21 --> فشل في تحديث العنصر ID: 2
+DEBUG - 2025-09-16 02:27:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:27:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:27:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:28:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 02:30:18 --> فشل في تحديث العنصر ID: 8
+DEBUG - 2025-09-16 02:30:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:32:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:32:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:32:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:33:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:35:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:35:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:35:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:37:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:38:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:38:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:39:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:40:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 02:40:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:16:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:16:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:17:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:17:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:18:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:18:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:20:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:20:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:20:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:30:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:30:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:30:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:39:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:39:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:39:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:39:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:40:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:40:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:40:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:40:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:41:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:41:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:41:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:41:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:42:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:45:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:45:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:46:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:46:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:47:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:47:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:50:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:50:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 03:51:10 --> TypeError: json_decode(): Argument #1 ($json) must be of type string, array given
+[Method: POST, Route: InventoryController/updateOrder/4]
+in APPPATH\Controllers\InventoryController.php on line 508.
+ 1 APPPATH\Controllers\InventoryController.php(508): json_decode([...], true)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->updateOrder('4')
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 03:53:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:53:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:55:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:55:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 03:56:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 04:00:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:30:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:31:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:31:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:32:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:33:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:34:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:35:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:37:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:43:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 05:43:20 --> Error: Cannot use object of type App\Entities\Order as array
+[Method: GET, Route: InventoryController/editOrder/7]
+in APPPATH\Controllers\InventoryController.php on line 418.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('7')
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-16 05:48:05 --> Error: Cannot use object of type App\Entities\ItemOrder as array
+[Method: GET, Route: InventoryController/editOrder/7]
+in APPPATH\Controllers\InventoryController.php on line 429.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('7')
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-09-16 05:50:01 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 05:50:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:50:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 05:50:06 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 05:50:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:50:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 05:50:08 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 05:50:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:50:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 05:50:12 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 05:50:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:50:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 05:50:15 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 05:50:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:50:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 05:50:27 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 05:50:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:50:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 05:50:30 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 05:50:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:50:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:52:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 05:52:26 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 05:52:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:52:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:59:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 05:59:18 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 05:59:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 05:59:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:02:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 06:02:43 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 06:02:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:02:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 06:02:45 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 06:02:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:02:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 06:02:49 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 06:02:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:02:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 06:03:01 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 06:03:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:03:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 06:03:05 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 06:03:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:03:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:04:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 06:04:46 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 06:04:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:04:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 06:04:48 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 06:04:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:04:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 06:05:34 --> Error in editOrder: Attempt to read property "building_id" on array
+DEBUG - 2025-09-16 06:05:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:05:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:07:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 06:07:04 --> ErrorException: Undefined variable $title
+[Method: GET, Route: InventoryController/editOrder/7]
+in APPPATH\Views\edit_order_form.php on line 6.
+ 1 APPPATH\Views\edit_order_form.php(6): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $title', 'C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php', 6)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(367): view('edit_order_form', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('7')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-16 06:07:55 --> ErrorException: Undefined variable $title
+[Method: GET, Route: InventoryController/editOrder/7]
+in APPPATH\Views\edit_order_form.php on line 7.
+ 1 APPPATH\Views\edit_order_form.php(7): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $title', 'C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php', 7)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory3\\app\\Views\\edit_order_form.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('edit_order_form', [], true)
+ 5 APPPATH\Controllers\InventoryController.php(367): view('edit_order_form', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->editOrder('7')
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 06:09:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:09:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:09:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:11:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:11:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:18:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:18:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:19:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:19:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:19:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:20:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:20:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:20:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:20:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:21:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:21:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:21:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:22:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:23:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:23:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:28:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:28:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:29:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:29:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:32:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:32:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:40:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:40:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:41:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:41:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:43:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:44:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 06:45:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 07:08:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-16 07:08:35 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Database\MySQLi\Connection.php:201
+Stack trace:
+#0 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Database\MySQLi\Connection.php(201): mysqli->real_connect('localhost', 'root', Object(SensitiveParameterValue), 'finaldb', 3309, '', 0)
+#1 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Database\BaseConnection.php(620): CodeIgniter\Database\BaseConnection->initialize()
+#3 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\BaseModel.php(717): CodeIgniter\Model->doFirst()
+#6 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\app\Controllers\login.php(25): CodeIgniter\BaseModel->first()
+#7 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\CodeIgniter.php(933): App\Controllers\login->login()
+#8 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\login))
+#9 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Database\MySQLi\Connection.php:246
+Stack trace:
+#0 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Database\BaseConnection.php(620): CodeIgniter\Database\BaseConnection->initialize()
+#2 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+#4 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\BaseModel.php(717): CodeIgniter\Model->doFirst()
+#5 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\app\Controllers\login.php(25): CodeIgniter\BaseModel->first()
+#6 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\CodeIgniter.php(933): App\Controllers\login->login()
+#7 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\login))
+#8 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#10 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\Users\by-u\OneDrive\Desktop\cl_ws\htdocs\inventory3\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 {main}
+CRITICAL - 2025-09-16 07:08:35 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+[Method: POST, Route: login/login]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(620): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `employee`
+WHERE `emp_id` = :emp_id:
+ LIMIT 1', [...], false)
+ 3 SYSTEMPATH\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(717): CodeIgniter\Model->doFirst()
+ 5 APPPATH\Controllers\login.php(25): CodeIgniter\BaseModel->first()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\login->login()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\login))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 07:09:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 07:09:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 07:09:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 07:10:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 07:10:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 07:33:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 07:33:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 07:34:22 --> UpdateOrder - Post Data: {"from_employee_id":"33","order_id":"16","to_employee_id":"EMP002","receiver_name":"\u0641\u0627\u0637\u0645\u0629 \u0639\u0644\u064a \u062d\u0633\u0646","email":"fatima.ali@company.com","transfer_number":"1002","building":"3","floor":"9","section":"9","room":"13","existing_item_order_id":["19","20"],"existing_asset_num":["98765432345678","\u00e0\u00e7_\u00e8-('"],"existing_serial_num":["&\u00e9\"'(-\u00e8_\u00e7","456789876543\u00e7"],"existing_brand":["\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","\u063a\u064a\u0631 \u0645\u062d\u062f\u062f"],"existing_model_num":["",""],"existing_notes":["\u0624\u0624\u0624","\u0644\u0627\u0644\u0627"],"new_item":"","new_asset_num":"","new_serial_num":"","new_brand":"","new_model_num":"","new_item_notes":"","notes":"\u0644\u0627\u0644\u0627\u0644\u0627\u0644\u0627ghhhh","existing_items_data":"[{\"id\":\"19\",\"asset_num\":\"98765432345678\",\"serial_num\":\"&\u00e9\\\"'(-\u00e8_\u00e7\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0624\u0624\u0624\"},{\"id\":\"20\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\",\"serial_num\":\"456789876543\u00e7\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0644\u0627\u0644\u0627\"}]"}
+INFO - 2025-09-16 07:34:22 --> Order update result: success
+INFO - 2025-09-16 07:34:22 --> Existing items data: [{"id":"19","asset_num":"98765432345678","serial_num":"&\u00e9\"'(-\u00e8_\u00e7","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0624\u0624\u0624"},{"id":"20","asset_num":"\u00e0\u00e7_\u00e8-('","serial_num":"456789876543\u00e7","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0644\u0627\u0644\u0627"}]
+INFO - 2025-09-16 07:34:36 --> UpdateOrder - Post Data: {"from_employee_id":"33","order_id":"16","to_employee_id":"EMP002","receiver_name":"\u0641\u0627\u0637\u0645\u0629 \u0639\u0644\u064a \u062d\u0633\u0646","email":"fatima.ali@company.com","transfer_number":"1002","building":"3","floor":"9","section":"9","room":"13","existing_item_order_id":["19","20"],"existing_asset_num":["98765432345678","\u00e0\u00e7_\u00e8-('"],"existing_serial_num":["23456789098765","456789876543\u00e7"],"existing_brand":["\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","\u063a\u064a\u0631 \u0645\u062d\u062f\u062f"],"existing_model_num":["",""],"existing_notes":["\u0624\u0624\u0624","\u0644\u0627\u0644\u0627"],"new_item":"","new_asset_num":"","new_serial_num":"","new_brand":"","new_model_num":"","new_item_notes":"","notes":"\u0644\u0627\u0644\u0627\u0644\u0627\u0644\u0627ghhhh","existing_items_data":"[{\"id\":\"19\",\"asset_num\":\"98765432345678\",\"serial_num\":\"23456789098765\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0624\u0624\u0624\"},{\"id\":\"20\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\",\"serial_num\":\"456789876543\u00e7\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0644\u0627\u0644\u0627\"}]"}
+INFO - 2025-09-16 07:34:36 --> Order update result: success
+INFO - 2025-09-16 07:34:36 --> Existing items data: [{"id":"19","asset_num":"98765432345678","serial_num":"23456789098765","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0624\u0624\u0624"},{"id":"20","asset_num":"\u00e0\u00e7_\u00e8-('","serial_num":"456789876543\u00e7","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0644\u0627\u0644\u0627"}]
+INFO - 2025-09-16 07:41:54 --> UpdateOrder - Post Data: {"from_employee_id":"33","order_id":"16","to_employee_id":"EMP002","receiver_name":"\u0641\u0627\u0637\u0645\u0629 \u0639\u0644\u064a \u062d\u0633\u0646","email":"fatima.ali@company.com","transfer_number":"1002","building":"3","floor":"9","section":"9","room":"13","existing_item_order_id":["19","20"],"existing_asset_num":["98765432345678","\u00e0\u00e7_\u00e8-('"],"existing_serial_num":["23456789098765","456789876543\u00e7"],"existing_brand":["\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","\u063a\u064a\u0631 \u0645\u062d\u062f\u062f"],"existing_model_num":["",""],"existing_notes":["\u0624\u0624\u0624","\u0644\u0627\u0644\u0627"],"new_item":"","new_asset_num":"","new_serial_num":"","new_brand":"","new_model_num":"","new_item_notes":"","notes":"\u0644\u0627\u0644\u0627\u0644\u0627\u0644\u0627ghhhh","existing_items_data":"[{\"id\":\"19\",\"asset_num\":\"98765432345678\",\"serial_num\":\"23456789098765\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0624\u0624\u0624\"},{\"id\":\"20\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\",\"serial_num\":\"456789876543\u00e7\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0644\u0627\u0644\u0627\"}]"}
+INFO - 2025-09-16 07:41:54 --> Order update result: success
+INFO - 2025-09-16 07:41:54 --> Existing items data: [{"id":"19","asset_num":"98765432345678","serial_num":"23456789098765","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0624\u0624\u0624"},{"id":"20","asset_num":"\u00e0\u00e7_\u00e8-('","serial_num":"456789876543\u00e7","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0644\u0627\u0644\u0627"}]
+DEBUG - 2025-09-16 07:41:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 07:42:24 --> UpdateOrder - Post Data: {"from_employee_id":"33","order_id":"16","to_employee_id":"EMP002","receiver_name":"\u0641\u0627\u0637\u0645\u0629 \u0639\u0644\u064a \u062d\u0633\u0646","email":"fatima.ali@company.com","transfer_number":"1002","building":"3","floor":"9","section":"9","room":"13","existing_item_order_id":["",""],"existing_asset_num":["\u00e0\u00e7_\u00e8-('\"\u00e9&34567","\u00e0\u00e7_\u00e8-('9876"],"existing_serial_num":["&\u00e9\"'(-\u00e8_\u00e7987654","\u00e9\"'(-\u00e7e567987"],"existing_brand":["\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","\u063a\u064a\u0631 \u0645\u062d\u062f\u062f"],"existing_model_num":["",""],"existing_notes":["\u0624\u0624\u0624","\u0644\u0627\u0644\u0627"],"new_item":"","new_asset_num":"","new_serial_num":"","new_brand":"","new_model_num":"","new_item_notes":"","notes":"\u0644\u0627\u0644\u0627\u0644\u0627\u0644\u0627ghhhh","existing_items_data":"[{\"id\":\"\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9&34567\",\"serial_num\":\"&\u00e9\\\"'(-\u00e8_\u00e7987654\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0624\u0624\u0624\"},{\"id\":\"\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('9876\",\"serial_num\":\"\u00e9\\\"'(-\u00e7e567987\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0644\u0627\u0644\u0627\"}]"}
+INFO - 2025-09-16 07:42:24 --> Order update result: success
+INFO - 2025-09-16 07:42:24 --> Existing items data: [{"id":"","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9&34567","serial_num":"&\u00e9\"'(-\u00e8_\u00e7987654","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0624\u0624\u0624"},{"id":"","asset_num":"\u00e0\u00e7_\u00e8-('9876","serial_num":"\u00e9\"'(-\u00e7e567987","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0644\u0627\u0644\u0627"}]
+INFO - 2025-09-16 07:43:39 --> === DEBUG ORDER ITEMS ===
+INFO - 2025-09-16 07:43:39 --> عدد العناصر: 2
+INFO - 2025-09-16 07:43:39 --> بنية العنصر الأول: {"item_order_id":"19","order_id":"16","item_id":"4","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","quantity":"1","model_num":"","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9&","serial_num":"&\u00e9\"'(-\u00e8_\u00e7","old_asset_num":null,"room_id":"13","assets_type":"\u0639\u0647\u062f\u0629 \u0639\u0627\u0645\u0629","created_by":"33","usage_status_id":"1","note":"\u0624\u0624\u0624","created_at":{"date":"2025-09-14 21:50:31.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-14 21:50:31.000000","timezone_type":3,"timezone":"UTC"},"item_name":"\u0644\u0627\u0628\u062a\u0648\u0628 HP EliteBook 840"}
+INFO - 2025-09-16 07:43:39 --> خصائص العنصر المتاحة: 
+INFO - 2025-09-16 07:43:39 --> ========================
+DEBUG - 2025-09-16 07:43:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 07:43:57 --> UpdateOrder - Post Data: {"from_employee_id":"33","order_id":"16","to_employee_id":"EMP002","receiver_name":"\u0641\u0627\u0637\u0645\u0629 \u0639\u0644\u064a \u062d\u0633\u0646","email":"fatima.ali@company.com","transfer_number":"1002","building":"3","floor":"9","section":"9","room":"13","existing_item_order_id":["",""],"existing_asset_num":["\u00e0\u00e7_\u00e8-('\"\u00e9&987","\u00e0\u00e7_\u00e8-('9876"],"existing_serial_num":["&\u00e9\"'(-\u00e8_\u00e7345","\u00e9\"'(-\u00e7w567"],"existing_brand":["\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","\u063a\u064a\u0631 \u0645\u062d\u062f\u062f"],"existing_model_num":["",""],"existing_notes":["\u0624\u0624\u0624","\u0644\u0627\u0644\u0627"],"new_item":"","new_asset_num":"","new_serial_num":"","new_brand":"","new_model_num":"","new_item_notes":"","notes":"\u0644\u0627\u0644\u0627\u0644\u0627\u0644\u0627ghhhh","existing_items_data":"[{\"id\":\"\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9&987\",\"serial_num\":\"&\u00e9\\\"'(-\u00e8_\u00e7345\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0624\u0624\u0624\"},{\"id\":\"\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('9876\",\"serial_num\":\"\u00e9\\\"'(-\u00e7w567\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0644\u0627\u0644\u0627\"}]"}
+INFO - 2025-09-16 07:43:57 --> Order update result: success
+INFO - 2025-09-16 07:43:57 --> Existing items data: [{"id":"","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9&987","serial_num":"&\u00e9\"'(-\u00e8_\u00e7345","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0624\u0624\u0624"},{"id":"","asset_num":"\u00e0\u00e7_\u00e8-('9876","serial_num":"\u00e9\"'(-\u00e7w567","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0644\u0627\u0644\u0627"}]
+INFO - 2025-09-16 07:44:29 --> UpdateOrder - Post Data: {"from_employee_id":"33","order_id":"16","to_employee_id":"EMP002","receiver_name":"\u0641\u0627\u0637\u0645\u0629 \u0639\u0644\u064a \u062d\u0633\u0646","email":"fatima.ali@company.com","transfer_number":"1002","building":"3","floor":"9","section":"9","room":"13","existing_item_order_id":["",""],"existing_asset_num":["\u00e0\u00e7_\u00e8-('\"\u00e9&987","\u00e0\u00e7_\u00e8-('9876"],"existing_serial_num":["&\u00e9\"'(-\u00e8_\u00e7345","\u00e9\"'(-\u00e7w567"],"existing_brand":["\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","\u063a\u064a\u0631 \u0645\u062d\u062f\u062f"],"existing_model_num":["",""],"existing_notes":["\u0624\u0624\u0624","\u0644\u0627\u0644\u0627"],"new_item":"","new_asset_num":"","new_serial_num":"","new_brand":"","new_model_num":"","new_item_notes":"","notes":"\u0644\u0627\u0644\u0627\u0644\u0627\u0644\u0627ghhhh","existing_items_data":"[{\"id\":\"\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9&987\",\"serial_num\":\"&\u00e9\\\"'(-\u00e8_\u00e7345\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0624\u0624\u0624\"},{\"id\":\"\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('9876\",\"serial_num\":\"\u00e9\\\"'(-\u00e7w567\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0644\u0627\u0644\u0627\"}]"}
+INFO - 2025-09-16 07:44:29 --> Order update result: success
+INFO - 2025-09-16 07:44:29 --> Existing items data: [{"id":"","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9&987","serial_num":"&\u00e9\"'(-\u00e8_\u00e7345","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0624\u0624\u0624"},{"id":"","asset_num":"\u00e0\u00e7_\u00e8-('9876","serial_num":"\u00e9\"'(-\u00e7w567","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0644\u0627\u0644\u0627"}]
+INFO - 2025-09-16 07:49:47 --> === DEBUG ORDER ITEMS ===
+INFO - 2025-09-16 07:49:47 --> عدد العناصر: 2
+INFO - 2025-09-16 07:49:47 --> بنية العنصر الأول: {"item_order_id":"19","order_id":"16","item_id":"4","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","quantity":"1","model_num":"","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9&","serial_num":"&\u00e9\"'(-\u00e8_\u00e7","old_asset_num":null,"room_id":"13","assets_type":"\u0639\u0647\u062f\u0629 \u0639\u0627\u0645\u0629","created_by":"33","usage_status_id":"1","note":"\u0624\u0624\u0624","created_at":{"date":"2025-09-14 21:50:31.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-14 21:50:31.000000","timezone_type":3,"timezone":"UTC"},"item_name":"\u0644\u0627\u0628\u062a\u0648\u0628 HP EliteBook 840"}
+INFO - 2025-09-16 07:49:47 --> خصائص العنصر المتاحة: 
+INFO - 2025-09-16 07:49:47 --> ========================
+DEBUG - 2025-09-16 07:49:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 08:00:09 --> ParseError: syntax error, unexpected token "const"
+[Method: GET, Route: InventoryController/editOrder/16]
+in APPPATH\Controllers\InventoryController.php on line 529.
+ 1 SYSTEMPATH\Router\Router.php(567): CodeIgniter\Router\AutoRouter->getRoute('InventoryController/editOrder/16', 'GET')
+ 2 SYSTEMPATH\Router\Router.php(231): CodeIgniter\Router\Router->autoRoute('InventoryController/editOrder/16')
+ 3 SYSTEMPATH\CodeIgniter.php(832): CodeIgniter\Router\Router->handle('InventoryController/editOrder/16')
+ 4 SYSTEMPATH\CodeIgniter.php(455): CodeIgniter\CodeIgniter->tryToRouteIt(Object(CodeIgniter\Router\RouteCollection))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-16 08:01:29 --> === DEBUG ORDER ITEMS DETAILED ===
+INFO - 2025-09-16 08:01:29 --> عدد العناصر: 2
+INFO - 2025-09-16 08:01:29 --> --- العنصر رقم 0 ---
+INFO - 2025-09-16 08:01:29 --> خاصية:  * datamap = array (
+)
+INFO - 2025-09-16 08:01:29 --> خاصية:  * dates = array (
+  0 => 'created_at',
+  1 => 'updated_at',
+  2 => 'deleted_at',
+)
+INFO - 2025-09-16 08:01:29 --> خاصية:  * casts = array (
+)
+INFO - 2025-09-16 08:01:29 --> خاصية:  * castHandlers = array (
+)
+INFO - 2025-09-16 08:01:29 --> خاصية:  CodeIgniter\Entity\Entity defaultCastHandlers = array (
+  'array' => 'CodeIgniter\\Entity\\Cast\\ArrayCast',
+  'bool' => 'CodeIgniter\\Entity\\Cast\\BooleanCast',
+  'boolean' => 'CodeIgniter\\Entity\\Cast\\BooleanCast',
+  'csv' => 'CodeIgniter\\Entity\\Cast\\CSVCast',
+  'datetime' => 'CodeIgniter\\Entity\\Cast\\DatetimeCast',
+  'double' => 'CodeIgniter\\Entity\\Cast\\FloatCast',
+  'float' => 'CodeIgniter\\Entity\\Cast\\FloatCast',
+  'int' => 'CodeIgniter\\Entity\\Cast\\IntegerCast',
+  'integer' => 'CodeIgniter\\Entity\\Cast\\IntegerCast',
+  'int-bool' => 'CodeIgniter\\Entity\\Cast\\IntBoolCast',
+  'json' => 'CodeIgniter\\Entity\\Cast\\JsonCast',
+  'object' => 'CodeIgniter\\Entity\\Cast\\ObjectCast',
+  'string' => 'CodeIgniter\\Entity\\Cast\\StringCast',
+  'timestamp' => 'CodeIgniter\\Entity\\Cast\\TimestampCast',
+  'uri' => 'CodeIgniter\\Entity\\Cast\\URICast',
+)
+INFO - 2025-09-16 08:01:29 --> خاصية:  * attributes = array (
+  'item_order_id' => '19',
+  'order_id' => '16',
+  'item_id' => '4',
+  'brand' => 'غير محدد',
+  'quantity' => '1',
+  'model_num' => '',
+  'asset_num' => 'àç_è-(\'"é&',
+  'serial_num' => '&é"\'(-è_ç',
+  'old_asset_num' => NULL,
+  'room_id' => '13',
+  'assets_type' => 'عهدة عامة',
+  'created_by' => '33',
+  'usage_status_id' => '1',
+  'note' => 'ؤؤؤ',
+  'created_at' => '2025-09-14 21:50:31',
+  'updated_at' => '2025-09-14 21:50:31',
+  'item_name' => 'لابتوب HP EliteBook 840',
+)
+INFO - 2025-09-16 08:01:29 --> خاصية:  * original = array (
+  'item_order_id' => '19',
+  'order_id' => '16',
+  'item_id' => '4',
+  'brand' => 'غير محدد',
+  'quantity' => '1',
+  'model_num' => '',
+  'asset_num' => 'àç_è-(\'"é&',
+  'serial_num' => '&é"\'(-è_ç',
+  'old_asset_num' => NULL,
+  'room_id' => '13',
+  'assets_type' => 'عهدة عامة',
+  'created_by' => '33',
+  'usage_status_id' => '1',
+  'note' => 'ؤؤؤ',
+  'created_at' => '2025-09-14 21:50:31',
+  'updated_at' => '2025-09-14 21:50:31',
+  'item_name' => 'لابتوب HP EliteBook 840',
+)
+INFO - 2025-09-16 08:01:29 --> خاصية:  * dataCaster = \CodeIgniter\DataCaster\DataCaster::__set_state(array(
+   'types' => 
+  array (
+  ),
+   'castHandlers' => 
+  array (
+    'array' => 'CodeIgniter\\Entity\\Cast\\ArrayCast',
+    'bool' => 'CodeIgniter\\Entity\\Cast\\BooleanCast',
+    'boolean' => 'CodeIgniter\\Entity\\Cast\\BooleanCast',
+    'csv' => 'CodeIgniter\\Entity\\Cast\\CSVCast',
+    'datetime' => 'CodeIgniter\\Entity\\Cast\\DatetimeCast',
+    'double' => 'CodeIgniter\\Entity\\Cast\\FloatCast',
+    'float' => 'CodeIgniter\\Entity\\Cast\\FloatCast',
+    'int' => 'CodeIgniter\\Entity\\Cast\\IntegerCast',
+    'integer' => 'CodeIgniter\\Entity\\Cast\\IntegerCast',
+    'int-bool' => 'CodeIgniter\\Entity\\Cast\\IntBoolCast',
+    'json' => 'CodeIgniter\\Entity\\Cast\\JsonCast',
+    'timestamp' => 'CodeIgniter\\Entity\\Cast\\TimestampCast',
+    'uri' => 'CodeIgniter\\Entity\\Cast\\URICast',
+    'object' => 'CodeIgniter\\Entity\\Cast\\ObjectCast',
+    'string' => 'CodeIgniter\\Entity\\Cast\\StringCast',
+  ),
+   'helper' => NULL,
+   'strict' => false,
+))
+INFO - 2025-09-16 08:01:29 --> خاصية:  CodeIgniter\Entity\Entity _cast = true
+INFO - 2025-09-16 08:01:29 --> --- نهاية العنصر ---
+INFO - 2025-09-16 08:01:29 --> --- العنصر رقم 1 ---
+INFO - 2025-09-16 08:01:29 --> خاصية:  * datamap = array (
+)
+INFO - 2025-09-16 08:01:29 --> خاصية:  * dates = array (
+  0 => 'created_at',
+  1 => 'updated_at',
+  2 => 'deleted_at',
+)
+INFO - 2025-09-16 08:01:29 --> خاصية:  * casts = array (
+)
+INFO - 2025-09-16 08:01:29 --> خاصية:  * castHandlers = array (
+)
+INFO - 2025-09-16 08:01:29 --> خاصية:  CodeIgniter\Entity\Entity defaultCastHandlers = array (
+  'array' => 'CodeIgniter\\Entity\\Cast\\ArrayCast',
+  'bool' => 'CodeIgniter\\Entity\\Cast\\BooleanCast',
+  'boolean' => 'CodeIgniter\\Entity\\Cast\\BooleanCast',
+  'csv' => 'CodeIgniter\\Entity\\Cast\\CSVCast',
+  'datetime' => 'CodeIgniter\\Entity\\Cast\\DatetimeCast',
+  'double' => 'CodeIgniter\\Entity\\Cast\\FloatCast',
+  'float' => 'CodeIgniter\\Entity\\Cast\\FloatCast',
+  'int' => 'CodeIgniter\\Entity\\Cast\\IntegerCast',
+  'integer' => 'CodeIgniter\\Entity\\Cast\\IntegerCast',
+  'int-bool' => 'CodeIgniter\\Entity\\Cast\\IntBoolCast',
+  'json' => 'CodeIgniter\\Entity\\Cast\\JsonCast',
+  'object' => 'CodeIgniter\\Entity\\Cast\\ObjectCast',
+  'string' => 'CodeIgniter\\Entity\\Cast\\StringCast',
+  'timestamp' => 'CodeIgniter\\Entity\\Cast\\TimestampCast',
+  'uri' => 'CodeIgniter\\Entity\\Cast\\URICast',
+)
+INFO - 2025-09-16 08:01:29 --> خاصية:  * attributes = array (
+  'item_order_id' => '20',
+  'order_id' => '16',
+  'item_id' => '8',
+  'brand' => 'غير محدد',
+  'quantity' => '1',
+  'model_num' => '',
+  'asset_num' => 'àç_è-(\'',
+  'serial_num' => 'é"\'(-ç',
+  'old_asset_num' => NULL,
+  'room_id' => '13',
+  'assets_type' => 'عهدة عامة',
+  'created_by' => '33',
+  'usage_status_id' => '1',
+  'note' => 'لالا',
+  'created_at' => '2025-09-14 21:50:31',
+  'updated_at' => '2025-09-14 21:50:31',
+  'item_name' => 'كرسي مكتبي قماش',
+)
+INFO - 2025-09-16 08:01:29 --> خاصية:  * original = array (
+  'item_order_id' => '20',
+  'order_id' => '16',
+  'item_id' => '8',
+  'brand' => 'غير محدد',
+  'quantity' => '1',
+  'model_num' => '',
+  'asset_num' => 'àç_è-(\'',
+  'serial_num' => 'é"\'(-ç',
+  'old_asset_num' => NULL,
+  'room_id' => '13',
+  'assets_type' => 'عهدة عامة',
+  'created_by' => '33',
+  'usage_status_id' => '1',
+  'note' => 'لالا',
+  'created_at' => '2025-09-14 21:50:31',
+  'updated_at' => '2025-09-14 21:50:31',
+  'item_name' => 'كرسي مكتبي قماش',
+)
+INFO - 2025-09-16 08:01:29 --> خاصية:  * dataCaster = \CodeIgniter\DataCaster\DataCaster::__set_state(array(
+   'types' => 
+  array (
+  ),
+   'castHandlers' => 
+  array (
+    'array' => 'CodeIgniter\\Entity\\Cast\\ArrayCast',
+    'bool' => 'CodeIgniter\\Entity\\Cast\\BooleanCast',
+    'boolean' => 'CodeIgniter\\Entity\\Cast\\BooleanCast',
+    'csv' => 'CodeIgniter\\Entity\\Cast\\CSVCast',
+    'datetime' => 'CodeIgniter\\Entity\\Cast\\DatetimeCast',
+    'double' => 'CodeIgniter\\Entity\\Cast\\FloatCast',
+    'float' => 'CodeIgniter\\Entity\\Cast\\FloatCast',
+    'int' => 'CodeIgniter\\Entity\\Cast\\IntegerCast',
+    'integer' => 'CodeIgniter\\Entity\\Cast\\IntegerCast',
+    'int-bool' => 'CodeIgniter\\Entity\\Cast\\IntBoolCast',
+    'json' => 'CodeIgniter\\Entity\\Cast\\JsonCast',
+    'timestamp' => 'CodeIgniter\\Entity\\Cast\\TimestampCast',
+    'uri' => 'CodeIgniter\\Entity\\Cast\\URICast',
+    'object' => 'CodeIgniter\\Entity\\Cast\\ObjectCast',
+    'string' => 'CodeIgniter\\Entity\\Cast\\StringCast',
+  ),
+   'helper' => NULL,
+   'strict' => false,
+))
+INFO - 2025-09-16 08:01:29 --> خاصية:  CodeIgniter\Entity\Entity _cast = true
+INFO - 2025-09-16 08:01:29 --> --- نهاية العنصر ---
+INFO - 2025-09-16 08:01:29 --> آخر استعلام: SELECT `item_order`.*, `items`.`name` as `item_name`
+FROM `item_order`
+JOIN `items` ON `items`.`id` = `item_order`.`item_id`
+WHERE `order_id` = '16'
+INFO - 2025-09-16 08:01:29 --> ========================
+DEBUG - 2025-09-16 08:01:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 08:01:48 --> UpdateOrder - Post Data: {"to_employee_id":"EMP001","room":"13","notes":"\u0644\u0627\u0644\u0627\u0644\u0627\u0644\u0627ghhhh","existing_items_data":"[{\"id\":\"19\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9&34567\",\"serial_num\":\"&\u00e9\\\"'(-\u00e8_\u00e7987654\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0624\u0624\u0624\"},{\"id\":\"20\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9&34567\",\"serial_num\":\"\u00e92345'(-\u00e7\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0644\u0627\u0644\u0627\"}]"}
+INFO - 2025-09-16 08:01:48 --> Order update result: success
+INFO - 2025-09-16 08:01:48 --> Existing items data: [{"id":"19","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9&34567","serial_num":"&\u00e9\"'(-\u00e8_\u00e7987654","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0624\u0624\u0624"},{"id":"20","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9&34567","serial_num":"\u00e92345'(-\u00e7","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0644\u0627\u0644\u0627"}]
+INFO - 2025-09-16 08:02:06 --> UpdateOrder - Post Data: {"to_employee_id":"EMP001","room":"13","notes":"\u0644\u0627\u0644\u0627\u0644\u0627\u0644\u0627ghhhh","existing_items_data":"[{\"id\":\"19\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9&34567\",\"serial_num\":\"&\u00e9\\\"'(-\u00e8_\u00e7987654\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0624\u0624\u0624\"},{\"id\":\"20\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9&34567\",\"serial_num\":\"\u00e92345'(-\u00e7\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0644\u0627\u0644\u0627\"}]"}
+INFO - 2025-09-16 08:02:06 --> Order update result: success
+INFO - 2025-09-16 08:02:06 --> Existing items data: [{"id":"19","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9&34567","serial_num":"&\u00e9\"'(-\u00e8_\u00e7987654","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0624\u0624\u0624"},{"id":"20","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9&34567","serial_num":"\u00e92345'(-\u00e7","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0644\u0627\u0644\u0627"}]
+DEBUG - 2025-09-16 08:21:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 08:21:50 --> UpdateOrder - Post Data: {"to_employee_id":"EMP002","room":"13","notes":"\u0644\u0627\u0644\u0627\u0644\u0627\u0644\u0627ghhhh","existing_items_data":"[{\"item_order_id\":\"19\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9&34567\",\"serial_num\":\"&\u00e9\\\"'(-\u00e8_\u00e7987654\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0624\u0624\u0624\"},{\"item_order_id\":\"20\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9&34567\",\"serial_num\":\"\u00e9\\\"'(-\u00e7\u00e8-(3456\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0644\u0627\u0644\u0627\"}]"}
+INFO - 2025-09-16 08:21:50 --> Order update result: success
+INFO - 2025-09-16 08:21:50 --> Existing items data: [{"item_order_id":"19","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9&34567","serial_num":"&\u00e9\"'(-\u00e8_\u00e7987654","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0624\u0624\u0624"},{"item_order_id":"20","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9&34567","serial_num":"\u00e9\"'(-\u00e7\u00e8-(3456","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0644\u0627\u0644\u0627"}]
+INFO - 2025-09-16 08:21:50 --> Item 19 update result: success
+INFO - 2025-09-16 08:22:10 --> UpdateOrder - Post Data: {"to_employee_id":"EMP002","room":"13","notes":"\u0644\u0627\u0644\u0627\u0644\u0627\u0644\u0627ghhhh","existing_items_data":"[{\"item_order_id\":\"19\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9&34567123\",\"serial_num\":\"&\u00e9\\\"'(-\u00e8_\u00e798765423123\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0624\u0624\u0624\"},{\"item_order_id\":\"20\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9&345671234\",\"serial_num\":\"\u00e9\\\"'(-\u00e7\u00e8-(34561234\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0644\u0627\u0644\u0627\"}]"}
+INFO - 2025-09-16 08:22:10 --> Order update result: success
+INFO - 2025-09-16 08:22:10 --> Existing items data: [{"item_order_id":"19","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9&34567123","serial_num":"&\u00e9\"'(-\u00e8_\u00e798765423123","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0624\u0624\u0624"},{"item_order_id":"20","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9&345671234","serial_num":"\u00e9\"'(-\u00e7\u00e8-(34561234","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0644\u0627\u0644\u0627"}]
+INFO - 2025-09-16 08:22:10 --> Item 19 update result: success
+INFO - 2025-09-16 08:22:10 --> Item 20 update result: success
+DEBUG - 2025-09-16 08:22:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 08:22:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 08:23:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 08:23:53 --> UpdateOrder - Post Data: {"to_employee_id":"EMP001","room":"13","notes":"\u0644\u0627\u0644\u0627\u0644\u0627\u0644\u0627ghhhh","existing_items_data":"[{\"item_order_id\":\"19\",\"asset_num\":\"sama1234567\",\"serial_num\":\"sama1234567\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0624\u0624\u0624\"},{\"item_order_id\":\"20\",\"asset_num\":\"sama1234567987\",\"serial_num\":\"sama12345678901\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0644\u0627\u0644\u0627\"}]"}
+INFO - 2025-09-16 08:23:53 --> Order update result: success
+INFO - 2025-09-16 08:23:53 --> Existing items data: [{"item_order_id":"19","asset_num":"sama1234567","serial_num":"sama1234567","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0624\u0624\u0624"},{"item_order_id":"20","asset_num":"sama1234567987","serial_num":"sama12345678901","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0644\u0627\u0644\u0627"}]
+INFO - 2025-09-16 08:23:53 --> Item 19 update result: success
+INFO - 2025-09-16 08:23:53 --> Item 20 update result: success
+DEBUG - 2025-09-16 08:23:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 08:27:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 08:29:12 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "show_order.php"
+[Method: GET, Route: InventoryController/showOrder/16]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(212): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('show_order.php')
+ 2 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('show_order', [], true)
+ 3 APPPATH\Controllers\InventoryController.php(829): view('show_order', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->showOrder('16')
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 08:30:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 08:33:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 08:35:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 08:45:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 08:45:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 08:46:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 08:57:21 --> ParseError: syntax error, unexpected token "public", expecting end of file
+[Method: GET, Route: InventoryController]
+in APPPATH\Controllers\InventoryController.php on line 835.
+ 1 SYSTEMPATH\Router\Router.php(567): CodeIgniter\Router\AutoRouter->getRoute('InventoryController', 'GET')
+ 2 SYSTEMPATH\Router\Router.php(231): CodeIgniter\Router\Router->autoRoute('InventoryController')
+ 3 SYSTEMPATH\CodeIgniter.php(832): CodeIgniter\Router\Router->handle('InventoryController')
+ 4 SYSTEMPATH\CodeIgniter.php(455): CodeIgniter\CodeIgniter->tryToRouteIt(Object(CodeIgniter\Router\RouteCollection))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 08:59:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 09:01:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 21:29:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-16 21:29:40 --> App\Exceptions\AuthenticationException: يجب تسجيل الدخول للوصول إلى هذه الصفحة
+[Method: GET, Route: InventoryController]
+in APPPATH\Controllers\InventoryController.php on line 57.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->index()
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-16 21:29:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 21:29:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 21:30:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 21:30:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:03:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 22:03:59 --> تم حذف الطلب 16 مع 2 عنصر بواسطة المستخدم 33
+DEBUG - 2025-09-16 22:04:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:05:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:05:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 22:05:18 --> تم حذف الطلب 15 مع 2 عنصر بواسطة المستخدم 33
+DEBUG - 2025-09-16 22:05:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:05:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:06:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:16:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:17:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:17:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:17:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:17:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 22:17:38 --> تم حذف العنصر كرسي مكتبي جلد (رقم الأصول: &é"'(-èç_è-('"'(-è) من الطلب 17 بواسطة المستخدم 33
+INFO - 2025-09-16 22:17:51 --> UpdateOrder - Post Data: {"to_employee_id":"EMP001","room":"6","notes":"\u0644\u0644","existing_items_data":"[{\"item_order_id\":\"21\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9\\\"'(\",\"serial_num\":\"\u00e7_\u00e8-('\\\"'(-\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0629\u0629\"}]"}
+INFO - 2025-09-16 22:17:51 --> Order update result: success
+INFO - 2025-09-16 22:17:51 --> Existing items data: [{"item_order_id":"21","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9\"'(","serial_num":"\u00e7_\u00e8-('\"'(-","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0629\u0629"}]
+INFO - 2025-09-16 22:17:51 --> Item 21 update result: failed
+INFO - 2025-09-16 22:18:11 --> UpdateOrder - Post Data: {"to_employee_id":"EMP001","room":"6","notes":"\u0644\u0644","existing_items_data":"[{\"item_order_id\":\"21\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9\\\"'(\",\"serial_num\":\"\u00e7_\u00e8-('\\\"'(-\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0629\u0629\"}]"}
+INFO - 2025-09-16 22:18:11 --> Order update result: success
+INFO - 2025-09-16 22:18:11 --> Existing items data: [{"item_order_id":"21","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9\"'(","serial_num":"\u00e7_\u00e8-('\"'(-","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0629\u0629"}]
+INFO - 2025-09-16 22:18:11 --> Item 21 update result: failed
+INFO - 2025-09-16 22:18:28 --> UpdateOrder - Post Data: {"to_employee_id":"EMP001","room":"6","notes":"\u0644\u0644","existing_items_data":"[{\"item_order_id\":\"21\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9\\\"'(\",\"serial_num\":\"\u00e7_\u00e8-('\\\"'(-\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0629\u0629\"}]"}
+INFO - 2025-09-16 22:18:28 --> Order update result: success
+INFO - 2025-09-16 22:18:28 --> Existing items data: [{"item_order_id":"21","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9\"'(","serial_num":"\u00e7_\u00e8-('\"'(-","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0629\u0629"}]
+INFO - 2025-09-16 22:18:28 --> Item 21 update result: failed
+DEBUG - 2025-09-16 22:18:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:19:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:19:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:19:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:19:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:19:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 22:20:16 --> UpdateOrder - Post Data: {"to_employee_id":"EMP001","room":"6","notes":"\u0644\u0644","existing_items_data":"[{\"item_order_id\":\"21\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9\\\"'(\",\"serial_num\":\"\u00e7_\u00e8-('\\\"'(-\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0629\u0629\"}]","new_item_data":"{\"item\":\"\u0644\u0627\u0628\u062a\u0648\u0628 HP EliteBook 840\",\"asset_num\":\"&\u00e9\\\"'(_\u00e8-('\u00e9\\\"'\",\"serial_num\":\"\u00e9\\\"'(-\u00e7_\u00e8-(\u00e9\\\"'(-\u00e8_\",\"brand\":\"\",\"model_num\":\"\",\"note\":\"\"}"}
+INFO - 2025-09-16 22:20:17 --> Order update result: success
+INFO - 2025-09-16 22:20:17 --> Existing items data: [{"item_order_id":"21","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9\"'(","serial_num":"\u00e7_\u00e8-('\"'(-","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0629\u0629"}]
+INFO - 2025-09-16 22:20:17 --> Item 21 update result: failed
+INFO - 2025-09-16 22:20:24 --> UpdateOrder - Post Data: {"to_employee_id":"EMP001","room":"6","notes":"\u0644\u0644","existing_items_data":"[{\"item_order_id\":\"21\",\"asset_num\":\"\u00e0\u00e7_\u00e8-('\\\"\u00e9\\\"'(\",\"serial_num\":\"\u00e7_\u00e8-('\\\"'(-\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\u0629\u0629\"}]","new_item_data":"{\"item\":\"\u0644\u0627\u0628\u062a\u0648\u0628 HP EliteBook 840\",\"asset_num\":\"&\u00e9\\\"'(_\u00e8-('\u00e9\\\"'\",\"serial_num\":\"\u00e9\\\"'(-\u00e7_\u00e8-(\u00e9\\\"'(-\u00e8_\",\"brand\":\"\",\"model_num\":\"\",\"note\":\"\"}"}
+INFO - 2025-09-16 22:20:24 --> Order update result: success
+INFO - 2025-09-16 22:20:24 --> Existing items data: [{"item_order_id":"21","asset_num":"\u00e0\u00e7_\u00e8-('\"\u00e9\"'(","serial_num":"\u00e7_\u00e8-('\"'(-","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":"\u0629\u0629"}]
+INFO - 2025-09-16 22:20:24 --> Item 21 update result: failed
+DEBUG - 2025-09-16 22:50:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:50:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:52:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:52:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:52:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 22:52:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 22:52:46 --> تم حذف العنصر لابتوب HP EliteBook 840 (رقم الأصول: _è-('"é&é"'(-è_ççàà_è-('") من الطلب 18 بواسطة المستخدم 33
+INFO - 2025-09-16 22:52:54 --> UpdateOrder - Order ID: 18
+INFO - 2025-09-16 22:52:54 --> UpdateOrder - Post Data: {"to_employee_id":"EMP002","room":"11","notes":"","existing_items_data":"[{\"item_order_id\":\"23\",\"asset_num\":\"0987654323456\u00e8\u00e8\u00e8\\\"\\\"1111\",\"serial_num\":\"123&&&&&&&&&&&&\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\"}]"}
+INFO - 2025-09-16 22:52:54 --> Order update result: success
+INFO - 2025-09-16 22:52:54 --> Existing items data: [{"item_order_id":"23","asset_num":"0987654323456\u00e8\u00e8\u00e8\"\"1111","serial_num":"123&&&&&&&&&&&&","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":""}]
+INFO - 2025-09-16 22:52:54 --> Processing item 0: ID=23, Asset=0987654323456èèè""1111, Serial=123&&&&&&&&&&&&
+INFO - 2025-09-16 22:52:54 --> Existing item found: {"item_order_id":"23","order_id":"18","item_id":"4","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","quantity":"1","model_num":"","asset_num":"0987654323456\u00e8\u00e8\u00e8\"\"1111","serial_num":"123&&&&&&&&&&&&","old_asset_num":null,"room_id":"11","assets_type":"\u0639\u0647\u062f\u0629 \u0639\u0627\u0645\u0629","created_by":"33","usage_status_id":"1","note":"","created_at":{"date":"2025-09-16 22:52:27.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-16 22:52:27.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-16 22:52:54 --> Update data for item 23: {"asset_num":"0987654323456\u00e8\u00e8\u00e8\"\"1111","serial_num":"123&&&&&&&&&&&&","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","room_id":"11","note":""}
+ERROR - 2025-09-16 22:52:54 --> Failed to update item 23. DB Errors: {"asset_num":"\u0631\u0642\u0645 \u0627\u0644\u0623\u0635\u0644 \u0645\u0648\u062c\u0648\u062f \u0645\u0633\u0628\u0642\u0627\u064b","serial_num":"\u0627\u0644\u0631\u0642\u0645 \u0627\u0644\u062a\u0633\u0644\u0633\u0644\u064a \u0645\u0648\u062c\u0648\u062f \u0645\u0633\u0628\u0642\u0627\u064b"}
+DEBUG - 2025-09-16 23:17:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:17:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:17:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:18:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 23:19:09 --> UpdateOrder - Order ID: 18
+INFO - 2025-09-16 23:19:09 --> UpdateOrder - Post Data: {"to_employee_id":"EMP002","room":"11","notes":"","existing_items_data":"[{\"item_order_id\":\"23\",\"asset_num\":\"0987654323456\u00e8\u00e8\u00e8\\\"\\\"1111\",\"serial_num\":\"123&&&&&&&&&&&&\",\"brand\":\"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f\",\"model_num\":\"\",\"note\":\"\"}]","new_item_data":"{\"item\":\"\u0643\u0631\u0633\u064a \u0645\u0643\u062a\u0628\u064a \u062c\u0644\u062f\",\"asset_num\":\"\u00e7_\u00e8-('\\\"\u00e9&\u00e9\\\"'(-\u00e8\u00e7_\u00e8-('\\\"\u00e9&\u00e9\\\"'(\",\"serial_num\":\"_\u00e8-('\\\"\u00e9&\u00e9\\\"'(_\u00e7_\u00e8-('\\\"\u00e9\\\"'(\",\"brand\":\"\",\"model_num\":\"\",\"note\":\"\"}"}
+INFO - 2025-09-16 23:19:09 --> Order update result: success
+INFO - 2025-09-16 23:19:09 --> Existing items data: [{"item_order_id":"23","asset_num":"0987654323456\u00e8\u00e8\u00e8\"\"1111","serial_num":"123&&&&&&&&&&&&","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","note":""}]
+INFO - 2025-09-16 23:19:09 --> Processing item 0: ID=23, Asset=0987654323456èèè""1111, Serial=123&&&&&&&&&&&&
+INFO - 2025-09-16 23:19:09 --> Existing item found: {"item_order_id":"23","order_id":"18","item_id":"4","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","quantity":"1","model_num":"","asset_num":"0987654323456\u00e8\u00e8\u00e8\"\"1111","serial_num":"123&&&&&&&&&&&&","old_asset_num":null,"room_id":"11","assets_type":"\u0639\u0647\u062f\u0629 \u0639\u0627\u0645\u0629","created_by":"33","usage_status_id":"1","note":"","created_at":{"date":"2025-09-16 22:52:27.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-16 22:52:27.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-16 23:19:09 --> Update data for item 23: {"asset_num":"0987654323456\u00e8\u00e8\u00e8\"\"1111","serial_num":"123&&&&&&&&&&&&","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","room_id":"11","note":""}
+ERROR - 2025-09-16 23:19:09 --> Failed to update item 23. DB Errors: {"asset_num":"\u0631\u0642\u0645 \u0627\u0644\u0623\u0635\u0644 \u0645\u0648\u062c\u0648\u062f \u0645\u0633\u0628\u0642\u0627\u064b","serial_num":"\u0627\u0644\u0631\u0642\u0645 \u0627\u0644\u062a\u0633\u0644\u0633\u0644\u064a \u0645\u0648\u062c\u0648\u062f \u0645\u0633\u0628\u0642\u0627\u064b"}
+DEBUG - 2025-09-16 23:19:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:19:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:22:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:22:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 23:22:44 --> UpdateOrder - Order ID: 18
+INFO - 2025-09-16 23:22:44 --> Current items in database: 23
+INFO - 2025-09-16 23:22:44 --> Submitted items from frontend: 23
+INFO - 2025-09-16 23:22:44 --> Item 23: Asset changed: NO, Serial changed: NO
+INFO - 2025-09-16 23:22:44 --> Updating item 23 with data: {"asset_num":"0987654323456\u00e8\u00e8\u00e8\"\"1111","serial_num":"123&&&&&&&&&&&&","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","room_id":"11","note":""}
+ERROR - 2025-09-16 23:22:44 --> Failed to update item 23: {"asset_num":"\u0631\u0642\u0645 \u0627\u0644\u0623\u0635\u0644 \u0645\u0648\u062c\u0648\u062f \u0645\u0633\u0628\u0642\u0627\u064b","serial_num":"\u0627\u0644\u0631\u0642\u0645 \u0627\u0644\u062a\u0633\u0644\u0633\u0644\u064a \u0645\u0648\u062c\u0648\u062f \u0645\u0633\u0628\u0642\u0627\u064b"}
+DEBUG - 2025-09-16 23:23:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:23:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:24:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:24:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:24:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:32:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:32:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 23:32:57 --> UpdateOrder - Order ID: 18
+INFO - 2025-09-16 23:32:57 --> Current items in database: 23
+INFO - 2025-09-16 23:32:57 --> Submitted items from frontend: 23
+INFO - 2025-09-16 23:32:57 --> Updating item 23 with data: {"asset_num":"0987654323456\u00e8\u00e8\u00e8\"\"1111","serial_num":"123&&&&&&&&&&&&","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","room_id":"11","note":""}
+INFO - 2025-09-16 23:32:57 --> Item 23 updated successfully
+DEBUG - 2025-09-16 23:32:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 23:32:58 --> New item added successfully to order 18
+INFO - 2025-09-16 23:32:58 --> Order 18 updated successfully
+DEBUG - 2025-09-16 23:33:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:33:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:33:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:33:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:33:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 23:33:24 --> تم حذف العنصر لابتوب HP EliteBook 840 (رقم الأصول: 0987654323456èèè""1111) من الطلب 18 بواسطة المستخدم 33
+INFO - 2025-09-16 23:33:35 --> UpdateOrder - Order ID: 18
+INFO - 2025-09-16 23:33:35 --> Current items in database: 25
+INFO - 2025-09-16 23:33:35 --> Submitted items from frontend: 25
+INFO - 2025-09-16 23:33:35 --> Updating item 25 with data: {"asset_num":"\u00e9\"'(\u00e8_\u00e7_\u00e0\u00e7\u00e7('","serial_num":"=)\u00e0\u00e7_\u00e8=)\u00e0\u00e7_","brand":"","model_num":"","room_id":"11","note":""}
+INFO - 2025-09-16 23:33:35 --> Item 25 updated successfully
+INFO - 2025-09-16 23:33:35 --> Order 18 updated successfully
+DEBUG - 2025-09-16 23:33:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:33:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:36:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:36:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:37:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:38:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:38:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:38:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:39:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:39:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:40:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:40:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:40:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-16 23:41:12 --> UpdateOrder - Order ID: 20
+INFO - 2025-09-16 23:41:12 --> Current items in database: 27, 28
+INFO - 2025-09-16 23:41:12 --> Submitted items from frontend: 27, 28
+INFO - 2025-09-16 23:41:12 --> Updating item 27 with data: {"asset_num":"''(''('('('","serial_num":"\"''\"'\u00e8_\u00e8__","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","room_id":"4","note":""}
+INFO - 2025-09-16 23:41:12 --> Item 27 updated successfully
+INFO - 2025-09-16 23:41:12 --> Updating item 28 with data: {"asset_num":"\u00e8__\u00e8_","serial_num":"-((--(\u00e8","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","room_id":"4","note":""}
+INFO - 2025-09-16 23:41:12 --> Item 28 updated successfully
+INFO - 2025-09-16 23:41:12 --> Order 20 updated successfully
+DEBUG - 2025-09-16 23:41:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:41:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:41:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:43:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:47:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:47:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-16 23:47:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

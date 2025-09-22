@@ -13,16 +13,21 @@ class PermissionModel extends Model
     protected $primaryKey    = 'id';
     protected $useAutoIncrement = true;
     protected $returnType    = Permission::class;
-    protected $allowedFields = ['emp_id', 'role_id'];
+    protected $allowedFields = ['emp_id','user_id','role_id'];
     protected $useTimestamps = true;
 
     protected $validationRules = [
         'emp_id'  => 'required|is_not_unique[employee.emp_id]',
+        'user_id' => 'required|is_not_unique[users.user_id]',
         'role_id' => 'required|numeric|is_not_unique[role.id]',
     ];
 
     protected $validationMessages = [
         'emp_id' => [
+            'required'      => 'يجب تحديد الموظف.',
+            'is_not_unique' => 'الموظف المحدد غير موجود.',
+        ],
+        'user_id' => [
             'required'      => 'يجب تحديد الموظف.',
             'is_not_unique' => 'الموظف المحدد غير موجود.',
         ],

@@ -1,0 +1,419 @@
+CRITICAL - 2025-09-22 00:06:18 --> ErrorException: Cannot redeclare App\Controllers\OrderController::validateAssetNumber()
+[Method: POST, Route: OrderController/store]
+in APPPATH\Controllers\OrderController.php on line 641.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+DEBUG - 2025-09-22 00:14:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-22 00:14:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-22 00:15:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-22 00:15:17 --> Search term: بر
+INFO - 2025-09-22 00:15:19 --> Items found: 0
+INFO - 2025-09-22 00:15:22 --> Search term: طا
+INFO - 2025-09-22 00:15:24 --> Items found: 1
+WARNING - 2025-09-22 00:15:56 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:16:11 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:16:18 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:16:25 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:16:32 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:17:20 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:17:24 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:17:31 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:17:40 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:19:22 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:19:26 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:19:37 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-22 00:19:43 --> User search started for: U102
+INFO - 2025-09-22 00:19:45 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-22 00:19:48 --> User search started for: U101
+INFO - 2025-09-22 00:19:50 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+WARNING - 2025-09-22 00:21:04 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:21:13 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:21:26 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:21:51 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-22 00:21:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-09-22 00:22:15 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:22:21 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:22:29 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-22 00:22:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-22 00:22:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-22 00:24:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-22 00:28:46 --> Search term: كر
+INFO - 2025-09-22 00:28:47 --> Search term: كرس
+INFO - 2025-09-22 00:28:47 --> Search term: كرسي
+INFO - 2025-09-22 00:28:48 --> Items found: 5
+INFO - 2025-09-22 00:28:49 --> Items found: 5
+INFO - 2025-09-22 00:28:49 --> Items found: 5
+WARNING - 2025-09-22 00:29:02 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:29:06 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-22 00:29:13 --> User search started for: U102
+INFO - 2025-09-22 00:29:15 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-22 00:29:17 --> User search started for: U103
+INFO - 2025-09-22 00:29:19 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-22 00:29:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-22 00:29:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-22 00:29:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-09-22 00:41:34 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:41:37 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-22 00:42:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-22 00:43:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-22 00:43:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-22 00:44:24 --> Search term: تل
+INFO - 2025-09-22 00:44:26 --> Items found: 2
+WARNING - 2025-09-22 00:44:37 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:44:47 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:44:55 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-22 00:45:00 --> User search started for: U102
+INFO - 2025-09-22 00:45:02 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-22 00:45:03 --> User search started for: U103
+INFO - 2025-09-22 00:45:05 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-22 00:45:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-22 00:45:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-22 00:48:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-22 00:49:08 --> Search term: فا
+INFO - 2025-09-22 00:49:09 --> Search term: فاك
+INFO - 2025-09-22 00:49:10 --> Items found: 2
+INFO - 2025-09-22 00:49:11 --> Items found: 1
+WARNING - 2025-09-22 00:49:31 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:49:51 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:50:01 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:50:16 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:50:26 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:50:43 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:51:04 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:51:12 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-22 00:51:14 --> User search started for: U102
+INFO - 2025-09-22 00:51:16 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-22 00:51:19 --> User search started for: U103
+INFO - 2025-09-22 00:51:21 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+WARNING - 2025-09-22 00:51:55 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:52:13 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:52:24 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:52:30 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:52:34 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:52:41 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:52:53 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:53:02 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-22 00:53:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-22 00:53:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-22 00:57:40 --> Search term: تا
+INFO - 2025-09-22 00:57:43 --> Items found: 0
+INFO - 2025-09-22 00:57:44 --> Search term: تل
+INFO - 2025-09-22 00:57:46 --> Items found: 2
+INFO - 2025-09-22 00:58:00 --> Search term: تلف
+INFO - 2025-09-22 00:58:02 --> Items found: 2
+WARNING - 2025-09-22 00:58:12 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 515.
+ 1 APPPATH\Controllers\OrderController.php(515): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-22 00:58:17 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 514.
+ 1 APPPATH\Controllers\OrderController.php(514): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-22 00:58:18 --> User search started for: U102
+INFO - 2025-09-22 00:58:20 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-22 00:58:21 --> User search started for: U101
+INFO - 2025-09-22 00:58:23 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-22 00:58:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-22 00:59:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-22 00:59:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
