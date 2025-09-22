@@ -817,57 +817,62 @@ public function bulkDeleteOrders()
             throw new \Exception("الرقم التسلسلي {$serialNum} موجود مسبقاً في النظام.");
         }
     }
-      public function showOrder($id)
+
+
+public function showOrder($id)
 {
-    $orderModel = new \App\Models\OrderModel();
-    $itemOrderModel = new \App\Models\ItemOrderModel();
+    $orderModel         = new \App\Models\OrderModel();
+    $itemOrderModel     = new \App\Models\ItemOrderModel();
+    $userModel          = new \App\Models\UserModel();
+    $itemModel          = new \App\Models\ItemModel();
+    $minorCatModel      = new \App\Models\MinorCategoryModel();
+    $majorCatModel      = new \App\Models\MajorCategoryModel();
+    $roomModel          = new \App\Models\RoomModel();
+    $usageStatusModel   = new \App\Models\UsageStatusModel();
+    $employeeModel      = new \App\Models\EmployeeModel();
+    $statusModel        = new \App\Models\OrderStatusModel();
 
 
-    $order = $orderModel
-        ->select('
-            order.*,
-            from_emp.name AS from_name,
-            to_emp.name AS to_name,
-            order_status.status AS status_name
-        ')
-        ->join('employee as from_emp', 'from_emp.emp_id = order.from_employee_id', 'left')
-        ->join('employee as to_emp', 'to_emp.emp_id = order.to_employee_id', 'left')
-        ->join('order_status', 'order_status.id = order.order_status_id', 'left')
-        ->where('order.order_id', $id)
-        ->first();
+    $order = $orderModel->find($id);
 
     if (!$order) {
         return redirect()->back()->with('error', 'الطلب غير موجود');
     }
 
 
-    $items = $itemOrderModel
-        ->select('
-            item_order.*,
-            items.name AS item_name,
-            minor_category.name AS minor_category_name,
-            major_category.name AS major_category_name,
-            room.code AS room_code,
-            usage_status.usage_status AS usage_status_name,
-            creator.name AS created_by_name
-        ')
-        ->join('items', 'items.id = item_order.item_id', 'left')
-        ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-        ->join('room', 'room.id = item_order.room_id', 'left')
-        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-        ->join('employee as creator', 'creator.emp_id = item_order.created_by', 'left')
-        ->where('item_order.order_id', $id)
-        ->findAll();
+    $fromUser = $userModel->where('user_id', $order->from_user_id)->first();
+    $toUser   = $userModel->where('user_id', $order->to_user_id)->first();
+    $status   = $statusModel->find($order->order_status_id);
 
-    $itemCount = count($items);
+    $order->from_name    = $fromUser->name ?? 'غير معروف';
+    $order->to_name      = $toUser->name ?? 'غير معروف';
+    $order->status_name  = $status->status ?? 'غير معروف';
 
+
+    $items = $itemOrderModel->where('order_id', $id)->findAll();
+
+    foreach ($items as $item) {
+        $itemData = $itemModel->find($item->item_id);
+        $minor    = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
+        $major    = $minor ? $majorCatModel->find($minor->major_category_id) : null;
+
+        $item->item_name             = $itemData->name ?? 'غير معروف';
+        $item->minor_category_name  = $minor->name ?? 'غير معروف';
+        $item->major_category_name  = $major->name ?? 'غير معروف';
+        $item->room_code            = $roomModel->find($item->room_id)->code ?? 'غير معروف';
+        $item->usage_status_name    = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
+        $item->created_by_name      = $employeeModel->where('emp_id', $item->created_by)->first()->name ?? 'غير معروف';
+    }
+
+    
     return view('warehouse/show_order', [
-        'order' => $order,
-        'items' => $items,
-        'item_count' => $itemCount
+        'order'       => $order,
+        'items'       => $items,
+        'item_count'  => count($items),
     ]);
 }
+
+
 public function deleteOrder($orderId)
 {
     try {
