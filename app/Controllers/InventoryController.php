@@ -50,16 +50,25 @@ class InventoryController extends BaseController
         $this->minorCategoryModel = new \App\Models\MinorCategoryModel();
     }
 
- public function index()
+public function index()
 {
     if (! session()->get('isLoggedIn')) {
-        throw new AuthenticationException();
+        throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
     }
 
     $itemOrderModel = new \App\Models\ItemOrderModel();
     $roomModel      = new \App\Models\RoomModel();
 
-    $itemOrders = $itemOrderModel
+
+    $search          = $this->request->getVar('search'); 
+    $category        = $this->request->getVar('category');     
+    $itemType        = $this->request->getVar('item_type');   
+    $serialNumber    = $this->request->getVar('serial_number'); 
+    $employeeId      = $this->request->getVar('employee_id');  
+    $location        = $this->request->getVar('location');     
+
+
+    $builder = $itemOrderModel
         ->distinct()
         ->select('
             item_order.order_id, 
@@ -68,40 +77,95 @@ class InventoryController extends BaseController
             item_order.room_id,
             employee.name AS created_by_name, 
             employee.emp_id AS employee_id, 
-            employee.emp_ext AS extension
+            employee.emp_ext AS extension,
+            items.name AS item_name,
+            minor_category.name AS category_name
         ')
         ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
+        ->join('items', 'items.id = item_order.item_id', 'left')
+        ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
         ->groupBy('item_order.order_id')
-        ->orderBy('item_order.created_at', 'DESC')
-        ->findAll();
+        ->orderBy('item_order.created_at', 'DESC');
 
-    // أضف رمز الموقع لكل طلب
+    if (!empty($search)) {
+        $builder->groupStart()
+            ->like('item_order.order_id', $search)
+            ->orLike('employee.name', $search)
+            ->orLike('employee.emp_id', $search)
+            ->orLike('employee.emp_ext', $search)
+            ->orLike('items.name', $search)
+            ->orLike('minor_category.name', $search)
+            ->orLike('item_order.serial_num', $search)
+            ->groupEnd();
+    }
+
+
+    if (!empty($search)) {
+    $builder->like('item_order.order_id', $search);
+    }
+    if (!empty($itemType)) {
+        $builder->like('items.name', $itemType);
+    }
+
+    if (!empty($category)) {
+        $builder->where('minor_category.id', $category);
+    }
+
+    if (!empty($serialNumber)) {
+        $builder->like('item_order.serial_num', $serialNumber);
+    }
+
+    if (!empty($employeeId)) {
+        $builder->where('employee.emp_id', $employeeId);
+    }
+
+ if (!empty($location)) {
+    $builder
+        ->join('room', 'room.id = item_order.room_id', 'left')
+        ->join('section', 'section.id = room.section_id', 'left')
+        ->join('floor', 'floor.id = section.floor_id', 'left')
+        ->join('building', 'building.id = floor.building_id', 'left')
+        ->groupStart()
+            ->like('room.code', $location)
+            ->orLike('section.code', $location)
+            ->orLike('floor.code', $location)
+            ->orLike('building.code', $location)
+        ->groupEnd();
+}
+
+    $itemOrders = $builder->findAll();
+
+
     foreach ($itemOrders as $order) {
         $order->location_code = $roomModel->getFullLocationCode($order->room_id);
     }
 
-    // باقي البيانات
     $minorCategoryModel = new \App\Models\MinorCategoryModel();
     $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
         ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
         ->findAll();
 
     $stats = $this->getWarehouseStats();
-
-    $orderStatusModel = new \App\Models\OrderStatusModel();
-    $statuses = $orderStatusModel->findAll();
-
-    $usageStatusModel = new \App\Models\UsageStatusModel();
-    $usageStatuses = $usageStatusModel->findAll();
+    $statuses = (new \App\Models\OrderStatusModel())->findAll();
+    $usageStatuses = (new \App\Models\UsageStatusModel())->findAll();
 
     return view('warehouse/warehouseView', [
-        'categories' => $categories,
-        'orders' => $itemOrders,
-        'stats' => $stats,
-        'statuses' => $statuses,
+        'categories'     => $categories,
+        'orders'         => $itemOrders,
+        'stats'          => $stats,
+        'statuses'       => $statuses,
         'usage_statuses' => $usageStatuses,
+        'filters'        => [
+            'search'        => $search,
+            'category'      => $category,
+            'item_type'     => $itemType,
+            'serial_number' => $serialNumber,
+            'employee_id'   => $employeeId,
+            'location'      => $location,
+        ]
     ]);
 }
+
 
     public function store()
     {

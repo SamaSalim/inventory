@@ -133,6 +133,15 @@ class FinalTablesSeeder extends Seeder
                 'email'    => 'sama@example.com',
                 'password' => password_hash('123459', PASSWORD_DEFAULT),
             ],
+            [
+                'emp_id'   => '1005',
+                'name'     => 'ليان السيد',
+                'emp_dept' => 'المستودعات',
+                'emp_ext'  => 5000,
+                'email'    => 'layan@example.com',
+                'password' => password_hash('123455', PASSWORD_DEFAULT),
+            ],
+            
         ];
         $this->db->table('employee')->insertBatch($employees);
 
@@ -204,6 +213,7 @@ class FinalTablesSeeder extends Seeder
             ['emp_id' => '1002', 'role_id' => 2, 'user_id' => null],
             ['emp_id' => '1003', 'role_id' => 3, 'user_id' => null],
             ['emp_id' => '1004', 'role_id' => 6, 'user_id' => null],
+            ['emp_id' => '1005', 'role_id' => 1, 'user_id' => null],
             ['emp_id' => null, 'role_id' => 4, 'user_id' => 'U101'],
             ['emp_id' => null, 'role_id' => 4, 'user_id' => 'U102'],
             ['emp_id' => null, 'role_id' => 4, 'user_id' => 'U103'],

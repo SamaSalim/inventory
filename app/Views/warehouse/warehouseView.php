@@ -313,50 +313,239 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        /* قسم الفلاتر */
+        /* قسم الفلاتر المحدث - تصميم أكثر احترافية */
         .filters-section {
             background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(5, 117, 144, 0.1);
         }
 
-        .filter-row {
+        /* شريط البحث الرئيسي */
+        .main-search-container {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .search-section-title {
+            color: #057590;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-bar-wrapper {
+            position: relative;
+            width: 50%;
+            max-width: 400px;
+        }
+
+        .main-search-input {
+            width: 100%;
+            padding: 12px 45px 12px 16px;
+            border: 2px solid #e8f4f8;
+            border-radius: 20px;
+            font-size: 14px;
+            background: linear-gradient(135deg, #ffffff, #f8fdff);
+            outline: none;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 2px 8px rgba(5, 117, 144, 0.08);
+        }
+
+        .main-search-input:focus {
+            border-color: #3AC0C3;
+            box-shadow: 0 0 0 4px rgba(58, 192, 195, 0.15),
+                        0 4px 20px rgba(58, 192, 195, 0.2);
+            background: white;
+            transform: translateY(-1px);
+        }
+
+        .main-search-input::placeholder {
+            color: #8aa8b5;
+            font-weight: 400;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8aa8b5;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-icon:hover {
+            color: #3AC0C3;
+            background-color: rgba(58, 192, 195, 0.1);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .main-search-input:focus + .search-icon {
+            color: #3AC0C3;
+        }
+
+        /* مقسم الفلاتر */
+        .filters-divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            text-align: center;
+            color: #666;
+        }
+
+        .filters-divider::before,
+        .filters-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ddd, transparent);
+        }
+
+        .filters-divider span {
+            padding: 0 20px;
+            background: white;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        /* الفلاتر التفصيلية */
+        .detailed-filters {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
             align-items: end;
+            /* Add more bottom margin to prevent upward dropdown */
+            margin-bottom: 40px;
         }
 
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
+            position: relative;
         }
 
         .filter-label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-
-        .filter-select,
-        .search-box {
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
             font-size: 13px;
-            background-color: white;
-            outline: none;
-            transition: all 0.3s ease;
+            color: #057590;
+            margin-bottom: 5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .filter-select:focus,
-        .search-box:focus {
-            border-color: #057590;
-            box-shadow: 0 0 0 2px rgba(5, 117, 144, 0.1);
+        .filter-label i {
+            font-size: 12px;
+            color: #3AC0C3;
+        }
+
+        .filter-input,
+        .filter-select {
+            padding: 12px 16px;
+            border: 1.5px solid #e8f4f8;
+            border-radius: 10px;
+            font-size: 14px;
+            background: linear-gradient(135deg, #ffffff, #f8fdff);
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            font-weight: 400;
+        }
+
+        .filter-input:focus,
+        .filter-select:focus {
+            border-color: #3AC0C3;
+            box-shadow: 0 0 0 3px rgba(58, 192, 195, 0.1);
+            background: white;
+            transform: translateY(-1px);
+        }
+
+        .filter-input::placeholder {
+            color: #a0b8c4;
+            font-weight: 300;
+        }
+
+        .filter-select {
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238aa8b5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: left 12px center;
+            background-size: 16px;
+            padding-left: 40px;
+        }
+
+        .filter-select option {
+            background: white;
+            color: #333;
+            padding: 8px;
+        }
+
+        /* أزرار العمليات */
+        .filter-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-start;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #3AC0C3, #2aa8ab);
+            color: white;
+            box-shadow: 0 4px 15px rgba(58, 192, 195, 0.3);
+        }
+
+        .search-btn:hover {
+            background: linear-gradient(135deg, #2aa8ab, #259a9d);
+            box-shadow: 0 6px 20px rgba(58, 192, 195, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            color: #057590;
+            border: 1.5px solid #e8f4f8;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            text-decoration: none;
+        }
+
+        .reset-btn:hover {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+            border-color: #3AC0C3;
+            color: #046073;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
         }
 
         /* الجدول */
@@ -964,7 +1153,7 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .filter-row {
+            .detailed-filters {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
@@ -991,7 +1180,7 @@
                 grid-template-columns: 1fr;
             }
 
-            .filter-row {
+            .detailed-filters {
                 grid-template-columns: 1fr;
                 gap: 15px;
             }
@@ -1063,6 +1252,27 @@
                 justify-content: center;
                 flex-wrap: wrap;
             }
+
+            /* تحسينات شريط البحث للموبايل */
+            .main-search-input {
+                padding: 14px 45px 14px 18px;
+                font-size: 14px;
+            }
+
+            .search-icon {
+                left: 15px;
+                font-size: 16px;
+            }
+
+            .filter-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .filter-btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1083,6 +1293,15 @@
                 padding: 5px 10px;
                 font-size: 9px;
                 min-width: 50px;
+            }
+
+            .filters-section {
+                padding: 20px 15px;
+            }
+
+            .main-search-input {
+                padding: 12px 40px 12px 15px;
+                font-size: 13px;
             }
         }
     </style>
@@ -1182,46 +1401,107 @@
                 </div>
             </div>
 
-            <div class="filters-section">
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label class="filter-label">البحث</label>
-                        <input type="text" class="search-box" id="generalSearch" placeholder="البحث العام">
+            <!-- قسم البحث والفلاتر المحدث -->
+            <form method="get" action="<?= base_url('InventoryController/index') ?>">
+                <div class="filters-section">
+                    <!-- شريط البحث الرئيسي -->
+                    <div class="main-search-container">
+                        <h3 class="search-section-title">
+                            <i class="fas fa-search"></i>
+                            البحث العام
+                        </h3>
+                        <div class="search-bar-wrapper">
+                            <input type="text" class="main-search-input" name="search" id="mainSearchInput"
+                                   value="<?= esc($filters['search'] ?? '') ?>" 
+                                   placeholder="ابحث في جميع الحقول...">
+                            <i class="fas fa-search search-icon" onclick="document.querySelector('form').submit();" title="بحث"></i>
+                        </div>
                     </div>
 
-                    <div class="filter-group">
-                        <label class="filter-label">الصنف</label>
-                        <input type="text" class="search-box" id="searchId" placeholder="الصنف">
+                    <!-- مقسم الفلاتر -->
+                    <div class="filters-divider">
+                        <span><i class="fas fa-filter"></i> الفلاتر التفصيلية</span>
                     </div>
 
-                    <div class="filter-group">
-                        <label class="filter-label">التصنيف</label>
-                        <select class="filter-select" id="searchCategory">
-                            <option value="">اختر التصنيف</option>
-                            <?php if (isset($categories)): ?>
-                                <?php foreach ($categories as $cat): ?>
-                                    <option value="<?= esc($cat->name) ?>"><?= esc($cat->name) ?></option>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </select>
+                    <!-- الفلاتر التفصيلية -->
+                    <div class="detailed-filters">
+                        <!-- الصنف -->
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-tag"></i>
+                                الصنف
+                            </label>
+                            <input type="text" class="filter-input" name="item_type"
+                                   value="<?= esc($filters['item_type'] ?? '') ?>" 
+                                   placeholder="اكتب نوع الصنف">
+                        </div>
+
+                        <!-- التصنيف -->
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-layer-group"></i>
+                                التصنيف
+                            </label>
+                            <select class="filter-select" name="category">
+                                <option value="">اختر التصنيف</option>
+                                <?php if (isset($categories)): ?>
+                                    <?php foreach ($categories as $cat): ?>
+                                        <option value="<?= esc($cat->id) ?>"
+                                            <?= ($filters['category'] ?? '') == $cat->id ? 'selected' : '' ?>>
+                                            <?= esc($cat->name) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+
+                        <!-- الرقم التسلسلي -->
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-barcode"></i>
+                                الرقم التسلسلي
+                            </label>
+                            <input type="text" class="filter-input" name="serial_number"
+                                   value="<?= esc($filters['serial_number'] ?? '') ?>" 
+                                   placeholder="رقم تسلسلي محدد">
+                        </div>
+
+                        <!-- الرقم الوظيفي -->
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-id-badge"></i>
+                                الرقم الوظيفي
+                            </label>
+                            <input type="text" class="filter-input" name="employee_id"
+                                   value="<?= esc($filters['employee_id'] ?? '') ?>" 
+                                   placeholder="رقم الموظف">
+                        </div>
+
+                        <!-- الموقع -->
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-map-marker-alt"></i>
+                                الموقع
+                            </label>
+                            <input type="text" class="filter-input" name="location"
+                                   value="<?= esc($filters['location'] ?? '') ?>" 
+                                   placeholder="اكتب اسم الموقع">
+                        </div>
                     </div>
 
-                    <div class="filter-group">
-                        <label class="filter-label">الرقم التسلسلي</label>
-                        <input type="text" class="search-box" id="searchSerial" placeholder="الرقم التسلسلي">
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label">الرقم الوظيفي</label>
-                        <input type="text" class="search-box" id="searchEmployeeId" placeholder="الرقم الوظيفي">
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label">الموقع</label>
-                        <input type="text" class="search-box" id="searchLocation" placeholder="الموقع">
+                    <!-- أزرار العمليات -->
+                    <div class="filter-actions">
+                        <button type="submit" class="filter-btn search-btn">
+                            <i class="fas fa-search"></i>
+                            بحث
+                        </button>
+                        <a href="<?= base_url('InventoryController/index') ?>" class="filter-btn reset-btn">
+                            <i class="fas fa-undo"></i>
+                            إعادة تعيين
+                        </a>
                     </div>
                 </div>
-            </div>
+            </form>
 
             <div class="table-container">
                 <table class="custom-table" id="datatable-orders">
