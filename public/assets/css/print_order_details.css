@@ -1,0 +1,432 @@
+@media print {
+  /* Hide all screen elements */
+  .main-content,
+  .action-buttons-container,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Show print content */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Reset page for printing */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  @page {
+    margin: 15mm;
+  }
+  @media print {
+    body {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    /* Try to hide browser headers/footers */
+    @page {
+      size: A4;
+      margin: 0; /* Removes default footer area */
+    }
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    font-family: "Arial", "Helvetica", sans-serif !important;
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+    color: #2c3e50 !important;
+    direction: rtl;
+  }
+
+  /* Main print container */
+  .print-container {
+    border: 2px solid #2c3e50 !important;
+    padding: 20px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    background: white !important;
+  }
+
+  /* ===== HEADER SECTION ===== */
+  .print-header {
+    border: 2px solid #ffffffff;
+    margin-bottom: 15px;
+    background: white;
+    position: relative;
+  }
+
+  /* Top section with logos and ministry info */
+  .header-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 25px;
+    border-bottom: 1px solid #bdc3c7;
+    background: white;
+    color: #2c3e50;
+    text-align: center;
+  }
+
+  .kamc-emblem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .kamc-emblem img {
+    margin-top: -30px;
+    width: 230px !important;
+    height: 230px !important;
+    object-fit: contain !important;
+    filter: none !important;
+  }
+
+  .ministry-name {
+    font-size: 16px;
+    margin-bottom: 3px;
+    color: #2c3e50;
+    font-weight: 500;
+  }
+
+  .department-name {
+    font-size: 14px;
+    color: #2c3e50;
+    font-weight: 400;
+  }
+
+  /* Header form fields */
+  .header-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: white !important;
+  }
+
+  .header-field {
+    padding: 15px 25px;
+    border-right: 1px solid #ffffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    min-height: 20px;
+    background: white !important;
+  }
+
+  .header-field:nth-child(even) {
+    background: #f8f9fa;
+  }
+
+  .header-field:last-child {
+    border-right: none;
+  }
+
+  .field-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-left: 15px;
+  }
+
+  .field-line {
+    border-bottom: 1px solid #7f8c8d;
+    flex: 1;
+    margin-right: 15px;
+    height: 1px;
+    min-width: 120px;
+  }
+
+  /* Form title */
+  .form-title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 15px;
+    background: white;
+    margin-top: -50px;
+    letter-spacing: 0.5px;
+    color: #2c3e50;
+    border-bottom: 1px solid #bdc3c7;
+  }
+
+  /* ===== MAIN TABLE ===== */
+  .main-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 15px 0 !important;
+    background: white;
+    font-size: 11px !important;
+    border: 2px solid #34495e;
+  }
+
+  .main-table th,
+  .main-table td {
+    border: 1px solid #bdc3c7 !important;
+    padding: 10px 8px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+  }
+
+  .main-table th {
+    background: #34495e !important;
+    color: white !important;
+    font-weight: 600 !important;
+    font-size: 10px !important;
+    text-transform: none !important;
+    letter-spacing: 0.3px !important;
+    padding: 12px 8px !important;
+  }
+
+  .main-table tbody tr:nth-child(even) {
+    background: #f8f9fa;
+  }
+
+  .main-table tbody tr:nth-child(odd) {
+    background: white;
+  }
+
+  /* Column widths */
+  .col-serial {
+    width: 5% !important;
+    background: #ecf0f1 !important;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  .col-description {
+    width: 25% !important;
+    text-align: right !important;
+  }
+  .col-model {
+    width: 12% !important;
+  }
+  .col-brand {
+    width: 10% !important;
+  }
+  .col-quantity-available {
+    width: 8% !important;
+  }
+  .col-quantity-requested {
+    width: 8% !important;
+  }
+  .col-unit-price {
+    width: 10% !important;
+    font-weight: 600;
+  }
+  .col-total-price {
+    width: 10% !important;
+    font-weight: 700;
+    background: #f8f9fa !important;
+  }
+  .col-notes {
+    width: 12% !important;
+    text-align: right !important;
+  }
+
+  /* Item description styling */
+  .item-description-cell {
+    text-align: right !important;
+    padding: 10px 12px !important;
+  }
+
+  .item-main-name {
+    font-weight: 600;
+    font-size: 11px;
+    margin-bottom: 3px;
+    line-height: 1.2;
+    color: #2c3e50;
+  }
+
+  .item-sub-details {
+    font-size: 9px;
+    color: #7f8c8d;
+    line-height: 1.2;
+  }
+
+  /* Notes column styling */
+  .notes-cell {
+    text-align: right !important;
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+    padding: 8px 10px !important;
+  }
+
+  /* Empty rows for manual filling */
+  .empty-row td {
+    height: 30px !important;
+    border: 1px solid #bdc3c7 !important;
+    background: white;
+  }
+
+  /* ===== SIGNATURE SECTION ===== */
+  .signature-section {
+    margin-top: 40px;
+    border: 2px solid #34495e;
+    background: white;
+    page-break-inside: avoid;
+  }
+
+  /* Additional fields after signature section */
+  .signature-section + .header-fields {
+    margin-top: 25px;
+    border: 2px solid #34495e;
+    border-bottom: 1px solid #bdc3c7;
+  }
+
+  .signature-section + .header-fields + .header-fields {
+    border: 2px solid #34495e;
+    border-top: none;
+    margin-top: 0;
+  }
+
+  .signature-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    background: white;
+  }
+
+  .signature-table td {
+    border: 1px solid #bdc3c7 !important;
+    padding: 20px 15px !important;
+    text-align: center !important;
+    vertical-align: top !important;
+    height: 70px !important;
+    width: 25% !important;
+    background: white;
+  }
+
+  .signature-table td:nth-child(1) {
+    background: white;
+  }
+
+  .signature-table td:nth-child(2) {
+    background: white;
+  }
+
+  .signature-table td:nth-child(3) {
+    background: white;
+  }
+
+  .signature-table td:nth-child(4) {
+    background: white;
+  }
+
+  .signature-title-cell {
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    padding-bottom: 10px !important;
+    color: #2c3e50;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 8px;
+  }
+
+  .signature-fields {
+    font-size: 10px !important;
+    line-height: 2 !important;
+    text-align: center !important;
+    color: #495057;
+  }
+
+  .signature-line {
+    display: inline-block;
+    border-bottom: 1px solid #6c757d;
+    width: 60px;
+    margin: 0 3px;
+  }
+
+  /* ===== FOOTER SECTION ===== */
+  .form-footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 10px;
+    padding: 15px;
+    border: 2px solid #dc3545;
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  .footer-warning {
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #721c24;
+    font-size: 11px;
+  }
+
+  .footer-note {
+    color: #721c24;
+    font-size: 9px;
+  }
+
+  /* Page break controls */
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+  }
+
+  .no-page-break {
+    page-break-inside: avoid;
+  }
+
+  /* Professional clean lines */
+  .main-table th:first-child {
+    border-right: 2px solid #2c3e50 !important;
+  }
+
+  .header-fields {
+    border-bottom: 1px solid #ffffffff;
+  }
+
+  /* Clean typography */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Arial", "Helvetica", sans-serif;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  /* Remove any fancy effects */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Keep only essential borders */
+  .print-header,
+  .main-table,
+  .signature-section,
+  .form-footer {
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+/* Screen-only styles */
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
+
+@media print {
+  /* Hide sidebar when printing */
+  .sidebar,
+  .sidebar-container,
+  .sidebar-wrapper {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
