@@ -1,0 +1,925 @@
+DEBUG - 2025-09-21 15:02:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-21 15:02:59 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in C:\xampp\htdocs\inventory6\system\Database\MySQLi\Connection.php:201
+Stack trace:
+#0 C:\xampp\htdocs\inventory6\system\Database\MySQLi\Connection.php(201): mysqli->real_connect('localhost', 'root', Object(SensitiveParameterValue), 'KAMC_Inventory', 3306, '', 0)
+#1 C:\xampp\htdocs\inventory6\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 C:\xampp\htdocs\inventory6\system\Database\BaseConnection.php(620): CodeIgniter\Database\BaseConnection->initialize()
+#3 C:\xampp\htdocs\inventory6\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 C:\xampp\htdocs\inventory6\system\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory6\system\BaseModel.php(717): CodeIgniter\Model->doFirst()
+#6 C:\xampp\htdocs\inventory6\app\Controllers\login.php(28): CodeIgniter\BaseModel->first()
+#7 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(933): App\Controllers\login->login()
+#8 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\login))
+#9 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory6\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory6\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory6\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in C:\xampp\htdocs\inventory6\system\Database\MySQLi\Connection.php:246
+Stack trace:
+#0 C:\xampp\htdocs\inventory6\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 C:\xampp\htdocs\inventory6\system\Database\BaseConnection.php(620): CodeIgniter\Database\BaseConnection->initialize()
+#2 C:\xampp\htdocs\inventory6\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 C:\xampp\htdocs\inventory6\system\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+#4 C:\xampp\htdocs\inventory6\system\BaseModel.php(717): CodeIgniter\Model->doFirst()
+#5 C:\xampp\htdocs\inventory6\app\Controllers\login.php(28): CodeIgniter\BaseModel->first()
+#6 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(933): App\Controllers\login->login()
+#7 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\login))
+#8 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\xampp\htdocs\inventory6\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#10 C:\xampp\htdocs\inventory6\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\xampp\htdocs\inventory6\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 {main}
+CRITICAL - 2025-09-21 15:02:59 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+[Method: POST, Route: login/login]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(620): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `employee`
+WHERE `emp_id` = :emp_id:
+ LIMIT 1', [...], false)
+ 3 SYSTEMPATH\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(717): CodeIgniter\Model->doFirst()
+ 5 APPPATH\Controllers\login.php(28): CodeIgniter\BaseModel->first()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\login->login()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\login))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-21 15:03:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-21 15:03:13 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in C:\xampp\htdocs\inventory6\system\Database\MySQLi\Connection.php:201
+Stack trace:
+#0 C:\xampp\htdocs\inventory6\system\Database\MySQLi\Connection.php(201): mysqli->real_connect('localhost', 'root', Object(SensitiveParameterValue), 'KAMC_Inventory', 3306, '', 0)
+#1 C:\xampp\htdocs\inventory6\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 C:\xampp\htdocs\inventory6\system\Database\BaseConnection.php(620): CodeIgniter\Database\BaseConnection->initialize()
+#3 C:\xampp\htdocs\inventory6\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 C:\xampp\htdocs\inventory6\system\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory6\system\BaseModel.php(717): CodeIgniter\Model->doFirst()
+#6 C:\xampp\htdocs\inventory6\app\Controllers\login.php(28): CodeIgniter\BaseModel->first()
+#7 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(933): App\Controllers\login->login()
+#8 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\login))
+#9 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory6\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory6\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory6\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in C:\xampp\htdocs\inventory6\system\Database\MySQLi\Connection.php:246
+Stack trace:
+#0 C:\xampp\htdocs\inventory6\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 C:\xampp\htdocs\inventory6\system\Database\BaseConnection.php(620): CodeIgniter\Database\BaseConnection->initialize()
+#2 C:\xampp\htdocs\inventory6\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 C:\xampp\htdocs\inventory6\system\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+#4 C:\xampp\htdocs\inventory6\system\BaseModel.php(717): CodeIgniter\Model->doFirst()
+#5 C:\xampp\htdocs\inventory6\app\Controllers\login.php(28): CodeIgniter\BaseModel->first()
+#6 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(933): App\Controllers\login->login()
+#7 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\login))
+#8 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\xampp\htdocs\inventory6\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#10 C:\xampp\htdocs\inventory6\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\xampp\htdocs\inventory6\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 {main}
+CRITICAL - 2025-09-21 15:03:13 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+[Method: POST, Route: login/login]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(620): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `employee`
+WHERE `emp_id` = :emp_id:
+ LIMIT 1', [...], false)
+ 3 SYSTEMPATH\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(717): CodeIgniter\Model->doFirst()
+ 5 APPPATH\Controllers\login.php(28): CodeIgniter\BaseModel->first()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\login->login()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\login))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-21 15:03:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 15:04:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 15:04:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 15:06:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 16:13:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 16:13:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 16:13:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 16:13:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 16:14:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 16:18:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 16:18:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 16:18:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 16:18:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 16:26:17 --> Search term: hp
+INFO - 2025-09-21 16:26:19 --> Items found: 0
+INFO - 2025-09-21 16:26:23 --> Search term: را
+INFO - 2025-09-21 16:26:25 --> Items found: 2
+INFO - 2025-09-21 16:26:45 --> Employee search started for: 1002
+INFO - 2025-09-21 16:26:47 --> Employee search result: {"id":"2","emp_id":"1002","name":"\u062d\u0645\u064a\u062f\u0629","emp_dept":"\u0627\u0644\u0639\u0647\u062f","emp_ext":"5678","email":"ahmad@example.com","password":"$2y$10$5\/izLON61hGU2Ciz6OYJWuczaml\/XalkmFyw0nKda\/v1TnziqTkcO","created_at":{"date":"2025-09-20 09:20:29.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:36:30.000000","timezone_type":3,"timezone":"UTC"}}
+CRITICAL - 2025-09-21 16:40:32 --> Error: Class "App\Models\UsersModel" not found
+[Method: GET, Route: OrderController/create]
+in APPPATH\Controllers\OrderController.php on line 35.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\OrderController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(498): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-21 16:44:29 --> Search term: را
+INFO - 2025-09-21 16:44:31 --> Items found: 2
+INFO - 2025-09-21 16:47:24 --> Search term: را
+INFO - 2025-09-21 16:47:26 --> Items found: 2
+INFO - 2025-09-21 16:47:53 --> User search started for: 1001
+INFO - 2025-09-21 16:47:55 --> User search result: null
+INFO - 2025-09-21 16:47:58 --> User search started for: 100
+INFO - 2025-09-21 16:47:58 --> User search started for: 1002
+INFO - 2025-09-21 16:48:00 --> User search result: null
+INFO - 2025-09-21 16:48:00 --> User search result: null
+INFO - 2025-09-21 16:48:25 --> User search started for: 100
+INFO - 2025-09-21 16:48:27 --> User search result: null
+INFO - 2025-09-21 16:48:28 --> User search started for: U101
+INFO - 2025-09-21 16:48:30 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 16:49:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 16:51:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 16:51:38 --> Search term: مك
+INFO - 2025-09-21 16:51:40 --> Items found: 4
+INFO - 2025-09-21 16:53:24 --> User search started for: U101
+INFO - 2025-09-21 16:53:26 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 16:53:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 17:04:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-21 17:04:17 --> Error in getformdata: Call to undefined method App\Models\ItemOrderModel::getAssetsTypeEnum
+ERROR - 2025-09-21 17:04:21 --> Error in getformdata: Call to undefined method App\Models\ItemOrderModel::getAssetsTypeEnum
+INFO - 2025-09-21 17:04:25 --> Search term: كر
+INFO - 2025-09-21 17:04:26 --> Search term: كرس
+INFO - 2025-09-21 17:04:27 --> Items found: 5
+INFO - 2025-09-21 17:04:28 --> Items found: 5
+INFO - 2025-09-21 17:05:05 --> User search started for: U101
+INFO - 2025-09-21 17:05:07 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 17:07:57 --> Search term: را
+INFO - 2025-09-21 17:08:00 --> Items found: 2
+INFO - 2025-09-21 17:08:17 --> User search started for: U101
+INFO - 2025-09-21 17:08:19 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 17:08:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 17:11:12 --> Search term: رل
+INFO - 2025-09-21 17:11:12 --> Search term: رلا
+INFO - 2025-09-21 17:11:14 --> Search term: را
+INFO - 2025-09-21 17:11:14 --> Items found: 0
+INFO - 2025-09-21 17:11:14 --> Search term: رل
+INFO - 2025-09-21 17:11:14 --> Items found: 0
+INFO - 2025-09-21 17:11:16 --> Items found: 2
+INFO - 2025-09-21 17:11:16 --> Items found: 0
+INFO - 2025-09-21 17:11:21 --> Search term: را
+INFO - 2025-09-21 17:11:23 --> Items found: 2
+INFO - 2025-09-21 17:11:32 --> User search started for: U101
+INFO - 2025-09-21 17:11:34 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 17:11:35 --> User search started for: U10
+INFO - 2025-09-21 17:11:36 --> User search started for: U102
+INFO - 2025-09-21 17:11:37 --> User search result: null
+INFO - 2025-09-21 17:11:38 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 17:24:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-21 17:24:39 --> mysqli_sql_exception: Unknown column 'order.from_employee_id' in 'on clause' in C:\xampp\htdocs\inventory6\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\inventory6\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `order`....', 0)
+#1 C:\xampp\htdocs\inventory6\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `order`....')
+#2 C:\xampp\htdocs\inventory6\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `order`....')
+#3 C:\xampp\htdocs\inventory6\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `order`....', Array, false)
+#4 C:\xampp\htdocs\inventory6\system\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory6\system\BaseModel.php(717): CodeIgniter\Model->doFirst()
+#6 C:\xampp\htdocs\inventory6\app\Controllers\InventoryController.php(837): CodeIgniter\BaseModel->first()
+#7 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(933): App\Controllers\InventoryController->showOrder('9')
+#8 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+#9 C:\xampp\htdocs\inventory6\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory6\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory6\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory6\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-09-21 17:24:39 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'order.from_employee_id' in 'on clause'
+[Method: GET, Route: InventoryController/showOrder/9]
+in SYSTEMPATH\Database\BaseConnection.php on line 692.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `order`.*, `from_emp`.`name` AS `from_name`, `to_emp`.`name` AS `to_name`, `order_status`.`status` AS `status_name`
+FROM `order`
+LEFT JOIN `employee` as `from_emp` ON `from_emp`.`emp_id` = `order`.`from_employee_id`
+LEFT JOIN `employee` as `to_emp` ON `to_emp`.`emp_id` = `order`.`to_employee_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `order`.`order_status_id`
+WHERE `order`.`order_id` = :order.order_id:
+ LIMIT 1', [...], false)
+ 2 SYSTEMPATH\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(717): CodeIgniter\Model->doFirst()
+ 4 APPPATH\Controllers\InventoryController.php(837): CodeIgniter\BaseModel->first()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->showOrder('9')
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-21 17:24:39 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'order.from_employee_id' in 'on clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `order`.*, `from_emp`.`name` AS `from_name`, `to_emp`.`name` AS `to_name`, `order_status`.`status` AS `status_name`
+FROM `order`
+LEFT JOIN `employee` as `from_emp` ON `from_emp`.`emp_id` = `order`.`from_employee_id`
+LEFT JOIN `employee` as `to_emp` ON `to_emp`.`emp_id` = `order`.`to_employee_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `order`.`order_status_id`
+WHERE `order`.`order_id` = \'9\'
+ LIMIT 1')
+ 2 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `order`.*, `from_emp`.`name` AS `from_name`, `to_emp`.`name` AS `to_name`, `order_status`.`status` AS `status_name`
+FROM `order`
+LEFT JOIN `employee` as `from_emp` ON `from_emp`.`emp_id` = `order`.`from_employee_id`
+LEFT JOIN `employee` as `to_emp` ON `to_emp`.`emp_id` = `order`.`to_employee_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `order`.`order_status_id`
+WHERE `order`.`order_id` = \'9\'
+ LIMIT 1')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `order`.*, `from_emp`.`name` AS `from_name`, `to_emp`.`name` AS `to_name`, `order_status`.`status` AS `status_name`
+FROM `order`
+LEFT JOIN `employee` as `from_emp` ON `from_emp`.`emp_id` = `order`.`from_employee_id`
+LEFT JOIN `employee` as `to_emp` ON `to_emp`.`emp_id` = `order`.`to_employee_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `order`.`order_status_id`
+WHERE `order`.`order_id` = :order.order_id:
+ LIMIT 1', [...], false)
+ 4 SYSTEMPATH\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(717): CodeIgniter\Model->doFirst()
+ 6 APPPATH\Controllers\InventoryController.php(837): CodeIgniter\BaseModel->first()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->showOrder('9')
+ 8 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 9 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-09-21 17:24:39 --> [Caused by] mysqli_sql_exception: Unknown column 'order.from_employee_id' in 'on clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `order`.*, `from_emp`.`name` AS `from_name`, `to_emp`.`name` AS `to_name`, `order_status`.`status` AS `status_name`
+FROM `order`
+LEFT JOIN `employee` as `from_emp` ON `from_emp`.`emp_id` = `order`.`from_employee_id`
+LEFT JOIN `employee` as `to_emp` ON `to_emp`.`emp_id` = `order`.`to_employee_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `order`.`order_status_id`
+WHERE `order`.`order_id` = \'9\'
+ LIMIT 1', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `order`.*, `from_emp`.`name` AS `from_name`, `to_emp`.`name` AS `to_name`, `order_status`.`status` AS `status_name`
+FROM `order`
+LEFT JOIN `employee` as `from_emp` ON `from_emp`.`emp_id` = `order`.`from_employee_id`
+LEFT JOIN `employee` as `to_emp` ON `to_emp`.`emp_id` = `order`.`to_employee_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `order`.`order_status_id`
+WHERE `order`.`order_id` = \'9\'
+ LIMIT 1')
+ 3 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `order`.*, `from_emp`.`name` AS `from_name`, `to_emp`.`name` AS `to_name`, `order_status`.`status` AS `status_name`
+FROM `order`
+LEFT JOIN `employee` as `from_emp` ON `from_emp`.`emp_id` = `order`.`from_employee_id`
+LEFT JOIN `employee` as `to_emp` ON `to_emp`.`emp_id` = `order`.`to_employee_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `order`.`order_status_id`
+WHERE `order`.`order_id` = \'9\'
+ LIMIT 1')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `order`.*, `from_emp`.`name` AS `from_name`, `to_emp`.`name` AS `to_name`, `order_status`.`status` AS `status_name`
+FROM `order`
+LEFT JOIN `employee` as `from_emp` ON `from_emp`.`emp_id` = `order`.`from_employee_id`
+LEFT JOIN `employee` as `to_emp` ON `to_emp`.`emp_id` = `order`.`to_employee_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `order`.`order_status_id`
+WHERE `order`.`order_id` = :order.order_id:
+ LIMIT 1', [...], false)
+ 5 SYSTEMPATH\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(717): CodeIgniter\Model->doFirst()
+ 7 APPPATH\Controllers\InventoryController.php(837): CodeIgniter\BaseModel->first()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->showOrder('9')
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-21 17:24:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 17:24:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 17:25:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 17:25:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 17:25:54 --> تم حذف الطلب 5 مع 1 عنصر بواسطة المستخدم 1001
+DEBUG - 2025-09-21 17:39:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 17:47:19 --> Search term: كر
+INFO - 2025-09-21 17:47:20 --> Search term: كرس
+INFO - 2025-09-21 17:47:21 --> Items found: 5
+INFO - 2025-09-21 17:47:22 --> Items found: 5
+INFO - 2025-09-21 17:47:51 --> User search started for: U102
+INFO - 2025-09-21 17:47:53 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 17:48:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 17:48:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 17:48:35 --> تم حذف الطلب 3 مع 1 عنصر بواسطة المستخدم 1001
+DEBUG - 2025-09-21 17:57:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 17:57:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-21 17:58:22 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "ordersCreate.php"
+[Method: GET, Route: OrderController/create]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(212): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('ordersCreate.php')
+ 2 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('ordersCreate', [], true)
+ 3 APPPATH\Controllers\OrderController.php(46): view('ordersCreate')
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->create()
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-09-21 18:00:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:05:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:05:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-09-21 18:16:44 --> Error: Class "App\Models\UsersModel" not found
+[Method: GET, Route: OrderController/create]
+in APPPATH\Controllers\OrderController.php on line 35.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\OrderController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(498): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-21 18:17:53 --> Search term: را
+INFO - 2025-09-21 18:17:55 --> Items found: 2
+INFO - 2025-09-21 18:18:01 --> Search term: راوت
+INFO - 2025-09-21 18:18:01 --> Search term: راو
+INFO - 2025-09-21 18:18:01 --> Search term: را
+INFO - 2025-09-21 18:18:03 --> Items found: 1
+INFO - 2025-09-21 18:18:03 --> Items found: 1
+INFO - 2025-09-21 18:18:03 --> Items found: 2
+INFO - 2025-09-21 18:18:03 --> Search term: را
+INFO - 2025-09-21 18:18:05 --> Items found: 2
+INFO - 2025-09-21 18:19:10 --> User search started for: U101
+INFO - 2025-09-21 18:19:13 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 18:19:20 --> User search started for: U10
+INFO - 2025-09-21 18:19:20 --> User search started for: U102
+INFO - 2025-09-21 18:19:22 --> User search result: null
+INFO - 2025-09-21 18:19:22 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 18:20:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:36:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 18:36:55 --> Search term: كر
+INFO - 2025-09-21 18:36:57 --> Items found: 5
+INFO - 2025-09-21 18:37:27 --> User search started for: U102
+INFO - 2025-09-21 18:37:29 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 18:37:31 --> User search started for: U101
+INFO - 2025-09-21 18:37:33 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 18:37:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:38:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:38:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:38:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:38:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:38:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:38:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 18:38:33 --> Search term: كر
+INFO - 2025-09-21 18:38:35 --> Items found: 5
+INFO - 2025-09-21 18:38:57 --> User search started for: U101
+INFO - 2025-09-21 18:38:59 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 18:39:10 --> User search started for: U10
+INFO - 2025-09-21 18:39:12 --> User search result: null
+INFO - 2025-09-21 18:39:16 --> User search started for: U102
+INFO - 2025-09-21 18:39:18 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 18:39:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:45:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-21 18:45:07 --> Error in store: Undefined variable $loggedEmployeeId
+DEBUG - 2025-09-21 18:46:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-09-21 18:46:34 --> Error in store: Undefined variable $isLoggedIn
+DEBUG - 2025-09-21 18:47:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:49:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 18:49:58 --> Search term: كر
+INFO - 2025-09-21 18:50:00 --> Items found: 5
+INFO - 2025-09-21 18:50:23 --> User search started for: U102
+INFO - 2025-09-21 18:50:25 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 18:50:29 --> User search started for: U101
+INFO - 2025-09-21 18:50:31 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 18:50:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:50:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:56:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:56:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 18:57:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 18:57:49 --> Search term: رل
+INFO - 2025-09-21 18:57:50 --> Search term: را
+INFO - 2025-09-21 18:57:51 --> Items found: 0
+INFO - 2025-09-21 18:57:52 --> Items found: 2
+INFO - 2025-09-21 18:58:12 --> User search started for: U102
+INFO - 2025-09-21 18:58:14 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 18:58:17 --> User search started for: U101
+INFO - 2025-09-21 18:58:19 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 18:58:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:01:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 19:01:31 --> Search term: كر
+INFO - 2025-09-21 19:01:33 --> Items found: 5
+INFO - 2025-09-21 19:02:01 --> User search started for: U102
+INFO - 2025-09-21 19:02:03 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 19:02:07 --> User search started for: U101
+INFO - 2025-09-21 19:02:09 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 19:02:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:13:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 19:14:08 --> Search term: كر
+INFO - 2025-09-21 19:14:10 --> Items found: 5
+INFO - 2025-09-21 19:14:33 --> User search started for: U102
+INFO - 2025-09-21 19:14:36 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 19:14:37 --> User search started for: U101
+INFO - 2025-09-21 19:14:39 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 19:15:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:15:01 --> Session data: {"__ci_last_regenerate":1758482037,"_ci_previous_url":"http:\/\/localhost\/inventory6\/inventoryController\/index","employee_id":"1001","name":"\u0641\u064a\u0651 \u0627\u0644\u0646\u0641\u064a\u0639\u064a","role":"admin","isLoggedIn":true,"isEmployee":true}
+DEBUG - 2025-09-21 19:15:01 --> Logged employee ID: 1001
+DEBUG - 2025-09-21 19:15:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:16:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:16:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:16:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:16:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 19:16:49 --> Search term: كر
+INFO - 2025-09-21 19:16:51 --> Items found: 5
+INFO - 2025-09-21 19:17:10 --> User search started for: U102
+INFO - 2025-09-21 19:17:12 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 19:17:13 --> User search started for: U101
+INFO - 2025-09-21 19:17:15 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 19:17:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:17:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:17:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:17:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:22:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 19:22:27 --> Search term: كر
+INFO - 2025-09-21 19:22:27 --> Search term: كرس
+INFO - 2025-09-21 19:22:29 --> Items found: 5
+INFO - 2025-09-21 19:22:29 --> Items found: 5
+INFO - 2025-09-21 19:22:48 --> User search started for: U102
+INFO - 2025-09-21 19:22:50 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 19:22:52 --> User search started for: U102
+INFO - 2025-09-21 19:22:54 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 19:22:57 --> User search started for: U10
+INFO - 2025-09-21 19:22:59 --> User search started for: U101
+INFO - 2025-09-21 19:22:59 --> User search result: null
+INFO - 2025-09-21 19:23:01 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 19:23:01 --> User search started for: U10
+INFO - 2025-09-21 19:23:01 --> User search started for: U103
+INFO - 2025-09-21 19:23:03 --> User search result: null
+INFO - 2025-09-21 19:23:03 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 19:23:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:23:25 --> Session data: {"__ci_last_regenerate":1758482540,"_ci_previous_url":"http:\/\/localhost\/inventory6\/inventoryController\/index","employee_id":"1001","name":"\u0641\u064a\u0651 \u0627\u0644\u0646\u0641\u064a\u0639\u064a","role":"admin","isLoggedIn":true,"isEmployee":true}
+DEBUG - 2025-09-21 19:23:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:23:53 --> Session data: {"__ci_last_regenerate":1758482540,"_ci_previous_url":"http:\/\/localhost\/inventory6\/inventoryController\/index","employee_id":"1001","name":"\u0641\u064a\u0651 \u0627\u0644\u0646\u0641\u064a\u0639\u064a","role":"admin","isLoggedIn":true,"isEmployee":true}
+DEBUG - 2025-09-21 19:24:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 19:25:57 --> Search term: كر
+INFO - 2025-09-21 19:25:59 --> Items found: 5
+INFO - 2025-09-21 19:26:03 --> Search term: تل
+INFO - 2025-09-21 19:26:05 --> Items found: 2
+INFO - 2025-09-21 19:26:24 --> User search started for: U102
+INFO - 2025-09-21 19:26:26 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 19:26:28 --> User search started for: U103
+INFO - 2025-09-21 19:26:30 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 19:26:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:26:55 --> Session data: {"__ci_last_regenerate":1758482540,"_ci_previous_url":"http:\/\/localhost\/inventory6\/inventoryController\/index","employee_id":"1001","name":"\u0641\u064a\u0651 \u0627\u0644\u0646\u0641\u064a\u0639\u064a","role":"admin","isLoggedIn":true,"isEmployee":true}
+DEBUG - 2025-09-21 19:27:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:27:25 --> Session data: {"__ci_last_regenerate":1758482845,"_ci_previous_url":"http:\/\/localhost\/inventory6\/inventoryController\/index","employee_id":"1001","name":"\u0641\u064a\u0651 \u0627\u0644\u0646\u0641\u064a\u0639\u064a","role":"admin","isLoggedIn":true,"isEmployee":true}
+DEBUG - 2025-09-21 19:27:25 --> Logged employee ID: NULL
+DEBUG - 2025-09-21 19:30:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:30:58 --> Session data: {"__ci_last_regenerate":1758482845,"_ci_previous_url":"http:\/\/localhost\/inventory6\/inventoryController\/index","employee_id":"1001","name":"\u0641\u064a\u0651 \u0627\u0644\u0646\u0641\u064a\u0639\u064a","role":"admin","isLoggedIn":true,"isEmployee":true}
+DEBUG - 2025-09-21 19:30:58 --> Logged employee ID: 1001
+DEBUG - 2025-09-21 19:31:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 19:33:09 --> Search term: kg
+INFO - 2025-09-21 19:33:11 --> Items found: 0
+INFO - 2025-09-21 19:33:14 --> Search term: تل
+INFO - 2025-09-21 19:33:16 --> Items found: 2
+INFO - 2025-09-21 19:33:39 --> User search started for: U102
+INFO - 2025-09-21 19:33:41 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 19:33:47 --> User search started for: U103
+INFO - 2025-09-21 19:33:49 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 19:34:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:34:09 --> Logged employee ID: 1001
+DEBUG - 2025-09-21 19:34:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 19:36:53 --> Search term: كر
+INFO - 2025-09-21 19:36:55 --> Items found: 5
+INFO - 2025-09-21 19:37:29 --> User search started for: U102
+INFO - 2025-09-21 19:37:31 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 19:37:33 --> User search started for: U101
+INFO - 2025-09-21 19:37:35 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 19:38:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:38:09 --> Logged employee ID: 1001
+ERROR - 2025-09-21 19:38:11 --> Error in store: Undefined variable $defaultUsageStatus
+INFO - 2025-09-21 19:46:32 --> Search term: ;v
+INFO - 2025-09-21 19:46:34 --> Items found: 0
+INFO - 2025-09-21 19:46:38 --> Search term: كر
+INFO - 2025-09-21 19:46:40 --> Items found: 5
+INFO - 2025-09-21 19:46:59 --> User search started for: U102
+INFO - 2025-09-21 19:47:01 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 19:47:03 --> User search started for: U103
+INFO - 2025-09-21 19:47:05 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 19:47:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:47:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:49:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:49:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:49:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:52:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 19:57:56 --> Search term: كر
+INFO - 2025-09-21 19:57:56 --> Search term: كرس
+INFO - 2025-09-21 19:57:58 --> Items found: 5
+INFO - 2025-09-21 19:57:58 --> Items found: 5
+INFO - 2025-09-21 19:58:17 --> User search started for: U102
+INFO - 2025-09-21 19:58:19 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 19:58:21 --> User search started for: U101
+INFO - 2025-09-21 19:58:23 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 19:58:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:58:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:59:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:59:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:59:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:59:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:59:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:59:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:59:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:59:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 19:59:35 --> Search term: كر
+DEBUG - 2025-09-21 19:59:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 19:59:37 --> Items found: 5
+DEBUG - 2025-09-21 19:59:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:59:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 19:59:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 20:03:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 20:07:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 20:08:07 --> Search term: كر
+INFO - 2025-09-21 20:08:08 --> Search term: كرس
+INFO - 2025-09-21 20:08:09 --> Items found: 5
+INFO - 2025-09-21 20:08:10 --> Items found: 5
+INFO - 2025-09-21 20:08:35 --> User search started for: U102
+INFO - 2025-09-21 20:08:37 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 20:08:40 --> User search started for: U103
+INFO - 2025-09-21 20:08:43 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 20:10:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 20:10:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 20:10:25 --> Search term: تل
+INFO - 2025-09-21 20:10:27 --> Items found: 2
+INFO - 2025-09-21 20:10:47 --> User search started for: U102
+INFO - 2025-09-21 20:10:49 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 20:10:50 --> User search started for: U102
+INFO - 2025-09-21 20:10:52 --> User search started for: U10
+INFO - 2025-09-21 20:10:52 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 20:10:53 --> User search started for: U104
+INFO - 2025-09-21 20:10:54 --> User search result: null
+INFO - 2025-09-21 20:10:55 --> User search result: {"id":"4","user_id":"U104","name":"\u062e\u0627\u0644\u062f \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0627\u0644\u064a\u0629","user_ext":"2229","email":"khaled@example.com","password":"$2y$10$luNnt3N5O\/7BHleaPVAA6.4YhxFQ8wssO.2RbqOuUuudB6auw7t0e","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 20:18:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 20:18:54 --> Search term: كر
+INFO - 2025-09-21 20:18:55 --> Search term: كرس
+INFO - 2025-09-21 20:18:55 --> Search term: كرسي
+INFO - 2025-09-21 20:18:56 --> Items found: 5
+INFO - 2025-09-21 20:18:57 --> Items found: 5
+INFO - 2025-09-21 20:18:57 --> Items found: 5
+DEBUG - 2025-09-21 20:19:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-09-21 20:19:44 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 489.
+ 1 APPPATH\Controllers\OrderController.php(489): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 20:19:51 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 488.
+ 1 APPPATH\Controllers\OrderController.php(488): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 20:20:09 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 489.
+ 1 APPPATH\Controllers\OrderController.php(489): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 20:20:12 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 488.
+ 1 APPPATH\Controllers\OrderController.php(488): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-21 20:20:31 --> User search started for: U102
+INFO - 2025-09-21 20:20:33 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 20:20:38 --> User search started for: U101
+INFO - 2025-09-21 20:20:40 --> User search result: {"id":"1","user_id":"U101","name":"\u0639\u0644\u064a \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u062a\u0633\u0648\u064a\u0642","user_ext":"1111","email":"ali@example.com","password":"$2y$10$9s444BCJbgNHaThgf5ExLuwJSiu8jY72oLPaLP2h8sAsD5srozmUy","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 20:21:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 20:21:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 20:22:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 20:23:39 --> Search term: ;v
+INFO - 2025-09-21 20:23:41 --> Items found: 0
+INFO - 2025-09-21 20:23:43 --> Search term: كر
+INFO - 2025-09-21 20:23:43 --> Search term: كرس
+INFO - 2025-09-21 20:23:45 --> Items found: 5
+INFO - 2025-09-21 20:23:45 --> Items found: 5
+WARNING - 2025-09-21 20:24:07 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 489.
+ 1 APPPATH\Controllers\OrderController.php(489): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 20:24:12 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 488.
+ 1 APPPATH\Controllers\OrderController.php(488): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 20:24:29 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 488.
+ 1 APPPATH\Controllers\OrderController.php(488): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-21 20:24:38 --> User search started for: U102
+INFO - 2025-09-21 20:24:40 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 20:24:44 --> User search started for: U103
+INFO - 2025-09-21 20:24:46 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 20:25:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 20:25:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 20:31:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 20:36:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 22:22:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 22:23:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 22:23:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 22:23:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 22:23:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 22:26:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 22:28:44 --> UpdateOrder - Order ID: 22
+INFO - 2025-09-21 22:28:46 --> Current items in database: 19
+INFO - 2025-09-21 22:28:46 --> Submitted items from frontend: 19
+INFO - 2025-09-21 22:28:46 --> Updating item 19 with data: {"asset_num":"94683","serial_num":"865456","brand":"\u063a\u064a\u0631 \u0645\u062d\u062f\u062f","model_num":"","room_id":"3","note":"\u0634\u0634"}
+INFO - 2025-09-21 22:28:46 --> Item 19 updated successfully
+DEBUG - 2025-09-21 22:28:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 22:28:46 --> New item added successfully to order 22
+INFO - 2025-09-21 22:28:46 --> Order 22 updated successfully
+DEBUG - 2025-09-21 22:28:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 22:41:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 22:42:19 --> Search term: كر
+INFO - 2025-09-21 22:42:20 --> Search term: كرس
+INFO - 2025-09-21 22:42:21 --> Items found: 5
+INFO - 2025-09-21 22:42:22 --> Items found: 5
+WARNING - 2025-09-21 22:42:40 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 490.
+ 1 APPPATH\Controllers\OrderController.php(490): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 22:42:44 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 489.
+ 1 APPPATH\Controllers\OrderController.php(489): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-21 22:42:54 --> User search started for: U102
+INFO - 2025-09-21 22:42:56 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 22:42:58 --> User search started for: U103
+INFO - 2025-09-21 22:43:00 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 22:43:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 22:43:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 22:46:09 --> Search term: تل
+INFO - 2025-09-21 22:46:09 --> Search term: تلف
+INFO - 2025-09-21 22:46:11 --> Items found: 2
+INFO - 2025-09-21 22:46:11 --> Items found: 2
+WARNING - 2025-09-21 22:46:23 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 490.
+ 1 APPPATH\Controllers\OrderController.php(490): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 22:46:27 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 489.
+ 1 APPPATH\Controllers\OrderController.php(489): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 22:46:37 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 490.
+ 1 APPPATH\Controllers\OrderController.php(490): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 22:46:44 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 489.
+ 1 APPPATH\Controllers\OrderController.php(489): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-21 22:46:46 --> User search started for: U102
+INFO - 2025-09-21 22:46:48 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 22:46:50 --> User search started for: U103
+INFO - 2025-09-21 22:46:52 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 22:47:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 22:47:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 22:51:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 22:51:07 --> Search term: ;v
+INFO - 2025-09-21 22:51:09 --> Items found: 0
+INFO - 2025-09-21 22:51:10 --> Search term: كر
+INFO - 2025-09-21 22:51:12 --> Items found: 5
+WARNING - 2025-09-21 22:51:24 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 490.
+ 1 APPPATH\Controllers\OrderController.php(490): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 22:51:28 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 489.
+ 1 APPPATH\Controllers\OrderController.php(489): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 22:51:31 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 490.
+ 1 APPPATH\Controllers\OrderController.php(490): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 22:51:35 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 489.
+ 1 APPPATH\Controllers\OrderController.php(489): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-21 22:51:37 --> User search started for: U102
+INFO - 2025-09-21 22:51:39 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 22:51:41 --> User search started for: U103
+INFO - 2025-09-21 22:51:43 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 22:52:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 22:52:58 --> Search term: ;v
+INFO - 2025-09-21 22:52:58 --> Search term: ;vs
+INFO - 2025-09-21 22:53:00 --> Items found: 0
+INFO - 2025-09-21 22:53:00 --> Search term: ;v
+INFO - 2025-09-21 22:53:00 --> Items found: 0
+INFO - 2025-09-21 22:53:02 --> Search term: كر
+INFO - 2025-09-21 22:53:02 --> Search term: كرس
+INFO - 2025-09-21 22:53:02 --> Items found: 0
+INFO - 2025-09-21 22:53:04 --> Items found: 5
+INFO - 2025-09-21 22:53:04 --> Items found: 5
+WARNING - 2025-09-21 22:53:23 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 490.
+ 1 APPPATH\Controllers\OrderController.php(490): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 22:53:28 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 489.
+ 1 APPPATH\Controllers\OrderController.php(489): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-21 22:53:41 --> User search started for: U102
+INFO - 2025-09-21 22:53:43 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 22:53:48 --> User search started for: U103
+INFO - 2025-09-21 22:53:50 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 22:54:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 22:56:12 --> Search term: كر
+INFO - 2025-09-21 22:56:14 --> Items found: 5
+WARNING - 2025-09-21 22:56:27 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 490.
+ 1 APPPATH\Controllers\OrderController.php(490): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 22:56:31 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 489.
+ 1 APPPATH\Controllers\OrderController.php(489): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-21 22:56:35 --> User search started for: U102
+INFO - 2025-09-21 22:56:37 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 22:56:39 --> User search started for: U103
+INFO - 2025-09-21 22:56:41 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 22:57:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 22:57:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 23:01:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 23:04:08 --> Search term: تل
+INFO - 2025-09-21 23:04:09 --> Search term: تلف
+INFO - 2025-09-21 23:04:10 --> Items found: 2
+INFO - 2025-09-21 23:04:11 --> Items found: 2
+WARNING - 2025-09-21 23:04:26 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 490.
+ 1 APPPATH\Controllers\OrderController.php(490): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 23:04:29 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 489.
+ 1 APPPATH\Controllers\OrderController.php(489): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-21 23:04:45 --> User search started for: U102
+INFO - 2025-09-21 23:04:47 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 23:04:49 --> User search started for: U103
+INFO - 2025-09-21 23:04:51 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 23:05:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 23:05:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 23:18:30 --> Search term: كر
+INFO - 2025-09-21 23:18:33 --> Items found: 5
+WARNING - 2025-09-21 23:18:49 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 492.
+ 1 APPPATH\Controllers\OrderController.php(492): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 23:18:53 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 491.
+ 1 APPPATH\Controllers\OrderController.php(491): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-21 23:19:22 --> User search started for: U102
+INFO - 2025-09-21 23:19:24 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 23:19:29 --> User search started for: U103
+INFO - 2025-09-21 23:19:31 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 23:19:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 23:19:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 23:33:16 --> Search term: كر
+INFO - 2025-09-21 23:33:18 --> Items found: 5
+WARNING - 2025-09-21 23:33:32 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 492.
+ 1 APPPATH\Controllers\OrderController.php(492): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 23:33:36 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 491.
+ 1 APPPATH\Controllers\OrderController.php(491): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-21 23:33:46 --> User search started for: U102
+INFO - 2025-09-21 23:33:48 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 23:33:50 --> User search started for: U103
+INFO - 2025-09-21 23:33:52 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+DEBUG - 2025-09-21 23:34:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 23:34:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-09-21 23:57:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-09-21 23:58:01 --> Search term: كر
+INFO - 2025-09-21 23:58:02 --> Search term: كرس
+INFO - 2025-09-21 23:58:02 --> Search term: كرسي
+INFO - 2025-09-21 23:58:03 --> Items found: 5
+INFO - 2025-09-21 23:58:04 --> Items found: 5
+INFO - 2025-09-21 23:58:04 --> Items found: 5
+WARNING - 2025-09-21 23:58:22 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 450.
+ 1 APPPATH\Controllers\OrderController.php(450): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 23:58:40 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 450.
+ 1 APPPATH\Controllers\OrderController.php(450): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-09-21 23:58:49 --> [DEPRECATED] trim(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\OrderController.php on line 449.
+ 1 APPPATH\Controllers\OrderController.php(449): trim(null)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\OrderController->validateAssetSerial()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OrderController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-09-21 23:59:03 --> User search started for: U102
+INFO - 2025-09-21 23:59:05 --> User search result: {"id":"2","user_id":"U102","name":"\u0646\u0648\u0631\u0629 \u0641\u0647\u062f","user_dept":"\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a","user_ext":"2222","email":"noura@example.com","password":"$2y$10$v5V623afIpa3yWZddO9Wo.8K5qxmR6dyrJaNseyJ6B0HUR8bsld52","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+INFO - 2025-09-21 23:59:07 --> User search started for: U103
+INFO - 2025-09-21 23:59:09 --> User search result: {"id":"3","user_id":"U103","name":"\u0628\u062f\u0631 \u0645\u062d\u0645\u062f","user_dept":"\u0627\u0644\u0634\u0624\u0648\u0646 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a\u0629","user_ext":"1119","email":"bader@example.com","password":"$2y$10$krbzkkUVLEMTSXb12KmPiOLf3xH\/Tq9ybN9fa7mZN17vCSFWDsnwW","created_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"},"updated_at":{"date":"2025-09-20 09:20:30.000000","timezone_type":3,"timezone":"UTC"}}
+ERROR - 2025-09-21 23:59:29 --> Error in store: Undefined variable $orderId
+ERROR - 2025-09-21 23:59:59 --> Error in store: Undefined variable $orderId
