@@ -1,21 +1,20 @@
 <?php
+// اضافة طلبات من نفس النوع 
 
 namespace App\Controllers;
-use CodeIgniter\HTTP\ResponseInterface;
 
-use App\Models\{
-    BuildingModel,
-    EmployeeModel,
-    FloorModel,
-    ItemModel,
-    ItemOrderModel,
-    MajorCategoryModel,
-    OrderModel,
-    RoomModel,
-    SectionModel,
-    UserModel,
-    UsageStatusModel  // إضافة UserModel
-};
+use App\Models\BuildingModel;
+use App\Models\EmployeeModel;
+use App\Models\FloorModel;
+use App\Models\ItemModel;
+use App\Models\ItemOrderModel;
+use App\Models\MajorCategoryModel;
+use App\Models\OrderModel;
+use App\Models\RoomModel;
+use App\Models\SectionModel;
+use App\Models\UserModel; // إضافة UserModel
+use App\Models\UsageStatusModel; 
+use CodeIgniter\HTTP\ResponseInterface;
 
 class OrderController extends BaseController
 {
@@ -46,10 +45,7 @@ class OrderController extends BaseController
         $this->usageStatusModel = new UsageStatusModel(); // تهيئة نموذج حالة الاستخدام
     }
 
-    public function create()
-    {
-        return view('warehouse\addOrder_1type');
-    }
+    
 
     /**
      * البحث عن الأصناف مع التصنيفات
@@ -169,13 +165,16 @@ class OrderController extends BaseController
     {
         try {
             $buildings = $this->buildingModel->findAll();
-          
+            $users = $this->userModel->select('user_dept')->distinct()->findAll();
+            $departments = array_unique(array_column($users, 'user_dept'));
+            
             // جلب قيم enum من المودل مباشرة
             $custodyTypes = $this->itemOrderModel->getAssetsTypeEnum();
 
             return $this->response->setJSON([
                 'success' => true,
                 'buildings' => $buildings,
+                'departments' => array_values($departments),
                 'custody_types' => $custodyTypes
             ]);
             
@@ -281,311 +280,105 @@ class OrderController extends BaseController
         }
     }
 
+
     /**
-     * حفظ طلب جديد
-     */
-    public function store()
-    {
-        try {
-            // التحقق من تسجيل الدخول
-            if (! session()->get('isLoggedIn')) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'يجب تسجيل الدخول أولاً'
-                ]);
-            }
-            
-            // الحصول على معرف الموظف من الجلسة
-            $loggedEmployeeId = session()->get('employee_id');
-            
-            // الحصول على حالة الاستخدام الافتراضية (أول سجل)
-            $defaultUsageStatus = $this->usageStatusModel->first();
-            
-            if (!$defaultUsageStatus) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'لا توجد حالات استخدام في النظام'
-                ]);
-            }
-
-            // التحقق من البيانات المطلوبة
-            $requiredFields = ['from_user_id', 'user_id', 'item', 'quantity', 'room'];
-            foreach ($requiredFields as $field) {
-                if (!$this->request->getPost($field)) {
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "الحقل {$field} مطلوب"
-                    ]);
-                }
-            }
-
-            // بدء المعاملة
-            $this->orderModel->transStart();
-            
-            // إنشاء الطلب الرئيسي
-            $orderData = [
-                'from_user_id' => $this->request->getPost('from_user_id'),
-                'to_user_id' => $this->request->getPost('user_id'), // to_user_id هو المستلم
-                'order_status_id' => 1, // جديد
-                'note' => $this->request->getPost('notes') ?? ''
-            ];
-
-            $orderId = $this->orderModel->insert($orderData);
-
-            if (!$orderId) {
-                $this->orderModel->transRollback();
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'فشل في إنشاء الطلب'
-                ]);
-            }
-
-            // العثور على الصنف
-            $itemName = $this->request->getPost('item');
-            $item = $this->itemModel->where('name', $itemName)->first();
-
-            if (!$item) {
-                $this->orderModel->transRollback();
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'الصنف المحدد غير موجود'
-                ]);
-            }
-
-            // إضافة العناصر حسب الكمية
-            $quantity = (int)$this->request->getPost('quantity');
-            $custodyType = $this->request->getPost('custody_type');
-            $assetNumbers = [];
-            $serialNumbers = [];
-
-            // جمع جميع أرقام الأصول والأرقام التسلسلية للتحقق
-            for ($i = 1; $i <= $quantity; $i++) {
-                $assetNum = trim($this->request->getPost("asset_num_{$i}"));
-                $serialNum = trim($this->request->getPost("serial_num_{$i}"));
-                
-                // التحقق من رقم الأصول
-                if (empty($assetNum)) {
-                    $this->orderModel->transRollback();
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "رقم الأصول مطلوب للعنصر رقم {$i}"
-                    ]);
-                }
-                
-                // التحقق من صحة تنسيق رقم الأصول
-                $assetValidation = $this->validateAssetNumber($assetNum);
-                if (!$assetValidation['valid']) {
-                    $this->orderModel->transRollback();
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "العنصر رقم {$i}: " . $assetValidation['message']
-                    ]);
-                }
-                
-                // التحقق من الرقم التسلسلي
-                if (empty($serialNum)) {
-                    $this->orderModel->transRollback();
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "الرقم التسلسلي مطلوب للعنصر رقم {$i}"
-                    ]);
-                }
-                
-                // التحقق من صحة تنسيق الرقم التسلسلي
-                $serialValidation = $this->validateSerialNumber($serialNum);
-                if (!$serialValidation['valid']) {
-                    $this->orderModel->transRollback();
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "العنصر رقم {$i}: " . $serialValidation['message']
-                    ]);
-                }
-                
-                // التحقق من عدم تكرار أرقام الأصول
-                if (in_array($assetNum, $assetNumbers)) {
-                    $this->orderModel->transRollback();
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "رقم الأصول {$assetNum} مكرر. يجب أن يكون كل رقم أصول فريد."
-                    ]);
-                }
-                
-                // التحقق من عدم تكرار الأرقام التسلسلية
-                if (in_array($serialNum, $serialNumbers)) {
-                    $this->orderModel->transRollback();
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "الرقم التسلسلي {$serialNum} مكرر. يجب أن يكون كل رقم تسلسلي فريد."
-                    ]);
-                }
-                
-                // التحقق من عدم وجود رقم الأصول في قاعدة البيانات
-                $existingAsset = $this->itemOrderModel->where('asset_num', $assetNum)->first();
-                if ($existingAsset) {
-                    $this->orderModel->transRollback();
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "رقم الأصول {$assetNum} موجود مسبقاً في النظام."
-                    ]);
-                }
-                
-                // التحقق من عدم وجود الرقم التسلسلي في قاعدة البيانات
-                $existingSerial = $this->itemOrderModel->where('serial_num', $serialNum)->first();
-                if ($existingSerial) {
-                    $this->orderModel->transRollback();
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "الرقم التسلسلي {$serialNum} موجود مسبقاً في النظام."
-                    ]);
-                }
-                
-                $assetNumbers[] = $assetNum;
-                $serialNumbers[] = $serialNum;
-            }
-            
-            // إدراج البيانات بعد التحقق من صحتها
-            for ($i = 1; $i <= $quantity; $i++) {
-                $assetNum = trim($this->request->getPost("asset_num_{$i}"));
-                $serialNum = trim($this->request->getPost("serial_num_{$i}"));
-                $modelNum = trim($this->request->getPost("model_num_{$i}")) ?? '';
-                $oldAssetNum = trim($this->request->getPost("old_asset_num_{$i}")) ?? '';
-                $brand = trim($this->request->getPost("brand_{$i}")) ?? 'غير محدد';
-
-                $itemOrderData = [
-                    'order_id' => $orderId,
-                    'item_id' => $item->id,
-                    'brand' => $brand,
-                    'quantity' => 1,
-                    'model_num' => $modelNum,
-                    'asset_num' => $assetNum,
-                    'old_asset_num' => $oldAssetNum,
-                    'serial_num' => $serialNum,
-                    'room_id' => $this->request->getPost('room'),
-                    'assets_type' => $custodyType,
-                    'created_by' => $loggedEmployeeId,
-                    'usage_status_id' => $defaultUsageStatus->id,
-                    'note' => $this->request->getPost('notes') ?? ''
-                ];
-
-                $itemOrderId = $this->itemOrderModel->insert($itemOrderData);
-                
-                if (!$itemOrderId) {
-                    $this->orderModel->transRollback();
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "فشل في إضافة العنصر رقم {$i}"
-                    ]);
-                }
-            }
-
-            // إنهاء المعاملة
-            $this->orderModel->transComplete();
-
-            if ($this->orderModel->transStatus() === FALSE) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'فشل في حفظ البيانات'
-                ]);
-            }
-
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'تم إنشاء الطلب بنجاح',
-                'order_id' => $orderId
-            ]);
-
-        } catch (\Exception $e) {
-            log_message('error', 'Error in store: ' . $e->getMessage());
+ * التحقق من تكرار أرقام الأصول والأرقام التسلسلية
+ */
+public function validateAssetSerial()
+{
+    try {
+        $assetNum = trim($this->request->getPost('asset_num'));
+        $serialNum = trim($this->request->getPost('serial_num'));
+        $checkType = $this->request->getPost('check_type');
+        $excludeItemId = $this->request->getPost('exclude_item_id'); 
+        
+        if (empty($assetNum) && empty($serialNum)) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'خطأ في حفظ الطلب: ' . $e->getMessage()
+                'message' => 'يجب إدخال رقم الأصول أو الرقم التسلسلي'
             ]);
         }
-    }
 
-    /**
-     * التحقق من تكرار أرقام الأصول والأرقام التسلسلية
-     */
-    public function validateAssetSerial()
-    {
-        try {
-            $assetNum = trim($this->request->getPost('asset_num'));
-            $serialNum = trim($this->request->getPost('serial_num'));
-            $checkType = $this->request->getPost('check_type');
+        $errors = [];
+
+        // التحقق من رقم الأصول
+        if (!empty($assetNum) && ($checkType === 'asset' || $checkType === 'both')) {
+            // التحقق من صحة تنسيق رقم الأصول أولاً
+            $assetValidation = $this->validateAssetNumber($assetNum);
             
-            if (empty($assetNum) && empty($serialNum)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'يجب إدخال رقم الأصول أو الرقم التسلسلي'
-                ]);
-            }
-
-            $errors = [];
-
-            // التحقق من رقم الأصول
-            if (!empty($assetNum) && ($checkType === 'asset' || $checkType === 'both')) {
-                // التحقق من صحة تنسيق رقم الأصول أولاً
-                $assetValidation = $this->validateAssetNumber($assetNum);
+            if (!$assetValidation['valid']) {
+                $errors[] = [
+                    'type' => 'asset',
+                    'message' => $assetValidation['message']
+                ];
+            } else {
+                // التحقق من التكرار في قاعدة البيانات
+                $assetQuery = $this->itemOrderModel->where('asset_num', $assetNum);
                 
-                if (!$assetValidation['valid']) {
+                // استثناء العنصر الحالي عند التعديل
+                if (!empty($excludeItemId)) {
+                    $assetQuery->where('order_id !=', $excludeItemId);
+                }
+                
+                $existingAsset = $assetQuery->first();
+                if ($existingAsset) {
                     $errors[] = [
                         'type' => 'asset',
-                        'message' => $assetValidation['message']
+                        'message' => "رقم الأصول {$assetNum} موجود مسبقاً في النظام"
                     ];
-                } else {
-                    // التحقق من التكرار في قاعدة البيانات
-                    $existingAsset = $this->itemOrderModel->where('asset_num', $assetNum)->first();
-                    if ($existingAsset) {
-                        $errors[] = [
-                            'type' => 'asset',
-                            'message' => "رقم الأصول {$assetNum} موجود مسبقاً في النظام"
-                        ];
-                    }
                 }
             }
+        }
 
-            // التحقق من الرقم التسلسلي
-            if (!empty($serialNum) && ($checkType === 'serial' || $checkType === 'both')) {
-                // التحقق من صحة تنسيق الرقم التسلسلي أولاً
-                $serialValidation = $this->validateSerialNumber($serialNum);
+        // التحقق من الرقم التسلسلي
+        if (!empty($serialNum) && ($checkType === 'serial' || $checkType === 'both')) {
+            // التحقق من صحة تنسيق الرقم التسلسلي أولاً
+            $serialValidation = $this->validateSerialNumber($serialNum);
+            
+            if (!$serialValidation['valid']) {
+                $errors[] = [
+                    'type' => 'serial',
+                    'message' => $serialValidation['message']
+                ];
+            } else {
+                // التحقق من التكرار في قاعدة البيانات
+                $serialQuery = $this->itemOrderModel->where('serial_num', $serialNum);
                 
-                if (!$serialValidation['valid']) {
+                // استثناء العنصر الحالي عند التعديل
+                if (!empty($excludeItemId)) {
+                    $serialQuery->where('order_id !=', $excludeItemId);
+                }
+                
+                $existingSerial = $serialQuery->first();
+                if ($existingSerial) {
                     $errors[] = [
-                        'type' => 'serial',
-                        'message' => $serialValidation['message']
+                        'type' => 'serial', 
+                        'message' => "الرقم التسلسلي {$serialNum} موجود مسبقاً في النظام"
                     ];
-                } else {
-                    // التحقق من التكرار في قاعدة البيانات
-                    $existingSerial = $this->itemOrderModel->where('serial_num', $serialNum)->first();
-                    if ($existingSerial) {
-                        $errors[] = [
-                            'type' => 'serial', 
-                            'message' => "الرقم التسلسلي {$serialNum} موجود مسبقاً في النظام"
-                        ];
-                    }
                 }
             }
+        }
 
-            if (!empty($errors)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'errors' => $errors
-                ]);
-            }
-
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'الأرقام متاحة للاستخدام'
-            ]);
-
-        } catch (\Exception $e) {
-            log_message('error', 'Error in validateAssetSerial: ' . $e->getMessage());
+        if (!empty($errors)) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'خطأ في التحقق من البيانات: ' . $e->getMessage()
+                'errors' => $errors
             ]);
         }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'الأرقام متاحة للاستخدام'
+        ]);
+
+    } catch (\Exception $e) {
+        log_message('error', 'Error in validateAssetSerial: ' . $e->getMessage());
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'خطأ في التحقق من البيانات: ' . $e->getMessage()
+        ]);
     }
+}
 
     /**
      * التحقق من رقم الأصول - يجب أن يكون 12 رقم فقط
@@ -717,7 +510,7 @@ class OrderController extends BaseController
                             'message' => "رقم الأصول والرقم التسلسلي مطلوبان للعنصر {$i} من الصنف '{$itemName}'"
                         ]);
                     }
-                    // إضافة العنصر إلى القائمة  - itemOrder  ليتم معالجته لاحقاً
+
                     $items[] = [
                         'item_id' => $item->id,
                         'item_name' => $itemName,
@@ -811,7 +604,6 @@ class OrderController extends BaseController
                 'note' => $notes
             ];
 
-            // إدخال الطلب الرئيسي
             $orderId = $this->orderModel->insert($orderData);
 
             if (!$orderId) {
@@ -839,7 +631,7 @@ class OrderController extends BaseController
                     'usage_status_id' => $defaultUsageStatus->id,
                     'note' => $notes
                 ];
-                // 
+
                 $itemOrderId = $this->itemOrderModel->insert($itemOrderData);
 
                 if (!$itemOrderId) {
@@ -880,5 +672,398 @@ class OrderController extends BaseController
     {
         return view('warehouse/addMultiItemOrder');
     }
+ 
+    
+/**
+ * عرض صفحة تعديل الطلب
+ */
+public function editOrder($orderId = null)
+{
+    if (!$orderId) {
+        return redirect()->to(base_url('inventoryController/index'))->with('error', 'رقم الطلب مطلوب');
+    }
+
+    // التحقق من وجود الطلب
+    $order = $this->orderModel->find($orderId);
+    if (!$order) {
+        return redirect()->to(base_url('inventoryController/index'))->with('error', 'الطلب غير موجود');
+    }
+
+    return view('warehouse/editMultiItemOrder', ['orderId' => $orderId]);
+}
+
+
+/**
+ * جلب بيانات الطلب للتعديل
+ */
+public function getOrderData($orderId = null)
+{
+    try {
+        if (!$orderId) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'رقم الطلب مطلوب'
+            ]);
+        }
+
+        // جلب بيانات الطلب كمصفوفة
+        $this->orderModel->asArray();
+        $order = $this->orderModel->find($orderId);
+        
+        log_message('info', 'Order data: ' . print_r($order, true));
+        
+        if (!$order) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'الطلب غير موجود'
+            ]);
+        }
+
+        // جلب بيانات المرسل كمصفوفة
+        $fromUser = null;
+        if (isset($order['from_user_id']) && $order['from_user_id']) {
+            $this->userModel->asArray();
+            $fromUser = $this->userModel->where('user_id', $order['from_user_id'])->first();
+        }
+        
+        // جلب بيانات المستلم كمصفوفة
+        $toUser = null;
+        if (isset($order['to_user_id']) && $order['to_user_id']) {
+            $this->userModel->asArray();
+            $toUser = $this->userModel->where('user_id', $order['to_user_id'])->first();
+        }
+
+        // جلب عناصر الطلب - استخدم order_id بدلاً من id
+        $builder = $this->itemOrderModel->builder();
+        $orderItems = $builder
+            ->select('item_order.*, items.name as item_name, room.id as room_id, room.code as room_code, 
+                     section.id as section_id, floor.id as floor_id, building.id as building_id')
+            ->join('items', 'item_order.item_id = items.id', 'left')
+            ->join('room', 'item_order.room_id = room.id', 'left')
+            ->join('section', 'room.section_id = section.id', 'left')
+            ->join('floor', 'section.floor_id = floor.id', 'left')
+            ->join('building', 'floor.building_id = building.id', 'left')
+            ->where('item_order.order_id', $order['order_id'])  // استخدم order_id هنا
+            ->get()
+            ->getResultArray();
+
+        // تجميع العناصر حسب الصنف
+        $groupedItems = [];
+        foreach ($orderItems as $item) {
+            $itemKey = $item['item_id'] . '_' . ($item['assets_type'] ?? 'unknown');
+            
+            if (!isset($groupedItems[$itemKey])) {
+                $groupedItems[$itemKey] = [
+                    'item_id' => $item['item_id'],
+                    'item_name' => $item['item_name'],
+                    'assets_type' => $item['assets_type'],
+                    'building_id' => $item['building_id'],
+                    'floor_id' => $item['floor_id'],
+                    'section_id' => $item['section_id'],
+                    'room_id' => $item['room_id'],
+                    'room_code' => $item['room_code'],
+                    'quantity' => 0,
+                    'items' => []
+                ];
+            }
+            
+            $groupedItems[$itemKey]['quantity']++;
+            $groupedItems[$itemKey]['items'][] = [
+                'id' => $item['order_id'],
+                'asset_num' => $item['asset_num'],
+                'serial_num' => $item['serial_num'],
+                'model_num' => $item['model_num'],
+                'old_asset_num' => $item['old_asset_num'],
+                'brand' => $item['brand']
+            ];
+        }
+
+        // إعادة تعيين returnType
+        $this->orderModel->asObject();
+        $this->userModel->asObject();
+
+        return $this->response->setJSON([
+            'success' => true,
+            'data' => [
+                'order' => $order,
+                'from_user' => $fromUser,
+                'to_user' => $toUser,
+                'items' => array_values($groupedItems)
+            ]
+        ]);
+
+    } catch (\Exception $e) {
+        log_message('error', 'Error in getOrderData: ' . $e->getMessage() . ' | Line: ' . $e->getLine());
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'خطأ في جلب بيانات الطلب: ' . $e->getMessage()
+        ]);
+    }
+}
+
+/**
+ * تحديث الطلب متعدد الأصناف
+ */
+public function updateMultiItem($orderId = null)
+{
+    try {
+        // التحقق من تسجيل الدخول
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'يجب تسجيل الدخول أولاً'
+            ]);
+        }
+
+        if (!$orderId) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'رقم الطلب مطلوب'
+            ]);
+        }
+
+        // التحقق من وجود الطلب
+        $existingOrder = $this->orderModel->find($orderId);
+        if (!$existingOrder) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'الطلب غير موجود'
+            ]);
+        }
+
+        $loggedEmployeeId = session()->get('employee_id');
+        
+        // الحصول على حالة الاستخدام الافتراضية
+        $defaultUsageStatus = $this->usageStatusModel->first();
+        if (!$defaultUsageStatus) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'لا توجد حالات استخدام في النظام'
+            ]);
+        }
+
+        // الحصول على البيانات الأساسية
+        $fromUserId = $this->request->getPost('from_user_id');
+        $toUserId = $this->request->getPost('user_id');
+        $roomId = $this->request->getPost('room');
+        $notes = $this->request->getPost('notes') ?? '';
+
+        // التحقق من الحقول المطلوبة
+        if (empty($fromUserId) || empty($toUserId) || empty($roomId)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'جميع الحقول الأساسية مطلوبة (المرسل، المستلم، الغرفة)'
+            ]);
+        }
+
+        // جمع بيانات الأصناف من النموذج (نفس الطريقة في storeMultiItem)
+        $items = [];
+        $allPostData = $this->request->getPost();
+        
+        // البحث عن جميع الأصناف في البيانات المرسلة
+        $itemNumbers = [];
+        foreach ($allPostData as $key => $value) {
+            if (preg_match('/^item_(\d+)$/', $key, $matches)) {
+                $itemNumbers[] = $matches[1];
+            }
+        }
+
+        // معالجة كل صنف
+        foreach ($itemNumbers as $itemNum) {
+            $itemName = $this->request->getPost("item_{$itemNum}");
+            $quantity = (int)$this->request->getPost("quantity_{$itemNum}");
+            $custodyType = $this->request->getPost("custody_type_{$itemNum}");
+
+            if (empty($itemName) || $quantity <= 0 || empty($custodyType)) {
+                continue; // تجاهل الأصناف غير المكتملة
+            }
+
+            // العثور على الصنف في قاعدة البيانات
+            $item = $this->itemModel->where('name', $itemName)->first();
+            if (!$item) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "الصنف '{$itemName}' غير موجود في قاعدة البيانات"
+                ]);
+            }
+
+            // جمع بيانات العناصر لهذا الصنف
+            for ($i = 1; $i <= $quantity; $i++) {
+                $assetNum = trim($this->request->getPost("asset_num_{$itemNum}_{$i}"));
+                $serialNum = trim($this->request->getPost("serial_num_{$itemNum}_{$i}"));
+                $modelNum = trim($this->request->getPost("model_num_{$itemNum}_{$i}") ?? '');
+                $oldAssetNum = trim($this->request->getPost("old_asset_num_{$itemNum}_{$i}") ?? '');
+                $brand = trim($this->request->getPost("brand_{$itemNum}_{$i}") ?? 'غير محدد');
+                $existingItemId = $this->request->getPost("existing_item_id_{$itemNum}_{$i}") ?? null;
+
+                if (empty($assetNum) || empty($serialNum)) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => "رقم الأصول والرقم التسلسلي مطلوبان للعنصر {$i} من الصنف '{$itemName}'"
+                    ]);
+                }
+
+                $items[] = [
+                    'existing_item_id' => $existingItemId,
+                    'item_id' => $item->id,
+                    'item_name' => $itemName,
+                    'asset_number' => $assetNum,
+                    'serial_number' => $serialNum,
+                    'model_number' => $modelNum,
+                    'old_asset_number' => $oldAssetNum,
+                    'brand' => $brand,
+                    'custody_type' => $custodyType,
+                    'quantity' => 1
+                ];
+            }
+        }
+
+        if (empty($items)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'لم يتم العثور على أي أصناف صالحة لإضافتها'
+            ]);
+        }
+
+        // التحقق من عدم تكرار الأرقام (نفس التحقق في storeMultiItem)
+        $assetNumbers = [];
+        $serialNumbers = [];
+
+        foreach ($items as $index => $item) {
+            $assetNum = $item['asset_number'];
+            $serialNum = $item['serial_number'];
+            $existingItemId = $item['existing_item_id'];
+
+            // التحقق من صحة تنسيق الأرقام
+            $assetValidation = $this->validateAssetNumber($assetNum);
+            if (!$assetValidation['valid']) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "العنصر " . ($index + 1) . ": " . $assetValidation['message']
+                ]);
+            }
+
+            $serialValidation = $this->validateSerialNumber($serialNum);
+            if (!$serialValidation['valid']) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "العنصر " . ($index + 1) . ": " . $serialValidation['message']
+                ]);
+            }
+
+            // التحقق من التكرار في الطلب الحالي
+            if (in_array($assetNum, $assetNumbers)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "رقم الأصول {$assetNum} مكرر في الطلب"
+                ]);
+            }
+
+            if (in_array($serialNum, $serialNumbers)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "الرقم التسلسلي {$serialNum} مكرر في الطلب"
+                ]);
+            }
+
+            // التحقق من التكرار في قاعدة البيانات (استثناء العنصر الحالي)
+            $assetQuery = $this->itemOrderModel->where('asset_num', $assetNum);
+            if ($existingItemId) {
+                $assetQuery->where('order_id !=', $existingItemId);
+            }
+            $existingAsset = $assetQuery->first();
+            
+            if ($existingAsset) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "رقم الأصول {$assetNum} موجود مسبقاً في النظام"
+                ]);
+            }
+
+            $serialQuery = $this->itemOrderModel->where('serial_num', $serialNum);
+            if ($existingItemId) {
+                $serialQuery->where('order_id !=', $existingItemId);
+            }
+            $existingSerial = $serialQuery->first();
+            
+            if ($existingSerial) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "الرقم التسلسلي {$serialNum} موجود مسبقاً في النظام"
+                ]);
+            }
+
+            $assetNumbers[] = $assetNum;
+            $serialNumbers[] = $serialNum;
+        }
+
+        // بدء المعاملة
+        $this->orderModel->transStart();
+
+        // تحديث الطلب الرئيسي
+        $orderData = [
+            'from_user_id' => $fromUserId,
+            'to_user_id' => $toUserId,
+            'note' => $notes
+        ];
+
+        $this->orderModel->update($orderId, $orderData);
+
+        // حذف العناصر القديمة
+        $this->itemOrderModel->where('order_id', $orderId)->delete();
+
+        // إضافة العناصر الجديدة
+        foreach ($items as $item) {
+            $itemOrderData = [
+                'order_id' => $orderId,
+                'item_id' => $item['item_id'],
+                'brand' => $item['brand'],
+                'quantity' => $item['quantity'],
+                'model_num' => $item['model_number'],
+                'asset_num' => $item['asset_number'],
+                'old_asset_num' => $item['old_asset_number'],
+                'serial_num' => $item['serial_number'],
+                'room_id' => $roomId,
+                'assets_type' => $item['custody_type'],
+                'created_by' => $loggedEmployeeId,
+                'usage_status_id' => $defaultUsageStatus->id,
+                'note' => $notes
+            ];
+
+            $itemOrderId = $this->itemOrderModel->insert($itemOrderData);
+
+            if (!$itemOrderId) {
+                $this->orderModel->transRollback();
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'فشل في تحديث أحد العناصر'
+                ]);
+            }
+        }
+
+        // إنهاء المعاملة
+        $this->orderModel->transComplete();
+
+        if ($this->orderModel->transStatus() === FALSE) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'فشل في حفظ التحديثات'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'تم تحديث الطلب بنجاح',
+            'order_id' => $orderId
+        ]);
+
+    } catch (\Exception $e) {
+        log_message('error', 'Error in updateMultiItem: ' . $e->getMessage() . ' | Line: ' . $e->getLine());
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'خطأ في تحديث الطلب: ' . $e->getMessage()
+        ]);
+    }
+}
 
 }
