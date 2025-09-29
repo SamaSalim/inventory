@@ -405,62 +405,7 @@ public function index()
         }
     }
 
-    public function editOrder($orderId)
-    {
-        if (!$orderId) {
-            return redirect()->back()->with('error', 'رقم الطلب غير محدد.');
-        }
 
-        $order = $this->orderModel->find($orderId);
-        if (!$order) {
-            return redirect()->back()->with('error', 'الطلب غير موجود.');
-        }
-
-        $orderItems = $this->itemOrderModel
-            ->select('item_order.*, items.name as item_name')
-            ->join('items', 'items.id = item_order.item_id')
-            ->where('order_id', $orderId)
-            ->findAll();
-
-        // من وجود الموظفين 
-        $fromEmployee = $this->employeeModel->find($order->from_employee_id);
-        $toEmployee = $this->employeeModel->find($order->to_employee_id);
-
-        // جلب جميع المباني من قاعدة البيانات
-        $buildings = $this->buildingModel->findAll();
-
-        // جلب معلومات الموقع
-        $locationInfo = null;
-        if (!empty($orderItems[0])) {
-            $itemOrder = $orderItems[0];
-            $room = $this->roomModel->find($itemOrder->room_id);
-            if ($room) {
-                $section = $this->sectionModel->find($room->section_id);
-                $floor = $this->floorModel->find($section->floor_id);
-                $building = $this->buildingModel->find($floor->building_id);
-                $locationInfo = [
-                    'building' => $building,
-                    'floor'    => $floor,
-                    'section'  => $section,
-                    'room'     => $room
-                ];
-            }
-        }
-
-        // جلب جميع التصنيفات الرئيسية
-        $majorCategories = $this->majorCategoryModel->findAll();
-
-        return view('warehouse/edit_order_form', [
-            'title'           => 'تعديل الطلب',
-            'order'           => $order,
-            'orderItems'      => $orderItems,
-            'fromEmployee'    => $fromEmployee,
-            'toEmployee'      => $toEmployee,
-            'buildings'       => $buildings,
-            'majorCategories' => $majorCategories,
-            'locationInfo'    => $locationInfo
-        ]);
-    }
 public function bulkDeleteOrders()
 {
     if (!$this->request->isAJAX()) {

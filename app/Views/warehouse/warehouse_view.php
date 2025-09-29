@@ -75,13 +75,11 @@
             <div class="section-header">
                 <h2 class="section-title">قائمة المخزون</h2>
                 <div class="buttons-group">
-                   <a href="<?= site_url('OrderController/create') ?>" class="add-btn">
-                    <i class="fas fa-plus"></i> إنشاء طلب لنفس التصنيف
-                    </a>
                     <!-- هنا زر لإنشاء طلب لتصنيفات مختلفة -->
-                    <a href="<?= site_url('OrderController/index') ?>" class="add-btn multiple-items">
-                        <i class="fas fa-layer-group"></i> إنشاء طلب لتصنيفات مختلفة
+                    <a href="<?= site_url('OrderController/index') ?>" class="add-btn ">
+                        <i class="fas fa-layer-group"></i> إنشاء طلب  
                     </a>
+           
                 </div>
             </div>
 
@@ -244,7 +242,7 @@
                                                 </svg>
                                                 عرض
                                             </a>
-                                            <a href="<?= site_url('InventoryController/editOrder/' . $order->order_id) ?>" class="action-btn edit-btn">
+                                            <a href="<?= site_url('OrderController/editOrder/' . $order->order_id) ?>" class="action-btn edit-btn">
                                                 <svg class="btn-icon" viewBox="0 0 24 24">
                                                     <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
                                                 </svg>
@@ -1115,7 +1113,7 @@
 
         // وظائف إدارة حذف الطلبات الفردية
         function editOrder(orderId) {
-            window.location.href = `<?= base_url('InventoryController/editOrder') ?>/${orderId}`;
+            window.location.href = `<?= base_url('OrderController/editOrder') ?>/${orderId}`;
         }
 
         function viewOrder(orderId) {

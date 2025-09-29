@@ -670,7 +670,7 @@ public function validateAssetSerial()
 
     public function index()
     {
-        return view('warehouse/addMultiItemOrder');
+        return view('warehouse/add_multi_item_order');
     }
  
     
@@ -689,7 +689,7 @@ public function editOrder($orderId = null)
         return redirect()->to(base_url('inventoryController/index'))->with('error', 'الطلب غير موجود');
     }
 
-    return view('warehouse/editMultiItemOrder', ['orderId' => $orderId]);
+    return view('warehouse/edit_order', ['orderId' => $orderId]);
 }
 
 
