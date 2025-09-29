@@ -89,10 +89,16 @@
            إدارة العهد
         </a>
 
-        <a href="<?= base_url('UserController/dashboard') ?>" 
-           class="<?= (service('uri')->getSegment(1) == 'UserController') ? 'active' : '' ?>">
-           العهد الخاصة بي
+       <a href="<?= base_url('UserController/userView2') ?>" 
+       class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'userView2') ? 'active' : '' ?>">
+        طلبات العهد
+       </a>
+
+       <a href="<?= base_url('UserController/dashboard') ?>" 
+        class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'dashboard') ? 'active' : '' ?>">
+          العهد الخاصة بي
         </a>
+
 
         <a href="<?= base_url('AdminController/dashboard') ?>" 
            class="<?= (service('uri')->getSegment(1) == 'AdminController') ? 'active' : '' ?>">
