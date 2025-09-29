@@ -368,7 +368,18 @@
             <?php if (isset($account)): ?>
                 <div class="user-info">
                     <div class="user-avatar">
-                        <?= strtoupper(substr(esc($account->name), 0, 1)) ?>
+                <?php
+                    $userName = session()->get('name') ?? 'م م';
+                    $nameParts = explode(' ', trim($userName));
+                    $initials = '';
+                    
+                    if (count($nameParts) >= 2) {
+                        $initials = mb_substr($nameParts[0], 0, 1, 'UTF-8') . mb_substr($nameParts[count($nameParts) - 1], 0, 1, 'UTF-8');
+                    } else {
+                        $initials = mb_substr($nameParts[0], 0, 1, 'UTF-8');
+                    }   
+                    echo strtoupper($initials);
+                ?>                      
                     </div>
                     <span><?= esc($account->name) ?></span>
                 </div>
@@ -379,7 +390,18 @@
             <div class="user-card">
                 <div class="user-profile-header">
                     <div class="profile-avatar">
-                        <?= strtoupper(substr(esc($account->name), 0, 1)) ?>
+                <?php
+                    $userName = session()->get('name') ?? 'م م';
+                    $nameParts = explode(' ', trim($userName));
+                    $initials = '';
+                    
+                    if (count($nameParts) >= 2) {
+                        $initials = mb_substr($nameParts[0], 0, 1, 'UTF-8') . mb_substr($nameParts[count($nameParts) - 1], 0, 1, 'UTF-8');
+                    } else {
+                        $initials = mb_substr($nameParts[0], 0, 1, 'UTF-8');
+                    }   
+                    echo strtoupper($initials);
+                ?>
                     </div>
                     <div class="profile-basic-info">
                         <h2><?= esc($account->name) ?></h2>
