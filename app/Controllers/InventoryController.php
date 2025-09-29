@@ -59,14 +59,12 @@ public function index()
     $itemOrderModel = new \App\Models\ItemOrderModel();
     $roomModel      = new \App\Models\RoomModel();
 
-
-    $search          = $this->request->getVar('search'); 
-    $category        = $this->request->getVar('category');     
-    $itemType        = $this->request->getVar('item_type');   
-    $serialNumber    = $this->request->getVar('serial_number'); 
-    $employeeId      = $this->request->getVar('employee_id');  
-    $location        = $this->request->getVar('location');     
-
+    $search        = $this->request->getVar('search'); 
+    $category      = $this->request->getVar('category');     
+    $itemType      = $this->request->getVar('item_type');   
+    $serialNumber  = $this->request->getVar('serial_number'); 
+    $employeeId    = $this->request->getVar('employee_id');  
+    $location      = $this->request->getVar('location');     
 
     $builder = $itemOrderModel
         ->distinct()
@@ -84,9 +82,10 @@ public function index()
         ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
         ->join('items', 'items.id = item_order.item_id', 'left')
         ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-        ->groupBy('item_order.order_id')
-        ->orderBy('item_order.created_at', 'DESC');
+        ->orderBy('item_order.created_at', 'DESC')
+        ->groupBy('item_order.order_id');
 
+    // فلترة البحث
     if (!empty($search)) {
         $builder->groupStart()
             ->like('item_order.order_id', $search)
@@ -99,10 +98,6 @@ public function index()
             ->groupEnd();
     }
 
-
-    if (!empty($search)) {
-    $builder->like('item_order.order_id', $search);
-    }
     if (!empty($itemType)) {
         $builder->like('items.name', $itemType);
     }
@@ -119,22 +114,23 @@ public function index()
         $builder->where('employee.emp_id', $employeeId);
     }
 
- if (!empty($location)) {
-    $builder
-        ->join('room', 'room.id = item_order.room_id', 'left')
-        ->join('section', 'section.id = room.section_id', 'left')
-        ->join('floor', 'floor.id = section.floor_id', 'left')
-        ->join('building', 'building.id = floor.building_id', 'left')
-        ->groupStart()
-            ->like('room.code', $location)
-            ->orLike('section.code', $location)
-            ->orLike('floor.code', $location)
-            ->orLike('building.code', $location)
-        ->groupEnd();
-}
+    if (!empty($location)) {
+        $builder
+            ->join('room', 'room.id = item_order.room_id', 'left')
+            ->join('section', 'section.id = room.section_id', 'left')
+            ->join('floor', 'floor.id = section.floor_id', 'left')
+            ->join('building', 'building.id = floor.building_id', 'left')
+            ->groupStart()
+                ->like('room.code', $location)
+                ->orLike('section.code', $location)
+                ->orLike('floor.code', $location)
+                ->orLike('building.code', $location)
+            ->groupEnd();
+    }
 
-    $itemOrders = $builder->findAll();
 
+    $itemOrders = $builder->paginate(5, 'orders');
+    $pager = $itemOrderModel->pager;
 
     foreach ($itemOrders as $order) {
         $order->location_code = $roomModel->getFullLocationCode($order->room_id);
@@ -149,12 +145,13 @@ public function index()
     $statuses = (new \App\Models\OrderStatusModel())->findAll();
     $usageStatuses = (new \App\Models\UsageStatusModel())->findAll();
 
-    return view('warehouse/warehouseView', [
+    return view('warehouse/warehouse_view', [
         'categories'     => $categories,
         'orders'         => $itemOrders,
         'stats'          => $stats,
         'statuses'       => $statuses,
         'usage_statuses' => $usageStatuses,
+        'pager'          => $pager, 
         'filters'        => [
             'search'        => $search,
             'category'      => $category,

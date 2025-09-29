@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="<?= base_url('public/assets/css/pagination-style.css') ?>">
 <?php 
 function toArabicNumerals($num) {
     $western = range(0, 10);
@@ -5,9 +6,7 @@ function toArabicNumerals($num) {
     return str_replace($western, $eastern, $num);
 }
 
-$links = $pager->links(); // get actual page links
-
-// Find current page from links
+$links = $pager->links(); 
 $currentPage = 1;
 $totalPages = 1;
 foreach ($links as $link) {
