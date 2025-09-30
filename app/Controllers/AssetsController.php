@@ -1,21 +1,293 @@
 <?php
 
-namespace App\Controllers; 
+namespace App\Controllers;
 
+use App\Controllers\BaseController;
+use App\Models\{
+    BuildingModel,
+    EmployeeModel,
+    FloorModel,
+    ItemModel,
+    ItemOrderModel,
+    MajorCategoryModel,
+    OrderModel,
+    RoomModel,
+    SectionModel,
+    OrderStatusModel,
+    UsageStatusModel,
+};
+use CodeIgniter\HTTP\ResponseInterface;
 use App\Exceptions\AuthenticationException;
+
 
 
 class AssetsController extends BaseController
 {
+    protected $orderModel;
+    protected $itemOrderModel;
+    protected $employeeModel;
+    protected $itemModel;
+    protected $buildingModel;
+    protected $floorModel;
+    protected $sectionModel;
+    protected $roomModel;
+    protected $majorCategoryModel;
+    protected $orderStatusModel;
+    protected $usageStatusModel;
+    protected $minorCategoryModel;
 
-     public function dashboard(): string // Assets view 
+    public function __construct()
     {
-        // exception handling
-          if (! session()->get('isLoggedIn')) {
-        throw new AuthenticationException();
+        $this->orderModel = new OrderModel();
+        $this->itemOrderModel = new ItemOrderModel();
+        $this->employeeModel = new EmployeeModel();
+        $this->itemModel = new ItemModel();
+        $this->buildingModel = new BuildingModel();
+        $this->floorModel = new FloorModel();
+        $this->sectionModel = new SectionModel();
+        $this->roomModel = new RoomModel();
+        $this->majorCategoryModel = new MajorCategoryModel();
+        $this->orderStatusModel = new OrderStatusModel();
+        $this->usageStatusModel = new UsageStatusModel();
+        $this->minorCategoryModel = new \App\Models\MinorCategoryModel();
     }
 
-        return view('assets/assets_dashboard');
+    public function index()
+    {
+        if (! session()->get('isLoggedIn')) {
+            throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
+        }
+
+        $itemOrderModel = new \App\Models\ItemOrderModel();
+        $roomModel      = new \App\Models\RoomModel();
+
+        $search        = $this->request->getVar('search'); 
+        $category      = $this->request->getVar('category');     
+        $itemType      = $this->request->getVar('item_type');   
+        $serialNumber  = $this->request->getVar('serial_number'); 
+        $employeeId    = $this->request->getVar('employee_id');  
+        $location      = $this->request->getVar('location');     
+
+        $builder = $itemOrderModel
+            ->distinct()
+            ->select('
+                item_order.order_id, 
+                item_order.created_at, 
+                item_order.created_by, 
+                item_order.room_id,
+                employee.name AS created_by_name, 
+                employee.emp_id AS employee_id, 
+                employee.emp_ext AS extension,
+                items.name AS item_name,
+                minor_category.name AS category_name
+            ')
+            ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
+            ->join('items', 'items.id = item_order.item_id', 'left')
+            ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+            ->orderBy('item_order.created_at', 'DESC')
+            ->groupBy('item_order.order_id');
+
+        // فلترة البحث
+        if (!empty($search)) {
+            $builder->groupStart()
+                ->like('item_order.order_id', $search)
+                ->orLike('employee.name', $search)
+                ->orLike('employee.emp_id', $search)
+                ->orLike('employee.emp_ext', $search)
+                ->orLike('items.name', $search)
+                ->orLike('minor_category.name', $search)
+                ->orLike('item_order.serial_num', $search)
+                ->groupEnd();
+        }
+
+        if (!empty($itemType)) {
+            $builder->like('items.name', $itemType);
+        }
+
+        if (!empty($category)) {
+            $builder->where('minor_category.id', $category);
+        }
+
+        if (!empty($serialNumber)) {
+            $builder->like('item_order.serial_num', $serialNumber);
+        }
+
+        if (!empty($employeeId)) {
+            $builder->where('employee.emp_id', $employeeId);
+        }
+
+        if (!empty($location)) {
+            $builder
+                ->join('room', 'room.id = item_order.room_id', 'left')
+                ->join('section', 'section.id = room.section_id', 'left')
+                ->join('floor', 'floor.id = section.floor_id', 'left')
+                ->join('building', 'building.id = floor.building_id', 'left')
+                ->groupStart()
+                    ->like('room.code', $location)
+                    ->orLike('section.code', $location)
+                    ->orLike('floor.code', $location)
+                    ->orLike('building.code', $location)
+                ->groupEnd();
+        }
+
+        $itemOrders = $builder->paginate(5, 'orders');
+        $pager = $itemOrderModel->pager;
+
+        foreach ($itemOrders as $order) {
+            $order->location_code = $roomModel->getFullLocationCode($order->room_id);
+        }
+
+        $minorCategoryModel = new \App\Models\MinorCategoryModel();
+        $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
+            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+            ->findAll();
+
+        $stats = $this->getWarehouseStats();
+        $statuses = (new \App\Models\OrderStatusModel())->findAll();
+        $usageStatuses = (new \App\Models\UsageStatusModel())->findAll();
+
+        return view('assets/assets_view', [
+            'categories'     => $categories,
+            'orders'         => $itemOrders,
+            'stats'          => $stats,
+            'statuses'       => $statuses,
+            'usage_statuses' => $usageStatuses,
+            'pager'          => $pager, 
+            'filters'        => [
+                'search'        => $search,
+                'category'      => $category,
+                'item_type'     => $itemType,
+                'serial_number' => $serialNumber,
+                'employee_id'   => $employeeId,
+                'location'      => $location,
+            ]
+        ]);
     }
+
+    private function getWarehouseStats(): array
+    {
+        $totalQuantityResult = $this->itemOrderModel->selectSum('quantity')->first();
+        $totalReceipts = $totalQuantityResult ? (int)$totalQuantityResult->quantity : 0;
+        $availableItems = $this->itemOrderModel->countAllResults();
+        $totalEntries = $this->itemModel->countAllResults();
+        $lowStock = $this->itemOrderModel->where('quantity <', 10)->where('quantity >', 0)->countAllResults();
+        $topCategoryResult = $this->itemOrderModel->select('items.minor_category_id, minor_category.name, COUNT(*) as count')
+            ->join('items', 'items.id = item_order.item_id')
+            ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+            ->groupBy('items.minor_category_id')
+            ->orderBy('count', 'ASC')
+            ->first();
+        $topCategory = $topCategoryResult ? $topCategoryResult->name : 'غير محدد';
+        $lastEntry = $this->itemOrderModel->select('item_order.created_at, items.name')
+            ->join('items', 'items.id = item_order.item_id', 'left')
+            ->orderBy('item_order.created_at', 'ASC')
+            ->first();
+        return [
+            'total_receipts' => $totalReceipts,
+            'available_items' => $availableItems,
+            'total_entries' => $totalEntries,
+            'low_stock' => $lowStock,
+            'top_category' => $topCategory,
+            'last_entry' => $lastEntry ? ['item' => $lastEntry->name ?? 'غير محدد', 'date' => date('Y-m-d H:i', strtotime($lastEntry->created_at))] : null
+        ];
+    }
+
+
+    public function returnForm($itemOrderId)
+    {
+        if (!session()->get('isLoggedIn')) {
+            throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
+        }
+
+        $itemOrder = $this->itemOrderModel
+            ->select('item_order.*, items.name as item_name, employee.name as employee_name')
+            ->join('items', 'items.id = item_order.item_id', 'left')
+            ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
+            ->find($itemOrderId);
+
+        if (!$itemOrder) {
+            return redirect()->back()->with('error', 'العنصر غير موجود.');
+        }
+
+        $usageStatuses = $this->usageStatusModel->findAll();
+
+        return view('assets/return_order', [
+            'itemOrder' => $itemOrder,
+            'usageStatuses' => $usageStatuses
+        ]);
+    }
+public function saveReturn() {
+    if (!session()->get('isLoggedIn')) {
+        throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
+    }
+
+    $validation = \Config\Services::validation();
+        
+    $validation->setRules([
+        'item_order_id' => 'required|integer',
+        'usage_status_id' => 'required|integer',
+        'notes' => 'required|min_length[10]',
+    ], [
+        'notes' => [
+            'required' => 'يرجى إدخال سبب الإرجاع',
+            'min_length' => 'يجب أن تكون الملاحظات 10 أحرف على الأقل'
+        ]
+    ]);
+
+    if (!$validation->withRequest($this->request)->run()) {
+        return redirect()->back()->withInput()->with('error', implode(' ', $validation->getErrors()));
+    }
+
+    $itemOrderId = $this->request->getPost('item_order_id');
+    $usageStatusId = $this->request->getPost('usage_status_id');
+    $notes = $this->request->getPost('notes');
+    
+    $itemOrder = $this->itemOrderModel->find($itemOrderId);
+    if (!$itemOrder) {
+        return redirect()->back()->with('error', 'العنصر غير موجود.');
+    }
+        
+    // Get employee ID from session - check multiple possible session keys
+    $currentEmployeeId = session()->get('emp_id');
+    
+    // Debug: Check if employee ID is retrieved correctly
+    if (!$currentEmployeeId) {
+        log_message('error', 'Employee ID not found in session');
+        // Try alternative session keys if your app uses different naming
+        $currentEmployeeId = session()->get('employee_id') ?? session()->get('user_id');
+    }
+    
+    // If still null, return error
+    if (!$currentEmployeeId) {
+        return redirect()->back()->with('error', 'معرف الموظف غير موجود في الجلسة.');
+    }
+
+    try {
+        $updateData = [
+            'usage_status_id' => $usageStatusId, 
+            'note' => $notes, 
+            'created_by' => $currentEmployeeId,  // This should now have a value
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+        
+        // Debug: Log the data being saved
+        log_message('debug', 'Update data: ' . json_encode($updateData));
+        
+        $updated = $this->itemOrderModel->update($itemOrderId, $updateData);
+
+        if (!$updated) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حفظ عملية الإرجاع.');
+        }
+
+        return redirect()->to(base_url('AssetsController'))
+            ->with('success', 'تم إرجاع الأصل بنجاح.');
+
+    } catch (\Exception $e) {
+        log_message('error', 'Error in saveReturn: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+    }
+}
+
+
 
 }

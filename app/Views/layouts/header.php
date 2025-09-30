@@ -110,7 +110,7 @@
        <i class="fa-solid fa-warehouse"></i> <span>إدارة المستودعات</span>
     </a>
 
-    <a href="<?= base_url('AssetsController/dashboard') ?>" 
+    <a href="<?= base_url('AssetsController/index') ?>" 
        class="<?= (service('uri')->getSegment(1) == 'AssetsController') ? 'active' : '' ?>">
        <i class="fa-solid fa-boxes-stacked"></i> <span>إدارة العهد</span>
     </a>
