@@ -23,15 +23,17 @@ class UserInfo extends BaseController
 
 
         $isEmployee = session()->get('isEmployee'); // جلب متغير التمييز من الجلسة
-        $emp_id = session()->get('employee_id'); // هذا المتغير يحتوي على user_id أو emp_id
+        $account_id = session()->get('employee_id'); // هذا المتغير يحتوي على user_id أو emp_id
+        $currentRole = session()->get('role'); // جلب الدور من الجلسة (للمستخدم العادي هو 'user')
 
         $account = null;
         if ($isEmployee) {
             $employeeModel = new EmployeeModel();
-            $account = $employeeModel->where('emp_id', $emp_id)->first();
+            $account = $employeeModel->where('emp_id', $account_id)->first();
         } else {
             $userModel = new UserModel();
-            $account = $userModel->where('user_id', $emp_id)->first();
+            // البحث باستخدام user_id المخزن في الجلسة
+            $account = $userModel->where('user_id', $account_id)->first();
         }
 
         if (!$account) {
@@ -43,30 +45,35 @@ class UserInfo extends BaseController
 
         // جلب الأدوار بناءً على نوع الحساب
         $permissions = null;
-        if ($isEmployee) {
-            $permissions = $permissionModel->select('role.*')
-                ->join('role', 'role.id = permission.role_id')
-                ->where('permission.emp_id', $emp_id)
-                ->findAll();
-        } else {
-            $permissions = $permissionModel->select('role.*')
-                ->join('role', 'role.id = permission.role_id')
-                ->where('permission.user_id', $emp_id)
-                ->findAll();
-        }
-
         $roles = [];
-        foreach ($permissions as $permission) {
+        
+        if ($isEmployee) {
+            // للموظف: لا يزال يتم جلب الصلاحيات من جدول permission بناءً على emp_id
+            $permissions = $permissionModel->select('role.*')
+                ->join('role', 'role.id = permission.role_id')
+                ->where('permission.emp_id', $account_id)
+                ->findAll();
+            
+            // تحويل نتائج قاعدة البيانات إلى مصفوفة الأدوار
+            foreach ($permissions as $permission) {
+                $roles[] = [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                ];
+            }
+        } else {
+            //  للمستخدم العادي، يتم إلغاء محاولة البحث في جدول permission 
+            // ويعتمد الدور على ما تم تخزينه في الجلسة ('user') بشكل افتراضي.
             $roles[] = [
-                'id' => $permission->id,
-                'name' => $permission->name,
+                'id' => 0, // ID وهمي
+                'name' => $currentRole,
             ];
         }
 
         $account->roles = $roles;
         $data['account'] = $account;
         $data['user_roles_array'] = array_column($roles, 'name');
-        $data['user_role'] = session()->get('role');
+        $data['user_role'] = $currentRole; // استخدام الدور الذي تم جلبه من الجلسة
 
         return view('user/user_info', $data);
     }

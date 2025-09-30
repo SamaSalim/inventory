@@ -105,32 +105,44 @@
         <img src="<?= base_url('public/assets/images/kamc1.png') ?>" alt="Logo" class="sidebar-logo">
     </div>
 
-    <a href="<?= base_url('inventoryController/index') ?>" 
-       class="<?= (service('uri')->getSegment(1) == 'inventoryController') ? 'active' : '' ?>">
-       <i class="fa-solid fa-warehouse"></i> <span>إدارة المستودعات</span>
-    </a>
+    <?php $role = service('session')->get('role'); // جلب الدور من الجلسة ?>
 
-    <a href="<?= base_url('AssetsController/index') ?>" 
-       class="<?= (service('uri')->getSegment(1) == 'AssetsController') ? 'active' : '' ?>">
-       <i class="fa-solid fa-boxes-stacked"></i> <span>إدارة العهد</span>
-    </a>
+    <?php if ($role === 'admin' || $role === 'warehouse'): ?>
+        <a href="<?= base_url('inventoryController/index') ?>"
+           class="<?= (service('uri')->getSegment(1) == 'inventoryController') ? 'active' : '' ?>">
+            <i class="fa-solid fa-warehouse"></i> <span>إدارة المستودعات</span>
+        </a>
+    <?php endif; ?>
 
-    <a href="<?= base_url('UserController/userView2') ?>" 
-       class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'userView2') ? 'active' : '' ?>">
-       <i class="fa-solid fa-file-circle-plus"></i> <span>طلبات العهد</span>
-    </a>
+    <?php if ($role === 'admin' || $role === 'assets'): ?>
+        <a href="<?= base_url('AssetsController/index') ?>"
+           class="<?= (service('uri')->getSegment(1) == 'AssetsController') ? 'active' : '' ?>">
+            <i class="fa-solid fa-boxes-stacked"></i> <span>إدارة العهد</span>
+        </a>
+    <?php endif; ?>
 
-    <a href="<?= base_url('UserController/dashboard') ?>" 
-       class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'dashboard') ? 'active' : '' ?>">
-       <i class="fa-solid fa-id-card"></i> <span>العهد الخاصة بي</span>
-    </a>
+    <?php if ($role === 'admin' || $role === 'assets'): ?>
+        <a href="<?= base_url('UserController/userView2') ?>"
+           class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'userView2') ? 'active' : '' ?>">
+            <i class="fa-solid fa-file-circle-plus"></i> <span>طلبات العهد</span>
+        </a>
+    <?php endif; ?>
 
-    <a href="<?= base_url('AdminController/dashboard') ?>" 
-       class="<?= (service('uri')->getSegment(1) == 'AdminController') ? 'active' : '' ?>">
-       <i class="fa-solid fa-user-shield"></i> <span>الصلاحيات</span>
-    </a>
+    <?php if ($role === 'admin' || $role === 'assets' || $role === 'user'): ?>
+        <a href="<?= base_url('UserController/dashboard') ?>"
+           class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'dashboard') ? 'active' : '' ?>">
+            <i class="fa-solid fa-id-card"></i> <span>العهد الخاصة بي</span>
+        </a>
+    <?php endif; ?>
+
+    <?php if ($role === 'admin'): ?>
+        <a href="<?= base_url('AdminController/dashboard') ?>"
+           class="<?= (service('uri')->getSegment(1) == 'AdminController') ? 'active' : '' ?>">
+            <i class="fa-solid fa-user-shield"></i> <span>الصلاحيات</span>
+        </a>
+    <?php endif; ?>
 
     <a href="<?= base_url('login') ?>">
-       <i class="fa-solid fa-right-from-bracket"></i> <span>تسجيل الخروج</span>
+        <i class="fa-solid fa-right-from-bracket"></i> <span>تسجيل الخروج</span>
     </a>
 </div>

@@ -139,7 +139,6 @@ class CreateFinalTables extends Migration
             'code' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 50,
-                'unique'     => true,
             ],
             'building_id' => [
                 'type'       => 'INT',
@@ -162,7 +161,6 @@ class CreateFinalTables extends Migration
             'code' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 50,
-                'unique'     => true,
             ],
             'floor_id' => [
                 'type'       => 'INT',
@@ -185,7 +183,6 @@ class CreateFinalTables extends Migration
             'code' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 50,
-                'unique'     => true,
             ],
             'section_id' => [
                 'type'       => 'INT',
@@ -474,12 +471,6 @@ class CreateFinalTables extends Migration
             'emp_id' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 50,
-                'null'       => true, // جعل الحقل يقبل قيمة فارغة
-            ],
-            'user_id' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 50,
-                'null'       => true, // جعل الحقل يقبل قيمة فارغة
             ],
             'role_id' => [
                 'type'       => 'INT',
@@ -491,7 +482,6 @@ class CreateFinalTables extends Migration
         ]);
         $this->forge->addPrimaryKey('id');
         $this->forge->addForeignKey('emp_id', 'employee', 'emp_id', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('user_id', 'users', 'user_id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('role_id', 'role', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('permission');
     }

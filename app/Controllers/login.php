@@ -30,6 +30,7 @@ class login extends BaseController
 
         // إذا لم يتم العثور عليه، حاول البحث في جدول 'users'
         if (!$account) {
+            // البحث مازال يعتمد على user_id الموجود في جدول users
             $account = $userModel->where('user_id', $empID)->first();
             $isEmployee = false;
         }
@@ -41,39 +42,52 @@ class login extends BaseController
 
         // جلب الصلاحيات بناءً على نوع الحساب
         $permission = null;
+        $roleName = null; // الدور سيكون null حتى يتم تعيينه
+
         if ($isEmployee) {
+            // للموظف: لا يزال البحث عن الصلاحيات مطلوباً
             $permission = $permissionModel->where('emp_id', $account->emp_id)->first();
         } else {
-            $permission = $permissionModel->where('user_id', $account->user_id)->first();
+            // ويُعطى الدور الافتراضي 'user' مباشرة.
+            $roleName = 'user';
         }
+        
+        // جزء التحقق من الصلاحية وجلب الدور: يتم تنفيذه فقط للموظفين
+        if ($isEmployee) {
+            if (!$permission || empty($permission->role_id)) {
+                 return redirect()->back()->with('error', 'لا يوجد دور مخصص أو بيانات صلاحيات غير صالحة للموظف.');
+            }
 
-        if (!$permission || empty($permission->role_id)) {
-            return redirect()->back()->with('error', 'لا يوجد دور مخصص أو بيانات صلاحيات غير صالحة.');
+            $role = $roleModel->find($permission->role_id);
+
+            if (!$role) {
+                return redirect()->back()->with('error', 'الدور غير صالح.');
+            }
+            
+            $roleName = $role->name; // تحديث الدور من قاعدة البيانات
         }
-
-        $role = $roleModel->find($permission->role_id);
-
-        if (!$role) {
-            return redirect()->back()->with('error', 'الدور غير صالح.');
-        }
+        
+        // **ملاحظة:** إذا كان $isEmployee خاطئ، فإن $roleName هو 'user' بالفعل من خطوة التعديل أعلاه.
 
         // تعيين بيانات الجلسة
         session()->set([
-            'employee_id' => $isEmployee ? $account->emp_id : $account->user_id, // استخدام المفتاح الصحيح
+            // استخدام المفتاح الصحيح: user_id للمستخدم العادي، emp_id للموظف
+            'employee_id' => $isEmployee ? $account->emp_id : $account->user_id,
             'name'        => $account->name,
-            'role'        => $role->name,
+            'role'        => $roleName, 
             'isLoggedIn'  => true,
-            'isEmployee'  => $isEmployee, // إضافة متغير لتمييز نوع الحساب
+            'isEmployee'  => $isEmployee, 
         ]);
 
         // التوجيه بناءً على الدور
-        if ($role->name === 'warehouse') {
+        if ($roleName === 'warehouse') {
             return redirect()->to('/InventoryController/index');
-        } elseif ($role->name === 'assets') {
+        } elseif ($roleName === 'assets') {
             return redirect()->to('/AssetsController/dashboard');
-        } elseif ($role->name === 'admin') {
+        } elseif ($roleName === 'admin') {
             return redirect()->to('/AdminController/dashboard');
-        } elseif ($role->name === 'user') {
+        } elseif ($roleName === 'user') {
+            // التوجيه لصفحة العهد
             return redirect()->to('/UserController/dashboard');
         } else {
             return redirect()->back()->with('error', 'دور غير معروف.');

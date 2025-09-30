@@ -38,7 +38,6 @@ class FinalTablesSeeder extends Seeder
         ];
         $this->db->table('usage_status')->insertBatch($usage_statuses);
 
-
         // Seeder for 'major_category' table
         $major_categories = [
             ['name' => 'Equipment - Non Medical'], // ID 1
@@ -53,50 +52,233 @@ class FinalTablesSeeder extends Seeder
 
         // Seeder for 'minor_category' table
         $minor_categories = [
-            ['name' => 'Ambulance', 'major_category_id' => 6], // Ambulances are 'Vehicles - Services' (ID 6) =>1
-            ['name' => 'Bus', 'major_category_id' => 7], // Bus is a 'Vehicles - Passengers' (ID 7) =>2
-            ['name' => 'Car', 'major_category_id' => 7], // Car is a 'Vehicles - Passengers' (ID 7) =>3
-            ['name' => 'General', 'major_category_id' => 1], // Correctly linked to 'Equipment - Non Medical' (ID 1) =>4
-            ['name' => 'Telecom', 'major_category_id' => 1], // Correctly linked to 'Equipment - Non Medical' (ID 1)=>5
-            ['name' => 'IT', 'major_category_id' => 1], // Correctly linked to 'Equipment - Non Medical' (ID 1)=>6
-            ['name' => 'Electric', 'major_category_id' => 1], // Correctly linked to 'Equipment - Non Medical' (ID 1)=>7
-            ['name' => 'Kitchen', 'major_category_id' => 1], // Correctly linked to 'Equipment - Non Medical' (ID 1)=>8
-            ['name' => 'Chairs', 'major_category_id' => 5], // Chairs are 'Furniture - Non Medical' (ID 5)=>9
-            ['name' => 'Tables', 'major_category_id' => 5], // Tables are 'Furniture - Non Medical' (ID 5)=>10
-            ['name' => 'Trollyes', 'major_category_id' => 4], // Correctly linked to 'Furniture - Medical' (ID 4)=>11
-            ['name' => 'General-Medical', 'major_category_id' => 4], // Correctly linked to 'Equipment -  Medical' (ID 1) =>12
-
+            ['name' => 'Ambulance', 'major_category_id' => 6], // ID 1
+            ['name' => 'Bus', 'major_category_id' => 7], // ID 2
+            ['name' => 'Car', 'major_category_id' => 7], // ID 3
+            ['name' => 'General', 'major_category_id' => 1], // ID 4
+            ['name' => 'Telecom', 'major_category_id' => 1], // ID 5
+            ['name' => 'IT', 'major_category_id' => 1], // ID 6
+            ['name' => 'Electric', 'major_category_id' => 1], // ID 7
+            ['name' => 'Kitchen', 'major_category_id' => 1], // ID 8
+            ['name' => 'Chairs', 'major_category_id' => 5], // ID 9
+            ['name' => 'Tables', 'major_category_id' => 5], // ID 10
+            ['name' => 'Trollyes', 'major_category_id' => 4], // ID 11
+            ['name' => 'General-Medical', 'major_category_id' => 4], // ID 12
         ];
         $this->db->table('minor_category')->insertBatch($minor_categories);
+
         // Seeder for 'building' table
         $buildings = [
-            ['code' => 'B1'],
-            ['code' => 'B2'],
-            ['code' => 'B3'],
+            ['code' => 'B1'], // ID 1
+            ['code' => 'B2'], // ID 2
+            ['code' => 'B3'], // ID 3
         ];
         $this->db->table('building')->insertBatch($buildings);
 
         // Seeder for 'floor' table
         $floors = [
-            ['code' => 'F1', 'building_id' => 1],
-            ['code' => 'F2', 'building_id' => 1],
-            ['code' => 'F3', 'building_id' => 2],
+            // أدوار المبنى B1
+            ['code' => 'F1', 'building_id' => 1], // ID 1
+            ['code' => 'F2', 'building_id' => 1], // ID 2
+            ['code' => 'F3', 'building_id' => 1], // ID 3
+
+            // أدوار المبنى B2
+            ['code' => 'F1', 'building_id' => 2], // ID 4
+            ['code' => 'F2', 'building_id' => 2], // ID 5
+            ['code' => 'F3', 'building_id' => 2], // ID 6
+
+            // أدوار المبنى B3
+            ['code' => 'F1', 'building_id' => 3], // ID 7
+            ['code' => 'F2', 'building_id' => 3], // ID 8
+            ['code' => 'F3', 'building_id' => 3], // ID 9
         ];
         $this->db->table('floor')->insertBatch($floors);
 
         // Seeder for 'section' table
         $sections = [
-            ['code' => 'S1', 'floor_id' => 1],
-            ['code' => 'S2', 'floor_id' => 1],
-            ['code' => 'S3', 'floor_id' => 2],
+            // أقسام B1-F1 (floor_id = 1)
+            ['code' => 'S1', 'floor_id' => 1], // ID 1
+            ['code' => 'S2', 'floor_id' => 1], // ID 2
+            ['code' => 'S3', 'floor_id' => 1], // ID 3
+
+            // أقسام B1-F2 (floor_id = 2)
+            ['code' => 'S1', 'floor_id' => 2], // ID 4
+            ['code' => 'S2', 'floor_id' => 2], // ID 5
+            ['code' => 'S3', 'floor_id' => 2], // ID 6
+
+            // أقسام B1-F3 (floor_id = 3)
+            ['code' => 'S1', 'floor_id' => 3], // ID 7
+            ['code' => 'S2', 'floor_id' => 3], // ID 8
+            ['code' => 'S3', 'floor_id' => 3], // ID 9
+
+            // أقسام B2-F1 (floor_id = 4)
+            ['code' => 'S1', 'floor_id' => 4], // ID 10
+            ['code' => 'S2', 'floor_id' => 4], // ID 11
+            ['code' => 'S3', 'floor_id' => 4], // ID 12
+
+            // أقسام B2-F2 (floor_id = 5)
+            ['code' => 'S1', 'floor_id' => 5], // ID 13
+            ['code' => 'S2', 'floor_id' => 5], // ID 14
+            ['code' => 'S3', 'floor_id' => 5], // ID 15
+
+            // أقسام B2-F3 (floor_id = 6)
+            ['code' => 'S1', 'floor_id' => 6], // ID 16
+            ['code' => 'S2', 'floor_id' => 6], // ID 17
+            ['code' => 'S3', 'floor_id' => 6], // ID 18
+
+            // أقسام B3-F1 (floor_id = 7)
+            ['code' => 'S1', 'floor_id' => 7], // ID 19
+            ['code' => 'S2', 'floor_id' => 7], // ID 20
+            ['code' => 'S3', 'floor_id' => 7], // ID 21
+
+            // أقسام B3-F2 (floor_id = 8)
+            ['code' => 'S1', 'floor_id' => 8], // ID 22
+            ['code' => 'S2', 'floor_id' => 8], // ID 23
+            ['code' => 'S3', 'floor_id' => 8], // ID 24
+
+            // أقسام B3-F3 (floor_id = 9)
+            ['code' => 'S1', 'floor_id' => 9], // ID 25
+            ['code' => 'S2', 'floor_id' => 9], // ID 26
+            ['code' => 'S3', 'floor_id' => 9], // ID 27
         ];
         $this->db->table('section')->insertBatch($sections);
 
         // Seeder for 'room' table
         $rooms = [
+            // غرف B1-F1-S1 (section_id = 1)
             ['code' => 'R101', 'section_id' => 1],
             ['code' => 'R102', 'section_id' => 1],
+            ['code' => 'R103', 'section_id' => 1],
+
+            // غرف B1-F1-S2 (section_id = 2)
             ['code' => 'R201', 'section_id' => 2],
+            ['code' => 'R202', 'section_id' => 2],
+            ['code' => 'R203', 'section_id' => 2],
+
+            // غرف B1-F1-S3 (section_id = 3)
+            ['code' => 'R301', 'section_id' => 3],
+            ['code' => 'R302', 'section_id' => 3],
+            ['code' => 'R303', 'section_id' => 3],
+
+            // غرف B1-F2-S1 (section_id = 4)
+            ['code' => 'R101', 'section_id' => 4],
+            ['code' => 'R102', 'section_id' => 4],
+            ['code' => 'R103', 'section_id' => 4],
+
+            // غرف B1-F2-S2 (section_id = 5)
+            ['code' => 'R201', 'section_id' => 5],
+            ['code' => 'R202', 'section_id' => 5],
+            ['code' => 'R203', 'section_id' => 5],
+
+            // غرف B1-F2-S3 (section_id = 6)
+            ['code' => 'R301', 'section_id' => 6],
+            ['code' => 'R302', 'section_id' => 6],
+            ['code' => 'R303', 'section_id' => 6],
+
+            // غرف B1-F3-S1 (section_id = 7)
+            ['code' => 'R101', 'section_id' => 7],
+            ['code' => 'R102', 'section_id' => 7],
+            ['code' => 'R103', 'section_id' => 7],
+
+            // غرف B1-F3-S2 (section_id = 8)
+            ['code' => 'R201', 'section_id' => 8],
+            ['code' => 'R202', 'section_id' => 8],
+            ['code' => 'R203', 'section_id' => 8],
+
+            // غرف B1-F3-S3 (section_id = 9)
+            ['code' => 'R301', 'section_id' => 9],
+            ['code' => 'R302', 'section_id' => 9],
+            ['code' => 'R303', 'section_id' => 9],
+
+            // غرف B2-F1-S1 (section_id = 10)
+            ['code' => 'R101', 'section_id' => 10],
+            ['code' => 'R102', 'section_id' => 10],
+            ['code' => 'R103', 'section_id' => 10],
+
+            // غرف B2-F1-S2 (section_id = 11)
+            ['code' => 'R201', 'section_id' => 11],
+            ['code' => 'R202', 'section_id' => 11],
+            ['code' => 'R203', 'section_id' => 11],
+
+            // غرف B2-F1-S3 (section_id = 12)
+            ['code' => 'R301', 'section_id' => 12],
+            ['code' => 'R302', 'section_id' => 12],
+            ['code' => 'R303', 'section_id' => 12],
+
+            // غرف B2-F2-S1 (section_id = 13)
+            ['code' => 'R101', 'section_id' => 13],
+            ['code' => 'R102', 'section_id' => 13],
+            ['code' => 'R103', 'section_id' => 13],
+
+            // غرف B2-F2-S2 (section_id = 14)
+            ['code' => 'R201', 'section_id' => 14],
+            ['code' => 'R202', 'section_id' => 14],
+            ['code' => 'R203', 'section_id' => 14],
+
+            // غرف B2-F2-S3 (section_id = 15)
+            ['code' => 'R301', 'section_id' => 15],
+            ['code' => 'R302', 'section_id' => 15],
+            ['code' => 'R303', 'section_id' => 15],
+
+            // غرف B2-F3-S1 (section_id = 16)
+            ['code' => 'R101', 'section_id' => 16],
+            ['code' => 'R102', 'section_id' => 16],
+            ['code' => 'R103', 'section_id' => 16],
+
+            // غرف B2-F3-S2 (section_id = 17)
+            ['code' => 'R201', 'section_id' => 17],
+            ['code' => 'R202', 'section_id' => 17],
+            ['code' => 'R203', 'section_id' => 17],
+
+            // غرف B2-F3-S3 (section_id = 18)
+            ['code' => 'R301', 'section_id' => 18],
+            ['code' => 'R302', 'section_id' => 18],
+            ['code' => 'R303', 'section_id' => 18],
+
+            // غرف B3-F1-S1 (section_id = 19)
+            ['code' => 'R101', 'section_id' => 19],
+            ['code' => 'R102', 'section_id' => 19],
+            ['code' => 'R103', 'section_id' => 19],
+
+            // غرف B3-F1-S2 (section_id = 20)
+            ['code' => 'R201', 'section_id' => 20],
+            ['code' => 'R202', 'section_id' => 20],
+            ['code' => 'R203', 'section_id' => 20],
+
+            // غرف B3-F1-S3 (section_id = 21)
+            ['code' => 'R301', 'section_id' => 21],
+            ['code' => 'R302', 'section_id' => 21],
+            ['code' => 'R303', 'section_id' => 21],
+
+            // غرف B3-F2-S1 (section_id = 22)
+            ['code' => 'R101', 'section_id' => 22],
+            ['code' => 'R102', 'section_id' => 22],
+            ['code' => 'R103', 'section_id' => 22],
+
+            // غرف B3-F2-S2 (section_id = 23)
+            ['code' => 'R201', 'section_id' => 23],
+            ['code' => 'R202', 'section_id' => 23],
+            ['code' => 'R203', 'section_id' => 23],
+
+            // غرف B3-F2-S3 (section_id = 24)
+            ['code' => 'R301', 'section_id' => 24],
+            ['code' => 'R302', 'section_id' => 24],
+            ['code' => 'R303', 'section_id' => 24],
+
+            // غرف B3-F3-S1 (section_id = 25)
+            ['code' => 'R101', 'section_id' => 25],
+            ['code' => 'R102', 'section_id' => 25],
+            ['code' => 'R103', 'section_id' => 25],
+
+            // غرف B3-F3-S2 (section_id = 26)
+            ['code' => 'R201', 'section_id' => 26],
+            ['code' => 'R202', 'section_id' => 26],
+            ['code' => 'R203', 'section_id' => 26],
+
+            // غرف B3-F3-S3 (section_id = 27)
+            ['code' => 'R301', 'section_id' => 27],
+            ['code' => 'R302', 'section_id' => 27],
+            ['code' => 'R303', 'section_id' => 27],
         ];
         $this->db->table('room')->insertBatch($rooms);
 
@@ -142,7 +324,6 @@ class FinalTablesSeeder extends Seeder
                 'email'    => 'layan@example.com',
                 'password' => password_hash('123455', PASSWORD_DEFAULT),
             ],
-            
         ];
         $this->db->table('employee')->insertBatch($employees);
 
@@ -185,7 +366,7 @@ class FinalTablesSeeder extends Seeder
 
         // Seeder for 'items' table
         $items = [
-            ['name' => '5915_ _PUMP, INFUSION, volumetric, STAND ALONE, 0.1 to 1000  ml/h_ _800802_ _ _22148017', 'minor_category_id' => 12],
+            ['name' => '5915_ _PUMP, INFUSION, volumetric, STAND ALONE, 0.1 to 1000  ml/h_ _800802_ _ _22148017', 'minor_category_id' => 12],
             ['name' => 'كرسي طبي, متحرك دوار', 'minor_category_id' => 12],
             ['name' => 'كرسي طبي، متحرك', 'minor_category_id' => 12],
             ['name' => 'كرسي طبي، ثابت', 'minor_category_id' => 12],
@@ -203,23 +384,16 @@ class FinalTablesSeeder extends Seeder
             ['name' => 'كرسي مكتبي متحرك جلد السوداء', 'minor_category_id' => 9],
             ['name' => '16-جمس-- اسعاف -2012-ابيض-ب و ا 7241-2 راكب ', 'minor_category_id' => 1],
             ['name' => 'عربة، معدنيه، 3 ارفف', 'minor_category_id' => 11],
-
-
         ];
         $this->db->table('items')->insertBatch($items);
 
         // Seeder for 'permission' table
         $permissions = [
-            ['emp_id' => '1001', 'role_id' => 1, 'user_id' => null],
-            ['emp_id' => '1002', 'role_id' => 2, 'user_id' => null],
-            ['emp_id' => '1003', 'role_id' => 3, 'user_id' => null],
-            ['emp_id' => '1004', 'role_id' => 6, 'user_id' => null],
-            ['emp_id' => '1005', 'role_id' => 1, 'user_id' => null],
-            ['emp_id' => null, 'role_id' => 4, 'user_id' => 'U101'],
-            ['emp_id' => null, 'role_id' => 4, 'user_id' => 'U102'],
-            ['emp_id' => null, 'role_id' => 4, 'user_id' => 'U103'],
-            ['emp_id' => null, 'role_id' => 4, 'user_id' => 'U104'],
-
+            ['emp_id' => '1001', 'role_id' => 1],
+            ['emp_id' => '1002', 'role_id' => 2],
+            ['emp_id' => '1003', 'role_id' => 3],
+            ['emp_id' => '1004', 'role_id' => 6],
+            ['emp_id' => '1005', 'role_id' => 1],
         ];
         $this->db->table('permission')->insertBatch($permissions);
 
@@ -228,13 +402,13 @@ class FinalTablesSeeder extends Seeder
             [
                 'from_user_id' => 'U101',
                 'to_user_id' => 'U102',
-                'order_status_id' => 1, // قيد الانتظار
+                'order_status_id' => 1,
                 'note' => 'طلب مجموعة أجهزة حاسوب جديدة.',
             ],
             [
                 'from_user_id' => 'U103',
                 'to_user_id' => 'U104',
-                'order_status_id' => 2, // قيد التنفيذ
+                'order_status_id' => 2,
                 'note' => 'طلب صيانة دورية للطابعات.',
             ],
         ];
@@ -254,7 +428,7 @@ class FinalTablesSeeder extends Seeder
                 'room_id' => 1,
                 'assets_type' => 'عهدة خاصة',
                 'created_by' => '1003',
-                'usage_status_id' => 1, // جديد
+                'usage_status_id' => 1,
                 'note' => 'تم تسليم الشاشة لموظف الموارد البشرية.',
             ],
             [
@@ -269,7 +443,7 @@ class FinalTablesSeeder extends Seeder
                 'room_id' => 3,
                 'assets_type' => 'عهدة عامة',
                 'created_by' => '1003',
-                'usage_status_id' => 1, // جديد 
+                'usage_status_id' => 1,
                 'note' => 'راوتر جديد جاهز للاستخدام.',
             ],
         ];

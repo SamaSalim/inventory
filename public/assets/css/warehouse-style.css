@@ -296,7 +296,6 @@ body {
 }
 main-content {
   margin-right: 80px;
-  padding: 0;
 }
 
 .header {
@@ -785,7 +784,6 @@ main-content {
 .custom-table {
   width: 100%;
   min-width: 1000px;
-  max-width: 1400px;
   margin: 0 auto;
   border-collapse: collapse;
   font-size: 12px;
