@@ -237,13 +237,13 @@
                                     <td><?= esc($order->created_by_name ?? '-') ?></td>
                                     <td>
                                         <div class="action-buttons">
-                                            <a href="<?= site_url('InventoryController/showOrder/' . $order->order_id) ?>" class="action-btn view-btn">
+                                            <a href="<?= site_url('AssetsController/orderDetails/' . $order->order_id) ?>" class="action-btn view-btn">
                                                 <svg class="btn-icon" viewBox="0 0 24 24">
                                                     <path d="M9 11H3v2h6v3l5-4-5-4v3zm12-8h-6c-1.1 0-2 .9-2 2v3h2V5h6v14h-6v-3h-2v3c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
                                                 </svg>
                                                 إرجاع
                                             </a>
-                                <a href="<?= site_url('AssetsController/returnForm/' . $order->order_id) ?>"
+                                <a href="<?= site_url('AssetsController/orderDetails/' . $order->order_id) ?>"
                                     class="action-btn edit-btn" title="تحويل">
                                     <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
                                         <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/>

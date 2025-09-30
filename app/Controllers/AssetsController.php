@@ -193,100 +193,134 @@ class AssetsController extends BaseController
     }
 
 
-    public function returnForm($itemOrderId)
-    {
-        if (!session()->get('isLoggedIn')) {
-            throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
-        }
+public function orderDetails($id)
+{
+    $orderModel         = new \App\Models\OrderModel();
+    $itemOrderModel     = new \App\Models\ItemOrderModel();
+    $userModel          = new \App\Models\UserModel();
+    $itemModel          = new \App\Models\ItemModel();
+    $minorCatModel      = new \App\Models\MinorCategoryModel();
+    $majorCatModel      = new \App\Models\MajorCategoryModel();
+    $roomModel          = new \App\Models\RoomModel();
+    $usageStatusModel   = new \App\Models\UsageStatusModel();
+    $employeeModel      = new \App\Models\EmployeeModel();
+    $statusModel        = new \App\Models\OrderStatusModel();
 
-        $itemOrder = $this->itemOrderModel
-            ->select('item_order.*, items.name as item_name, employee.name as employee_name')
-            ->join('items', 'items.id = item_order.item_id', 'left')
-            ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
-            ->find($itemOrderId);
 
-        if (!$itemOrder) {
-            return redirect()->back()->with('error', 'العنصر غير موجود.');
-        }
+    $order = $orderModel->find($id);
 
-        $usageStatuses = $this->usageStatusModel->findAll();
-
-        return view('assets/return_order', [
-            'itemOrder' => $itemOrder,
-            'usageStatuses' => $usageStatuses
-        ]);
-    }
-public function saveReturn() {
-    if (!session()->get('isLoggedIn')) {
-        throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
+    if (!$order) {
+        return redirect()->back()->with('error', 'الطلب غير موجود');
     }
 
-    $validation = \Config\Services::validation();
-        
-    $validation->setRules([
-        'item_order_id' => 'required|integer',
-        'usage_status_id' => 'required|integer',
-        'notes' => 'required|min_length[10]',
-    ], [
-        'notes' => [
-            'required' => 'يرجى إدخال سبب الإرجاع',
-            'min_length' => 'يجب أن تكون الملاحظات 10 أحرف على الأقل'
-        ]
+
+    $fromUser = $userModel->where('user_id', $order->from_user_id)->first();
+    $toUser   = $userModel->where('user_id', $order->to_user_id)->first();
+    $status   = $statusModel->find($order->order_status_id);
+
+    $order->from_name    = $fromUser->name ?? 'غير معروف';
+    $order->to_name      = $toUser->name ?? 'غير معروف';
+    $order->status_name  = $status->status ?? 'غير معروف';
+
+
+    $items = $itemOrderModel->where('order_id', $id)->findAll();
+
+    foreach ($items as $item) {
+        $itemData = $itemModel->find($item->item_id);
+        $minor    = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
+        $major    = $minor ? $majorCatModel->find($minor->major_category_id) : null;
+
+        $item->item_name             = $itemData->name ?? 'غير معروف';
+        $item->minor_category_name  = $minor->name ?? 'غير معروف';
+        $item->major_category_name  = $major->name ?? 'غير معروف';
+        $item->location_code        = $roomModel->getFullLocationCode($item->room_id);
+        $item->usage_status_name    = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
+        $item->created_by_name      = $employeeModel->where('emp_id', $item->created_by)->first()->name ?? 'غير معروف';
+    }
+
+    
+    return view('assets/return_order', [
+        'order'       => $order,
+        'items'       => $items,
+        'item_count'  => count($items),
     ]);
-
-    if (!$validation->withRequest($this->request)->run()) {
-        return redirect()->back()->withInput()->with('error', implode(' ', $validation->getErrors()));
-    }
-
-    $itemOrderId = $this->request->getPost('item_order_id');
-    $usageStatusId = $this->request->getPost('usage_status_id');
-    $notes = $this->request->getPost('notes');
-    
-    $itemOrder = $this->itemOrderModel->find($itemOrderId);
-    if (!$itemOrder) {
-        return redirect()->back()->with('error', 'العنصر غير موجود.');
-    }
-        
-    // Get employee ID from session - check multiple possible session keys
-    $currentEmployeeId = session()->get('emp_id');
-    
-    // Debug: Check if employee ID is retrieved correctly
-    if (!$currentEmployeeId) {
-        log_message('error', 'Employee ID not found in session');
-        // Try alternative session keys if your app uses different naming
-        $currentEmployeeId = session()->get('employee_id') ?? session()->get('user_id');
-    }
-    
-    // If still null, return error
-    if (!$currentEmployeeId) {
-        return redirect()->back()->with('error', 'معرف الموظف غير موجود في الجلسة.');
-    }
-
-    try {
-        $updateData = [
-            'usage_status_id' => $usageStatusId, 
-            'note' => $notes, 
-            'created_by' => $currentEmployeeId,  // This should now have a value
-            'updated_at' => date('Y-m-d H:i:s')
-        ];
-        
-        // Debug: Log the data being saved
-        log_message('debug', 'Update data: ' . json_encode($updateData));
-        
-        $updated = $this->itemOrderModel->update($itemOrderId, $updateData);
-
-        if (!$updated) {
-            return redirect()->back()->with('error', 'حدث خطأ أثناء حفظ عملية الإرجاع.');
-        }
-
-        return redirect()->to(base_url('AssetsController'))
-            ->with('success', 'تم إرجاع الأصل بنجاح.');
-
-    } catch (\Exception $e) {
-        log_message('error', 'Error in saveReturn: ' . $e->getMessage());
-        return redirect()->back()->with('error', 'حدث خطأ: ' . $e->getMessage());
-    }
+    return view('assets/transfer_order', [
+        'order'       => $order,
+        'items'       => $items,
+        'item_count'  => count($items),
+    ]);
 }
+// public function saveReturn() {
+//     if (!session()->get('isLoggedIn')) {
+//         throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
+//     }
+
+//     $validation = \Config\Services::validation();
+        
+//     $validation->setRules([
+//         'item_order_id' => 'required|integer',
+//         'usage_status_id' => 'required|integer',
+//         'notes' => 'required|min_length[10]',
+//     ], [
+//         'notes' => [
+//             'required' => 'يرجى إدخال سبب الإرجاع',
+//             'min_length' => 'يجب أن تكون الملاحظات 10 أحرف على الأقل'
+//         ]
+//     ]);
+
+//     if (!$validation->withRequest($this->request)->run()) {
+//         return redirect()->back()->withInput()->with('error', implode(' ', $validation->getErrors()));
+//     }
+
+//     $itemOrderId = $this->request->getPost('item_order_id');
+//     $usageStatusId = $this->request->getPost('usage_status_id');
+//     $notes = $this->request->getPost('notes');
+    
+//     $itemOrder = $this->itemOrderModel->find($itemOrderId);
+//     if (!$itemOrder) {
+//         return redirect()->back()->with('error', 'العنصر غير موجود.');
+//     }
+        
+//     // Get employee ID from session - check multiple possible session keys
+//     $currentEmployeeId = session()->get('emp_id');
+    
+//     // Debug: Check if employee ID is retrieved correctly
+//     if (!$currentEmployeeId) {
+//         log_message('error', 'Employee ID not found in session');
+//         // Try alternative session keys if your app uses different naming
+//         $currentEmployeeId = session()->get('employee_id') ?? session()->get('user_id');
+//     }
+    
+//     // If still null, return error
+//     if (!$currentEmployeeId) {
+//         return redirect()->back()->with('error', 'معرف الموظف غير موجود في الجلسة.');
+//     }
+
+//     try {
+//         $updateData = [
+//             'usage_status_id' => $usageStatusId, 
+//             'note' => $notes, 
+//             'created_by' => $currentEmployeeId,  // This should now have a value
+//             'updated_at' => date('Y-m-d H:i:s')
+//         ];
+        
+//         // Debug: Log the data being saved
+//         log_message('debug', 'Update data: ' . json_encode($updateData));
+        
+//         $updated = $this->itemOrderModel->update($itemOrderId, $updateData);
+
+//         if (!$updated) {
+//             return redirect()->back()->with('error', 'حدث خطأ أثناء حفظ عملية الإرجاع.');
+//         }
+
+//         return redirect()->to(base_url('AssetsController'))
+//             ->with('success', 'تم إرجاع الأصل بنجاح.');
+
+//     } catch (\Exception $e) {
+//         log_message('error', 'Error in saveReturn: ' . $e->getMessage());
+//         return redirect()->back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+//     }
+// }
 
 
 
