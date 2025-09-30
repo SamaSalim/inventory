@@ -17,7 +17,18 @@
             <h1 class="page-title">إدارة المستودعات</h1>
             <div class="user-info" onclick="location.href='<?= base_url('UserInfo/getUserInfo') ?>'">
                 <div class="user-avatar">
-                    <?= strtoupper(substr(esc(session()->get('name')), 0, 1)) ?>
+                <?php
+                    $userName = session()->get('name') ?? 'م م';
+                    $nameParts = explode(' ', trim($userName));
+                    $initials = '';
+                    
+                    if (count($nameParts) >= 2) {
+                        $initials = mb_substr($nameParts[0], 0, 1, 'UTF-8') . mb_substr($nameParts[count($nameParts) - 1], 0, 1, 'UTF-8');
+                    } else {
+                        $initials = mb_substr($nameParts[0], 0, 1, 'UTF-8');
+                    }   
+                    echo strtoupper($initials);
+                ?>
                 </div>
                 <span><?= esc(session()->get('name')) ?></span>
             </div>
@@ -46,7 +57,9 @@
                     </div>
                     <div class="info-card">
                         <div class="info-label">تاريخ الإنشاء</div>
-                        <div class="info-value"><?= esc($order->created_at) ?></div>
+                        <div class="info-value">
+                            <?= date('Y-m-d', strtotime($order->created_at)) ?>
+                        </div>
                     </div>
                 </div>
             </div>

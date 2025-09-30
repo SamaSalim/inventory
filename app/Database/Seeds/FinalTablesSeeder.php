@@ -34,6 +34,7 @@ class FinalTablesSeeder extends Seeder
         $usage_statuses = [
             ['usage_status' => 'جديد'],
             ['usage_status' => 'رجيع'],
+            ['usage_status' => 'تحويل'],
         ];
         $this->db->table('usage_status')->insertBatch($usage_statuses);
 

@@ -296,7 +296,6 @@ body {
 }
 main-content {
   margin-right: 80px;
-  padding: 0;
 }
 
 .header {
@@ -772,6 +771,18 @@ main-content {
   text-decoration: none;
 }
 
+.search-btn,
+.reset-btn {
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 20px;
+}
+
+.search-btn i,
+.reset-btn i {
+  font-size: 12px;
+}
+
 .table-container {
   background-color: white;
   border-radius: 10px;
@@ -785,7 +796,6 @@ main-content {
 .custom-table {
   width: 100%;
   min-width: 1000px;
-  max-width: 1400px;
   margin: 0 auto;
   border-collapse: collapse;
   font-size: 12px;

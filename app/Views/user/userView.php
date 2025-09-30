@@ -706,7 +706,7 @@
             <h1 class="page-title">الصفحة الرئيسية</h1>
             <div class="user-info" onclick="location.href='<?= base_url('UserInfo/getUserInfo') ?>'">
                 <div class="user-avatar">
-                                        <?php
+                <?php
                     $userName = session()->get('name') ?? 'م م';
                     $nameParts = explode(' ', trim($userName));
                     $initials = '';
