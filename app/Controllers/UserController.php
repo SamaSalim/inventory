@@ -36,9 +36,6 @@ class UserController extends BaseController
      */
     public function dashboard(): string
     {
-    $itemOrderModel = new \App\Models\ItemOrderModel();
-    $roomModel      = new \App\Models\RoomModel();
-
         $this->checkAuth(); // تحقق من تسجيل الدخول
 
 
@@ -50,7 +47,6 @@ class UserController extends BaseController
                 'item_order.order_id, 
                  item_order.created_at, 
                  item_order.created_by, 
-                 room.id AS room_id,
                  room.code AS room_code, 
                  employee.name AS created_by_name, 
                  employee.emp_id AS employee_id, 
@@ -61,12 +57,6 @@ class UserController extends BaseController
             ->groupBy('item_order.order_id')
             ->orderBy('item_order.created_at', 'DESC')
             ->findAll();
-              // أضف رمز الموقع لكل طلب
-    foreach ($itemOrders as $order) {
-        $order->location_code = $roomModel->getFullLocationCode($order->room_id);
-    }
-
-
 
         $minorCategoryModel = new MinorCategoryModel();
         $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
@@ -151,4 +141,55 @@ class UserController extends BaseController
         $data['order'] = $order;
         return view('warehouse/showOrderView', $data); // فيو تفصيلي للطلب
     }
+
+
+
+    /**
+ * صفحة جديدة userView2
+ */
+public function userView2(): string
+{
+    $this->checkAuth(); // تحقق من تسجيل الدخول
+
+    $itemOrderModel = new ItemOrderModel();
+
+    $itemOrders = $itemOrderModel
+        ->distinct()
+        ->select(
+            'item_order.order_id, 
+             item_order.created_at, 
+             item_order.created_by, 
+             room.code AS room_code, 
+             employee.name AS created_by_name, 
+             employee.emp_id AS employee_id, 
+             employee.emp_ext AS extension'
+        )
+        ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
+        ->join('room', 'room.id = item_order.room_id', 'left')
+        ->groupBy('item_order.order_id')
+        ->orderBy('item_order.created_at', 'DESC')
+        ->findAll();
+
+    $minorCategoryModel = new MinorCategoryModel();
+    $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
+        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+        ->findAll();
+
+    $stats = $this->getWarehouseStats();
+
+    $orderStatusModel = new OrderStatusModel();
+    $statuses = $orderStatusModel->findAll();
+
+    $usageStatusModel = new UsageStatusModel();
+    $usageStatuses = $usageStatusModel->findAll();
+
+    return view('user/userView2', [
+        'categories' => $categories,
+        'orders' => $itemOrders,
+        'stats' => $stats,
+        'statuses' => $statuses,
+        'usage_statuses' => $usageStatuses
+    ]);
+}
+
 }
