@@ -258,8 +258,9 @@ function updateMasterCheckbox() {
 function updateBulkActionsBar() {
     const bulkActions = document.getElementById('bulkActions');
     const selectedCount = document.getElementById('selectedCount');
+    const popupExists = document.getElementById('selectedItemsPopup');
     
-    if (selectedItems.length > 0) {
+    if (selectedItems.length > 0 && !popupExists) {
         bulkActions.classList.add('show');
         selectedCount.textContent = selectedItems.length;
     } else {
@@ -358,8 +359,9 @@ function showSelectedItemsPopup() {
         return;
     }
     
+    // Hide the bar when popup opens
     const bulkActions = document.getElementById('bulkActions');
-    bulkActions.style.display = 'none';
+    bulkActions.classList.remove('show');
     
     const existingPopup = document.getElementById('selectedItemsPopup');
     if (existingPopup) {
@@ -562,7 +564,7 @@ function showSelectedItemsPopup() {
             justify-content: space-between;
             gap: 10px;
         ">
-            <button onclick="clearSelection(); closeSelectedItemsPopup();" style="
+            <button onclick="handleCancelSelection()" style="
                 flex: 1;
                 padding: 12px 20px;
                 background: #95a5a6;
@@ -633,6 +635,11 @@ function showSelectedItemsPopup() {
     document.body.appendChild(popup);
 }
 
+function handleCancelSelection() {
+    clearSelection();
+    closeSelectedItemsPopup();
+}
+
 function closeSelectedItemsPopup() {
     const popup = document.getElementById('selectedItemsPopup');
     const backdrop = document.getElementById('popupBackdrop');
@@ -640,10 +647,8 @@ function closeSelectedItemsPopup() {
     if (popup) popup.remove();
     if (backdrop) backdrop.remove();
     
-    if (selectedItems.length > 0) {
-        const bulkActions = document.getElementById('bulkActions');
-        bulkActions.style.display = 'flex';
-    }
+    // Always update the bar state after closing popup
+    updateBulkActionsBar();
 }
 
 function removeItemFromSelection(itemId) {
