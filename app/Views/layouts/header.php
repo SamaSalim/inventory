@@ -74,36 +74,47 @@
 
     </style>
    <!-- الشريط الجانبي -->
-     <div class="sidebar">
+    <div class="sidebar">
     <div class="logo">
         <img src="<?= base_url('public/assets/images/kamc1.png') ?>" alt="Logo" class="sidebar-logo">
     </div>
 
-        <a href="<?= base_url('inventoryController/index') ?>" 
+    <?php $role = service('session')->get('role'); // جلب الدور من الجلسة ?>
+
+    <?php if ($role === 'admin' || $role === 'warehouse'): ?>
+        <a href="<?= base_url('inventoryController/index') ?>"
            class="<?= (service('uri')->getSegment(1) == 'inventoryController') ? 'active' : '' ?>">
-           إدارة المستودعات
+            إدارة المستودعات
         </a>
+    <?php endif; ?>
 
-        <a href="<?= base_url('AssetsController/dashboard') ?>" 
+    <?php if ($role === 'admin' || $role === 'assets'): ?>
+        <a href="<?= base_url('AssetsController/dashboard') ?>"
            class="<?= (service('uri')->getSegment(1) == 'AssetsController') ? 'active' : '' ?>">
-           إدارة العهد
+            إدارة العهد
         </a>
+    <?php endif; ?>
 
-       <a href="<?= base_url('UserController/userView2') ?>" 
-       class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'userView2') ? 'active' : '' ?>">
-        طلبات العهد
-       </a>
-
-       <a href="<?= base_url('UserController/dashboard') ?>" 
-        class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'dashboard') ? 'active' : '' ?>">
-          العهد الخاصة بي
+    <?php if ($role === 'admin' || $role === 'assets'): ?>
+        <a href="<?= base_url('UserController/userView2') ?>"
+           class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'userView2') ? 'active' : '' ?>">
+            طلبات العهد
         </a>
+    <?php endif; ?>
 
+    <?php if ($role === 'admin' || $role === 'assets' || $role === 'user'): ?>
+        <a href="<?= base_url('UserController/dashboard') ?>"
+           class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'dashboard') ? 'active' : '' ?>">
+            العهد الخاصة بي
+        </a>
+    <?php endif; ?>
 
-        <a href="<?= base_url('AdminController/dashboard') ?>" 
+    <?php if ($role === 'admin'): ?>
+        <a href="<?= base_url('AdminController/dashboard') ?>"
            class="<?= (service('uri')->getSegment(1) == 'AdminController') ? 'active' : '' ?>">
-           الصلاحيات
+            الصلاحيات
         </a>
+    <?php endif; ?>
 
-        <a href="<?= base_url('login') ?>">تسجيل الخروج</a>
-    </div>
+    <a href="<?= base_url('login') ?>">تسجيل الخروج</a>
+</div>

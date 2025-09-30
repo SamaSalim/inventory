@@ -79,7 +79,15 @@ class FinalTablesSeeder extends Seeder
         $floors = [
             ['code' => 'F1', 'building_id' => 1],
             ['code' => 'F2', 'building_id' => 1],
+            ['code' => 'F3', 'building_id' => 1],
+
+            ['code' => 'F1', 'building_id' => 2],
+            ['code' => 'F2', 'building_id' => 2],
             ['code' => 'F3', 'building_id' => 2],
+
+            ['code' => 'F1', 'building_id' => 3],
+            ['code' => 'F2', 'building_id' => 3],
+            ['code' => 'F3', 'building_id' => 3],
         ];
         $this->db->table('floor')->insertBatch($floors);
 
@@ -87,7 +95,15 @@ class FinalTablesSeeder extends Seeder
         $sections = [
             ['code' => 'S1', 'floor_id' => 1],
             ['code' => 'S2', 'floor_id' => 1],
+            ['code' => 'S3', 'floor_id' => 1],
+
+            ['code' => 'S1', 'floor_id' => 2],
+            ['code' => 'S2', 'floor_id' => 2],
             ['code' => 'S3', 'floor_id' => 2],
+
+            ['code' => 'S1', 'floor_id' => 3],
+            ['code' => 'S2', 'floor_id' => 3],
+            ['code' => 'S3', 'floor_id' => 3],
         ];
         $this->db->table('section')->insertBatch($sections);
 
@@ -95,7 +111,13 @@ class FinalTablesSeeder extends Seeder
         $rooms = [
             ['code' => 'R101', 'section_id' => 1],
             ['code' => 'R102', 'section_id' => 1],
+            ['code' => 'R103', 'section_id' => 1],
             ['code' => 'R201', 'section_id' => 2],
+            ['code' => 'R202', 'section_id' => 2],
+            ['code' => 'R203', 'section_id' => 2],
+            ['code' => 'R301', 'section_id' => 3],
+            ['code' => 'R302', 'section_id' => 3],
+            ['code' => 'R303', 'section_id' => 3],
         ];
         $this->db->table('room')->insertBatch($rooms);
 
@@ -141,7 +163,7 @@ class FinalTablesSeeder extends Seeder
                 'email'    => 'layan@example.com',
                 'password' => password_hash('123455', PASSWORD_DEFAULT),
             ],
-            
+
         ];
         $this->db->table('employee')->insertBatch($employees);
 
@@ -209,15 +231,11 @@ class FinalTablesSeeder extends Seeder
 
         // Seeder for 'permission' table
         $permissions = [
-            ['emp_id' => '1001', 'role_id' => 1, 'user_id' => null],
-            ['emp_id' => '1002', 'role_id' => 2, 'user_id' => null],
-            ['emp_id' => '1003', 'role_id' => 3, 'user_id' => null],
-            ['emp_id' => '1004', 'role_id' => 6, 'user_id' => null],
-            ['emp_id' => '1005', 'role_id' => 1, 'user_id' => null],
-            ['emp_id' => null, 'role_id' => 4, 'user_id' => 'U101'],
-            ['emp_id' => null, 'role_id' => 4, 'user_id' => 'U102'],
-            ['emp_id' => null, 'role_id' => 4, 'user_id' => 'U103'],
-            ['emp_id' => null, 'role_id' => 4, 'user_id' => 'U104'],
+            ['emp_id' => '1001', 'role_id' => 1],
+            ['emp_id' => '1002', 'role_id' => 2],
+            ['emp_id' => '1003', 'role_id' => 3],
+            ['emp_id' => '1004', 'role_id' => 6],
+            ['emp_id' => '1005', 'role_id' => 1,],
 
         ];
         $this->db->table('permission')->insertBatch($permissions);
