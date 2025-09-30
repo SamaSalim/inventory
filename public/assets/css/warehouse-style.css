@@ -771,6 +771,18 @@ main-content {
   text-decoration: none;
 }
 
+.search-btn,
+.reset-btn {
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 20px;
+}
+
+.search-btn i,
+.reset-btn i {
+  font-size: 12px;
+}
+
 .table-container {
   background-color: white;
   border-radius: 10px;

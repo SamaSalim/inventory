@@ -57,7 +57,9 @@
                     </div>
                     <div class="info-card">
                         <div class="info-label">تاريخ الإنشاء</div>
-                        <div class="info-value"><?= esc($order->created_at) ?></div>
+                        <div class="info-value">
+                            <?= date('Y-m-d', strtotime($order->created_at)) ?>
+                        </div>
                     </div>
                 </div>
             </div>
