@@ -3,17 +3,20 @@
 
 namespace App\Controllers;
 
-use App\Models\BuildingModel;
-use App\Models\EmployeeModel;
-use App\Models\FloorModel;
-use App\Models\ItemModel;
-use App\Models\ItemOrderModel;
-use App\Models\MajorCategoryModel;
-use App\Models\OrderModel;
-use App\Models\RoomModel;
-use App\Models\SectionModel;
-use App\Models\UserModel; // إضافة UserModel
-use App\Models\UsageStatusModel; 
+use App\Models\{
+    BuildingModel,
+    EmployeeModel,
+    FloorModel,
+    ItemModel,
+    ItemOrderModel,
+    MajorCategoryModel,
+    OrderModel,
+    RoomModel,
+    SectionModel,
+    UserModel,// إضافة UserModel
+    UsageStatusModel
+};
+
 use CodeIgniter\HTTP\ResponseInterface;
 
 class OrderController extends BaseController
@@ -165,16 +168,13 @@ class OrderController extends BaseController
     {
         try {
             $buildings = $this->buildingModel->findAll();
-            $users = $this->userModel->select('user_dept')->distinct()->findAll();
-            $departments = array_unique(array_column($users, 'user_dept'));
-            
+
             // جلب قيم enum من المودل مباشرة
             $custodyTypes = $this->itemOrderModel->getAssetsTypeEnum();
 
             return $this->response->setJSON([
                 'success' => true,
                 'buildings' => $buildings,
-                'departments' => array_values($departments),
                 'custody_types' => $custodyTypes
             ]);
             
