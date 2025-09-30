@@ -14,44 +14,6 @@ body {
   font-size: 14px;
 }
 
-/* الشريط الجانبي */
-.sidebar {
-  position: fixed;
-  right: 0;
-  top: 0;
-  height: 100vh;
-  width: 80px;
-  background-color: #057590;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 0;
-  z-index: 1000;
-}
-
-.sidebar .logo {
-  color: white;
-  font-size: 20px;
-  margin-bottom: 30px;
-}
-
-.sidebar-icon {
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 15px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.sidebar-icon:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
 /* المحتوى الرئيسي */
 .main-content {
   margin-right: 80px;

@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="<?= base_url('public/assets/css/pagination-style.css') ?>">
+<link rel="stylesheet" href="<?= base_url('public/assets/css/components/pagination-style.css') ?>">
 <?php 
 function toArabicNumerals($num) {
     $western = range(0, 10);
