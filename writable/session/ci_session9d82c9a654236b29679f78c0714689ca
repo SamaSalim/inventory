@@ -1,1 +1,5 @@
+<<<<<<< HEAD:writable/session/ci_session9d82c9a654236b29679f78c0714689ca
 __ci_last_regenerate|i:1759299980;_ci_previous_url|s:52:"http://localhost/inventory/inventoryController/index";employee_id|s:4:"1001";name|s:21:"فيّ النفيعي";role|s:5:"admin";isLoggedIn|b:1;isEmployee|b:1;
+=======
+__ci_last_regenerate|i:1759268741;_ci_previous_url|s:52:"http://localhost/inventory/inventoryController/index";employee_id|s:4:"1001";name|s:21:"فيّ النفيعي";role|s:5:"admin";isLoggedIn|b:1;isEmployee|b:1;
+>>>>>>> 028f17ab36c465dcb6e819b6576eccfb631e709b:writable/session/ci_sessionbba279337ba69fc1e09db15f8a67b3ba
