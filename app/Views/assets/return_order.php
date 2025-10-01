@@ -848,12 +848,12 @@ function confirmBulkReturnWithFiles() {
         
         console.log(`Added asset_num: ${item.assetNum}, comment: ${item.comment || 'تم الترجيع'}`);
         
-        // Add files for this asset using the correct format
+
         if (item.files && item.files.length > 0) {
             console.log(`Processing ${item.files.length} files for asset ${item.assetNum}`);
             
             item.files.forEach((file) => {
-                // Use empty brackets [] to let CodeIgniter handle array indexing
+
                 const fileKey = `attachments[${item.assetNum}][]`;
                 formData.append(fileKey, file, file.name);
                 console.log(`Added file: ${file.name} with key: ${fileKey}`);
@@ -863,7 +863,7 @@ function confirmBulkReturnWithFiles() {
         }
     });
     
-    // Debug: Log all FormData entries
+ 
     console.log('=== FormData Contents ===');
     for (let pair of formData.entries()) {
         if (pair[1] instanceof File) {

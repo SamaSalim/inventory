@@ -52,7 +52,6 @@ class Attachment extends BaseController
             ]);
         }
 
-        // Create upload directory if it doesn't exist
         $uploadPath = WRITEPATH . 'uploads/return_attachments';
         if (!is_dir($uploadPath)) {
             mkdir($uploadPath, 0755, true);

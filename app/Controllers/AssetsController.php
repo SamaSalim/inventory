@@ -125,7 +125,7 @@ class AssetsController extends BaseController
                 ->groupEnd();
         }
 
-        $itemOrders = $builder->paginate(5, 'orders');
+        $itemOrders = $builder->paginate(3, 'orders');
         $pager = $itemOrderModel->pager;
 
         foreach ($itemOrders as $order) {
