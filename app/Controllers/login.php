@@ -83,7 +83,7 @@ class login extends BaseController
         if ($roleName === 'warehouse') {
             return redirect()->to('/InventoryController/index');
         } elseif ($roleName === 'assets') {
-            return redirect()->to('/AssetsController/dashboard');
+            return redirect()->to('/AssetsController/index');
         } elseif ($roleName === 'admin') {
             return redirect()->to('/AdminController/dashboard');
         } elseif ($roleName === 'user') {
