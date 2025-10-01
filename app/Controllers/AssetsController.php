@@ -250,78 +250,333 @@ public function orderDetails($id)
         'item_count'  => count($items),
     ]);
 }
-// public function saveReturn() {
-//     if (!session()->get('isLoggedIn')) {
-//         throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
-//     }
+public function processReturn()
+{
+    if (!session()->get('isLoggedIn')) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'غير مصرح بالدخول'
+        ])->setStatusCode(401);
+    }
 
-//     $validation = \Config\Services::validation();
-        
-//     $validation->setRules([
-//         'item_order_id' => 'required|integer',
-//         'usage_status_id' => 'required|integer',
-//         'notes' => 'required|min_length[10]',
-//     ], [
-//         'notes' => [
-//             'required' => 'يرجى إدخال سبب الإرجاع',
-//             'min_length' => 'يجب أن تكون الملاحظات 10 أحرف على الأقل'
-//         ]
-//     ]);
-
-//     if (!$validation->withRequest($this->request)->run()) {
-//         return redirect()->back()->withInput()->with('error', implode(' ', $validation->getErrors()));
-//     }
-
-//     $itemOrderId = $this->request->getPost('item_order_id');
-//     $usageStatusId = $this->request->getPost('usage_status_id');
-//     $notes = $this->request->getPost('notes');
+    $returnedItemsModel = new \App\Models\ReturnedItemsModel();
+    $db = \Config\Database::connect();
     
-//     $itemOrder = $this->itemOrderModel->find($itemOrderId);
-//     if (!$itemOrder) {
-//         return redirect()->back()->with('error', 'العنصر غير موجود.');
-//     }
+    try {
+        $items = $this->request->getJSON(true)['items'] ?? [];
         
-//     // Get employee ID from session - check multiple possible session keys
-//     $currentEmployeeId = session()->get('emp_id');
+        if (empty($items)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'لم يتم تحديد أي عناصر للترجيع'
+            ]);
+        }
+
+        $employeeId = session()->get('emp_id');
+        $returnedCount = 0;
+        $errors = [];
+
+        $db->transStart();
+
+        foreach ($items as $item) {
+            $itemOrderId = $item['id'];
+            $comment = $item['comment'] ?? '';
+            $files = $item['files'] ?? [];
+
+            // Get the current item_order record
+            $itemOrder = $this->itemOrderModel->find($itemOrderId);
+            
+            if (!$itemOrder) {
+                $errors[] = "العنصر برقم {$itemOrderId} غير موجود";
+                continue;
+            }
+
+            // Handle file attachments
+            $attachmentPath = null;
+            if (!empty($files)) {
+                $attachmentPath = $this->saveReturnAttachments($itemOrderId, $files);
+            }
+
+            // Update item_order record
+            $updateData = [
+                'created_by' => $employeeId,
+                'note' => $comment,
+                'usage_status_id' => 2, // 2 = 'رجيع' (returned status)
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+
+            if ($attachmentPath) {
+                $updateData['attachment'] = $attachmentPath;
+            }
+
+            $this->itemOrderModel->update($itemOrderId, $updateData);
+
+            // Insert into returned_items table
+            $returnedItemsModel->insert([
+                'item_order_id' => $itemOrderId,
+                'notes' => $comment,
+                'attach_id' => 0, // You can implement a separate attachments table if needed
+                'return_date' => date('Y-m-d H:i:s')
+            ]);
+
+            // Add to history
+            $historyModel = new \App\Models\HistoryModel();
+            $historyModel->insert([
+                'item_order_id' => $itemOrderId,
+                'action' => "تم ترجيع العهدة بواسطة {$employeeId}",
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $returnedCount++;
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء معالجة الترجيع'
+            ]);
+        }
+
+        $message = "تم ترجيع {$returnedCount} عنصر بنجاح";
+        if (!empty($errors)) {
+            $message .= "\n\nأخطاء: " . implode(", ", $errors);
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => $message,
+            'returned_count' => $returnedCount
+        ]);
+
+    } catch (\Exception $e) {
+        $db->transRollback();
+        log_message('error', 'Return processing error: ' . $e->getMessage());
+        
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'حدث خطأ: ' . $e->getMessage()
+        ])->setStatusCode(500);
+    }
+}
+
+/**
+ * Save return attachments
+ */
+private function saveReturnAttachments($itemOrderId, $files)
+{
+    $uploadPath = WRITEPATH . 'uploads/return_attachments/';
     
-//     // Debug: Check if employee ID is retrieved correctly
-//     if (!$currentEmployeeId) {
-//         log_message('error', 'Employee ID not found in session');
-//         // Try alternative session keys if your app uses different naming
-//         $currentEmployeeId = session()->get('employee_id') ?? session()->get('user_id');
-//     }
+    // Create directory if it doesn't exist
+    if (!is_dir($uploadPath)) {
+        mkdir($uploadPath, 0755, true);
+    }
+
+    $savedFiles = [];
+
+    foreach ($files as $fileData) {
+        try {
+            // If files are coming from JavaScript FormData
+            if (isset($fileData['tmp_name'])) {
+                $file = new \CodeIgniter\HTTP\Files\UploadedFile(
+                    $fileData['tmp_name'],
+                    $fileData['name'],
+                    $fileData['type'],
+                    $fileData['size'],
+                    $fileData['error']
+                );
+            } else {
+                continue;
+            }
+
+            if (!$file->isValid()) {
+                continue;
+            }
+
+            // Validate file size (5MB max)
+            if ($file->getSizeByUnit('mb') > 5) {
+                log_message('warning', "File {$file->getName()} exceeds 5MB limit");
+                continue;
+            }
+
+            // Validate file type
+            $allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf', 
+                           'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            
+            if (!in_array($file->getMimeType(), $allowedTypes)) {
+                log_message('warning', "File {$file->getName()} has invalid type");
+                continue;
+            }
+
+            // Generate unique filename
+            $newName = $itemOrderId . '_' . time() . '_' . $file->getRandomName();
+            
+            // Move file
+            $file->move($uploadPath, $newName);
+            
+            $savedFiles[] = $newName;
+
+        } catch (\Exception $e) {
+            log_message('error', 'File upload error: ' . $e->getMessage());
+        }
+    }
+
+    // Return comma-separated list of filenames
+    return !empty($savedFiles) ? implode(',', $savedFiles) : null;
+}
+
+/**
+ * Get attachment for download
+ */
+public function getAttachment($itemOrderId, $filename)
+{
+    if (!session()->get('isLoggedIn')) {
+        throw new \CodeIgniter\Exceptions\PageNotFoundException();
+    }
+
+    $path = WRITEPATH . 'uploads/return_attachments/' . $filename;
+
+    if (!is_file($path)) {
+        throw new \CodeIgniter\Exceptions\PageNotFoundException();
+    }
+
+    // Verify the file belongs to the item_order
+    if (strpos($filename, $itemOrderId . '_') !== 0) {
+        throw new \CodeIgniter\Exceptions\PageNotFoundException();
+    }
+
+    $finfo = new \finfo(FILEINFO_MIME);
+    $type = $finfo->file($path);
+
+    return $this->response
+        ->setHeader('Content-Type', $type)
+        ->setHeader('Content-Length', filesize($path))
+        ->setHeader('Content-Disposition', 'attachment; filename="' . basename($filename) . '"')
+        ->setBody(file_get_contents($path));
+}
+
+/**
+ * Alternative method if you're receiving files via regular form upload
+ */
+public function processReturnWithFormData()
+{
+    if (!session()->get('isLoggedIn')) {
+        return redirect()->back()->with('error', 'غير مصرح بالدخول');
+    }
+
+    $returnedItemsModel = new \App\Models\ReturnedItemsModel();
+    $db = \Config\Database::connect();
     
-//     // If still null, return error
-//     if (!$currentEmployeeId) {
-//         return redirect()->back()->with('error', 'معرف الموظف غير موجود في الجلسة.');
-//     }
+    try {
+        $itemIds = $this->request->getPost('item_ids');
+        $comments = $this->request->getPost('comments');
+        $files = $this->request->getFiles();
 
-//     try {
-//         $updateData = [
-//             'usage_status_id' => $usageStatusId, 
-//             'note' => $notes, 
-//             'created_by' => $currentEmployeeId,  // This should now have a value
-//             'updated_at' => date('Y-m-d H:i:s')
-//         ];
+        if (empty($itemIds)) {
+            return redirect()->back()->with('error', 'لم يتم تحديد أي عناصر للترجيع');
+        }
+
+        $employeeId = session()->get('emp_id');
+        $returnedCount = 0;
+
+        $db->transStart();
+
+        foreach ($itemIds as $index => $itemOrderId) {
+            $comment = $comments[$itemOrderId] ?? '';
+            
+            // Handle file uploads for this item
+            $attachmentPath = null;
+            if (isset($files['attachments'][$itemOrderId])) {
+                $itemFiles = $files['attachments'][$itemOrderId];
+                $attachmentPath = $this->saveReturnAttachmentsFromForm($itemOrderId, $itemFiles);
+            }
+
+            // Update item_order
+            $updateData = [
+                'created_by' => $employeeId,
+                'note' => $comment,
+                'usage_status_id' => 2,
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+
+            if ($attachmentPath) {
+                $updateData['attachment'] = $attachmentPath;
+            }
+
+            $this->itemOrderModel->update($itemOrderId, $updateData);
+
+            // Insert into returned_items
+            $returnedItemsModel->insert([
+                'item_order_id' => $itemOrderId,
+                'notes' => $comment,
+                'attach_id' => 0,
+                'return_date' => date('Y-m-d H:i:s')
+            ]);
+
+            // Add history
+            $historyModel = new \App\Models\HistoryModel();
+            $historyModel->insert([
+                'item_order_id' => $itemOrderId,
+                'action' => "تم ترجيع العهدة بواسطة {$employeeId}",
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $returnedCount++;
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء معالجة الترجيع');
+        }
+
+        return redirect()->to('AssetsController')
+            ->with('message', "تم ترجيع {$returnedCount} عنصر بنجاح");
+
+    } catch (\Exception $e) {
+        $db->transRollback();
+        log_message('error', 'Return processing error: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+    }
+}
+
+private function saveReturnAttachmentsFromForm($itemOrderId, $files)
+{
+    $uploadPath = WRITEPATH . 'uploads/return_attachments/';
+    
+    if (!is_dir($uploadPath)) {
+        mkdir($uploadPath, 0755, true);
+    }
+
+    $savedFiles = [];
+
+    if (!is_array($files)) {
+        $files = [$files];
+    }
+
+    foreach ($files as $file) {
+        if (!$file->isValid() || $file->hasMoved()) {
+            continue;
+        }
+
+        if ($file->getSizeByUnit('mb') > 5) {
+            continue;
+        }
+
+        $allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf', 
+                       'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
         
-//         // Debug: Log the data being saved
-//         log_message('debug', 'Update data: ' . json_encode($updateData));
-        
-//         $updated = $this->itemOrderModel->update($itemOrderId, $updateData);
+        if (!in_array($file->getMimeType(), $allowedTypes)) {
+            continue;
+        }
 
-//         if (!$updated) {
-//             return redirect()->back()->with('error', 'حدث خطأ أثناء حفظ عملية الإرجاع.');
-//         }
+        $newName = $itemOrderId . '_' . time() . '_' . $file->getRandomName();
+        $file->move($uploadPath, $newName);
+        $savedFiles[] = $newName;
+    }
 
-//         return redirect()->to(base_url('AssetsController'))
-//             ->with('success', 'تم إرجاع الأصل بنجاح.');
-
-//     } catch (\Exception $e) {
-//         log_message('error', 'Error in saveReturn: ' . $e->getMessage());
-//         return redirect()->back()->with('error', 'حدث خطأ: ' . $e->getMessage());
-//     }
-// }
-
-
+    return !empty($savedFiles) ? implode(',', $savedFiles) : null;
+}
 
 }

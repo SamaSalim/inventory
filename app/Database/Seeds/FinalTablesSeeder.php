@@ -429,7 +429,7 @@ class FinalTablesSeeder extends Seeder
                 'assets_type' => 'عهدة خاصة',
                 'created_by' => '1003',
                 'usage_status_id' => 1,
-                'note' => 'تم تسليم الشاشة لموظف الموارد البشرية.',
+                'note' => 'تم تسليم الشاشة لموظف الموارد البشرية.',               
             ],
             [
                 'order_id' => 2,
@@ -449,21 +449,13 @@ class FinalTablesSeeder extends Seeder
         ];
         $this->db->table('item_order')->insertBatch($item_orders);
 
-        // Seeder for 'attachments' table
-        $attachments = [
-            [
-                'file_name' => 'مستند استلام.pdf',
-                'file_path' => 'uploads/receipts/document_1.pdf'
-            ],
-        ];
-        $this->db->table('attachments')->insertBatch($attachments);
+
 
         // Seeder for 'returned_items' table
         $returned_items = [
             [
                 'item_order_id' => 1,
                 'notes' => 'تم إرجاع الجهاز بحالة جيدة.',
-                'attach_id' => 1,
             ],
         ];
         $this->db->table('returned_items')->insertBatch($returned_items);

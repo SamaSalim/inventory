@@ -368,6 +368,11 @@ class CreateFinalTables extends Migration
                 'type'       => 'TEXT',
                 'null'       => true,
             ],
+            "attachment" => [
+                "type"       => "VARCHAR",
+                "constraint" => 128,
+                'null'       => true,
+            ],
             'created_at datetime default current_timestamp',
             'updated_at datetime default current_timestamp on update current_timestamp',
         ]);
@@ -379,27 +384,6 @@ class CreateFinalTables extends Migration
         $this->forge->addForeignKey('usage_status_id', 'usage_status', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('item_order');
 
-        // attachments
-        $this->forge->addField([
-            'id' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'unsigned'       => true,
-                'auto_increment' => true,
-            ],
-            'file_name' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '255',
-            ],
-            'file_path' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '255',
-            ],
-            'uploaded_on datetime default current_timestamp',
-        ]);
-
-        $this->forge->addPrimaryKey('id');
-        $this->forge->createTable('attachments');
 
 
         // returned_items
@@ -428,7 +412,6 @@ class CreateFinalTables extends Migration
 
         ]);
         $this->forge->addPrimaryKey('id');
-        $this->forge->addForeignKey('attach_id', 'attachments', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('item_order_id', 'item_order', 'item_order_id', 'CASCADE', 'CASCADE'); // ربط صحيح بجدول item_order
         $this->forge->createTable('returned_items');
 
@@ -505,6 +488,6 @@ class CreateFinalTables extends Migration
         $this->forge->dropTable('order_status'); // يعتمد عليه جدول: order
         $this->forge->dropTable('usage_status');
         $this->forge->dropTable('role'); // يعتمد عليه جدول: permission
-        $this->forge->dropTable('attachments');
+
     }
 }

@@ -184,7 +184,7 @@
 
 <script>
 let selectedItems = [];
-let uploadedFiles = {};
+let uploadedFiles = {}; // Now keyed by assetNum
 
 function updateSelection() {
     selectedItems = [];
@@ -207,7 +207,7 @@ function updateSelection() {
             category: category,
             model: model,
             serialNum: serialNum,
-            assetNum: assetNum
+            assetNum: assetNum  // This is the unique identifier we'll use
         });
         
         itemCard.classList.add('selected');
@@ -285,27 +285,35 @@ function clearSelection() {
     }
 }
 
-function handleFileUpload(itemId, files) {
-    if (!uploadedFiles[itemId]) {
-        uploadedFiles[itemId] = [];
+function handleFileUpload(assetNum, files) {
+    if (!uploadedFiles[assetNum]) {
+        uploadedFiles[assetNum] = [];
     }
+    
+    console.log('Uploading files for asset:', assetNum);
+    console.log('Number of files:', files.length);
     
     Array.from(files).forEach(file => {
         if (file.size > 5 * 1024 * 1024) {
             showAlert('warning', `الملف ${file.name} أكبر من 5 ميجابايت`);
             return;
         }
-        uploadedFiles[itemId].push(file);
+        uploadedFiles[assetNum].push(file);
+        console.log(`Added file "${file.name}" to asset ${assetNum}`);
     });
     
-    updateFileList(itemId);
+    updateFileList(assetNum);
+    console.log('Current uploadedFiles:', uploadedFiles);
 }
 
-function updateFileList(itemId) {
-    const fileList = document.getElementById(`fileList_${itemId}`);
-    if (!fileList) return;
+function updateFileList(assetNum) {
+    const fileList = document.getElementById(`fileList_${assetNum}`);
+    if (!fileList) {
+        console.warn(`File list element not found for asset: ${assetNum}`);
+        return;
+    }
     
-    const files = uploadedFiles[itemId] || [];
+    const files = uploadedFiles[assetNum] || [];
     
     if (files.length === 0) {
         fileList.innerHTML = '<div style="color: #999; font-size: 13px; padding: 10px; text-align: center;">لم يتم رفع أي ملفات</div>';
@@ -328,7 +336,7 @@ function updateFileList(itemId) {
                 <span style="font-size: 13px; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</span>
                 <span style="font-size: 11px; color: #999;">(${(file.size / 1024).toFixed(1)} KB)</span>
             </div>
-            <button onclick="removeFile('${itemId}', ${index})" style="
+            <button onclick="removeFile('${assetNum}', ${index})" style="
                 background: #e74c3c;
                 color: white;
                 border: none;
@@ -346,10 +354,11 @@ function updateFileList(itemId) {
     `).join('');
 }
 
-function removeFile(itemId, fileIndex) {
-    if (uploadedFiles[itemId]) {
-        uploadedFiles[itemId].splice(fileIndex, 1);
-        updateFileList(itemId);
+function removeFile(assetNum, fileIndex) {
+    if (uploadedFiles[assetNum]) {
+        uploadedFiles[assetNum].splice(fileIndex, 1);
+        updateFileList(assetNum);
+        console.log(`Removed file index ${fileIndex} from asset ${assetNum}`);
     }
 }
 
@@ -359,7 +368,6 @@ function showSelectedItemsPopup() {
         return;
     }
     
-    // Hide the bar when popup opens
     const bulkActions = document.getElementById('bulkActions');
     bulkActions.classList.remove('show');
     
@@ -446,14 +454,15 @@ function showSelectedItemsPopup() {
                     ">
                         <input 
                             type="file" 
-                            id="fileInput_${item.id}"
+                            id="fileInput_${item.assetNum}"
+                            data-asset-num="${item.assetNum}"
                             multiple
                             accept="image/*,.pdf,.doc,.docx"
-                            onchange="handleFileUpload('${item.id}', this.files)"
+                            onchange="handleFileUpload(this.dataset.assetNum, this.files)"
                             style="display: none;"
                         />
                         <button 
-                            onclick="document.getElementById('fileInput_${item.id}').click()"
+                            onclick="document.getElementById('fileInput_${item.assetNum}').click()"
                             style="
                                 background: linear-gradient(135deg, #3ac0c3, #2aa8ab);
                                 color: white;
@@ -479,7 +488,7 @@ function showSelectedItemsPopup() {
                         <div style="font-size: 11px; color: #999; text-align: center; margin-top: 8px;">
                             الحد الأقصى: 5 ميجابايت لكل ملف
                         </div>
-                        <div id="fileList_${item.id}" style="margin-top: 10px;">
+                        <div id="fileList_${item.assetNum}" style="margin-top: 10px;">
                             <div style="color: #999; font-size: 13px; padding: 10px; text-align: center;">لم يتم رفع أي ملفات</div>
                         </div>
                     </div>
@@ -647,7 +656,6 @@ function closeSelectedItemsPopup() {
     if (popup) popup.remove();
     if (backdrop) backdrop.remove();
     
-    // Always update the bar state after closing popup
     updateBulkActionsBar();
 }
 
@@ -655,6 +663,14 @@ function removeItemFromSelection(itemId) {
     const checkbox = document.querySelector(`.item-card[data-item-id="${itemId}"] .item-checkbox`);
     if (checkbox) {
         checkbox.checked = false;
+        
+        // Find the item's assetNum and clear its files
+        const item = selectedItems.find(i => i.id === itemId);
+        if (item && item.assetNum) {
+            delete uploadedFiles[item.assetNum];
+            console.log(`Cleared files for asset: ${item.assetNum}`);
+        }
+        
         updateSelection();
         
         if (selectedItems.length === 0) {
@@ -677,8 +693,9 @@ function submitReturn() {
         return {
             id: item.id,
             name: item.name,
+            assetNum: item.assetNum,
             comment: commentElement ? commentElement.value.trim() : '',
-            files: uploadedFiles[item.id] || []
+            files: uploadedFiles[item.assetNum] || []
         };
     });
     
@@ -709,6 +726,7 @@ function showReturnConfirmation(returnData) {
         const filesInfo = item.files.length > 0 ? `<br><small style="color: #3ac0c3;">📎 ${item.files.length} مرفق</small>` : '';
         return `<div style="margin: 8px 0; padding: 8px; background: #f8f9fa; border-radius: 6px;">
             <strong>${index + 1}. ${item.name}</strong>
+            <br><small style="color: #888;">رقم الأصل: ${item.assetNum}</small>
             ${item.comment ? `<br><small style="color: #666;">📝 ${item.comment}</small>` : '<br><small style="color: #999;">بدون ملاحظات</small>'}
             ${filesInfo}
         </div>`;
@@ -739,37 +757,126 @@ function confirmBulkReturn() {
         return;
     }
     
-    console.log('Submitting return for items:', returnData);
+    const confirmBtn = document.querySelector('.confirm-delete-btn');
+    const originalText = confirmBtn.innerHTML;
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الترجيع...';
     
-    setTimeout(() => {
-        returnData.forEach(item => {
-            const card = document.querySelector(`.item-card[data-item-id="${item.id}"]`);
-            if (card) {
-                card.style.animation = 'fadeOut 0.3s ease';
-                setTimeout(() => card.remove(), 300);
-            }
-        });
-        
-        showAlert('success', `تم ترجيع ${returnData.length} عنصر بنجاح`);
-        
-        selectedItems = [];
-        uploadedFiles = {};
-        updateBulkActionsBar();
-        closeDeleteModal();
-        
-        delete window.tempReturnData;
-        
-        setTimeout(() => {
-            const remainingItems = document.querySelectorAll('.item-card');
-            if (remainingItems.length === 0) {
-                const itemsGrid = document.querySelector('.items-grid');
-                if (itemsGrid) {
-                    itemsGrid.innerHTML = '<div class="no-items-msg">تم ترجيع جميع العناصر بنجاح</div>';
+    const itemsData = returnData.map(item => ({
+        id: item.id,
+        assetNum: item.assetNum,
+        comment: item.comment
+    }));
+    
+    fetch('<?= base_url("AssetsController/processReturn") ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            items: itemsData
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            returnData.forEach(item => {
+                const card = document.querySelector(`.item-card[data-item-id="${item.id}"]`);
+                if (card) {
+                    card.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => card.remove(), 300);
                 }
-                document.querySelector('.select-all-container')?.remove();
-            }
-        }, 400);
-    }, 500);
+            });
+            
+            showAlert('success', data.message);
+            
+            selectedItems = [];
+            uploadedFiles = {};
+            updateBulkActionsBar();
+            closeDeleteModal();
+            delete window.tempReturnData;
+            
+            setTimeout(() => {
+                const remainingItems = document.querySelectorAll('.item-card');
+                if (remainingItems.length === 0) {
+                    const itemsGrid = document.querySelector('.items-grid');
+                    if (itemsGrid) {
+                        itemsGrid.innerHTML = '<div class="no-items-msg">تم ترجيع جميع العناصر بنجاح</div>';
+                    }
+                    document.querySelector('.select-all-container')?.remove();
+                }
+                
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }, 400);
+            
+        } else {
+            showAlert('error', data.message || 'حدث خطأ أثناء الترجيع');
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = originalText;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('error', 'حدث خطأ في الاتصال بالخادم');
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = originalText;
+    });
+}
+
+function confirmBulkReturnWithFiles() {
+    const returnData = window.tempReturnData;
+    
+    if (!returnData) {
+        showAlert('warning', 'حدث خطأ في البيانات');
+        return;
+    }
+    
+    const confirmBtn = document.querySelector('.confirm-delete-btn');
+    const originalText = confirmBtn.innerHTML;
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الترجيع...';
+    
+    const formData = new FormData();
+    
+    returnData.forEach((item, index) => {
+        formData.append(`item_ids[${index}]`, item.id);
+        formData.append(`asset_nums[${index}]`, item.assetNum);
+        formData.append(`comments[${item.assetNum}]`, item.comment);
+        
+        if (item.files && item.files.length > 0) {
+            item.files.forEach((file, fileIndex) => {
+                formData.append(`attachments[${item.assetNum}][${fileIndex}]`, file);
+            });
+        }
+    });
+    
+    fetch('<?= base_url("AssetsController/processReturnWithFormData") ?>', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            showAlert('error', data.message || 'حدث خطأ أثناء الترجيع');
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = originalText;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('error', 'حدث خطأ في الاتصال بالخادم');
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = originalText;
+    });
 }
 
 function closeDeleteModal() {
@@ -808,7 +915,7 @@ if (!document.getElementById('fadeOutAnimationStyles')) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Return system initialized');
+    console.log('Return system initialized with asset number tracking');
 });
 </script>
 </body>
