@@ -551,8 +551,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>القسم</label>
-                        <select name="department" id="departmentSelect">
+                        <label>القسم <span class="required">*</span></label>
+                        <select name="sections" id="sectionSelect" required disabled>
                             <option value="">اختر القسم</option>
                         </select>
                     </div>
@@ -707,7 +707,7 @@
             
             if (orderData.items[0]) {
                 const firstItem = orderData.items[0];
-                setLocationFromData(firstItem.building_id, firstItem.floor_id, firstItem.room_id);
+                setLocationFromData(firstItem.building_id, firstItem.floor_id, firstItem.section_id,  firstItem.room_id);
             }
         }
     });
@@ -844,19 +844,30 @@
         }
 
         // تعيين الموقع من البيانات
-        function setLocationFromData(buildingId, floorId, roomId) {
+        function setLocationFromData(buildingId, floorId, sectionId, roomId) {
             if (buildingId) {
                 const buildingSelect = document.getElementById('buildingSelect');
                 buildingSelect.value = buildingId;
                 
                 // تحميل الطوابق
                 loadFloors(buildingId).then(() => {
+                   
                     if (floorId) {
                         const floorSelect = document.getElementById('floorSelect');
                         floorSelect.value = floorId;
                         
                         // تحميل الأقسام والغرف
                         loadSections(floorId).then(() => {
+
+                            if (sectionId) {
+                                const sectionSelect = document.getElementById('sectionSelect');
+                                sectionSelect.value = sectionId;
+                            }
+                        });
+
+                           // تحميل الأقسام والغرف
+                        loadRooms(sectionId).then(() => {
+                            
                             if (roomId) {
                                 const roomSelect = document.getElementById('roomSelect');
                                 roomSelect.value = roomId;
@@ -1306,6 +1317,7 @@
         function initLocationDropdowns() {
             const buildingSelect = document.getElementById('buildingSelect');
             const floorSelect = document.getElementById('floorSelect');
+            const sectionSelect = document.getElementById('sectionSelect');
             const roomSelect = document.getElementById('roomSelect');
 
             buildingSelect.addEventListener('change', function() {
@@ -1314,6 +1326,10 @@
 
             floorSelect.addEventListener('change', function() {
                 loadSections(this.value);
+            });
+
+            sectionSelect.addEventListener('change', function() {
+                loadRooms(this.value);
             });
         }
 
@@ -1330,15 +1346,6 @@
                                 buildingSelect.innerHTML += `<option value="${building.id}">${building.code || building.name}</option>`;
                             });
                         }
-
-                        // تحميل الأقسام
-                        if (data.departments && Array.isArray(data.departments)) {
-                            const departmentSelect = document.getElementById('departmentSelect');
-                            departmentSelect.innerHTML = '<option value="">اختر القسم</option>';
-                            data.departments.forEach(dept => {
-                                departmentSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
-                            });
-                        }
                     }
                     return data;
                 })
@@ -1351,8 +1358,10 @@
         function loadFloors(buildingId) {
             const floorSelect = document.getElementById('floorSelect');
             const roomSelect = document.getElementById('roomSelect');
+            const sectionSelect = document.getElementById('sectionSelect');
             
             floorSelect.innerHTML = '<option value="">اختر الطابق</option>';
+            sectionSelect.innerHTML = '<option value="">اختر القسم</option>';
             roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
             
             if (!buildingId) {
@@ -1384,6 +1393,7 @@
         function loadSections(floorId) {
             const roomSelect = document.getElementById('roomSelect');
             
+            sectionSelect.innerHTML = '<option value="">اختر القسم</option>';
             roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
             
             if (!floorId) {
@@ -1391,7 +1401,30 @@
                 return Promise.resolve();
             }
 
-            return fetch(buildUrl(`OrderController/getsectionsbyfloor/${floorId}`))
+            return  fetch(buildUrl(`OrderController/getsectionsbyfloor/${floorId}`))
+         .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+         })
+            .then(data => {
+            console.log('Sections response:', data);
+            if (data.success && data.data && Array.isArray(data.data)) {
+                data.data.forEach(section => {
+                    sectionSelect.innerHTML += `<option value="${section.id}">${section.code || section.name}</option>`;
+                });
+                sectionSelect.disabled = false;
+            } else {
+                sectionSelect.disabled = true;
+            }
+            })
+            .catch(error => {
+            console.error('خطأ في تحميل الأقسام:', error);
+            sectionSelect.disabled = true;
+            });
+
+          return fetch(buildUrl(`OrderController/getsectionsbyfloor/${floorId}`))
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.data && Array.isArray(data.data) && data.data.length > 0) {
