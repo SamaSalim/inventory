@@ -848,12 +848,12 @@ function confirmBulkReturnWithFiles() {
         
         console.log(`Added asset_num: ${item.assetNum}, comment: ${item.comment || 'تم الترجيع'}`);
         
-        // Add files for this asset - FIXED: Use empty brackets []
+        // Add files for this asset using the correct format
         if (item.files && item.files.length > 0) {
             console.log(`Processing ${item.files.length} files for asset ${item.assetNum}`);
             
             item.files.forEach((file) => {
-                // Use empty brackets to let CI4 handle the array indexing
+                // Use empty brackets [] to let CodeIgniter handle array indexing
                 const fileKey = `attachments[${item.assetNum}][]`;
                 formData.append(fileKey, file, file.name);
                 console.log(`Added file: ${file.name} with key: ${fileKey}`);
@@ -874,7 +874,8 @@ function confirmBulkReturnWithFiles() {
     }
     console.log('========================');
     
-    fetch('<?= base_url("AssetsController/processReturnWithFiles") ?>', {
+    // UPDATED URL - Point to new Attachment controller
+    fetch('<?= base_url("item/attachment/upload") ?>', {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
@@ -886,6 +887,12 @@ function confirmBulkReturnWithFiles() {
         console.log('Response:', data);
         if (data.success) {
             showAlert('success', data.message);
+            
+            selectedItems = [];
+            uploadedFiles = {};
+            closeDeleteModal();
+            delete window.tempReturnData;
+            
             setTimeout(() => window.location.reload(), 1500);
         } else {
             showAlert('error', data.message || 'حدث خطأ أثناء الترجيع');
