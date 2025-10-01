@@ -174,7 +174,7 @@
                 <button class="confirm-btn confirm-cancel-btn" onclick="closeDeleteModal()">
                     إلغاء
                 </button>
-                <button class="confirm-btn confirm-delete-btn" onclick="confirmBulkReturn()">
+                <button class="confirm-btn confirm-delete-btn" onclick="confirmBulkReturnWithFiles()">
                     <i class="fas fa-undo"></i>
                     تأكيد الترجيع
                 </button>
@@ -841,19 +841,40 @@ function confirmBulkReturnWithFiles() {
     
     const formData = new FormData();
     
+    // Add asset numbers and comments
     returnData.forEach((item, index) => {
-        formData.append(`item_ids[${index}]`, item.id);
         formData.append(`asset_nums[${index}]`, item.assetNum);
-        formData.append(`comments[${item.assetNum}]`, item.comment);
+        formData.append(`comments[${item.assetNum}]`, item.comment || 'تم الترجيع');
         
+        console.log(`Added asset_num: ${item.assetNum}, comment: ${item.comment || 'تم الترجيع'}`);
+        
+        // Add files for this asset - FIXED: Use empty brackets []
         if (item.files && item.files.length > 0) {
-            item.files.forEach((file, fileIndex) => {
-                formData.append(`attachments[${item.assetNum}][${fileIndex}]`, file);
+            console.log(`Processing ${item.files.length} files for asset ${item.assetNum}`);
+            
+            item.files.forEach((file) => {
+                // Use empty brackets to let CI4 handle the array indexing
+                const fileKey = `attachments[${item.assetNum}][]`;
+                formData.append(fileKey, file, file.name);
+                console.log(`Added file: ${file.name} with key: ${fileKey}`);
             });
+        } else {
+            console.log(`No files for asset ${item.assetNum}`);
         }
     });
     
-    fetch('<?= base_url("AssetsController/processReturnWithFormData") ?>', {
+    // Debug: Log all FormData entries
+    console.log('=== FormData Contents ===');
+    for (let pair of formData.entries()) {
+        if (pair[1] instanceof File) {
+            console.log(pair[0], ':', pair[1].name, '(', pair[1].size, 'bytes)');
+        } else {
+            console.log(pair[0], ':', pair[1]);
+        }
+    }
+    console.log('========================');
+    
+    fetch('<?= base_url("AssetsController/processReturnWithFiles") ?>', {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
@@ -862,6 +883,7 @@ function confirmBulkReturnWithFiles() {
     })
     .then(response => response.json())
     .then(data => {
+        console.log('Response:', data);
         if (data.success) {
             showAlert('success', data.message);
             setTimeout(() => window.location.reload(), 1500);

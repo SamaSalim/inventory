@@ -222,8 +222,12 @@ public function orderDetails($id)
     $order->to_name      = $toUser->name ?? 'غير معروف';
     $order->status_name  = $status->status ?? 'غير معروف';
 
+    $items = $itemOrderModel
+                ->where('order_id', $id)
+                ->where('usage_status_id !=', 2)
+                ->findAll();
 
-    $items = $itemOrderModel->where('order_id', $id)->findAll();
+
 
     foreach ($items as $item) {
         $itemData = $itemModel->find($item->item_id);
@@ -250,84 +254,102 @@ public function orderDetails($id)
         'item_count'  => count($items),
     ]);
 }
-public function processReturn()
+public function processReturnWithFiles()
 {
-    if (!session()->get('isLoggedIn')) {
-        return $this->response->setJSON([
-            'success' => false,
-            'message' => 'غير مصرح بالدخول'
-        ])->setStatusCode(401);
-    }
-
-    $returnedItemsModel = new \App\Models\ReturnedItemsModel();
-    $db = \Config\Database::connect();
-    
     try {
-        $items = $this->request->getJSON(true)['items'] ?? [];
-        
-        if (empty($items)) {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'يجب تسجيل الدخول أولاً'
+            ]);
+        }
+
+        $loggedEmployeeId = session()->get('employee_id');
+        $assetNums = $this->request->getPost('asset_nums');
+        $comments  = $this->request->getPost('comments');
+
+        if (empty($assetNums) || !is_array($assetNums)) {
             return $this->response->setJSON([
                 'success' => false,
                 'message' => 'لم يتم تحديد أي عناصر للترجيع'
             ]);
         }
 
-        $employeeId = session()->get('emp_id');
-        $returnedCount = 0;
-        $errors = [];
+        $returnedStatus = $this->usageStatusModel->where('usage_status', 'رجيع')->first();
+        if (!$returnedStatus) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'حالة "رجيع" غير موجودة في النظام'
+            ]);
+        }
 
+        $uploadPath = WRITEPATH . 'uploads/return_attachments';
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
+
+        $db = \Config\Database::connect();
         $db->transStart();
 
-        foreach ($items as $item) {
-            $itemOrderId = $item['id'];
-            $comment = $item['comment'] ?? '';
-            $files = $item['files'] ?? [];
+        $successCount = 0;
+        $failedItems  = [];
+        $allFiles = $this->request->getFiles();
 
-            // Get the current item_order record
-            $itemOrder = $this->itemOrderModel->find($itemOrderId);
-            
-            if (!$itemOrder) {
-                $errors[] = "العنصر برقم {$itemOrderId} غير موجود";
+        foreach ($assetNums as $assetNum) {
+            $originalItem = $this->itemOrderModel->where('asset_num', $assetNum)->first();
+            if (!$originalItem) {
+                $failedItems[] = "الأصل رقم: $assetNum";
                 continue;
             }
 
-            // Handle file attachments
-            $attachmentPath = null;
-            if (!empty($files)) {
-                $attachmentPath = $this->saveReturnAttachments($itemOrderId, $files);
+            // === FILE UPLOAD HANDLING ===
+            $uploadedFileNames = [];
+            if (isset($allFiles['attachments'][$assetNum])) {
+                foreach ($allFiles['attachments'][$assetNum] as $file) {
+                    if (!$file->isValid()) continue;
+
+                    if ($file->getSizeByUnit("mb") > 5) {
+                        $failedItems[] = "ملف كبير جداً للأصل: $assetNum - " . $file->getName();
+                        continue;
+                    }
+
+                    $allowedMimes = [
+                        "image/png", "image/jpeg", "image/jpg",
+                        "application/pdf",
+                        "application/msword",
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    ];
+
+                    if (!in_array($file->getMimeType(), $allowedMimes)) {
+                        $failedItems[] = "نوع ملف غير مسموح للأصل: $assetNum - " . $file->getName();
+                        continue;
+                    }
+
+                    $newName = $assetNum . '_' . time() . '_' . $file->getRandomName();
+                    if ($file->move($uploadPath, $newName)) {
+                        $uploadedFileNames[] = $newName;
+                    }
+                }
             }
 
-            // Update item_order record
+            $attachmentPath = !empty($uploadedFileNames) ? implode(',', $uploadedFileNames) : $originalItem->attachment;
+
+            // === UPDATE EXISTING RECORD ===
             $updateData = [
-                'created_by' => $employeeId,
-                'note' => $comment,
-                'usage_status_id' => 2, // 2 = 'رجيع' (returned status)
-                'updated_at' => date('Y-m-d H:i:s')
+                'created_by'      => $loggedEmployeeId,
+                'usage_status_id' => $returnedStatus->id, // ID = 2
+                'note'            => $comments[$assetNum] ?? 'تم الترجيع',
+                'attachment'      => $attachmentPath,
+                'updated_at'      => date('Y-m-d H:i:s')
             ];
 
-            if ($attachmentPath) {
-                $updateData['attachment'] = $attachmentPath;
+            $updated = $this->itemOrderModel->update($originalItem->item_order_id, $updateData);
+
+            if ($updated) {
+                $successCount++;
+            } else {
+                $failedItems[] = "الأصل رقم: $assetNum";
             }
-
-            $this->itemOrderModel->update($itemOrderId, $updateData);
-
-            // Insert into returned_items table
-            $returnedItemsModel->insert([
-                'item_order_id' => $itemOrderId,
-                'notes' => $comment,
-                'attach_id' => 0, // You can implement a separate attachments table if needed
-                'return_date' => date('Y-m-d H:i:s')
-            ]);
-
-            // Add to history
-            $historyModel = new \App\Models\HistoryModel();
-            $historyModel->insert([
-                'item_order_id' => $itemOrderId,
-                'action' => "تم ترجيع العهدة بواسطة {$employeeId}",
-                'created_at' => date('Y-m-d H:i:s')
-            ]);
-
-            $returnedCount++;
         }
 
         $db->transComplete();
@@ -335,248 +357,30 @@ public function processReturn()
         if ($db->transStatus() === false) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'حدث خطأ أثناء معالجة الترجيع'
+                'message' => 'فشل في حفظ البيانات'
             ]);
         }
 
-        $message = "تم ترجيع {$returnedCount} عنصر بنجاح";
-        if (!empty($errors)) {
-            $message .= "\n\nأخطاء: " . implode(", ", $errors);
+        $message = "تم تحديث $successCount عنصر بنجاح";
+        if (!empty($failedItems)) {
+            $message .= "\n\nفشل التحديث: " . implode(', ', $failedItems);
         }
 
         return $this->response->setJSON([
-            'success' => true,
-            'message' => $message,
-            'returned_count' => $returnedCount
+            'success'        => true,
+            'message'        => $message,
+            'updated_count'  => $successCount,
+            'failed_count'   => count($failedItems)
         ]);
 
     } catch (\Exception $e) {
-        $db->transRollback();
-        log_message('error', 'Return processing error: ' . $e->getMessage());
-        
+        log_message('error', 'Error in processReturnWithFiles: ' . $e->getMessage());
         return $this->response->setJSON([
             'success' => false,
-            'message' => 'حدث خطأ: ' . $e->getMessage()
-        ])->setStatusCode(500);
+            'message' => 'خطأ في معالجة الترجيع: ' . $e->getMessage()
+        ]);
     }
 }
 
-/**
- * Save return attachments
- */
-private function saveReturnAttachments($itemOrderId, $files)
-{
-    $uploadPath = WRITEPATH . 'uploads/return_attachments/';
-    
-    // Create directory if it doesn't exist
-    if (!is_dir($uploadPath)) {
-        mkdir($uploadPath, 0755, true);
-    }
-
-    $savedFiles = [];
-
-    foreach ($files as $fileData) {
-        try {
-            // If files are coming from JavaScript FormData
-            if (isset($fileData['tmp_name'])) {
-                $file = new \CodeIgniter\HTTP\Files\UploadedFile(
-                    $fileData['tmp_name'],
-                    $fileData['name'],
-                    $fileData['type'],
-                    $fileData['size'],
-                    $fileData['error']
-                );
-            } else {
-                continue;
-            }
-
-            if (!$file->isValid()) {
-                continue;
-            }
-
-            // Validate file size (5MB max)
-            if ($file->getSizeByUnit('mb') > 5) {
-                log_message('warning', "File {$file->getName()} exceeds 5MB limit");
-                continue;
-            }
-
-            // Validate file type
-            $allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf', 
-                           'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-            
-            if (!in_array($file->getMimeType(), $allowedTypes)) {
-                log_message('warning', "File {$file->getName()} has invalid type");
-                continue;
-            }
-
-            // Generate unique filename
-            $newName = $itemOrderId . '_' . time() . '_' . $file->getRandomName();
-            
-            // Move file
-            $file->move($uploadPath, $newName);
-            
-            $savedFiles[] = $newName;
-
-        } catch (\Exception $e) {
-            log_message('error', 'File upload error: ' . $e->getMessage());
-        }
-    }
-
-    // Return comma-separated list of filenames
-    return !empty($savedFiles) ? implode(',', $savedFiles) : null;
-}
-
-/**
- * Get attachment for download
- */
-public function getAttachment($itemOrderId, $filename)
-{
-    if (!session()->get('isLoggedIn')) {
-        throw new \CodeIgniter\Exceptions\PageNotFoundException();
-    }
-
-    $path = WRITEPATH . 'uploads/return_attachments/' . $filename;
-
-    if (!is_file($path)) {
-        throw new \CodeIgniter\Exceptions\PageNotFoundException();
-    }
-
-    // Verify the file belongs to the item_order
-    if (strpos($filename, $itemOrderId . '_') !== 0) {
-        throw new \CodeIgniter\Exceptions\PageNotFoundException();
-    }
-
-    $finfo = new \finfo(FILEINFO_MIME);
-    $type = $finfo->file($path);
-
-    return $this->response
-        ->setHeader('Content-Type', $type)
-        ->setHeader('Content-Length', filesize($path))
-        ->setHeader('Content-Disposition', 'attachment; filename="' . basename($filename) . '"')
-        ->setBody(file_get_contents($path));
-}
-
-/**
- * Alternative method if you're receiving files via regular form upload
- */
-public function processReturnWithFormData()
-{
-    if (!session()->get('isLoggedIn')) {
-        return redirect()->back()->with('error', 'غير مصرح بالدخول');
-    }
-
-    $returnedItemsModel = new \App\Models\ReturnedItemsModel();
-    $db = \Config\Database::connect();
-    
-    try {
-        $itemIds = $this->request->getPost('item_ids');
-        $comments = $this->request->getPost('comments');
-        $files = $this->request->getFiles();
-
-        if (empty($itemIds)) {
-            return redirect()->back()->with('error', 'لم يتم تحديد أي عناصر للترجيع');
-        }
-
-        $employeeId = session()->get('emp_id');
-        $returnedCount = 0;
-
-        $db->transStart();
-
-        foreach ($itemIds as $index => $itemOrderId) {
-            $comment = $comments[$itemOrderId] ?? '';
-            
-            // Handle file uploads for this item
-            $attachmentPath = null;
-            if (isset($files['attachments'][$itemOrderId])) {
-                $itemFiles = $files['attachments'][$itemOrderId];
-                $attachmentPath = $this->saveReturnAttachmentsFromForm($itemOrderId, $itemFiles);
-            }
-
-            // Update item_order
-            $updateData = [
-                'created_by' => $employeeId,
-                'note' => $comment,
-                'usage_status_id' => 2,
-                'updated_at' => date('Y-m-d H:i:s')
-            ];
-
-            if ($attachmentPath) {
-                $updateData['attachment'] = $attachmentPath;
-            }
-
-            $this->itemOrderModel->update($itemOrderId, $updateData);
-
-            // Insert into returned_items
-            $returnedItemsModel->insert([
-                'item_order_id' => $itemOrderId,
-                'notes' => $comment,
-                'attach_id' => 0,
-                'return_date' => date('Y-m-d H:i:s')
-            ]);
-
-            // Add history
-            $historyModel = new \App\Models\HistoryModel();
-            $historyModel->insert([
-                'item_order_id' => $itemOrderId,
-                'action' => "تم ترجيع العهدة بواسطة {$employeeId}",
-                'created_at' => date('Y-m-d H:i:s')
-            ]);
-
-            $returnedCount++;
-        }
-
-        $db->transComplete();
-
-        if ($db->transStatus() === false) {
-            return redirect()->back()->with('error', 'حدث خطأ أثناء معالجة الترجيع');
-        }
-
-        return redirect()->to('AssetsController')
-            ->with('message', "تم ترجيع {$returnedCount} عنصر بنجاح");
-
-    } catch (\Exception $e) {
-        $db->transRollback();
-        log_message('error', 'Return processing error: ' . $e->getMessage());
-        return redirect()->back()->with('error', 'حدث خطأ: ' . $e->getMessage());
-    }
-}
-
-private function saveReturnAttachmentsFromForm($itemOrderId, $files)
-{
-    $uploadPath = WRITEPATH . 'uploads/return_attachments/';
-    
-    if (!is_dir($uploadPath)) {
-        mkdir($uploadPath, 0755, true);
-    }
-
-    $savedFiles = [];
-
-    if (!is_array($files)) {
-        $files = [$files];
-    }
-
-    foreach ($files as $file) {
-        if (!$file->isValid() || $file->hasMoved()) {
-            continue;
-        }
-
-        if ($file->getSizeByUnit('mb') > 5) {
-            continue;
-        }
-
-        $allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf', 
-                       'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-        
-        if (!in_array($file->getMimeType(), $allowedTypes)) {
-            continue;
-        }
-
-        $newName = $itemOrderId . '_' . time() . '_' . $file->getRandomName();
-        $file->move($uploadPath, $newName);
-        $savedFiles[] = $newName;
-    }
-
-    return !empty($savedFiles) ? implode(',', $savedFiles) : null;
-}
 
 }
