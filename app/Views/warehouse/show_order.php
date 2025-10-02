@@ -300,7 +300,6 @@
                             <div class="signature-title-cell">رئيس الجهة الطالبة</div>
                             <div class="signature-fields">
                                 الاسم: <span class="signature-line"></span><br>
-                                التوقيع: <span class="signature-line"></span><br>
                                 التاريخ: <span class="signature-line"></span>
                             </div>
                         </td>
@@ -310,7 +309,6 @@
                             <div class="signature-title-cell">إدارة المستودعات</div>
                             <div class="signature-fields">
                                 الاسم: <span class="signature-line"></span><br>
-                                التوقيع: <span class="signature-line"></span><br>
                                 التاريخ: <span class="signature-line"></span>
                             </div>
                         </td>
@@ -318,7 +316,6 @@
                             <div class="signature-title-cell">أمين المستودع</div>
                             <div class="signature-fields">
                                 الاسم: <span class="signature-line"></span><br>
-                                التوقيع: <span class="signature-line"></span><br>
                                 التاريخ: <span class="signature-line"></span>
                             </div>
                         </td>
@@ -326,7 +323,6 @@
                             <div class="signature-title-cell">المستلم</div>
                             <div class="signature-fields">
                                 الاسم: <span class="signature-line"></span><br>
-                                التوقيع: <span class="signature-line"></span><br>
                                 التاريخ: <span class="signature-line"></span>
                             </div>
                         </td>
