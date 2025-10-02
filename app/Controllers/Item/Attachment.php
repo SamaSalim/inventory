@@ -17,10 +17,7 @@ class Attachment extends BaseController
         $this->model = new ItemOrderModel();
     }
 
-    /**
-     * Upload attachments for a specific item return
-     * This handles multiple files per item using asset_num as identifier
-     */
+
     public function upload()
     {
         if (!session()->get('isLoggedIn')) {
@@ -41,7 +38,6 @@ class Attachment extends BaseController
             ]);
         }
 
-        // Get usage status for "رجيع" (returned)
         $usageStatusModel = new \App\Models\UsageStatusModel();
         $returnedStatus = $usageStatusModel->where('usage_status', 'رجيع')->first();
         
@@ -126,7 +122,7 @@ class Attachment extends BaseController
                 ? implode(',', $uploadedFileNames) 
                 : $originalItem->attachment;
 
-            // === UPDATE ITEM RECORD ===
+
             $updateData = [
                 'created_by'      => $loggedEmployeeId,
                 'usage_status_id' => $returnedStatus->id,
@@ -135,7 +131,7 @@ class Attachment extends BaseController
                 'updated_at'      => date('Y-m-d H:i:s')
             ];
 
-            // Use protect(false) to allow updating the attachment field directly
+
             $updated = $this->model->protect(false)
                                    ->update($originalItem->item_order_id, $updateData);
 
@@ -168,9 +164,6 @@ class Attachment extends BaseController
         ]);
     }
 
-    /**
-     * Get/serve attachment file with proper headers
-     */
     public function get($itemOrderId)
     {
         $item = $this->model->find($itemOrderId);
@@ -180,7 +173,7 @@ class Attachment extends BaseController
         }
 
         if ($item->attachment) {
-            // Handle comma-separated multiple files - serve the first one
+
             $files = explode(',', $item->attachment);
             $firstFile = trim($files[0]);
             
@@ -204,9 +197,7 @@ class Attachment extends BaseController
         throw new PageNotFoundException("No attachment found for this item");
     }
 
-    /**
-     * Delete attachment(s) for an item
-     */
+
     public function delete($itemOrderId)
     {
         if (!session()->get('isLoggedIn')) {
@@ -220,7 +211,7 @@ class Attachment extends BaseController
         }
 
         if ($item->attachment) {
-            // Delete all files (comma-separated)
+
             $files = explode(',', $item->attachment);
             
             foreach ($files as $filename) {
@@ -232,7 +223,6 @@ class Attachment extends BaseController
                 }
             }
 
-            // Clear attachment field in database
             $this->model->protect(false)
                         ->update($itemOrderId, ['attachment' => null]);
 
@@ -244,9 +234,7 @@ class Attachment extends BaseController
                          ->with('error', 'لا توجد مرفقات لحذفها');
     }
 
-    /**
-     * Download a specific attachment file
-     */
+
     public function download($itemOrderId, $fileIndex = 0)
     {
         $item = $this->model->find($itemOrderId);

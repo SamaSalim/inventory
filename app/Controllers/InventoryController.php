@@ -129,7 +129,7 @@ public function index()
     }
 
 
-    $itemOrders = $builder->paginate(5, 'orders');
+    $itemOrders = $builder->paginate(10, 'orders');
     $pager = $itemOrderModel->pager;
 
     foreach ($itemOrders as $order) {

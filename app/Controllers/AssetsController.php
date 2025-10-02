@@ -95,6 +95,12 @@ class AssetsController extends BaseController
                 ->groupEnd();
         }
 
+    $builder->whereIn('item_order.order_id', function($sub) {
+    return $sub->select('order_id')
+               ->from('item_order')
+               ->where('usage_status_id !=', 2);
+        });
+        
         if (!empty($itemType)) {
             $builder->like('items.name', $itemType);
         }
@@ -125,7 +131,7 @@ class AssetsController extends BaseController
                 ->groupEnd();
         }
 
-        $itemOrders = $builder->paginate(3, 'orders');
+        $itemOrders = $builder->paginate(10, 'orders');
         $pager = $itemOrderModel->pager;
 
         foreach ($itemOrders as $order) {
