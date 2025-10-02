@@ -53,8 +53,8 @@ class Attachment extends BaseController
             mkdir($uploadPath, 0755, true);
         }
 
-        $db = \Config\Database::connect();
-        $db->transStart();
+        // Use model's built-in transaction methods
+        $this->model->transStart();
 
         $successCount = 0;
         $failedItems  = [];
@@ -104,10 +104,8 @@ class Attachment extends BaseController
                         continue;
                     }
 
-                    // Generate unique filename: assetNum_timestamp_randomName
                     $newName = $assetNum . '_' . time() . '_' . $file->getRandomName();
-                    
-                    // Move file to upload directory
+
                     if ($file->move($uploadPath, $newName)) {
                         $uploadedFileNames[] = $newName;
                     } else {
@@ -116,12 +114,9 @@ class Attachment extends BaseController
                 }
             }
 
-            // Determine attachment path
-            // If new files uploaded, use them; otherwise keep existing attachment
             $attachmentPath = !empty($uploadedFileNames) 
                 ? implode(',', $uploadedFileNames) 
                 : $originalItem->attachment;
-
 
             $updateData = [
                 'created_by'      => $loggedEmployeeId,
@@ -130,7 +125,6 @@ class Attachment extends BaseController
                 'attachment'      => $attachmentPath,
                 'updated_at'      => date('Y-m-d H:i:s')
             ];
-
 
             $updated = $this->model->protect(false)
                                    ->update($originalItem->item_order_id, $updateData);
@@ -142,9 +136,9 @@ class Attachment extends BaseController
             }
         }
 
-        $db->transComplete();
+        $this->model->transComplete();
 
-        if ($db->transStatus() === false) {
+        if ($this->model->transStatus() === false) {
             return $this->response->setJSON([
                 'success' => false,
                 'message' => 'فشل في حفظ البيانات'
