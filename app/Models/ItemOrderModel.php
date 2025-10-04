@@ -24,6 +24,7 @@ class ItemOrderModel extends Model
         'assets_type',
         'created_by',
         'usage_status_id',
+        'attachment',
         'note'
     ];
 
@@ -44,6 +45,7 @@ class ItemOrderModel extends Model
         'assets_type' => 'permit_empty|in_list[غير محدد,عهدة عامة,عهدة خاصة]',
         'created_by' => 'permit_empty|max_length[50]',
         'usage_status_id' => 'required|integer|is_not_unique[usage_status.id]',
+        'attachment'       => 'permit_empty|max_length[128]',
         'note' => 'permit_empty'
     ];
 
@@ -93,6 +95,9 @@ class ItemOrderModel extends Model
             'required' => 'حالة الاستخدام مطلوبة',
             'integer' => 'حالة الاستخدام يجب أن تكون رقم صحيح',
             'is_not_unique' => 'حالة الاستخدام المحددة غير موجودة'
+        ],
+        'attachment' => [
+            'max_length'      => 'اسم المرفق يجب ألا يتجاوز 128 حرف'
         ]
     ];
 
@@ -102,8 +107,8 @@ class ItemOrderModel extends Model
         // التحقق من تكرار رقم الأصول
         if (isset($data['asset_num'])) {
             $duplicateAsset = $this->where('asset_num', $data['asset_num'])
-                                   ->where('item_order_id !=', $id)
-                                   ->first();
+                ->where('item_order_id !=', $id)
+                ->first();
             if ($duplicateAsset) {
                 return [
                     'success' => false,
@@ -115,8 +120,8 @@ class ItemOrderModel extends Model
         // التحقق من تكرار الرقم التسلسلي
         if (isset($data['serial_num'])) {
             $duplicateSerial = $this->where('serial_num', $data['serial_num'])
-                                    ->where('item_order_id !=', $id)
-                                    ->first();
+                ->where('item_order_id !=', $id)
+                ->first();
             if ($duplicateSerial) {
                 return [
                     'success' => false,
@@ -127,7 +132,7 @@ class ItemOrderModel extends Model
 
         // تحديث البيانات
         $result = $this->update($id, $data);
-        
+
         if ($result) {
             return [
                 'success' => true,
@@ -168,7 +173,7 @@ class ItemOrderModel extends Model
 
         // إدراج البيانات
         $result = $this->insert($data);
-        
+
         if ($result) {
             return [
                 'success' => true,
@@ -189,7 +194,7 @@ class ItemOrderModel extends Model
         try {
             $query = $this->db->query("SHOW COLUMNS FROM {$this->table} LIKE 'assets_type'");
             $row = $query->getRow();
-            
+
             $custodyTypes = [];
             if ($row) {
                 $enumStr = $row->Type; // مثال: enum('غير محدد','عهدة عامة','عهدة خاصة')
@@ -203,9 +208,8 @@ class ItemOrderModel extends Model
                     ];
                 }
             }
-            
+
             return $custodyTypes;
-            
         } catch (\Exception $e) {
             log_message('error', 'Error getting assets_type enum: ' . $e->getMessage());
             return [];
@@ -237,33 +241,28 @@ class ItemOrderModel extends Model
         $builder->select('item_order.*, items.name as item_name, room.code as room_code');
         $builder->join('items', 'item_order.item_id = items.id', 'left');
         $builder->join('room', 'item_order.room_id = room.id', 'left');
-        
+
         if ($orderId) {
             $builder->where('item_order.order_id', $orderId);
         }
-        
+
         return $builder->get()->getResultArray();
     }
 
 
 
-// دالة للحصول على رمز موقع كامل لعنصر في طلب معين
-public function getOrderLocationCode($itemOrderId)
-{
-    $row = $this->select('room_id')
-                ->where('item_order_id', $itemOrderId)
-                ->first();
+    // دالة للحصول على رمز موقع كامل لعنصر في طلب معين
+    public function getOrderLocationCode($itemOrderId)
+    {
+        $row = $this->select('room_id')
+            ->where('item_order_id', $itemOrderId)
+            ->first();
 
-    if ($row) {
-        $roomModel = new \App\Models\RoomModel();
-        return $roomModel->getFullLocationCode($row->room_id);
+        if ($row) {
+            $roomModel = new \App\Models\RoomModel();
+            return $roomModel->getFullLocationCode($row->room_id);
+        }
+
+        return null;
     }
-
-    return null;
 }
-
-
-}
-
-
-

@@ -7,7 +7,7 @@ use CodeIgniter\Entity\Entity;
 class ItemOrder extends Entity
 {
     protected $attributes = [
-        'item_order_id'=>null,
+        'item_order_id' => null,
         'order_id' => null,
         'item_id' => null,
         'brand' => null,
@@ -19,7 +19,8 @@ class ItemOrder extends Entity
         'room_id' => null,
         'created_by' => null,
         'usage_status_id' => null,
-        'assets_type' =>'غير محدد',
+        'assets_type' => 'غير محدد',
+        'attachment' => null,
         'note' => null
     ];
 }

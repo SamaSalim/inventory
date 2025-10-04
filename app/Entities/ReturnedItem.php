@@ -10,7 +10,6 @@ class ReturnedItem extends Entity
         'id'       => null,
         'item_order_id'=>null,
         'notes'=>null,
-        'attach_id'=>null,
         'return_date'=>null
 
 
