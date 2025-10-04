@@ -24,9 +24,8 @@ class FinalTablesSeeder extends Seeder
         // Seeder for 'order_status' table
         $order_statuses = [
             ['status' => 'قيد الانتظار'],
-            ['status' => 'قيد التنفيذ'],
-            ['status' => 'مكتمل'],
-            ['status' => 'ملغي'],
+            ['status' => 'مقبول'],
+            ['status' => 'مرفوض'],
         ];
         $this->db->table('order_status')->insertBatch($order_statuses);
 
@@ -63,7 +62,7 @@ class FinalTablesSeeder extends Seeder
             ['name' => 'Chairs', 'major_category_id' => 5], // ID 9
             ['name' => 'Tables', 'major_category_id' => 5], // ID 10
             ['name' => 'Trollyes', 'major_category_id' => 4], // ID 11
-            ['name' => 'General-Medical', 'major_category_id' => 4], // ID 12
+            ['name' => 'General', 'major_category_id' => 4], // ID 12
         ];
         $this->db->table('minor_category')->insertBatch($minor_categories);
 
@@ -429,7 +428,7 @@ class FinalTablesSeeder extends Seeder
                 'assets_type' => 'عهدة خاصة',
                 'created_by' => '1003',
                 'usage_status_id' => 1,
-                'note' => 'تم تسليم الشاشة لموظف الموارد البشرية.',               
+                'note' => 'تم تسليم الشاشة لموظف الموارد البشرية.',
             ],
             [
                 'order_id' => 2,
@@ -459,6 +458,33 @@ class FinalTablesSeeder extends Seeder
             ],
         ];
         $this->db->table('returned_items')->insertBatch($returned_items);
+
+        // Seeder for 'transfer_items' table
+        $transfer_items = [
+            [
+                'item_order_id' => 1,
+                'from_user_id' => 'U101',
+                'to_user_id' => 'U102',
+                'order_status_id' => 2,
+                'note' => 'تحويل الشاشة من قسم التسويق إلى قسم المبيعات',
+            ],
+            [
+                'item_order_id' => 2,
+                'from_user_id' => 'U103',
+                'to_user_id' => 'U104',
+                'order_status_id' => 1,
+                'note' => 'تحويل الراوتر من الشؤون القانونية إلى المالية',
+            ],
+            [
+                'item_order_id' => 1,
+                'from_user_id' => 'U102',
+                'to_user_id' => 'U103',
+                'order_status_id' => 2,
+                'note' => 'تحويل مؤقت للشاشة لحين الانتهاء من المشروع',
+            ],
+        ];
+
+        $this->db->table('transfer_items')->insertBatch($transfer_items);
 
         // Seeder for 'history' table
         $histories = [

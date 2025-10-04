@@ -97,7 +97,6 @@ class CreateFinalTables extends Migration
             'name' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
-                'unique'     => true,
             ],
             'major_category_id' => [
                 'type'       => 'INT',
@@ -108,6 +107,8 @@ class CreateFinalTables extends Migration
             'updated_at datetime default current_timestamp on update current_timestamp',
         ]);
         $this->forge->addPrimaryKey('id');
+        $this->forge->addKey('major_category_id'); // index
+        $this->forge->addKey('name'); // index للبحث
         $this->forge->addForeignKey('major_category_id', 'major_category', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('minor_category');
 
@@ -147,6 +148,7 @@ class CreateFinalTables extends Migration
             ],
         ]);
         $this->forge->addPrimaryKey('id');
+        $this->forge->addKey('building_id'); // index
         $this->forge->addForeignKey('building_id', 'building', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('floor');
 
@@ -169,6 +171,7 @@ class CreateFinalTables extends Migration
             ]
         ]);
         $this->forge->addPrimaryKey('id');
+        $this->forge->addKey('floor_id'); // index
         $this->forge->addForeignKey('floor_id', 'floor', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('section');
 
@@ -191,6 +194,7 @@ class CreateFinalTables extends Migration
             ],
         ]);
         $this->forge->addPrimaryKey('id');
+        $this->forge->addKey('section_id'); // index
         $this->forge->addForeignKey('section_id', 'section', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('room');
 
@@ -257,6 +261,8 @@ class CreateFinalTables extends Migration
             'updated_at datetime default current_timestamp on update current_timestamp',
         ]);
         $this->forge->addPrimaryKey('id');
+        $this->forge->addKey('minor_category_id'); // index
+        $this->forge->addKey('name'); // index للبحث
         $this->forge->addForeignKey('minor_category_id', 'minor_category', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('items');
 
@@ -289,6 +295,9 @@ class CreateFinalTables extends Migration
             'updated_at datetime default current_timestamp on update current_timestamp',
         ]);
         $this->forge->addPrimaryKey('order_id');
+        $this->forge->addKey('from_user_id'); // index
+        $this->forge->addKey('to_user_id'); // index
+        $this->forge->addKey('order_status_id'); // index
         $this->forge->addForeignKey('from_user_id', 'users', 'user_id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('to_user_id', 'users', 'user_id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('order_status_id', 'order_status', 'id', 'CASCADE', 'CASCADE');
@@ -377,6 +386,11 @@ class CreateFinalTables extends Migration
             'updated_at datetime default current_timestamp on update current_timestamp',
         ]);
         $this->forge->addPrimaryKey('item_order_id');
+        $this->forge->addKey('order_id');   // index
+        $this->forge->addKey('item_id');    // index
+        $this->forge->addKey('created_by');     // index
+        $this->forge->addKey('room_id');    // index
+        $this->forge->addKey('usage_status_id');
         $this->forge->addForeignKey('room_id', 'room', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('created_by', 'employee', 'emp_id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('order_id', 'order', 'order_id', 'CASCADE', 'CASCADE');
@@ -384,6 +398,50 @@ class CreateFinalTables extends Migration
         $this->forge->addForeignKey('usage_status_id', 'usage_status', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('item_order');
 
+        // transfer_items
+        $this->forge->addField([
+            'transfer_item_id' => [
+                'type'           => 'INT',
+                'constraint'     => 11,
+                'unsigned'       => true,
+                'auto_increment' => true,
+            ],
+            'item_order_id' => [
+                'type'           => 'INT',
+                'constraint'     => 11,
+                'unsigned'       => true,
+            ],
+            'from_user_id' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 50,
+            ],
+            'to_user_id' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 50,
+            ],
+            'order_status_id' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
+            ],
+            'note' => [
+                'type'       => 'TEXT',
+                'null'       => true,
+            ],
+            'created_at datetime default current_timestamp',
+            'updated_at datetime default current_timestamp on update current_timestamp',
+        ]);
+        $this->forge->addPrimaryKey('transfer_item_id');
+        $this->forge->addKey('item_order_id');  // لتحسين الأداء
+        $this->forge->addKey('from_user_id');   //index لتحسين الأداء 
+        $this->forge->addKey('to_user_id'); //index لتحسين الأداء 
+        $this->forge->addKey('order_status_id'); //index لتحسين الأداء 
+        $this->forge->addKey('created_at'); //index لتحسين الأداء 
+        $this->forge->addForeignKey('item_order_id', 'item_order', 'item_order_id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('from_user_id', 'users', 'user_id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('to_user_id', 'users', 'user_id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('order_status_id', 'order_status', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->createTable('transfer_items');
 
 
         // returned_items
@@ -403,15 +461,11 @@ class CreateFinalTables extends Migration
                 'type' => 'TEXT',
                 'null' => true,
             ],
-            'attach_id' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'unsigned'   => true,
-            ],
             'return_date datetime default current_timestamp',
 
         ]);
         $this->forge->addPrimaryKey('id');
+        $this->forge->addKey('item_order_id'); // index
         $this->forge->addForeignKey('item_order_id', 'item_order', 'item_order_id', 'CASCADE', 'CASCADE'); // ربط صحيح بجدول item_order
         $this->forge->createTable('returned_items');
 
@@ -439,6 +493,7 @@ class CreateFinalTables extends Migration
         ]);
 
         $this->forge->addPrimaryKey('id');
+        $this->forge->addKey('item_order_id'); // index
         $this->forge->addForeignKey('item_order_id', 'item_order', 'item_order_id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('history');
 
@@ -464,6 +519,8 @@ class CreateFinalTables extends Migration
             'updated_at datetime default current_timestamp on update current_timestamp',
         ]);
         $this->forge->addPrimaryKey('id');
+        $this->forge->addKey('emp_id');     // index لتحسين الأداء
+        $this->forge->addKey('role_id'); // index لتحسين الأداء
         $this->forge->addForeignKey('emp_id', 'employee', 'emp_id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('role_id', 'role', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('permission');
@@ -475,6 +532,7 @@ class CreateFinalTables extends Migration
         $this->forge->dropTable('permission');
         $this->forge->dropTable('returned_items');
         $this->forge->dropTable('history');
+        $this->forge->dropTable('transfer_items');
         $this->forge->dropTable('item_order');
         $this->forge->dropTable('items');
         $this->forge->dropTable('order');
