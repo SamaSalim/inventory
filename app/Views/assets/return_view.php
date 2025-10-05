@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>العهد الخاصة بي </title>
+    <title>عمليات الإرجاع</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -335,7 +335,7 @@
 
 <div class="main-content">
 <div class="header">
-<h1 class="page-title">العهد الخاصة بي </h1>
+<h1 class="page-title"> عمليات الإرجاع  </h1>
 <!-- <div class="user-info" onclick="location.href='<?= base_url('UserInfo/getUserInfo') ?>'">
 <div class="user-avatar">
 <?= strtoupper(substr(esc(session()->get('name')), 0, 1)) ?>
@@ -345,212 +345,7 @@
 </div>
 
 
-<br>
-<br>
-
-
-<!-- أزرار العمليات -->
-<div class="mb-3 d-flex justify-content-center gap-2">
-    <button type="button" class="custom-btn" onclick="filterTable('transfer')">عمليات التحويل</button>
-    <button type="button" class="custom-btn" onclick="filterTable('return')">عمليات الإرجاع</button>
-    <button type="button" class="custom-btn" onclick="filterTable('all')">عرض الكل</button>
-</div>
-
-
-
-
-<!-- 🔎 البحث والفلترة -->
-<div class="row mb-3" dir="rtl">
-    <!-- بحث عام -->
-    <div class="col-md-3">
-        <input type="text" id="searchInput" class="form-control" placeholder="ابحث في كل الأعمدة...">
-    </div>
-
-    <!-- من تاريخ -->
-    <div class="col-md-3">
-        <input type="text" id="startDate" class="form-control" placeholder="من تاريخ">
-    </div>
-
-    <!-- إلى تاريخ -->
-    <div class="col-md-3">
-        <input type="text" id="endDate" class="form-control" placeholder="إلى تاريخ">
-    </div>
-
-    <!-- بحث بالرقم الوظيفي -->
-    <div class="col-md-3">
-        <input type="text" id="employeeFilter" class="form-control" placeholder="ابحث بالرقم الوظيفي">
-    </div>
-</div>
-
-
-
-<!-- الجدول -->
-<div class="table-container">
-<table class="custom-table" id="usersTable">
-<thead>
-<tr class="text-center">
-<th class="checkbox-cell">
-<input type="checkbox" class="master-checkbox" id="masterCheckbox" onchange="toggleAllSelection()">
-</th>
-<th>رقم الطلب</th>
-<th>الرقم الوظيفي</th>
-<!-- <th>التحويلة</th> -->
-<th>حالة الاستخدام</th> 
-<th>تاريخ الطلب </th>
-<!-- <th>رمز الموقع </th> -->
-<!-- <th>مدخل البيانات</th> -->
-<th>عمليات </th>
-
-</tr>
-</thead>
-<tbody>
-<?php if (isset($orders) && !empty($orders)): ?>
-<?php foreach ($orders as $order): ?>
-<tr class="text-center align-middle" data-order-id="<?= $order->order_id ?>">
-<td class="checkbox-cell">
-<input type="checkbox" class="custom-checkbox row-checkbox" onchange="updateSelection()">
-</td>
-<td><?= esc($order->order_id ?? '-') ?></td>
-<td><?= esc($order->employee_id ?? '-') ?></td>
-<!-- <td><?= esc($order->extension ?? 'na') ?></td> -->
-<td><?= esc($order->usage_status_name ?? '-') ?></td>
-<td><?= isset($order->created_at) ? esc(date('Y-m-d', strtotime($order->created_at))) : '-' ?></td>
-<!-- <td><?= esc($order->location_code ?? '---') ?></td> -->
-<!-- <td><?= esc($order->created_by_name ?? '-') ?></td> -->
-<td>
-<div class="action-buttons">
-<a href="<?= site_url('InventoryController/showOrder/' . $order->order_id) ?>" class="action-btn view-btn">
-<svg class="btn-icon" viewBox="0 0 24 24">
-<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-</svg>
-عرض
-</a>
-
-</div>
-</td>
-</tr>
-<?php endforeach; ?>
-<?php else: ?>
-<tr>
-<td colspan="8" class="text-center">لا توجد بيانات متاحة</td>
-</tr>
-<?php endif; ?>
-</tbody>
-</table>
-</div>
-
-
-
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Flatpickr datepicker
-    flatpickr("#startDate", { dateFormat: "d/m/Y", allowInput: true, onChange: filterUsersTable });
-    flatpickr("#endDate",   { dateFormat: "d/m/Y", allowInput: true, onChange: filterUsersTable });
-
-    // Events
-    document.getElementById("searchInput").addEventListener("keyup", filterUsersTable);
-    document.getElementById("employeeFilter").addEventListener("keyup", filterUsersTable);
-
-    filterUsersTable(); // تشغيل أولي
-});
-
-// Parse d/m/Y
-function parseDMY(d) {
-    if (!d) return null;
-    const parts = d.split('/');
-    if (parts.length !== 3) return null;
-    return new Date(parts[2], parts[1] - 1, parts[0]);
-}
-
-// Parse yyyy-mm-dd
-function parseYMD(d) {
-    if (!d) return null;
-    const parts = d.split('-');
-    if (parts.length !== 3) return null;
-    return new Date(parts[0], parts[1] - 1, parts[2]);
-}
-
-// جلب التاريخ من نص الخلية
-function parseRowDate(dateText) {
-    if (!dateText) return null;
-    dateText = dateText.trim();
-
-    // ابحث عن dd/mm/yyyy
-    const dmy = dateText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
-    if (dmy) return parseDMY(dmy[1]);
-
-    // ابحث عن yyyy-mm-dd
-    const ymd = dateText.match(/(\d{4}-\d{2}-\d{2})/);
-    if (ymd) return parseYMD(ymd[1]);
-
-    // محاولة أخيرة
-    const dt = new Date(dateText);
-    return isNaN(dt.getTime()) ? null : dt;
-}
-
-function filterUsersTable() {
-    const searchValue = document.getElementById("searchInput").value.trim().toLowerCase();
-    const startDateStr = document.getElementById("startDate").value.trim();
-    const endDateStr = document.getElementById("endDate").value.trim();
-    const employeeValue = document.getElementById("employeeFilter").value.trim().toLowerCase();
-
-    let start = startDateStr ? parseDMY(startDateStr) : null;
-    let end = endDateStr ? parseDMY(endDateStr) : null;
-    if (end) end.setHours(23, 59, 59, 999); // نخلي النهاية تشمل اليوم كامل
-
-    const rows = document.querySelectorAll("#usersTable tbody tr");
-
-    rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        if (!cells.length) return;
-
-        // كل النصوص للبحث العام
-        const rowText = Array.from(cells).map(td => td.textContent.trim()).join(" ").toLowerCase();
-
-        // الرقم الوظيفي موجود في العمود الثالث (index = 2)
-        const employeeText = (cells[2] && cells[2].textContent) ? cells[2].textContent.trim().toLowerCase() : "";
-
-        // التاريخ موجود في العمود الخامس (index = 4)
-        const dateText = (cells[4] && cells[4].textContent) ? cells[4].textContent.trim() : "";
-        const rowDate = parseRowDate(dateText);
-
-        // تحقق من الشروط
-        const matchSearch = searchValue ? rowText.includes(searchValue) : true;
-        const matchEmployee = employeeValue ? employeeText.includes(employeeValue) : true;
-        let matchDate = true;
-
-        if (start || end) {
-            if (!rowDate) {
-                matchDate = false;
-            } else {
-                if (start && rowDate < start) matchDate = false;
-                if (end && rowDate > end) matchDate = false;
-            }
-        }
-
-        row.style.display = (matchSearch && matchEmployee && matchDate) ? "" : "none";
-    });
-}
-
-
-
-function filterTable(type) {
-    const rows = document.querySelectorAll('#usersTable tbody tr');
-    rows.forEach(row => {
-        const status = row.cells[4].innerText.toLowerCase(); // عمود usage_status الجديد
-
-        if (type === 'all') {
-            row.style.display = '';
-        } else if (type === 'transfer') {
-            row.style.display = status === 'تحويل' ? '' : 'none';
-        } else if (type === 'return') {
-            row.style.display = status === 'رجيع' ? '' : 'none';
-        }
-    });
-}
-</script>
 
 
 </body>
+</html>

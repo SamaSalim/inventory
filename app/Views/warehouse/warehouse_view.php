@@ -223,11 +223,12 @@
                             <th class="checkbox-cell">
                                 <input type="checkbox" class="master-checkbox" id="masterCheckbox" onchange="toggleAllSelection()">
                             </th>
-                            <th>رقم الطلب</th>
-                            <th>الرقم الوظيفي</th>
-                            <th>التحويلة</th>
+                                     <th>رقم الطلب</th>
+                            <!-- <th>الرقم الوظيفي</th> -->
+                            <!-- <th>التحويلة</th> -->
+                            <th>حالة الاستخدام</th> 
                             <th>تاريخ الطلب</th>
-                            <th>رمز الموقع</th>
+                            <!-- <th>رمز الموقع</th> -->
                             <th>مدخل البيانات</th>
                             <th>عمليات</th>
                         </tr>
@@ -240,10 +241,11 @@
                                         <input type="checkbox" class="custom-checkbox row-checkbox" onchange="updateSelection()">
                                     </td>
                                     <td><?= esc($order->order_id ?? '-') ?></td>
-                                    <td><?= esc($order->employee_id ?? '-') ?></td>
-                                    <td><?= esc($order->extension ?? 'na') ?></td>
-                                    <td><?= esc($order->created_at ?? '-') ?></td>
-                                    <td><?= $order->location_code ?></td>
+                                    <!-- <td><?= esc($order->employee_id ?? '-') ?></td> -->
+                                    <!-- <td><?= esc($order->extension ?? 'na') ?></td> -->
+                                    <td><?= esc($order->usage_status_name ?? '-') ?></td>
+                                    <td><?= isset($order->created_at) ? esc(date('Y-m-d', strtotime($order->created_at))) : '-' ?></td>
+                                    <!-- <td><?= $order->location_code ?></td> -->
                                     <td><?= esc($order->created_by_name ?? '-') ?></td>
                                     <td>
                                         <div class="action-buttons">

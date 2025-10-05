@@ -34,53 +34,57 @@ class UserController extends BaseController
     /**
      * -    userView جدول  
      */
-    public function dashboard(): string
-    {
-        $this->checkAuth(); // تحقق من تسجيل الدخول
+public function dashboard(): string
+{
+    $this->checkAuth(); // تحقق من تسجيل الدخول
 
+    $itemOrderModel = new ItemOrderModel();
 
-        $itemOrderModel = new ItemOrderModel();
+    // استعلام الطلبات مع ربط جدول الاستخدام
+    $itemOrders = $itemOrderModel
+        ->distinct()
+        ->select(
+            'item_order.order_id, 
+             item_order.created_at, 
+             item_order.created_by, 
+             room.code AS room_code, 
+             employee.name AS created_by_name, 
+             employee.emp_id AS employee_id, 
+             employee.emp_ext AS extension,
+             usage_status.usage_status AS usage_status_name'
+        )
+        ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
+        ->join('room', 'room.id = item_order.room_id', 'left')
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left') // ربط جدول الاستخدام
+        ->orderBy('item_order.created_at', 'DESC')
+        ->findAll();
 
-        $itemOrders = $itemOrderModel
-            ->distinct()
-            ->select(
-                'item_order.order_id, 
-                 item_order.created_at, 
-                 item_order.created_by, 
-                 room.code AS room_code, 
-                 employee.name AS created_by_name, 
-                 employee.emp_id AS employee_id, 
-                 employee.emp_ext AS extension'
-            )
-            ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
-            ->join('room', 'room.id = item_order.room_id', 'left')
-            ->groupBy('item_order.order_id')
-            ->orderBy('item_order.created_at', 'DESC')
-            ->findAll();
+    // جلب الفئات
+    $minorCategoryModel = new MinorCategoryModel();
+    $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
+        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+        ->findAll();
 
-        $minorCategoryModel = new MinorCategoryModel();
-        $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
-            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-            ->findAll();
+    // احصائيات المخزن
+    $stats = $this->getWarehouseStats();
 
-     
-        $stats = $this->getWarehouseStats();
+    // حالات الطلب
+    $orderStatusModel = new OrderStatusModel();
+    $statuses = $orderStatusModel->findAll();
 
-       
-        $orderStatusModel = new OrderStatusModel();
-        $statuses = $orderStatusModel->findAll();
+    // حالات الاستخدام
+    $usageStatusModel = new UsageStatusModel();
+    $usageStatuses = $usageStatusModel->findAll();
 
-        $usageStatusModel = new UsageStatusModel();
-        $usageStatuses = $usageStatusModel->findAll();
+    return view('user/userView', [
+        'categories' => $categories,
+        'orders' => $itemOrders,
+        'stats' => $stats,
+        'statuses' => $statuses,
+        'usage_statuses' => $usageStatuses
+    ]);
+}
 
-        return view('user/userView', [
-            'categories' => $categories,
-            'orders' => $itemOrders,
-            'stats' => $stats,
-            'statuses' => $statuses,
-            'usage_statuses' => $usageStatuses
-        ]);
-    }
 
   
     private function getWarehouseStats(): array
@@ -145,51 +149,14 @@ class UserController extends BaseController
 
 
     /**
- * صفحة جديدة userView2
+ * صفحة  userView2
  */
+
 public function userView2(): string
 {
     $this->checkAuth(); // تحقق من تسجيل الدخول
 
-    $itemOrderModel = new ItemOrderModel();
-
-    $itemOrders = $itemOrderModel
-        ->distinct()
-        ->select(
-            'item_order.order_id, 
-             item_order.created_at, 
-             item_order.created_by, 
-             room.code AS room_code, 
-             employee.name AS created_by_name, 
-             employee.emp_id AS employee_id, 
-             employee.emp_ext AS extension'
-        )
-        ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
-        ->join('room', 'room.id = item_order.room_id', 'left')
-        ->groupBy('item_order.order_id')
-        ->orderBy('item_order.created_at', 'DESC')
-        ->findAll();
-
-    $minorCategoryModel = new MinorCategoryModel();
-    $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
-        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-        ->findAll();
-
-    $stats = $this->getWarehouseStats();
-
-    $orderStatusModel = new OrderStatusModel();
-    $statuses = $orderStatusModel->findAll();
-
-    $usageStatusModel = new UsageStatusModel();
-    $usageStatuses = $usageStatusModel->findAll();
-
-    return view('user/userView2', [
-        'categories' => $categories,
-        'orders' => $itemOrders,
-        'stats' => $stats,
-        'statuses' => $statuses,
-        'usage_statuses' => $usageStatuses
-    ]);
+    return view('user/userView2');
 }
 
 }

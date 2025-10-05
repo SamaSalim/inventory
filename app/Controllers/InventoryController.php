@@ -66,25 +66,26 @@ public function index()
     $employeeId    = $this->request->getVar('employee_id');  
     $location      = $this->request->getVar('location');     
 
-    $builder = $itemOrderModel
-        ->distinct()
-        ->select('
-            item_order.order_id, 
-            item_order.created_at, 
-            item_order.created_by, 
-            item_order.room_id,
-            employee.name AS created_by_name, 
-            employee.emp_id AS employee_id, 
-            employee.emp_ext AS extension,
-            items.name AS item_name,
-            minor_category.name AS category_name
-        ')
-        ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
-        ->join('items', 'items.id = item_order.item_id', 'left')
-        ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-        ->orderBy('item_order.created_at', 'DESC')
-        ->groupBy('item_order.order_id');
-
+ $builder = $itemOrderModel
+    ->distinct()
+    ->select('
+        item_order.order_id, 
+        item_order.created_at, 
+        item_order.created_by, 
+        item_order.room_id,
+        employee.name AS created_by_name, 
+        employee.emp_id AS employee_id, 
+        employee.emp_ext AS extension,
+        items.name AS item_name,
+        minor_category.name AS category_name,
+        usage_status.usage_status AS usage_status_name
+    ')
+    ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
+    ->join('items', 'items.id = item_order.item_id', 'left')
+    ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+    ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+    ->orderBy('item_order.created_at', 'DESC')
+    ->groupBy('item_order.order_id');
     // فلترة البحث
     if (!empty($search)) {
         $builder->groupStart()

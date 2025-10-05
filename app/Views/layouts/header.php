@@ -37,8 +37,8 @@
     .sidebar .logo { margin-bottom: 30px; }
 
     .sidebar-logo {
-        width: 50px;
-        height: 50px;
+        width: 70px;
+        height: 70px;
         object-fit: contain;
     }
 
@@ -141,6 +141,12 @@
             <i class="fa-solid fa-user-shield"></i> <span>الصلاحيات</span>
         </a>
     <?php endif; ?>
+
+    <a href="<?= base_url('AssetsHistory') ?>"
+   class="<?= (service('uri')->getSegment(1) == 'AssetsHistory') ? 'active' : '' ?>">
+    <i class="fa-solid fa-archive"></i> <span>عمليات الإرجاع </span>
+</a>
+
 
     <a href="<?= base_url('login') ?>">
         <i class="fa-solid fa-right-from-bracket"></i> <span>تسجيل الخروج</span>
