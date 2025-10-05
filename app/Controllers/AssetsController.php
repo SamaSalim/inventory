@@ -245,4 +245,174 @@ class AssetsController extends BaseController
         ]);
     }
 
+
+
+
+
+    public function transferView($orderId)
+{
+    if (!session()->get('isLoggedIn')) {
+        throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
+    }
+
+    $itemOrderModel = new \App\Models\ItemOrderModel();
+    $itemModel = new \App\Models\ItemModel();
+    $minorCatModel = new \App\Models\MinorCategoryModel();
+    $majorCatModel = new \App\Models\MajorCategoryModel();
+    $usageStatusModel = new \App\Models\UsageStatusModel();
+    $userModel = new \App\Models\UserModel();
+    
+
+    // جلب الأصول المرتبطة بالطلب والتي ليست مرجعة
+    $items = $itemOrderModel
+        ->where('order_id', $orderId)
+        ->where('usage_status_id !=', 2) // ليست مرجعة
+        ->findAll();
+
+    foreach ($items as $item) {
+        $itemData = $itemModel->find($item->item_id);
+        $minor = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
+        $major = $minor ? $majorCatModel->find($minor->major_category_id) : null;
+
+        $item->item_name = $itemData->name ?? 'غير معروف';
+        $item->minor_category_name = $minor->name ?? 'غير معروف';
+        $item->major_category_name = $major->name ?? 'غير معروف';
+        $item->model_num = $itemData->model_num ?? '';
+        $item->serial_num = $itemData->serial_num ?? '';
+        $item->asset_num = $itemData->asset_num ?? '';
+        $item->usage_status_name = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
+    }
+
+    // جلب جميع المستخدمين
+    $users = $userModel->findAll();
+
+    return view('assets/transfer_order', [
+        'items' => $items,
+        'users' => $users,
+        'order_id' => $orderId
+    ]);
+}
+
+/**
+ * معالجة طلب التحويل
+ */
+public function processTransfer()
+{
+    if (!session()->get('isLoggedIn')) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'يجب تسجيل الدخول أولاً'
+        ]);
+    }
+
+    $json = $this->request->getJSON();
+    
+    if (!$json) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'بيانات غير صحيحة'
+        ]);
+    }
+
+    $itemOrderIds = $json->items ?? [];
+    $fromUserId = $json->from_user_id ?? null;
+    $toUserId = $json->to_user_id ?? null;
+    $note = $json->note ?? '';
+
+    // التحقق من البيانات
+    if (empty($itemOrderIds) || !$fromUserId || !$toUserId) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'جميع الحقول مطلوبة'
+        ]);
+    }
+
+    if ($fromUserId === $toUserId) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'لا يمكن التحويل لنفس الشخص'
+        ]);
+    }
+
+    $db = \Config\Database::connect();
+    $db->transStart();
+
+    try {
+        $itemOrderModel = new \App\Models\ItemOrderModel();
+        $transferItemsModel = new \App\Models\TransferItemsModel();
+        $orderModel = new \App\Models\OrderModel();
+
+        // إنشاء طلب جديد للتحويل
+        $orderData = [
+            'from_user_id' => $fromUserId,
+            'to_user_id' => $toUserId,
+            'order_status_id' => 1, // 1 = قيد الانتظار
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        $newOrderId = $orderModel->insert($orderData);
+
+        if (!$newOrderId) {
+            throw new \Exception('فشل إنشاء طلب التحويل');
+        }
+
+        // معالجة كل أصل محدد
+        foreach ($itemOrderIds as $itemOrderId) {
+            // التحقق من وجود الأصل
+            $currentItem = $itemOrderModel->find($itemOrderId);
+            
+            if (!$currentItem) {
+                log_message('warning', "Item order {$itemOrderId} not found");
+                continue;
+            }
+
+            // تحديث حالة الأصل إلى "قيد التحويل"
+            $itemOrderModel->update($itemOrderId, [
+                'usage_status_id' => 5, // 5 = قيد التحويل
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            // إنشاء سجل في جدول transfer_items
+            $transferData = [
+                'item_order_id' => $itemOrderId,
+                'from_user_id' => $fromUserId,
+                'to_user_id' => $toUserId,
+                'order_status_id' => 1, // 1 = قيد الانتظار
+                'note' => $note
+            ];
+
+            $transferItemsModel->insert($transferData);
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'فشل حفظ البيانات'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'تم إنشاء طلب التحويل بنجاح',
+            'order_id' => $newOrderId
+        ]);
+
+    } catch (\Exception $e) {
+        $db->transRollback();
+        log_message('error', 'Transfer Error: ' . $e->getMessage());
+        
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'حدث خطأ: ' . $e->getMessage()
+        ]);
+    }
+}
+
+
+
+
+    
 }

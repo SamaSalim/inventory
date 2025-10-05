@@ -243,7 +243,7 @@
                                                 </svg>
                                                 إرجاع
                                             </a>
-                                <a href="<?= site_url('AssetsController/orderDetails/' . $order->order_id) ?>"
+                                <a href="<?= site_url('AssetsController/transferView/' . $order->order_id) ?>"
                                     class="action-btn edit-btn" title="تحويل">
                                     <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
                                         <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/>
