@@ -441,56 +441,56 @@
 
 
 
-
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     // Flatpickr datepicker
-    flatpickr("#startDate", { dateFormat: "d/m/Y", allowInput: true, onChange: filterUsersTable });
-    flatpickr("#endDate",   { dateFormat: "d/m/Y", allowInput: true, onChange: filterUsersTable });
+    flatpickr("#startDate", { dateFormat: "d/m/Y", allowInput: true, onChange: filterTableFast });
+    flatpickr("#endDate",   { dateFormat: "d/m/Y", allowInput: true, onChange: filterTableFast });
 
-    // Events
-    document.getElementById("searchInput").addEventListener("keyup", filterUsersTable);
-    document.getElementById("employeeFilter").addEventListener("keyup", filterUsersTable);
+    // البحث بالكتابة
+    document.getElementById("searchInput").addEventListener("keyup", filterTableFast);
+    document.getElementById("employeeFilter").addEventListener("keyup", filterTableFast);
 
-    filterUsersTable(); // تشغيل أولي
+    // حفظ كل الصفوف في مصفوفة عند البداية
+    const tableBody = document.querySelector("#usersTable tbody");
+    const allRows = Array.from(tableBody.querySelectorAll("tr"));
+
+    window.fastTableData = allRows.map(row => {
+        const cells = row.querySelectorAll("td");
+        return {
+            row: row,
+            text: Array.from(cells).map(td => td.textContent.trim().toLowerCase()).join(" "),
+            employee: (cells[2] && cells[2].textContent) ? cells[2].textContent.trim().toLowerCase() : "",
+            status: (cells[3] && cells[3].textContent) ? cells[3].textContent.trim().toLowerCase() : "",
+            date: parseRowDate((cells[4] && cells[4].textContent) ? cells[4].textContent.trim() : "")
+        };
+    });
+
+    // النوع الحالي (الكل / تحويل / رجيع)
+    window.currentFilterType = 'all';
+
+    filterTableFast(); // فلترة أولية
 });
 
-// Parse d/m/Y
+// دالة تحويل نص التاريخ
 function parseDMY(d) {
     if (!d) return null;
     const parts = d.split('/');
     if (parts.length !== 3) return null;
-    return new Date(parts[2], parts[1] - 1, parts[0]);
+    return new Date(parts[2], parts[1]-1, parts[0]);
 }
 
-// Parse yyyy-mm-dd
-function parseYMD(d) {
-    if (!d) return null;
-    const parts = d.split('-');
-    if (parts.length !== 3) return null;
-    return new Date(parts[0], parts[1] - 1, parts[2]);
-}
-
-// جلب التاريخ من نص الخلية
 function parseRowDate(dateText) {
     if (!dateText) return null;
     dateText = dateText.trim();
-
-    // ابحث عن dd/mm/yyyy
     const dmy = dateText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
     if (dmy) return parseDMY(dmy[1]);
-
-    // ابحث عن yyyy-mm-dd
-    const ymd = dateText.match(/(\d{4}-\d{2}-\d{2})/);
-    if (ymd) return parseYMD(ymd[1]);
-
-    // محاولة أخيرة
     const dt = new Date(dateText);
     return isNaN(dt.getTime()) ? null : dt;
 }
 
-function filterUsersTable() {
+// فلترة سريعة لجميع الشروط
+function filterTableFast() {
     const searchValue = document.getElementById("searchInput").value.trim().toLowerCase();
     const startDateStr = document.getElementById("startDate").value.trim();
     const endDateStr = document.getElementById("endDate").value.trim();
@@ -498,59 +498,39 @@ function filterUsersTable() {
 
     let start = startDateStr ? parseDMY(startDateStr) : null;
     let end = endDateStr ? parseDMY(endDateStr) : null;
-    if (end) end.setHours(23, 59, 59, 999); // نخلي النهاية تشمل اليوم كامل
+    if (end) end.setHours(23,59,59,999);
 
-    const rows = document.querySelectorAll("#usersTable tbody tr");
+    fastTableData.forEach(item => {
+        let visible = true;
 
-    rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        if (!cells.length) return;
+        // البحث العام
+        if (searchValue && !item.text.includes(searchValue)) visible = false;
 
-        // كل النصوص للبحث العام
-        const rowText = Array.from(cells).map(td => td.textContent.trim()).join(" ").toLowerCase();
+        // البحث بالرقم الوظيفي
+        if (employeeValue && !item.employee.includes(employeeValue)) visible = false;
 
-        // الرقم الوظيفي موجود في العمود الثالث (index = 2)
-        const employeeText = (cells[2] && cells[2].textContent) ? cells[2].textContent.trim().toLowerCase() : "";
+        // البحث بالتاريخ
+        if ((start || end) && item.date) {
+            if (start && item.date < start) visible = false;
+            if (end && item.date > end) visible = false;
+        } else if ((start || end) && !item.date) visible = false;
 
-        // التاريخ موجود في العمود الخامس (index = 4)
-        const dateText = (cells[4] && cells[4].textContent) ? cells[4].textContent.trim() : "";
-        const rowDate = parseRowDate(dateText);
+        // فلترة النوع
+        if (currentFilterType === 'transfer' && item.status !== 'تحويل') visible = false;
+        if (currentFilterType === 'return' && item.status !== 'رجيع') visible = false;
 
-        // تحقق من الشروط
-        const matchSearch = searchValue ? rowText.includes(searchValue) : true;
-        const matchEmployee = employeeValue ? employeeText.includes(employeeValue) : true;
-        let matchDate = true;
-
-        if (start || end) {
-            if (!rowDate) {
-                matchDate = false;
-            } else {
-                if (start && rowDate < start) matchDate = false;
-                if (end && rowDate > end) matchDate = false;
-            }
-        }
-
-        row.style.display = (matchSearch && matchEmployee && matchDate) ? "" : "none";
+        item.row.style.display = visible ? "" : "none";
     });
 }
 
-
-
+// تغيير نوع الفلترة عند الضغط على الأزرار
 function filterTable(type) {
-    const rows = document.querySelectorAll('#usersTable tbody tr');
-    rows.forEach(row => {
-        const status = row.cells[4].innerText.toLowerCase(); // عمود usage_status الجديد
-
-        if (type === 'all') {
-            row.style.display = '';
-        } else if (type === 'transfer') {
-            row.style.display = status === 'تحويل' ? '' : 'none';
-        } else if (type === 'return') {
-            row.style.display = status === 'رجيع' ? '' : 'none';
-        }
-    });
+    currentFilterType = type;
+    filterTableFast();
 }
 </script>
 
 
+
 </body>
+</html>
