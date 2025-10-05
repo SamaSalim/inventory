@@ -50,25 +50,25 @@ class InventoryController extends BaseController
         $this->minorCategoryModel = new \App\Models\MinorCategoryModel();
     }
 
-public function index()
-{
-    if (! session()->get('isLoggedIn')) {
-        throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
-    }
+    public function index()
+    {
+        if (! session()->get('isLoggedIn')) {
+            throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
+        }
 
-    $itemOrderModel = new \App\Models\ItemOrderModel();
-    $roomModel      = new \App\Models\RoomModel();
+        $itemOrderModel = new \App\Models\ItemOrderModel();
+        $roomModel      = new \App\Models\RoomModel();
 
-    $search        = $this->request->getVar('search'); 
-    $category      = $this->request->getVar('category');     
-    $itemType      = $this->request->getVar('item_type');   
-    $serialNumber  = $this->request->getVar('serial_number'); 
-    $employeeId    = $this->request->getVar('employee_id');  
-    $location      = $this->request->getVar('location');     
+        $search        = $this->request->getVar('search');
+        $category      = $this->request->getVar('category');
+        $itemType      = $this->request->getVar('item_type');
+        $serialNumber  = $this->request->getVar('serial_number');
+        $employeeId    = $this->request->getVar('employee_id');
+        $location      = $this->request->getVar('location');
 
-    $builder = $itemOrderModel
-        ->distinct()
-        ->select('
+        $builder = $itemOrderModel
+            ->distinct()
+            ->select('
             item_order.order_id, 
             item_order.created_at, 
             item_order.created_by, 
@@ -79,89 +79,89 @@ public function index()
             items.name AS item_name,
             minor_category.name AS category_name
         ')
-        ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
-        ->join('items', 'items.id = item_order.item_id', 'left')
-        ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-        ->orderBy('item_order.created_at', 'DESC')
-        ->groupBy('item_order.order_id');
+            ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
+            ->join('items', 'items.id = item_order.item_id', 'left')
+            ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+            ->orderBy('item_order.created_at', 'DESC')
+            ->groupBy('item_order.order_id');
 
-    // فلترة البحث
-    if (!empty($search)) {
-        $builder->groupStart()
-            ->like('item_order.order_id', $search)
-            ->orLike('employee.name', $search)
-            ->orLike('employee.emp_id', $search)
-            ->orLike('employee.emp_ext', $search)
-            ->orLike('items.name', $search)
-            ->orLike('minor_category.name', $search)
-            ->orLike('item_order.serial_num', $search)
-            ->groupEnd();
-    }
+        // فلترة البحث
+        if (!empty($search)) {
+            $builder->groupStart()
+                ->like('item_order.order_id', $search)
+                ->orLike('employee.name', $search)
+                ->orLike('employee.emp_id', $search)
+                ->orLike('employee.emp_ext', $search)
+                ->orLike('items.name', $search)
+                ->orLike('minor_category.name', $search)
+                ->orLike('item_order.serial_num', $search)
+                ->groupEnd();
+        }
 
-    if (!empty($itemType)) {
-        $builder->like('items.name', $itemType);
-    }
+        if (!empty($itemType)) {
+            $builder->like('items.name', $itemType);
+        }
 
-    if (!empty($category)) {
-        $builder->where('minor_category.id', $category);
-    }
+        if (!empty($category)) {
+            $builder->where('minor_category.id', $category);
+        }
 
-    if (!empty($serialNumber)) {
-        $builder->like('item_order.serial_num', $serialNumber);
-    }
+        if (!empty($serialNumber)) {
+            $builder->like('item_order.serial_num', $serialNumber);
+        }
 
-    if (!empty($employeeId)) {
-        $builder->where('employee.emp_id', $employeeId);
-    }
+        if (!empty($employeeId)) {
+            $builder->where('employee.emp_id', $employeeId);
+        }
 
-    if (!empty($location)) {
-        $builder
-            ->join('room', 'room.id = item_order.room_id', 'left')
-            ->join('section', 'section.id = room.section_id', 'left')
-            ->join('floor', 'floor.id = section.floor_id', 'left')
-            ->join('building', 'building.id = floor.building_id', 'left')
-            ->groupStart()
+        if (!empty($location)) {
+            $builder
+                ->join('room', 'room.id = item_order.room_id', 'left')
+                ->join('section', 'section.id = room.section_id', 'left')
+                ->join('floor', 'floor.id = section.floor_id', 'left')
+                ->join('building', 'building.id = floor.building_id', 'left')
+                ->groupStart()
                 ->like('room.code', $location)
                 ->orLike('section.code', $location)
                 ->orLike('floor.code', $location)
                 ->orLike('building.code', $location)
-            ->groupEnd();
+                ->groupEnd();
+        }
+
+
+        $itemOrders = $builder->paginate(10, 'orders');
+        $pager = $itemOrderModel->pager;
+
+        foreach ($itemOrders as $order) {
+            $order->location_code = $roomModel->getFullLocationCode($order->room_id);
+        }
+
+        $minorCategoryModel = new \App\Models\MinorCategoryModel();
+        $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
+            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+            ->findAll();
+
+        $stats = $this->getWarehouseStats();
+        $statuses = (new \App\Models\OrderStatusModel())->findAll();
+        $usageStatuses = (new \App\Models\UsageStatusModel())->findAll();
+
+        return view('warehouse/warehouse_view', [
+            'categories'     => $categories,
+            'orders'         => $itemOrders,
+            'stats'          => $stats,
+            'statuses'       => $statuses,
+            'usage_statuses' => $usageStatuses,
+            'pager'          => $pager,
+            'filters'        => [
+                'search'        => $search,
+                'category'      => $category,
+                'item_type'     => $itemType,
+                'serial_number' => $serialNumber,
+                'employee_id'   => $employeeId,
+                'location'      => $location,
+            ]
+        ]);
     }
-
-
-    $itemOrders = $builder->paginate(10, 'orders');
-    $pager = $itemOrderModel->pager;
-
-    foreach ($itemOrders as $order) {
-        $order->location_code = $roomModel->getFullLocationCode($order->room_id);
-    }
-
-    $minorCategoryModel = new \App\Models\MinorCategoryModel();
-    $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
-        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-        ->findAll();
-
-    $stats = $this->getWarehouseStats();
-    $statuses = (new \App\Models\OrderStatusModel())->findAll();
-    $usageStatuses = (new \App\Models\UsageStatusModel())->findAll();
-
-    return view('warehouse/warehouse_view', [
-        'categories'     => $categories,
-        'orders'         => $itemOrders,
-        'stats'          => $stats,
-        'statuses'       => $statuses,
-        'usage_statuses' => $usageStatuses,
-        'pager'          => $pager, 
-        'filters'        => [
-            'search'        => $search,
-            'category'      => $category,
-            'item_type'     => $itemType,
-            'serial_number' => $serialNumber,
-            'employee_id'   => $employeeId,
-            'location'      => $location,
-        ]
-    ]);
-}
 
 
     public function store()
@@ -406,261 +406,259 @@ public function index()
     }
 
 
-public function bulkDeleteOrders()
-{
-    if (!$this->request->isAJAX()) {
-        return $this->response->setJSON(['success' => false, 'message' => 'طلب غير صحيح']);
-    }
-
-    if (!session()->get('isLoggedIn')) {
-        return $this->response->setJSON(['success' => false, 'message' => 'يجب تسجيل الدخول أولاً']);
-    }
-
-    try {
-        $input = $this->request->getJSON(true);
-        $orderIds = $input['order_ids'] ?? [];
-
-        if (empty($orderIds)) {
-            return $this->response->setJSON(['success' => false, 'message' => 'لم يتم اختيار أي طلبات']);
+    public function bulkDeleteOrders()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['success' => false, 'message' => 'طلب غير صحيح']);
         }
 
-        // تحميل المودلز
-        $orderModel = new \App\Models\OrderModel();
-        $itemOrderModel = new \App\Models\ItemOrderModel();
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'يجب تسجيل الدخول أولاً']);
+        }
 
-        $deletedCount = 0;
+        try {
+            $input = $this->request->getJSON(true);
+            $orderIds = $input['order_ids'] ?? [];
 
-        foreach ($orderIds as $orderId) {
-            if (is_numeric($orderId) && $orderId > 0) {
-                // التحقق من وجود الطلب
-                $order = $orderModel->find($orderId);
-                
-                if ($order) {
-                    // حذف عناصر الطلب المرتبطة أولاً (من جدول item_order)
-                    $itemOrderModel->where('order_id', $orderId)->delete();
-                    
-                    // ثم حذف الطلب نفسه (من جدول order)
-                    if ($orderModel->delete($orderId)) {
-                        $deletedCount++;
-                    }
-                }
+            if (empty($orderIds)) {
+                return $this->response->setJSON(['success' => false, 'message' => 'لم يتم اختيار أي طلبات']);
             }
-        }
 
-        return $this->response->setJSON([
-            'success' => true,
-            'message' => "تم حذف {$deletedCount} طلب بنجاح"
-        ]);
+            // تحميل المودلز
+            $orderModel = new \App\Models\OrderModel();
+            $itemOrderModel = new \App\Models\ItemOrderModel();
 
-    } catch (\Exception $e) {
-        return $this->response->setJSON([
-            'success' => false,
-            'message' => 'خطأ في حذف الطلبات: ' . $e->getMessage()
-        ]);
-    }
-}
-    public function updateOrder($orderId)
-{
-    try {
-        if (!$orderId) {
-            return $this->response->setJSON(['success' => false, 'message' => 'رقم الطلب غير محدد.']);
-        }
+            $deletedCount = 0;
 
-        $postData = $this->request->getPost();
-        
-        log_message('info', 'UpdateOrder - Order ID: ' . $orderId);
+            foreach ($orderIds as $orderId) {
+                if (is_numeric($orderId) && $orderId > 0) {
+                    // التحقق من وجود الطلب
+                    $order = $orderModel->find($orderId);
 
-        // التحقق من الحقول الأساسية
-        if (empty($postData['to_employee_id']) || empty($postData['room'])) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'الحقلين (الرقم الوظيفي للمستلم) و (الغرفة) مطلوبين.'
-            ]);
-        }
+                    if ($order) {
+                        // حذف عناصر الطلب المرتبطة أولاً (من جدول item_order)
+                        $itemOrderModel->where('order_id', $orderId)->delete();
 
-        // التحقق من وجود الطلب
-        $existingOrder = $this->orderModel->find($orderId);
-        if (!$existingOrder) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'الطلب غير موجود.'
-            ]);
-        }
-
-        // ✅ الحصول على العناصر الحالية في الطلب من قاعدة البيانات
-        $currentOrderItems = $this->itemOrderModel->where('order_id', $orderId)->findAll();
-        $currentItemIds = array_column($currentOrderItems, 'item_order_id');
-        
-        log_message('info', 'Current items in database: ' . implode(', ', $currentItemIds));
-
-        // ✅ الحصول على العناصر المرسلة من الواجهة
-        $submittedItemIds = [];
-        $existingItemsData = [];
-        
-        if (!empty($postData['existing_items_data'])) {
-            $existingItemsData = json_decode($postData['existing_items_data'], true);
-            if (!empty($existingItemsData) && is_array($existingItemsData)) {
-                $submittedItemIds = array_map('strval', array_column($existingItemsData, 'item_order_id'));
-            }
-        }
-        
-        log_message('info', 'Submitted items from frontend: ' . implode(', ', $submittedItemIds));
-
-        // ✅ حذف العناصر غير المرسلة من الواجهة (المحذوفة)
-        $itemsToDelete = array_diff(array_map('strval', $currentItemIds), $submittedItemIds);
-        
-        if (!empty($itemsToDelete)) {
-            log_message('info', 'Deleting items: ' . implode(', ', $itemsToDelete));
-            
-            foreach ($itemsToDelete as $itemToDelete) {
-                $deleteResult = $this->itemOrderModel->delete($itemToDelete);
-                if (!$deleteResult) {
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "فشل في حذف العنصر رقم {$itemToDelete}"
-                    ]);
-                }
-                log_message('info', "Successfully deleted item: {$itemToDelete}");
-            }
-        }
-
-        // ✅ تحديث بيانات الطلب الرئيسية
-        $orderMainData = [
-            'to_employee_id' => $postData['to_employee_id'],
-            'note' => $postData['notes'] ?? ''
-        ];
-        
-        $orderUpdateResult = $this->orderModel->update($orderId, $orderMainData);
-        if (!$orderUpdateResult) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'فشل في تحديث بيانات الطلب الأساسية.'
-            ]);
-        }
-
-        // ✅ تحديث العناصر المرسلة من الواجهة باستخدام الدالة الجديدة
-        if (!empty($existingItemsData) && is_array($existingItemsData)) {
-            foreach ($existingItemsData as $index => $itemData) {
-                $itemOrderId = $itemData['item_order_id'] ?? null;
-                $assetNum = trim($itemData['asset_num'] ?? '');
-                $serialNum = trim($itemData['serial_num'] ?? '');
-                $brand = trim($itemData['brand'] ?? '');
-                $modelNum = trim($itemData['model_num'] ?? '');
-                $note = trim($itemData['note'] ?? '');
-
-                if (!$itemOrderId || !$assetNum || !$serialNum) {
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "جميع الحقول مطلوبة للعنصر رقم " . ($index + 1)
-                    ]);
-                }
-
-                // التحقق من وجود العنصر
-                $existingItem = $this->itemOrderModel->find($itemOrderId);
-                if (!$existingItem) {
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "العنصر رقم {$itemOrderId} غير موجود."
-                    ]);
-                }
-
-                // ✅ تحديث البيانات باستخدام الدالة الجديدة
-                $updateData = [
-                    'asset_num' => $assetNum,
-                    'serial_num' => $serialNum,
-                    'brand' => $brand,
-                    'model_num' => $modelNum,
-                    'room_id' => $postData['room'],
-                    'note' => $note
-                ];
-                
-                log_message('info', "Updating item {$itemOrderId} with data: " . json_encode($updateData));
-                
-                // ✅ استخدام الدالة الجديدة للتحديث مع فحص التكرار
-                $updateResult = $this->itemOrderModel->updateWithUniqueCheck($itemOrderId, $updateData);
-                
-                if (!$updateResult['success']) {
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "فشل في تحديث العنصر رقم {$itemOrderId}: " . $updateResult['message']
-                    ]);
-                }
-                
-                log_message('info', "Item {$itemOrderId} updated successfully");
-            }
-        }
-
-        // ✅ إضافة صنف جديد (اختياري) باستخدام الدالة الجديدة
-        if (!empty($postData['new_item_data'])) {
-            $newItemData = json_decode($postData['new_item_data'], true);
-            
-            if ($newItemData && is_array($newItemData)) {
-                $newItem = trim($newItemData['item'] ?? '');
-                $newAsset = trim($newItemData['asset_num'] ?? '');
-                $newSerial = trim($newItemData['serial_num'] ?? '');
-
-                if ($newItem && $newAsset && $newSerial) {
-                    // البحث عن الصنف أو إنشاؤه
-                    $item = $this->itemModel->where('name', $newItem)->first();
-                    if (!$item) {
-                        $itemId = $this->itemModel->insert(['name' => $newItem]);
-                        if (!$itemId) {
-                            return $this->response->setJSON([
-                                'success' => false,
-                                'message' => 'فشل في إنشاء الصنف الجديد.'
-                            ]);
+                        // ثم حذف الطلب نفسه (من جدول order)
+                        if ($orderModel->delete($orderId)) {
+                            $deletedCount++;
                         }
-                    } else {
-                        $itemId = $item->id;
                     }
+                }
+            }
 
-                    // ✅ إضافة العنصر الجديد باستخدام الدالة الجديدة
-                    $newItemOrderData = [
-                        'order_id' => $orderId,
-                        'item_id' => $itemId,
-                        'asset_num' => $newAsset,
-                        'serial_num' => $newSerial,
-                        'brand' => trim($newItemData['brand'] ?? 'غير محدد'),
-                        'model_num' => trim($newItemData['model_num'] ?? ''),
-                        'room_id' => $postData['room'],
-                        'assets_type' => 'عهدة عامة',
-                        'created_by' => session()->get('employee_id'),
-                        'usage_status_id' => 1,
-                        'quantity' => 1,
-                        'note' => trim($newItemData['note'] ?? '')
-                    ];
-                    
-                    $insertResult = $this->itemOrderModel->insertWithUniqueCheck($newItemOrderData);
-                    
-                    if (!$insertResult['success']) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => "تم حذف {$deletedCount} طلب بنجاح"
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'خطأ في حذف الطلبات: ' . $e->getMessage()
+            ]);
+        }
+    }
+    public function updateOrder($orderId)
+    {
+        try {
+            if (!$orderId) {
+                return $this->response->setJSON(['success' => false, 'message' => 'رقم الطلب غير محدد.']);
+            }
+
+            $postData = $this->request->getPost();
+
+            log_message('info', 'UpdateOrder - Order ID: ' . $orderId);
+
+            // التحقق من الحقول الأساسية
+            if (empty($postData['to_employee_id']) || empty($postData['room'])) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'الحقلين (الرقم الوظيفي للمستلم) و (الغرفة) مطلوبين.'
+                ]);
+            }
+
+            // التحقق من وجود الطلب
+            $existingOrder = $this->orderModel->find($orderId);
+            if (!$existingOrder) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'الطلب غير موجود.'
+                ]);
+            }
+
+            // ✅ الحصول على العناصر الحالية في الطلب من قاعدة البيانات
+            $currentOrderItems = $this->itemOrderModel->where('order_id', $orderId)->findAll();
+            $currentItemIds = array_column($currentOrderItems, 'item_order_id');
+
+            log_message('info', 'Current items in database: ' . implode(', ', $currentItemIds));
+
+            // ✅ الحصول على العناصر المرسلة من الواجهة
+            $submittedItemIds = [];
+            $existingItemsData = [];
+
+            if (!empty($postData['existing_items_data'])) {
+                $existingItemsData = json_decode($postData['existing_items_data'], true);
+                if (!empty($existingItemsData) && is_array($existingItemsData)) {
+                    $submittedItemIds = array_map('strval', array_column($existingItemsData, 'item_order_id'));
+                }
+            }
+
+            log_message('info', 'Submitted items from frontend: ' . implode(', ', $submittedItemIds));
+
+            // ✅ حذف العناصر غير المرسلة من الواجهة (المحذوفة)
+            $itemsToDelete = array_diff(array_map('strval', $currentItemIds), $submittedItemIds);
+
+            if (!empty($itemsToDelete)) {
+                log_message('info', 'Deleting items: ' . implode(', ', $itemsToDelete));
+
+                foreach ($itemsToDelete as $itemToDelete) {
+                    $deleteResult = $this->itemOrderModel->delete($itemToDelete);
+                    if (!$deleteResult) {
                         return $this->response->setJSON([
                             'success' => false,
-                            'message' => 'فشل في إضافة الصنف الجديد: ' . $insertResult['message']
+                            'message' => "فشل في حذف العنصر رقم {$itemToDelete}"
                         ]);
                     }
-                    
-                    log_message('info', "New item added successfully to order {$orderId}");
+                    log_message('info', "Successfully deleted item: {$itemToDelete}");
                 }
             }
+
+            // ✅ تحديث بيانات الطلب الرئيسية
+            $orderMainData = [
+                'to_employee_id' => $postData['to_employee_id'],
+                'note' => $postData['notes'] ?? ''
+            ];
+
+            $orderUpdateResult = $this->orderModel->update($orderId, $orderMainData);
+            if (!$orderUpdateResult) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'فشل في تحديث بيانات الطلب الأساسية.'
+                ]);
+            }
+
+            // ✅ تحديث العناصر المرسلة من الواجهة باستخدام الدالة الجديدة
+            if (!empty($existingItemsData) && is_array($existingItemsData)) {
+                foreach ($existingItemsData as $index => $itemData) {
+                    $itemOrderId = $itemData['item_order_id'] ?? null;
+                    $assetNum = trim($itemData['asset_num'] ?? '');
+                    $serialNum = trim($itemData['serial_num'] ?? '');
+                    $brand = trim($itemData['brand'] ?? '');
+                    $modelNum = trim($itemData['model_num'] ?? '');
+                    $note = trim($itemData['note'] ?? '');
+
+                    if (!$itemOrderId || !$assetNum || !$serialNum) {
+                        return $this->response->setJSON([
+                            'success' => false,
+                            'message' => "جميع الحقول مطلوبة للعنصر رقم " . ($index + 1)
+                        ]);
+                    }
+
+                    // التحقق من وجود العنصر
+                    $existingItem = $this->itemOrderModel->find($itemOrderId);
+                    if (!$existingItem) {
+                        return $this->response->setJSON([
+                            'success' => false,
+                            'message' => "العنصر رقم {$itemOrderId} غير موجود."
+                        ]);
+                    }
+
+                    // ✅ تحديث البيانات باستخدام الدالة الجديدة
+                    $updateData = [
+                        'asset_num' => $assetNum,
+                        'serial_num' => $serialNum,
+                        'brand' => $brand,
+                        'model_num' => $modelNum,
+                        'room_id' => $postData['room'],
+                        'note' => $note
+                    ];
+
+                    log_message('info', "Updating item {$itemOrderId} with data: " . json_encode($updateData));
+
+                    // ✅ استخدام الدالة الجديدة للتحديث مع فحص التكرار
+                    $updateResult = $this->itemOrderModel->updateWithUniqueCheck($itemOrderId, $updateData);
+
+                    if (!$updateResult['success']) {
+                        return $this->response->setJSON([
+                            'success' => false,
+                            'message' => "فشل في تحديث العنصر رقم {$itemOrderId}: " . $updateResult['message']
+                        ]);
+                    }
+
+                    log_message('info', "Item {$itemOrderId} updated successfully");
+                }
+            }
+
+            // ✅ إضافة صنف جديد (اختياري) باستخدام الدالة الجديدة
+            if (!empty($postData['new_item_data'])) {
+                $newItemData = json_decode($postData['new_item_data'], true);
+
+                if ($newItemData && is_array($newItemData)) {
+                    $newItem = trim($newItemData['item'] ?? '');
+                    $newAsset = trim($newItemData['asset_num'] ?? '');
+                    $newSerial = trim($newItemData['serial_num'] ?? '');
+
+                    if ($newItem && $newAsset && $newSerial) {
+                        // البحث عن الصنف أو إنشاؤه
+                        $item = $this->itemModel->where('name', $newItem)->first();
+                        if (!$item) {
+                            $itemId = $this->itemModel->insert(['name' => $newItem]);
+                            if (!$itemId) {
+                                return $this->response->setJSON([
+                                    'success' => false,
+                                    'message' => 'فشل في إنشاء الصنف الجديد.'
+                                ]);
+                            }
+                        } else {
+                            $itemId = $item->id;
+                        }
+
+                        // ✅ إضافة العنصر الجديد باستخدام الدالة الجديدة
+                        $newItemOrderData = [
+                            'order_id' => $orderId,
+                            'item_id' => $itemId,
+                            'asset_num' => $newAsset,
+                            'serial_num' => $newSerial,
+                            'brand' => trim($newItemData['brand'] ?? 'غير محدد'),
+                            'model_num' => trim($newItemData['model_num'] ?? ''),
+                            'room_id' => $postData['room'],
+                            'assets_type' => 'عهدة عامة',
+                            'created_by' => session()->get('employee_id'),
+                            'usage_status_id' => 1,
+                            'quantity' => 1,
+                            'note' => trim($newItemData['note'] ?? '')
+                        ];
+
+                        $insertResult = $this->itemOrderModel->insertWithUniqueCheck($newItemOrderData);
+
+                        if (!$insertResult['success']) {
+                            return $this->response->setJSON([
+                                'success' => false,
+                                'message' => 'فشل في إضافة الصنف الجديد: ' . $insertResult['message']
+                            ]);
+                        }
+
+                        log_message('info', "New item added successfully to order {$orderId}");
+                    }
+                }
+            }
+
+            log_message('info', "Order {$orderId} updated successfully");
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'تم تحديث الطلب بنجاح',
+                'order_id' => $orderId
+            ]);
+        } catch (\Exception $e) {
+            log_message('error', 'Error in updateOrder: ' . $e->getMessage());
+            log_message('error', 'Stack trace: ' . $e->getTraceAsString());
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'خطأ في تحديث الطلب: ' . $e->getMessage()
+            ]);
         }
-
-        log_message('info', "Order {$orderId} updated successfully");
-
-        return $this->response->setJSON([
-            'success' => true, 
-            'message' => 'تم تحديث الطلب بنجاح', 
-            'order_id' => $orderId
-        ]);
-
-    } catch (\Exception $e) {
-        log_message('error', 'Error in updateOrder: ' . $e->getMessage());
-        log_message('error', 'Stack trace: ' . $e->getTraceAsString());
-        return $this->response->setJSON([
-            'success' => false, 
-            'message' => 'خطأ في تحديث الطلب: ' . $e->getMessage()
-        ]);
     }
-}
 
     public function editWarehouseItem($id)
     {
@@ -778,7 +776,7 @@ public function bulkDeleteOrders()
             return $this->response->setJSON(['success' => false, 'message' => 'خطأ في تحميل التصنيفات الفرعية: ' . $e->getMessage(), 'data' => []]);
         }
     }
-    
+
     public function getsectionsbyfloor($floorId = null)
     {
         try {
@@ -827,242 +825,240 @@ public function bulkDeleteOrders()
             throw new \Exception("الرقم التسلسلي {$serialNum} موجود مسبقاً في النظام.");
         }
     }
-public function showOrder($id)
-{
-    $orderModel         = new \App\Models\OrderModel();
-    $itemOrderModel     = new \App\Models\ItemOrderModel();
-    $userModel          = new \App\Models\UserModel();
-    $itemModel          = new \App\Models\ItemModel();
-    $minorCatModel      = new \App\Models\MinorCategoryModel();
-    $majorCatModel      = new \App\Models\MajorCategoryModel();
-    $roomModel          = new \App\Models\RoomModel();
-    $usageStatusModel   = new \App\Models\UsageStatusModel();
-    $employeeModel      = new \App\Models\EmployeeModel();
-    $statusModel        = new \App\Models\OrderStatusModel();
+    public function showOrder($id)
+    {
+        session()->setFlashdata('previous_url', previous_url());
+        $orderModel         = new \App\Models\OrderModel();
+        $itemOrderModel     = new \App\Models\ItemOrderModel();
+        $userModel          = new \App\Models\UserModel();
+        $itemModel          = new \App\Models\ItemModel();
+        $minorCatModel      = new \App\Models\MinorCategoryModel();
+        $majorCatModel      = new \App\Models\MajorCategoryModel();
+        $roomModel          = new \App\Models\RoomModel();
+        $usageStatusModel   = new \App\Models\UsageStatusModel();
+        $employeeModel      = new \App\Models\EmployeeModel();
+        $statusModel        = new \App\Models\OrderStatusModel();
 
 
-    $order = $orderModel->find($id);
+        $order = $orderModel->find($id);
 
-    if (!$order) {
-        return redirect()->back()->with('error', 'الطلب غير موجود');
-    }
-
-
-    $fromUser = $userModel->where('user_id', $order->from_user_id)->first();
-    $toUser   = $userModel->where('user_id', $order->to_user_id)->first();
-    $status   = $statusModel->find($order->order_status_id);
-
-    $order->from_name    = $fromUser->name ?? 'غير معروف';
-    $order->to_name      = $toUser->name ?? 'غير معروف';
-    $order->status_name  = $status->status ?? 'غير معروف';
-
-
-    $items = $itemOrderModel->where('order_id', $id)->findAll();
-
-    foreach ($items as $item) {
-        $itemData = $itemModel->find($item->item_id);
-        $minor    = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
-        $major    = $minor ? $majorCatModel->find($minor->major_category_id) : null;
-
-        $item->item_name             = $itemData->name ?? 'غير معروف';
-        $item->minor_category_name  = $minor->name ?? 'غير معروف';
-        $item->major_category_name  = $major->name ?? 'غير معروف';
-        $item->location_code        = $roomModel->getFullLocationCode($item->room_id);
-        $item->usage_status_name    = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
-        $item->created_by_name      = $employeeModel->where('emp_id', $item->created_by)->first()->name ?? 'غير معروف';
-    }
-
-    
-    return view('warehouse/show_order', [
-        'order'       => $order,
-        'items'       => $items,
-        'item_count'  => count($items),
-    ]);
-}
-public function deleteOrder($orderId)
-{
-    try {
-        if (!$orderId) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'رقم الطلب غير محدد.'
-            ]);
-        }
-
-        // التحقق من وجود الطلب
-        $order = $this->orderModel->find($orderId);
         if (!$order) {
+            return redirect()->back()->with('error', 'الطلب غير موجود');
+        }
+
+
+        $fromUser = $userModel->where('user_id', $order->from_user_id)->first();
+        $toUser   = $userModel->where('user_id', $order->to_user_id)->first();
+        $status   = $statusModel->find($order->order_status_id);
+
+        $order->from_name    = $fromUser->name ?? 'غير معروف';
+        $order->to_name      = $toUser->name ?? 'غير معروف';
+        $order->status_name  = $status->status ?? 'غير معروف';
+
+
+        $items = $itemOrderModel->where('order_id', $id)->findAll();
+
+        foreach ($items as $item) {
+            $itemData = $itemModel->find($item->item_id);
+            $minor    = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
+            $major    = $minor ? $majorCatModel->find($minor->major_category_id) : null;
+
+            $item->item_name             = $itemData->name ?? 'غير معروف';
+            $item->minor_category_name  = $minor->name ?? 'غير معروف';
+            $item->major_category_name  = $major->name ?? 'غير معروف';
+            $item->location_code        = $roomModel->getFullLocationCode($item->room_id);
+            $item->usage_status_name    = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
+            $item->created_by_name      = $employeeModel->where('emp_id', $item->created_by)->first()->name ?? 'غير معروف';
+        }
+
+
+        return view('warehouse/show_order', [
+
+            'order'       => $order,
+            'items'       => $items,
+            'item_count'  => count($items),
+        ]);
+    }
+    public function deleteOrder($orderId)
+    {
+        try {
+            if (!$orderId) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'رقم الطلب غير محدد.'
+                ]);
+            }
+
+            // التحقق من وجود الطلب
+            $order = $this->orderModel->find($orderId);
+            if (!$order) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'الطلب غير موجود.'
+                ]);
+            }
+
+            // التحقق من الصلاحيات (اختياري)
+            $currentUserId = session()->get('employee_id');
+            if ($order->from_employee_id !== $currentUserId) {
+                // يمكن إضافة فحص للأدمن هنا
+                // return $this->response->setJSON([
+                //     'success' => false,
+                //     'message' => 'ليس لديك صلاحية لحذف هذا الطلب.'
+                // ]);
+            }
+
+
+            // عد العناصر قبل الحذف
+            $itemsCount = $this->itemOrderModel->where('order_id', $orderId)->countAllResults();
+
+            // حذف الطلب (سيحذف العناصر تلقائياً بسبب CASCADE في قاعدة البيانات)
+            $deleteResult = $this->orderModel->delete($orderId);
+
+            if (!$deleteResult) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'فشل في حذف الطلب.'
+                ]);
+            }
+
+            log_message('info', "تم حذف الطلب {$orderId} مع {$itemsCount} عنصر بواسطة المستخدم {$currentUserId}");
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => "تم حذف الطلب رقم {$orderId} مع جميع عناصره ({$itemsCount} عنصر) بنجاح."
+            ]);
+        } catch (\Exception $e) {
+            log_message('error', 'Error in deleteOrder: ' . $e->getMessage());
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'الطلب غير موجود.'
+                'message' => 'خطأ في حذف الطلب: ' . $e->getMessage()
             ]);
         }
+    }
 
-        // التحقق من الصلاحيات (اختياري)
-        $currentUserId = session()->get('employee_id');
-        if ($order->from_employee_id !== $currentUserId) {
-            // يمكن إضافة فحص للأدمن هنا
-            // return $this->response->setJSON([
-            //     'success' => false,
-            //     'message' => 'ليس لديك صلاحية لحذف هذا الطلب.'
-            // ]);
-        }
+    /**
+     * حذف عنصر واحد من الطلب
+     */
+    public function deleteOrderItem($itemOrderId)
+    {
+        try {
+            if (!$itemOrderId) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'رقم العنصر غير محدد.'
+                ]);
+            }
 
-        
-        // عد العناصر قبل الحذف
-        $itemsCount = $this->itemOrderModel->where('order_id', $orderId)->countAllResults();
+            // التحقق من وجود العنصر
+            $orderItem = $this->itemOrderModel->find($itemOrderId);
+            if (!$orderItem) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'العنصر غير موجود.'
+                ]);
+            }
 
-        // حذف الطلب (سيحذف العناصر تلقائياً بسبب CASCADE في قاعدة البيانات)
-        $deleteResult = $this->orderModel->delete($orderId);
-        
-        if (!$deleteResult) {
+            // الحصول على معلومات الطلب للتحقق من الصلاحيات
+            $order = $this->orderModel->find($orderItem->order_id);
+            if (!$order) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'الطلب المرتبط بهذا العنصر غير موجود.'
+                ]);
+            }
+
+            // التحقق من الصلاحيات (اختياري)
+            $currentUserId = session()->get('employee_id');
+
+            // فحص عدد العناصر المتبقية في الطلب
+            $remainingItemsCount = $this->itemOrderModel->where('order_id', $orderItem->order_id)->countAllResults();
+
+            if ($remainingItemsCount <= 1) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'لا يمكن حذف العنصر الأخير من الطلب. احذف الطلب كاملاً بدلاً من ذلك.'
+                ]);
+            }
+
+            // الحصول على معلومات العنصر للـ log
+            $itemInfo = $this->itemOrderModel
+                ->select('item_order.*, items.name as item_name')
+                ->join('items', 'items.id = item_order.item_id')
+                ->where('item_order.item_order_id', $itemOrderId)
+                ->first();
+
+            // حذف العنصر
+            $deleteResult = $this->itemOrderModel->delete($itemOrderId);
+
+            if (!$deleteResult) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'فشل في حذف العنصر.'
+                ]);
+            }
+
+            $itemName = $itemInfo->item_name ?? 'غير محدد';
+            $assetNum = $itemInfo->asset_num ?? '';
+
+            log_message('info', "تم حذف العنصر {$itemName} (رقم الأصول: {$assetNum}) من الطلب {$orderItem->order_id} بواسطة المستخدم {$currentUserId}");
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => "تم حذف العنصر ({$itemName}) بنجاح.",
+                'order_id' => $orderItem->order_id,
+                'remaining_items' => $remainingItemsCount - 1
+            ]);
+        } catch (\Exception $e) {
+            log_message('error', 'Error in deleteOrderItem: ' . $e->getMessage());
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'فشل في حذف الطلب.'
+                'message' => 'خطأ في حذف العنصر: ' . $e->getMessage()
             ]);
         }
+    }
 
-        log_message('info', "تم حذف الطلب {$orderId} مع {$itemsCount} عنصر بواسطة المستخدم {$currentUserId}");
+    /**
+     * الحصول على تفاصيل الطلب مع العناصر (لتحديث الواجهة بعد الحذف)
+     */
+    public function getOrderDetails($orderId)
+    {
+        try {
+            if (!$orderId) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'رقم الطلب غير محدد.'
+                ]);
+            }
 
-        return $this->response->setJSON([
-            'success' => true,
-            'message' => "تم حذف الطلب رقم {$orderId} مع جميع عناصره ({$itemsCount} عنصر) بنجاح."
-        ]);
+            $order = $this->orderModel->find($orderId);
+            if (!$order) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'الطلب غير موجود.'
+                ]);
+            }
 
-    } catch (\Exception $e) {
-        log_message('error', 'Error in deleteOrder: ' . $e->getMessage());
-        return $this->response->setJSON([
-            'success' => false,
-            'message' => 'خطأ في حذف الطلب: ' . $e->getMessage()
-        ]);
+            $orderItems = $this->itemOrderModel
+                ->select('item_order.*, items.name as item_name')
+                ->join('items', 'items.id = item_order.item_id')
+                ->where('order_id', $orderId)
+                ->findAll();
+
+            return $this->response->setJSON([
+                'success' => true,
+                'data' => [
+                    'order' => $order,
+                    'items' => $orderItems,
+                    'items_count' => count($orderItems)
+                ]
+            ]);
+        } catch (\Exception $e) {
+            log_message('error', 'Error in getOrderDetails: ' . $e->getMessage());
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'خطأ في جلب تفاصيل الطلب: ' . $e->getMessage()
+            ]);
+        }
     }
 }
-
-/**
- * حذف عنصر واحد من الطلب
- */
-public function deleteOrderItem($itemOrderId)
-{
-    try {
-        if (!$itemOrderId) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'رقم العنصر غير محدد.'
-            ]);
-        }
-
-        // التحقق من وجود العنصر
-        $orderItem = $this->itemOrderModel->find($itemOrderId);
-        if (!$orderItem) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'العنصر غير موجود.'
-            ]);
-        }
-
-        // الحصول على معلومات الطلب للتحقق من الصلاحيات
-        $order = $this->orderModel->find($orderItem->order_id);
-        if (!$order) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'الطلب المرتبط بهذا العنصر غير موجود.'
-            ]);
-        }
-
-        // التحقق من الصلاحيات (اختياري)
-        $currentUserId = session()->get('employee_id');
-        
-        // فحص عدد العناصر المتبقية في الطلب
-        $remainingItemsCount = $this->itemOrderModel->where('order_id', $orderItem->order_id)->countAllResults();
-        
-        if ($remainingItemsCount <= 1) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'لا يمكن حذف العنصر الأخير من الطلب. احذف الطلب كاملاً بدلاً من ذلك.'
-            ]);
-        }
-
-        // الحصول على معلومات العنصر للـ log
-        $itemInfo = $this->itemOrderModel
-            ->select('item_order.*, items.name as item_name')
-            ->join('items', 'items.id = item_order.item_id')
-            ->where('item_order.item_order_id', $itemOrderId)
-            ->first();
-
-        // حذف العنصر
-        $deleteResult = $this->itemOrderModel->delete($itemOrderId);
-        
-        if (!$deleteResult) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'فشل في حذف العنصر.'
-            ]);
-        }
-
-        $itemName = $itemInfo->item_name ?? 'غير محدد';
-        $assetNum = $itemInfo->asset_num ?? '';
-        
-        log_message('info', "تم حذف العنصر {$itemName} (رقم الأصول: {$assetNum}) من الطلب {$orderItem->order_id} بواسطة المستخدم {$currentUserId}");
-
-        return $this->response->setJSON([
-            'success' => true,
-            'message' => "تم حذف العنصر ({$itemName}) بنجاح.",
-            'order_id' => $orderItem->order_id,
-            'remaining_items' => $remainingItemsCount - 1
-        ]);
-
-    } catch (\Exception $e) {
-        log_message('error', 'Error in deleteOrderItem: ' . $e->getMessage());
-        return $this->response->setJSON([
-            'success' => false,
-            'message' => 'خطأ في حذف العنصر: ' . $e->getMessage()
-        ]);
-    }
-}
-
-/**
- * الحصول على تفاصيل الطلب مع العناصر (لتحديث الواجهة بعد الحذف)
- */
-public function getOrderDetails($orderId)
-{
-    try {
-        if (!$orderId) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'رقم الطلب غير محدد.'
-            ]);
-        }
-
-        $order = $this->orderModel->find($orderId);
-        if (!$order) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'الطلب غير موجود.'
-            ]);
-        }
-
-        $orderItems = $this->itemOrderModel
-            ->select('item_order.*, items.name as item_name')
-            ->join('items', 'items.id = item_order.item_id')
-            ->where('order_id', $orderId)
-            ->findAll();
-
-        return $this->response->setJSON([
-            'success' => true,
-            'data' => [
-                'order' => $order,
-                'items' => $orderItems,
-                'items_count' => count($orderItems)
-            ]
-        ]);
-
-    } catch (\Exception $e) {
-        log_message('error', 'Error in getOrderDetails: ' . $e->getMessage());
-        return $this->response->setJSON([
-            'success' => false,
-            'message' => 'خطأ في جلب تفاصيل الطلب: ' . $e->getMessage()
-        ]);
-    }
-
-    
-}}

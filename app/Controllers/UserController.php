@@ -26,6 +26,7 @@ class UserController extends BaseController
      */
     private function checkAuth()
     {
+
         if (! session()->get('isLoggedIn')) {
             throw new AuthenticationException();
         }
@@ -63,10 +64,10 @@ class UserController extends BaseController
             ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
             ->findAll();
 
-     
+
         $stats = $this->getWarehouseStats();
 
-       
+
         $orderStatusModel = new OrderStatusModel();
         $statuses = $orderStatusModel->findAll();
 
@@ -82,7 +83,7 @@ class UserController extends BaseController
         ]);
     }
 
-  
+
     private function getWarehouseStats(): array
     {
         $itemOrderModel = new ItemOrderModel();
@@ -128,7 +129,9 @@ class UserController extends BaseController
      * عرض تفاصيل طلب محدد
      */
     public function showOrder($order_id)
+
     {
+
         $this->checkAuth(); // تحقق من تسجيل الدخول
 
         $itemOrderModel = new ItemOrderModel();
@@ -145,51 +148,50 @@ class UserController extends BaseController
 
 
     /**
- * صفحة جديدة userView2
- */
-public function userView2(): string
-{
-    $this->checkAuth(); // تحقق من تسجيل الدخول
+     * صفحة جديدة userView2
+     */
+    public function userView2(): string
+    {
+        $this->checkAuth(); // تحقق من تسجيل الدخول
 
-    $itemOrderModel = new ItemOrderModel();
+        $itemOrderModel = new ItemOrderModel();
 
-    $itemOrders = $itemOrderModel
-        ->distinct()
-        ->select(
-            'item_order.order_id, 
+        $itemOrders = $itemOrderModel
+            ->distinct()
+            ->select(
+                'item_order.order_id, 
              item_order.created_at, 
              item_order.created_by, 
              room.code AS room_code, 
              employee.name AS created_by_name, 
              employee.emp_id AS employee_id, 
              employee.emp_ext AS extension'
-        )
-        ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
-        ->join('room', 'room.id = item_order.room_id', 'left')
-        ->groupBy('item_order.order_id')
-        ->orderBy('item_order.created_at', 'DESC')
-        ->findAll();
+            )
+            ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
+            ->join('room', 'room.id = item_order.room_id', 'left')
+            ->groupBy('item_order.order_id')
+            ->orderBy('item_order.created_at', 'DESC')
+            ->findAll();
 
-    $minorCategoryModel = new MinorCategoryModel();
-    $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
-        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-        ->findAll();
+        $minorCategoryModel = new MinorCategoryModel();
+        $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
+            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+            ->findAll();
 
-    $stats = $this->getWarehouseStats();
+        $stats = $this->getWarehouseStats();
 
-    $orderStatusModel = new OrderStatusModel();
-    $statuses = $orderStatusModel->findAll();
+        $orderStatusModel = new OrderStatusModel();
+        $statuses = $orderStatusModel->findAll();
 
-    $usageStatusModel = new UsageStatusModel();
-    $usageStatuses = $usageStatusModel->findAll();
+        $usageStatusModel = new UsageStatusModel();
+        $usageStatuses = $usageStatusModel->findAll();
 
-    return view('user/userView2', [
-        'categories' => $categories,
-        'orders' => $itemOrders,
-        'stats' => $stats,
-        'statuses' => $statuses,
-        'usage_statuses' => $usageStatuses
-    ]);
-}
-
+        return view('user/userView2', [
+            'categories' => $categories,
+            'orders' => $itemOrders,
+            'stats' => $stats,
+            'statuses' => $statuses,
+            'usage_statuses' => $usageStatuses
+        ]);
+    }
 }
