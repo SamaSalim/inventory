@@ -6,116 +6,142 @@ use CodeIgniter\Config\BaseConfig;
 
 class Email extends BaseConfig
 {
-    public string $fromEmail  = '';
-    public string $fromName   = '';
-    public string $recipients = '';
+    public $fromEmail;
+    public $fromName;
+    public $recipients;
 
     /**
      * The "user agent"
      */
-    public string $userAgent = 'CodeIgniter';
+    public $userAgent = 'CodeIgniter';
 
     /**
      * The mail sending protocol: mail, sendmail, smtp
      */
-    public string $protocol = 'mail';
+    public $protocol;
 
     /**
      * The server path to Sendmail.
      */
-    public string $mailPath = '/usr/sbin/sendmail';
+    public $mailPath = '/usr/sbin/sendmail';
 
     /**
      * SMTP Server Hostname
      */
-    public string $SMTPHost = '';
+    public $SMTPHost;
 
     /**
      * SMTP Username
      */
-    public string $SMTPUser = '';
+    public $SMTPUser;
 
     /**
      * SMTP Password
      */
-    public string $SMTPPass = '';
+    public $SMTPPass;
 
     /**
      * SMTP Port
      */
-    public int $SMTPPort = 25;
+    public $SMTPPort;
 
     /**
      * SMTP Timeout (in seconds)
      */
-    public int $SMTPTimeout = 5;
+    public $SMTPTimeout;
 
     /**
      * Enable persistent SMTP connections
      */
-    public bool $SMTPKeepAlive = false;
+    public $SMTPKeepAlive;
 
     /**
-     * SMTP Encryption.
-     *
-     * @var string '', 'tls' or 'ssl'. 'tls' will issue a STARTTLS command
-     *             to the server. 'ssl' means implicit SSL. Connection on port
-     *             465 should set this to ''.
+     * SMTP Encryption. '', 'tls' or 'ssl'
      */
-    public string $SMTPCrypto = 'tls';
+    public $SMTPCrypto;
 
     /**
      * Enable word-wrap
      */
-    public bool $wordWrap = true;
+    public $wordWrap;
 
     /**
      * Character count to wrap at
      */
-    public int $wrapChars = 76;
+    public $wrapChars;
 
     /**
      * Type of mail, either 'text' or 'html'
      */
-    public string $mailType = 'text';
+    public $mailType;
 
     /**
      * Character set (utf-8, iso-8859-1, etc.)
      */
-    public string $charset = 'UTF-8';
+    public $charset;
 
     /**
      * Whether to validate the email address
      */
-    public bool $validate = false;
+    public $validate;
 
     /**
      * Email Priority. 1 = highest. 5 = lowest. 3 = normal
      */
-    public int $priority = 3;
+    public $priority;
 
     /**
      * Newline character. (Use “\r\n” to comply with RFC 822)
      */
-    public string $CRLF = "\r\n";
+    public $CRLF;
 
     /**
      * Newline character. (Use “\r\n” to comply with RFC 822)
      */
-    public string $newline = "\r\n";
+    public $newline;
 
     /**
      * Enable BCC Batch Mode.
      */
-    public bool $BCCBatchMode = false;
+    public $BCCBatchMode;
 
     /**
      * Number of emails in each BCC batch
      */
-    public int $BCCBatchSize = 200;
+    public $BCCBatchSize;
 
     /**
      * Enable notify message from server
      */
-    public bool $DSN = false;
+    public $DSN;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        // Read from .env or fallback defaults
+        $this->fromEmail    = getenv('email.fromEmail') ?: 'kamctester@gmail.com';
+        $this->fromName     = getenv('email.fromName') ?: 'KAMC Inventory System';
+        $this->recipients   = '';
+
+        $this->protocol     = getenv('email.protocol') ?: 'smtp';
+        $this->SMTPHost     = getenv('email.SMTPHost') ?: 'smtp.gmail.com';
+        $this->SMTPUser     = getenv('email.SMTPUser') ?: 'kamctester@gmail.com';
+        $this->SMTPPass     = getenv('email.SMTPPass') ?: 'yourAppPasswordHere';
+        $this->SMTPPort     = (int) (getenv('email.SMTPPort') ?: 587);
+        $this->SMTPTimeout  = (int) (getenv('email.SMTPTimeout') ?: 10);
+        $this->SMTPKeepAlive= (bool)(getenv('email.SMTPKeepAlive') ?: false);
+        $this->SMTPCrypto   = getenv('email.SMTPCrypto') ?: 'tls';
+        $this->wordWrap     = (bool)(getenv('email.wordWrap') ?: true);
+        $this->wrapChars    = (int)(getenv('email.wrapChars') ?: 76);
+        $this->mailType     = getenv('email.mailType') ?: 'html';
+        $this->charset      = getenv('email.charset') ?: 'UTF-8';
+        $this->validate     = (bool)(getenv('email.validate') ?: true);
+        $this->priority     = (int)(getenv('email.priority') ?: 3);
+        $this->CRLF         = "\r\n";
+        $this->newline      = "\r\n";
+        $this->BCCBatchMode = false;
+        $this->BCCBatchSize = 200;
+        $this->DSN          = false;
+    }
 }

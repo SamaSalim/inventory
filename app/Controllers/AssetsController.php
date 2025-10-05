@@ -334,19 +334,28 @@ public function processTransfer()
         ]);
     }
 
-    $db = \Config\Database::connect();
-    $db->transStart();
-
     try {
         $itemOrderModel = new \App\Models\ItemOrderModel();
         $transferItemsModel = new \App\Models\TransferItemsModel();
         $orderModel = new \App\Models\OrderModel();
+        $userModel = new \App\Models\UserModel();
+
+        // Get user details for email
+        $fromUser = $userModel->where('user_id', $fromUserId)->first();
+        $toUser = $userModel->where('user_id', $toUserId)->first();
+
+        if (!$fromUser || !$toUser) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'المستخدم غير موجود'
+            ]);
+        }
 
         // إنشاء طلب جديد للتحويل
         $orderData = [
             'from_user_id' => $fromUserId,
             'to_user_id' => $toUserId,
-            'order_status_id' => 1, // 1 = قيد الانتظار
+            'order_status_id' => 1,
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
         ];
@@ -354,45 +363,47 @@ public function processTransfer()
         $newOrderId = $orderModel->insert($orderData);
 
         if (!$newOrderId) {
-            throw new \Exception('فشل إنشاء طلب التحويل');
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'فشل إنشاء طلب التحويل'
+            ]);
         }
 
+        // Get items details for email
+        $itemsDetails = [];
+        
         // معالجة كل أصل محدد
         foreach ($itemOrderIds as $itemOrderId) {
-            // التحقق من وجود الأصل
-            $currentItem = $itemOrderModel->find($itemOrderId);
+            $currentItem = $itemOrderModel
+                ->select('item_order.*, items.name as item_name')
+                ->join('items', 'items.id = item_order.item_id')
+                ->find($itemOrderId);
             
             if (!$currentItem) {
                 log_message('warning', "Item order {$itemOrderId} not found");
                 continue;
             }
 
-            // تحديث حالة الأصل إلى "قيد التحويل"
+            $itemsDetails[] = $currentItem;
+
             $itemOrderModel->update($itemOrderId, [
-                'usage_status_id' => 5, // 5 = قيد التحويل
+                'usage_status_id' => 5,
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            // إنشاء سجل في جدول transfer_items
             $transferData = [
                 'item_order_id' => $itemOrderId,
                 'from_user_id' => $fromUserId,
                 'to_user_id' => $toUserId,
-                'order_status_id' => 1, // 1 = قيد الانتظار
+                'order_status_id' => 1,
                 'note' => $note
             ];
 
             $transferItemsModel->insert($transferData);
         }
 
-        $db->transComplete();
-
-        if ($db->transStatus() === false) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'فشل حفظ البيانات'
-            ]);
-        }
+        // Send email notification
+        $this->sendTransferEmail($toUser, $fromUser, $itemsDetails, $note, $newOrderId);
 
         return $this->response->setJSON([
             'success' => true,
@@ -401,7 +412,6 @@ public function processTransfer()
         ]);
 
     } catch (\Exception $e) {
-        $db->transRollback();
         log_message('error', 'Transfer Error: ' . $e->getMessage());
         
         return $this->response->setJSON([
@@ -411,8 +421,151 @@ public function processTransfer()
     }
 }
 
+private function sendTransferEmail($toUser, $fromUser, $itemsDetails, $note, $orderId)
+{
+    try {
+        $email = \Config\Services::email();
 
+        $email->setTo($toUser->email);
+        $email->setSubject('إشعار تحويل أصول جديد - KAMC Inventory System');
 
+        $itemsList = '';
+        foreach ($itemsDetails as $item) {
+            $itemsList .= "
+                <tr>
+                    <td style='padding: 10px; border: 1px solid #ddd;'>{$item->item_name}</td>
+                    <td style='padding: 10px; border: 1px solid #ddd;'>{$item->asset_num}</td>
+                    <td style='padding: 10px; border: 1px solid #ddd;'>{$item->serial_num}</td>
+                    <td style='padding: 10px; border: 1px solid #ddd;'>" . ($item->brand ?? 'N/A') . "</td>
+                </tr>
+            ";
+        }
 
-    
+        $transferUrl = "http://localhost/inventory/AssetsController/transferView/{$orderId}";
+
+        $message = "
+            <html dir='rtl'>
+            <head>
+                <style>
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        direction: rtl; 
+                        background-color: #f5f5f5;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .container { 
+                        max-width: 600px; 
+                        margin: 20px auto; 
+                        background-color: white;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    }
+                    .header { 
+                        background-color:  #0896baff; 
+                        color: white; 
+                        padding: 30px 15px; 
+                        text-align: center;
+                        font-size: 28px;
+                        font-weight: bold;
+                    }
+                    .content { 
+                        padding: 30px 20px; 
+                        background-color: #f9f9f9; 
+                    }
+                    table { 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                        margin: 15px 0; 
+                        background-color: white;
+                    }
+                    th { 
+                        background-color: #0896baff; 
+                        color: white; 
+                        padding: 12px 10px; 
+                        text-align: right;
+                        font-weight: bold;
+                    }
+                    td { 
+                        padding: 10px; 
+                        border: 1px solid #ddd; 
+                    }
+                    .note { 
+                        background-color: #fff3cd; 
+                        padding: 15px; 
+                        border-right: 4px solid #ffc107; 
+                        margin: 15px 0; 
+                    }
+                    .info-row {
+                        margin: 10px 0;
+                        line-height: 1.6;
+                    }
+                    .btn-container {
+                        text-align: center;
+                        margin: 30px 0;
+                    }
+                    .btn {
+                        display: inline-block;
+                        background-color: #0896baff;
+                        color: white !important;
+                        padding: 15px 40px;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        font-weight: bold;
+                        font-size: 16px;
+                    }
+                    .btn:hover {
+                        background-color: #0896baff;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <div class='header'>
+                        إشعار تحويل أصول
+                    </div>
+                    <div class='content'>
+                        <p class='info-row'>,عزيزي/عزيزتي <strong>{$toUser->name}</strong></p>
+                        <p class='info-row'>تم إرسال طلب تحويل أصول إليك من قبل: <strong>{$fromUser->name}</strong></p>
+                        <p class='info-row'><strong>رقم الطلب:</strong> {$orderId}</p>
+                        
+                        
+                        <h3 style='color: #0896baff; margin-top: 25px;'>تفاصيل الأصول المحولة:</h3>
+                        <table>
+                            <tr>
+                                <th>اسم الصنف</th>
+                                <th>رقم الأصل</th>
+                                <th>الرقم التسلسلي</th>
+                                <th>العلامة التجارية</th>
+                            </tr>
+                            {$itemsList}
+                        </table>
+                        
+                        <div class='btn-container'>
+                            <a href='{$transferUrl}' class='btn'>مراجعة النظام لقبول أو رفض الطلب</a>
+                        </div>
+                        
+                        <p style='text-align: center; margin-top: 30px; color: #666;'>
+                            شكراً لك،<br>
+                            <strong>KAMC - نظام إدارة العهد</strong>
+                        </p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        ";
+
+        $email->setMessage($message);
+
+        if ($email->send()) {
+            log_message('info', "Transfer email sent successfully to {$toUser->email}");
+            return true;
+        } else {
+            log_message('error', 'Email sending failed: ' . $email->printDebugger(['headers']));
+            return false;
+        }
+    } catch (\Exception $e) {
+        log_message('error', 'Email Error: ' . $e->getMessage());
+        return false;
+    }
+}
 }
