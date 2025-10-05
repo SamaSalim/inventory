@@ -26,6 +26,7 @@ class UserController extends BaseController
      */
     private function checkAuth()
     {
+
         if (! session()->get('isLoggedIn')) {
             throw new AuthenticationException();
         }
@@ -132,7 +133,9 @@ public function dashboard(): string
      * عرض تفاصيل طلب محدد
      */
     public function showOrder($order_id)
+
     {
+
         $this->checkAuth(); // تحقق من تسجيل الدخول
 
         $itemOrderModel = new ItemOrderModel();
