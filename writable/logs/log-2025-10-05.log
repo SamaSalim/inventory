@@ -493,3 +493,760 @@ INFO - 2025-10-05 14:56:23 --> Transfer email sent successfully to laymix2005@gm
 DEBUG - 2025-10-05 14:57:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2025-10-05 14:57:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2025-10-05 14:57:31 --> Transfer email sent successfully to laymix2005@gmail.com
+DEBUG - 2025-10-05 16:30:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-05 16:30:57 --> Error: Class "CodeIgniter\Shield\Exceptions\AuthenticationException" not found
+[Method: GET, Route: AssetsController/transferView/2]
+in APPPATH\Controllers\AssetsController.php on line 255.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\AssetsController->transferView('2')
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AssetsController))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 16:43:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-05 16:43:44 --> Error: Class "CodeIgniter\Shield\Exceptions\AuthenticationException" not found
+[Method: GET, Route: AssetsController/index]
+in APPPATH\Controllers\AssetsController.php on line 54.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\AssetsController->index()
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AssetsController))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 16:43:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-05 16:43:47 --> Error: Class "CodeIgniter\Shield\Exceptions\AuthenticationException" not found
+[Method: GET, Route: inventoryController/index]
+in APPPATH\Controllers\InventoryController.php on line 56.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\InventoryController->index()
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\InventoryController))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 16:43:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-05 16:43:48 --> App\Exceptions\AuthenticationException: يجب تسجيل الدخول للوصول إلى هذه الصفحة
+[Method: GET, Route: UserController/userView2]
+in APPPATH\Controllers\UserController.php on line 31.
+ 1 APPPATH\Controllers\UserController.php(160): App\Controllers\UserController->checkAuth()
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->userView2()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 16:43:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 16:43:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 16:43:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 16:44:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 16:44:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 16:45:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-10-05 16:45:06 --> Transfer email sent successfully to noura@example.com
+DEBUG - 2025-10-05 16:45:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-10-05 16:45:07 --> Email: Unable to send email using SMTP. Your server might not be configured to send mail using this method.
+ERROR - 2025-10-05 16:45:07 --> 220 smtp.gmail.com ESMTP ffacd0b85a97d-4255d8ac750sm17142145f8f.24 - gsmtp
+
+hello: 250-smtp.gmail.com at your service, [2001:16a2:f18b:7b00:651f:7fa9:c238:1c56]
+250-SIZE 35882577
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+
+starttls: 220 2.0.0 Ready to start TLS
+
+hello: 250-smtp.gmail.com at your service, [2001:16a2:f18b:7b00:651f:7fa9:c238:1c56]
+250-SIZE 35882577
+250-8BITMIME
+250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+
+Failed to authenticate password. Error: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-4255d8ac750sm17142145f8f.24 - gsmtp
+
+ERROR - 2025-10-05 16:45:07 --> Email sending failed: 220 smtp.gmail.com ESMTP ffacd0b85a97d-4255d8ac750sm17142145f8f.24 - gsmtp
+<br><pre>hello: 250-smtp.gmail.com at your service, [2001:16a2:f18b:7b00:651f:7fa9:c238:1c56]
+250-SIZE 35882577
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+</pre><pre>starttls: 220 2.0.0 Ready to start TLS
+</pre><pre>hello: 250-smtp.gmail.com at your service, [2001:16a2:f18b:7b00:651f:7fa9:c238:1c56]
+250-SIZE 35882577
+250-8BITMIME
+250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+</pre>Failed to authenticate password. Error: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-4255d8ac750sm17142145f8f.24 - gsmtp
+<br>Unable to send email using SMTP. Your server might not be configured to send mail using this method.<br><pre>Date: Sun, 5 Oct 2025 16:45:06 +0000
+To: noura@example.com
+Subject: =?UTF-8?Q?=D8=A5=D8=B4=D8=B9=D8=A7=D8=B1=20=D8=AA=D8=AD=D9=88=D9=8A?= =?UTF-8?Q?=D9=84=20=D8=A3=D8=B5=D9=88=D9=84=20=D8=AC=D8=AF=D9=8A=D8=AF=20?= =?UTF-8?Q?-=20KAMC=20Inventory=20System?=
+From: &quot;KAMC Inventory System&quot; &lt;kamctester@gmail.com&gt;
+Return-Path: &lt;kamctester@gmail.com&gt;
+Reply-To: &lt;kamctester@gmail.com&gt;
+User-Agent: CodeIgniter
+X-Sender: kamctester@gmail.com
+X-Mailer: CodeIgniter
+X-Priority: 3 (Normal)
+Message-ID: &lt;68e2a09244d806.83770797@gmail.com&gt;
+Mime-Version: 1.0
+
+</pre>
+DEBUG - 2025-10-05 16:45:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 16:45:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:02:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:02:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:09:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:09:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:25:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:26:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:26:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:26:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:26:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:26:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:26:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:26:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:26:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:27:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:28:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:28:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:32:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:33:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:33:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:33:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:34:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:35:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:35:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:35:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:35:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:35:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:35:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:35:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:36:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:36:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:36:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:36:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:41:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-05 17:41:58 --> ErrorException: Undefined variable $pager
+[Method: GET, Route: UserController/dashboard]
+in APPPATH\Views\user\userView.php on line 248.
+ 1 APPPATH\Views\user\userView.php(248): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $pager', 'C:\\xampp\\htdocs\\inventory\\app\\Views\\user\\userView.php', 248)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory\\app\\Views\\user\\userView.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('user/userView', [], true)
+ 5 APPPATH\Controllers\UserController.php(79): view('user/userView', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 17:42:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:43:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:43:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:44:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:44:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:44:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:45:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:45:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:53:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:53:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:53:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:53:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:53:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:53:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:58:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 17:58:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:02:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:02:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:03:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:03:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:03:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:03:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:04:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:04:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:04:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:05:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:05:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:05:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:06:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:14:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:14:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:14:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:14:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:15:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:15:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:20:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:36:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:36:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:36:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:36:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-10-05 18:37:00 --> Transfer email sent successfully to ali@example.com
+DEBUG - 2025-10-05 18:37:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-10-05 18:37:01 --> Email: Unable to send email using SMTP. Your server might not be configured to send mail using this method.
+ERROR - 2025-10-05 18:37:01 --> 220 smtp.gmail.com ESMTP 5b1f17b1804b1-46e5c4dd9e4sm123470005e9.10 - gsmtp
+
+hello: 250-smtp.gmail.com at your service, [2001:16a2:f18b:7b00:651f:7fa9:c238:1c56]
+250-SIZE 35882577
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+
+starttls: 220 2.0.0 Ready to start TLS
+
+hello: 250-smtp.gmail.com at your service, [2001:16a2:f18b:7b00:651f:7fa9:c238:1c56]
+250-SIZE 35882577
+250-8BITMIME
+250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+
+Failed to authenticate password. Error: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-46e5c4dd9e4sm123470005e9.10 - gsmtp
+
+ERROR - 2025-10-05 18:37:01 --> Email sending failed: 220 smtp.gmail.com ESMTP 5b1f17b1804b1-46e5c4dd9e4sm123470005e9.10 - gsmtp
+<br><pre>hello: 250-smtp.gmail.com at your service, [2001:16a2:f18b:7b00:651f:7fa9:c238:1c56]
+250-SIZE 35882577
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+</pre><pre>starttls: 220 2.0.0 Ready to start TLS
+</pre><pre>hello: 250-smtp.gmail.com at your service, [2001:16a2:f18b:7b00:651f:7fa9:c238:1c56]
+250-SIZE 35882577
+250-8BITMIME
+250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+</pre>Failed to authenticate password. Error: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-46e5c4dd9e4sm123470005e9.10 - gsmtp
+<br>Unable to send email using SMTP. Your server might not be configured to send mail using this method.<br><pre>Date: Sun, 5 Oct 2025 18:37:00 +0000
+To: ali@example.com
+Subject: =?UTF-8?Q?=D8=A5=D8=B4=D8=B9=D8=A7=D8=B1=20=D8=AA=D8=AD=D9=88=D9=8A?= =?UTF-8?Q?=D9=84=20=D8=A3=D8=B5=D9=88=D9=84=20=D8=AC=D8=AF=D9=8A=D8=AF=20?= =?UTF-8?Q?-=20KAMC=20Inventory=20System?=
+From: &quot;KAMC Inventory System&quot; &lt;kamctester@gmail.com&gt;
+Return-Path: &lt;kamctester@gmail.com&gt;
+Reply-To: &lt;kamctester@gmail.com&gt;
+User-Agent: CodeIgniter
+X-Sender: kamctester@gmail.com
+X-Mailer: CodeIgniter
+X-Priority: 3 (Normal)
+Message-ID: &lt;68e2bacc9c60f1.96439339@gmail.com&gt;
+Mime-Version: 1.0
+
+</pre>
+DEBUG - 2025-10-05 18:37:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:37:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-10-05 18:37:23 --> Transfer email sent successfully to noura@example.com
+DEBUG - 2025-10-05 18:37:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:38:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:38:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:38:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:38:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-10-05 18:38:33 --> Transfer email sent successfully to noura@example.com
+DEBUG - 2025-10-05 18:40:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-10-05 18:40:22 --> Transfer email sent successfully to noura@example.com
+DEBUG - 2025-10-05 18:42:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:42:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:43:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:43:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:43:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:45:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:45:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:45:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:50:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:50:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 18:50:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:01:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:09:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:11:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:11:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:12:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:17:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:22:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:26:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:26:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:26:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:26:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:27:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:28:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:29:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:35:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:36:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:36:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:36:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:36:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 19:37:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 20:38:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 20:43:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 20:43:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 20:43:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 20:43:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 20:49:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 20:49:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 20:49:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 20:49:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 20:49:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 20:53:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:10:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:10:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:10:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:16:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:17:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:18:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:18:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:19:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:19:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:19:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:24:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:24:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:26:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:26:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:41:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:51:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:55:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:56:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:56:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:56:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:58:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:58:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 21:59:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:00:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:00:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:03:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:03:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:03:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:03:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:09:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:09:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:09:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:12:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:13:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:19:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:20:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:21:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:23:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:23:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:23:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:23:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:24:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:24:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:24:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:24:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:25:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:26:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:26:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:26:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:26:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:27:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:27:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:27:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:27:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:27:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:27:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:27:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:28:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:28:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:28:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:28:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:28:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:33:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:33:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:33:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:42:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-05 22:42:43 --> ErrorException: Undefined variable $stats
+[Method: GET, Route: UserController/dashboard]
+in APPPATH\Controllers\UserController.php on line 83.
+ 1 APPPATH\Controllers\UserController.php(83): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $stats', 'C:\\xampp\\htdocs\\inventory\\app\\Controllers\\UserController.php', 83)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 22:42:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:42:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:42:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:43:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:43:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:46:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:46:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:46:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:46:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:49:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:49:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:49:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:49:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:50:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:53:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:54:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 22:57:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:14:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-10-05 23:14:44 --> mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_n...' at line 1 in C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT DISTINCT...', 0)
+#1 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT DISTINCT...')
+#2 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT DISTINCT...')
+#3 C:\xampp\htdocs\inventory\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT DISTINCT...', Array, false)
+#4 C:\xampp\htdocs\inventory\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory\system\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\inventory\app\Controllers\UserController.php(61): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\inventory\system\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+#8 C:\xampp\htdocs\inventory\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+#9 C:\xampp\htdocs\inventory\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-05 23:14:44 --> CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_n...' at line 1
+[Method: GET, Route: UserController/dashboard]
+in SYSTEMPATH\Database\BaseConnection.php on line 692.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id item_order`.`item_order_id users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `users` ON `users`.`name` = `transfer_items`.`from_user_id`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+ORDER BY `item_order`.`created_at` DESC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\UserController.php(61): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-05 23:14:44 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_n...' at line 1
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id item_order`.`item_order_id users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `users` ON `users`.`name` = `transfer_items`.`from_user_id`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+ORDER BY `item_order`.`created_at` DESC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id item_order`.`item_order_id users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `users` ON `users`.`name` = `transfer_items`.`from_user_id`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+ORDER BY `item_order`.`created_at` DESC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id item_order`.`item_order_id users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `users` ON `users`.`name` = `transfer_items`.`from_user_id`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+ORDER BY `item_order`.`created_at` DESC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\UserController.php(61): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 8 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 9 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-05 23:14:44 --> [Caused by] mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_n...' at line 1
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id item_order`.`item_order_id users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `users` ON `users`.`name` = `transfer_items`.`from_user_id`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+ORDER BY `item_order`.`created_at` DESC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id item_order`.`item_order_id users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `users` ON `users`.`name` = `transfer_items`.`from_user_id`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+ORDER BY `item_order`.`created_at` DESC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id item_order`.`item_order_id users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `users` ON `users`.`name` = `transfer_items`.`from_user_id`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+ORDER BY `item_order`.`created_at` DESC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id item_order`.`item_order_id users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `users` ON `users`.`name` = `transfer_items`.`from_user_id`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+ORDER BY `item_order`.`created_at` DESC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\UserController.php(61): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 23:21:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-05 23:21:08 --> TypeError: App\Controllers\UserController::dashboard(): Return value must be of type string, CodeIgniter\HTTP\RedirectResponse returned
+[Method: GET, Route: UserController/dashboard]
+in APPPATH\Controllers\UserController.php on line 47.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 23:25:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-10-05 23:25:56 --> mysqli_sql_exception: Unknown column 'item_order.employee_id' in 'field list' in C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT DISTINCT...', 0)
+#1 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT DISTINCT...')
+#2 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT DISTINCT...')
+#3 C:\xampp\htdocs\inventory\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT DISTINCT...', Array, false)
+#4 C:\xampp\htdocs\inventory\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory\system\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\inventory\app\Controllers\UserController.php(70): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\inventory\system\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+#8 C:\xampp\htdocs\inventory\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+#9 C:\xampp\htdocs\inventory\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-05 23:25:56 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'item_order.employee_id' in 'field list'
+[Method: GET, Route: UserController/dashboard]
+in SYSTEMPATH\Database\BaseConnection.php on line 692.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id`, `item_order`.`item_order_id` AS `order_id`, `item_order`.`employee_id`, `users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` ON `users`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+WHERE `transfer_items`.`to_user_id` = :transfer_items.to_user_id:
+ORDER BY `transfer_items`.`created_at` DESC', [...], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\UserController.php(70): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-05 23:25:56 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'item_order.employee_id' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id`, `item_order`.`item_order_id` AS `order_id`, `item_order`.`employee_id`, `users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` ON `users`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+WHERE `transfer_items`.`to_user_id` = \'1001\'
+ORDER BY `transfer_items`.`created_at` DESC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id`, `item_order`.`item_order_id` AS `order_id`, `item_order`.`employee_id`, `users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` ON `users`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+WHERE `transfer_items`.`to_user_id` = \'1001\'
+ORDER BY `transfer_items`.`created_at` DESC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id`, `item_order`.`item_order_id` AS `order_id`, `item_order`.`employee_id`, `users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` ON `users`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+WHERE `transfer_items`.`to_user_id` = :transfer_items.to_user_id:
+ORDER BY `transfer_items`.`created_at` DESC', [...], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\UserController.php(70): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 8 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 9 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-05 23:25:56 --> [Caused by] mysqli_sql_exception: Unknown column 'item_order.employee_id' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id`, `item_order`.`item_order_id` AS `order_id`, `item_order`.`employee_id`, `users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` ON `users`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+WHERE `transfer_items`.`to_user_id` = \'1001\'
+ORDER BY `transfer_items`.`created_at` DESC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id`, `item_order`.`item_order_id` AS `order_id`, `item_order`.`employee_id`, `users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` ON `users`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+WHERE `transfer_items`.`to_user_id` = \'1001\'
+ORDER BY `transfer_items`.`created_at` DESC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id`, `item_order`.`item_order_id` AS `order_id`, `item_order`.`employee_id`, `users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` ON `users`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+WHERE `transfer_items`.`to_user_id` = \'1001\'
+ORDER BY `transfer_items`.`created_at` DESC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`from_user_id`, `transfer_items`.`item_order_id`, `item_order`.`item_order_id` AS `order_id`, `item_order`.`employee_id`, `users`.`name` AS `from_user_name`, `usage_status`.`usage_status` AS `usage_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` ON `users`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `transfer_items`.`usage_status_id`
+WHERE `transfer_items`.`to_user_id` = :transfer_items.to_user_id:
+ORDER BY `transfer_items`.`created_at` DESC', [...], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\UserController.php(70): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 23:35:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-05 23:35:51 --> TypeError: App\Controllers\UserController::dashboard(): Return value must be of type string, CodeIgniter\HTTP\RedirectResponse returned
+[Method: GET, Route: UserController/dashboard]
+in APPPATH\Controllers\UserController.php on line 47.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 23:37:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-05 23:37:21 --> ErrorException: Undefined variable $currentUserId
+[Method: GET, Route: UserController/dashboard]
+in APPPATH\Controllers\UserController.php on line 43.
+ 1 APPPATH\Controllers\UserController.php(43): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $currentUserId', 'C:\\xampp\\htdocs\\inventory\\app\\Controllers\\UserController.php', 43)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 23:37:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-05 23:37:58 --> TypeError: App\Controllers\UserController::dashboard(): Return value must be of type string, CodeIgniter\HTTP\RedirectResponse returned
+[Method: GET, Route: UserController/dashboard]
+in APPPATH\Controllers\UserController.php on line 47.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 23:39:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-05 23:39:06 --> TypeError: App\Controllers\UserController::dashboard(): Return value must be of type string, CodeIgniter\HTTP\RedirectResponse returned
+[Method: GET, Route: UserController/dashboard]
+in APPPATH\Controllers\UserController.php on line 48.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 23:39:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:39:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:39:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:39:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:39:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:39:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:39:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:39:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:39:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:39:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:39:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:39:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:39:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:39:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:39:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:40:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:40:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:40:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:40:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:40:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:40:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:40:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:40:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:40:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-05 23:40:47 --> ErrorException: Undefined variable $currentUserId
+[Method: GET, Route: UserController/dashboard]
+in APPPATH\Controllers\UserController.php on line 72.
+ 1 APPPATH\Controllers\UserController.php(72): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $currentUserId', 'C:\\xampp\\htdocs\\inventory\\app\\Controllers\\UserController.php', 72)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 23:41:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:43:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:44:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:44:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:45:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:47:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:47:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:47:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:47:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:47:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:47:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-10-05 23:47:45 --> Transfer email sent successfully to ali@example.com
+DEBUG - 2025-10-05 23:47:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:47:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:47:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:48:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:48:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:48:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:48:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-05 23:48:14 --> TypeError: App\Controllers\UserController::dashboard(): Return value must be of type string, CodeIgniter\HTTP\RedirectResponse returned
+[Method: GET, Route: UserController/dashboard]
+in APPPATH\Controllers\UserController.php on line 61.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 23:48:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-05 23:48:27 --> TypeError: App\Controllers\UserController::dashboard(): Return value must be of type string, CodeIgniter\HTTP\RedirectResponse returned
+[Method: GET, Route: UserController/dashboard]
+in APPPATH\Controllers\UserController.php on line 61.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-05 23:48:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:48:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:48:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:49:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-10-05 23:49:15 --> Transfer email sent successfully to khaled@example.com
+DEBUG - 2025-10-05 23:49:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:50:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:50:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:51:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:52:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:52:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:53:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:53:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:53:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:53:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:53:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:53:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:54:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:54:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:54:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:54:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-05 23:54:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

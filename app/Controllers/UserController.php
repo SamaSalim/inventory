@@ -11,6 +11,9 @@ use App\Models\UsageStatusModel;
 use App\Exceptions\AuthenticationException;
 use App\Entities\Item;
 use App\Entities\ItemOrder;
+use CodeIgniter\HTTP\RedirectResponse;
+
+use App\Models\TransferItemsModel;
 
 class UserController extends BaseController
 {
@@ -26,67 +29,72 @@ class UserController extends BaseController
      */
     private function checkAuth()
     {
-
         if (! session()->get('isLoggedIn')) {
             throw new AuthenticationException();
         }
     }
 
     /**
-     * -    userView جدول  
+     * عرض الطلبات المحولة للمستخدم الحالي
      */
 public function dashboard(): string
-{
-    $this->checkAuth(); // تحقق من تسجيل الدخول
+    {
+        $this->checkAuth();
 
-    $itemOrderModel = new ItemOrderModel();
+        // التحقق من تسجيل الدخول
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
+        }
 
-    // استعلام الطلبات مع ربط جدول الاستخدام
-    $itemOrders = $itemOrderModel
-        ->distinct()
-        ->select(
-            'item_order.order_id, 
-             item_order.created_at, 
-             item_order.created_by, 
-             room.code AS room_code, 
-             employee.name AS created_by_name, 
-             employee.emp_id AS employee_id, 
-             employee.emp_ext AS extension,
-             usage_status.usage_status AS usage_status_name'
-        )
-        ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
-        ->join('room', 'room.id = item_order.room_id', 'left')
-        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left') // ربط جدول الاستخدام
-        ->orderBy('item_order.created_at', 'DESC')
-        ->findAll();
+        // جلب معلومات الحساب من السيشن (نفس طريقة UserInfo)
+        $isEmployee = session()->get('isEmployee');
+        $account_id = session()->get('employee_id'); // يحتوي على user_id أو emp_id
+        
+        // تحديد user_id بناءً على نوع الحساب
+        $currentUserId = null;
+        
+        if (!$isEmployee) {
+            // إذا كان مستخدم عادي، account_id هو user_id مباشرة
+            $currentUserId = $account_id;
+         }
+         // else {
+        //     // إذا كان موظف، لا يمكنه الوصول لهذه الصفحة (صفحة خاصة بالمستخدمين فقط)
+        //     return redirect()->to('/dashboard')->with('error', 'هذه الصفحة مخصصة للمستخدمين فقط');
+        // }
 
-    // جلب الفئات
-    $minorCategoryModel = new MinorCategoryModel();
-    $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
-        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-        ->findAll();
+        // if (!$currentUserId) {
+        //     return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
+        // }
 
-    // احصائيات المخزن
-    $stats = $this->getWarehouseStats();
+        $transferItemsModel = new TransferItemsModel();
 
-    // حالات الطلب
-    $orderStatusModel = new OrderStatusModel();
-    $statuses = $orderStatusModel->findAll();
+        // استعلام الطلبات المحولة للمستخدم الحالي
+        $myOrders = $transferItemsModel
+            ->distinct()
+            ->select(
+                'transfer_items.transfer_item_id,
+                 transfer_items.created_at,
+                 transfer_items.item_order_id,
+                 item_order.created_by AS employee_id,
+                 item_order.asset_num,
+                 item_order.serial_num,
+                 from_user.name AS from_user_name,
+                 from_user.user_dept AS from_user_dept,
+                 usage_status.usage_status AS usage_status_name,
+                 order_status.status AS order_status_name'
+            )
+            ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+            ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
+            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+            ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
+            ->where('transfer_items.to_user_id', $currentUserId)
+            ->orderBy('transfer_items.created_at', 'DESC')
+            ->findAll();
 
-    // حالات الاستخدام
-    $usageStatusModel = new UsageStatusModel();
-    $usageStatuses = $usageStatusModel->findAll();
-
-    return view('user/userView', [
-        'categories' => $categories,
-        'orders' => $itemOrders,
-        'stats' => $stats,
-        'statuses' => $statuses,
-        'usage_statuses' => $usageStatuses
-    ]);
-}
-
-
+        return view('user/userView', [
+            'orders' => $myOrders
+        ]);
+    }
   
     private function getWarehouseStats(): array
     {
@@ -132,22 +140,20 @@ public function dashboard(): string
     /**
      * عرض تفاصيل طلب محدد
      */
-    public function showOrder($order_id)
+    // public function showOrder($order_id)
+    // {
+    //     $this->checkAuth(); // تحقق من تسجيل الدخول
 
-    {
+    //     $itemOrderModel = new ItemOrderModel();
+    //     $order = $itemOrderModel->find($order_id);
 
-        $this->checkAuth(); // تحقق من تسجيل الدخول
+    //     if (!$order) {
+    //         return redirect()->back()->with('error', 'الطلب غير موجود');
+    //     }
 
-        $itemOrderModel = new ItemOrderModel();
-        $order = $itemOrderModel->find($order_id);
-
-        if (!$order) {
-            return redirect()->back()->with('error', 'الطلب غير موجود');
-        }
-
-        $data['order'] = $order;
-        return view('warehouse/showOrderView', $data); // فيو تفصيلي للطلب
-    }
+    //     $data['order'] = $order;
+    //     return view('warehouse/showOrderView', $data); // فيو تفصيلي للطلب
+    // }
 
 
 
@@ -161,5 +167,163 @@ public function userView2(): string
 
     return view('user/userView2');
 }
+
+
+
+    /**
+     * جلب تفاصيل طلب التحويل 
+     */
+public function getTransferDetails($transferId)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'يجب تسجيل الدخول أولاً'
+            ]);
+        }
+
+        $transferModel = new TransferItemsModel();
+        
+        $transfer = $transferModel
+            ->select(
+                'transfer_items.*,
+                 item_order.item_id,
+                 item_order.brand,
+                 item_order.model_num,
+                 item_order.asset_num,
+                 item_order.serial_num,
+                 item_order.quantity,
+                 item_order.note as item_note,
+                 items.name as item_name,
+                 from_user.name AS from_user_name,
+                 from_user.user_dept AS from_user_dept,
+                 from_user.user_ext AS from_user_ext,
+                 from_user.email AS from_user_email,
+                 usage_status.usage_status AS usage_status_name,
+                 order_status.status AS order_status_name'
+            )
+            ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+            ->join('items', 'items.id = item_order.item_id', 'left')
+            ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
+            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+            ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
+            ->where('transfer_items.transfer_item_id', $transferId)
+            ->first();
+
+        if (!$transfer) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'الطلب غير موجود'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'data' => $transfer
+        ]);
+    }
+
+    /**
+     * قبول أو رفض طلب التحويل
+     */
+    public function respondToTransfer()
+    {
+        $this->response->setContentType('application/json');
+
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'يجب تسجيل الدخول أولاً'
+            ]);
+        }
+
+        $json = $this->request->getJSON();
+        
+        if (!$json) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'بيانات غير صحيحة'
+            ]);
+        }
+
+        $transferId = $json->transfer_id ?? null;
+        $action = $json->action ?? null; // 'accept' or 'reject'
+
+        if (!$transferId || !$action) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'البيانات المطلوبة غير مكتملة'
+            ]);
+        }
+
+        try {
+            $transferModel = new TransferItemsModel();
+
+            // جلب معلومات الطلب
+            $transfer = $transferModel->find($transferId);
+            
+            if (!$transfer) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'الطلب غير موجود'
+                ]);
+            }
+
+            // التحقق من أن المستخدم الحالي هو المستقبل
+            $currentUserId = session()->get('employee_id');
+            if ($transfer->to_user_id !== $currentUserId) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'ليس لديك صلاحية لهذا الإجراء'
+                ]);
+            }
+
+            // التحقق من أن الطلب في حالة "قيد الانتظار"
+            if ($transfer->order_status_id != 1) {
+                $statusText = $transfer->order_status_id == 2 ? 'مقبول' : 'مرفوض';
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'هذا الطلب ' . $statusText . ' مسبقاً'
+                ]);
+            }
+
+            // تحديد حالة الطلب: 2 = مقبول, 3 = مرفوض
+            $orderStatusId = ($action === 'accept') ? 2 : 3;
+
+            // تحديث حالة الطلب
+            $updated = $transferModel->update($transferId, [
+                'order_status_id' => $orderStatusId,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            if (!$updated) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'فشل تحديث حالة الطلب'
+                ]);
+            }
+
+            $message = ($action === 'accept') 
+                ? 'تم قبول الطلب بنجاح. العهدة الآن في عهدتك' 
+                : 'تم رفض الطلب. العهدة ستبقى مع المُرسل';
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => $message
+            ]);
+
+        } catch (\Exception $e) {
+            log_message('error', 'Transfer Response Error: ' . $e->getMessage());
+            
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'حدث خطأ: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+
+
+
 
 }
