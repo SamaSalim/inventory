@@ -1,0 +1,33 @@
+/* تعريف خط Janna LT - Regular */
+@font-face {
+    font-family: 'JannaLT';
+    src: url('../fonts/JannaLT/JannaLT-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* تعريف خط Janna LT - Bold */
+@font-face {
+    font-family: 'JannaLT';
+    src: url('../fonts/JannaLT/JannaLT-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* تطبيق الخط على كل الصفحة */
+body {
+    font-family: 'JannaLT', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #F4F4F4;
+    direction: rtl; 
+    text-align: right;
+    min-height: 100vh;
+    color: black;
+}
+
+/* لو تبغى العناوين تكون Bold تلقائيًا */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'JannaLT', sans-serif;
+    font-weight: bold;
+}

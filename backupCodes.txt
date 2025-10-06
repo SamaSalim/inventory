@@ -1,0 +1,130 @@
+in addEmployee View: 
+----------------------------
+              <?php if (!empty($message)): ?>
+                <div class="message <?= esc($status) ?>">
+                    <?= esc($message) ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (session()->getFlashdata('errors')): ?>
+                <div class="message error validation-errors">
+                    <ul>
+                        <?php foreach (session()->getFlashdata('errors') as $error): ?>
+                            <li><?= esc($error) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
+-----------------------------
+طباعة البي دي إف
+  <script>
+
+        async function handleViewWarehousePDF() { // طباعة التقرير
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.setFont("Helvetica", "bold");
+        doc.text("تقرير المستودع", 105, 20, { align: "center" });
+
+        doc.setFont("Helvetica", "normal");
+        doc.text("• الصنف 1: عدد 10", 20, 40);
+        doc.text("• الصنف 2: عدد 5", 20, 50);
+
+        doc.save("warehouse-report.pdf"); // حفظ الملف مباشرة
+    }
+
+     function handleViewAssetsPDF() {
+        alert('View Assets PDF functionality clicked');
+    }
+</script>
+--------------------------------------------
+public function updatePermission($permissionId = null)
+    {
+        if (empty($permissionId)) {
+            session()->setFlashdata('message', 'معرف الصلاحية غير محدد لتحديثها.');
+            session()->setFlashdata('status', 'error');
+            return redirect()->to(base_url('admin/addPermission'));
+        }
+
+        $permission = $this->permissionModel->find($permissionId);
+
+        if (!$permission) {
+            session()->setFlashdata('message', 'الصلاحية المطلوبة غير موجودة.');
+            session()->setFlashdata('status', 'error');
+            return redirect()->to(base_url('admin/addPermission'));
+        }
+
+        $data = [
+            'permission' => $permission,
+            'employees'  => $this->employeeModel->findAll(),
+            'roles'      => $this->roleModel->findAll(),
+            'message'    => session()->getFlashdata('message'),
+            'status'     => session()->getFlashdata('status')
+        ];
+
+        if ($this->request->is('post')) {
+            $newEmpId = $this->request->getPost('emp_id');
+            $newRoleId = $this->request->getPost('role_id');
+
+            $rules = [
+                'emp_id' => 'required|numeric',
+                'role_id' => 'required|numeric',
+            ];
+
+            if (!$this->validate($rules)) {
+                session()->setFlashdata('message', 'الرجاء التأكد من إدخال جميع الحقول المطلوبة بشكل صحيح.');
+                session()->setFlashdata('status', 'error');
+                return redirect()->back()->withInput();
+            }
+
+            $employee = $this->employeeModel->find($newEmpId);
+            $role = $this->roleModel->find($newRoleId);
+
+            if (!$employee) {
+                session()->setFlashdata('message', 'الموظف الجديد المحدد غير موجود.');
+                session()->setFlashdata('status', 'error');
+                return redirect()->back()->withInput();
+            }
+
+            if (!$role) {
+                session()->setFlashdata('message', 'الدور الجديد المحدد غير موجود.');
+                session()->setFlashdata('status', 'error');
+                return redirect()->back()->withInput();
+            }
+
+            $existingPermissionWithNewValues = $this->permissionModel
+                                                ->where('emp_id', $newEmpId)
+                                                ->where('role_id', $newRoleId)
+                                                ->where('id !=', $permissionId)
+                                                ->first();
+
+            if ($existingPermissionWithNewValues) {
+                session()->setFlashdata('message', 'الصلاحية الجديدة (الموظف والدور) موجودة بالفعل.');
+                session()->setFlashdata('status', 'error');
+                return redirect()->back()->withInput();
+            }
+
+            $permissionData = [
+                'emp_id' => $newEmpId,
+                'role_id' => $newRoleId,
+            ];
+
+            if ($this->permissionModel->update($permissionId, $permissionData)) {
+                session()->setFlashdata('message', 'تم تحديث الصلاحية بنجاح.');
+                session()->setFlashdata('status', 'success');
+                بعد التحديث الناجح، يمكننا إعادة التوجيه لصفحة معلومات الموظف
+                return redirect()->to(base_url('user/getUserInfo/' . $newEmpId));
+            } else {
+                session()->setFlashdata('message', 'فشل في تحديث الصلاحية.');
+                session()->setFlashdata('status', 'error');
+                return redirect()->back()->withInput();
+            }
+        }
+
+        return view('update_permission_traditional', $data);
+    }
+    -----------------------------------------
+
+    
+            
+            
