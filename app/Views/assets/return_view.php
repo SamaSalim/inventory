@@ -330,15 +330,16 @@
 </head>
 
 <body>
-    <!-- الشريط الجانبي للتنقل -->
-    <?= $this->include('layouts/header') ?>
 
-    <div class="main-content">
-        <div class="header">
-            <h1 class="page-title"> عمليات الإرجاع </h1>
-        </div>
+<!-- الشريط الجانبي للتنقل -->
+<?= $this->include('layouts/header') ?>
 
-        <br><br>
+<div class="main-content">
+<div class="header">
+<h1 class="page-title"> عمليات الإرجاع </h1>
+</div>
+
+<br><br>
 
         <!-- 🔎 البحث والفلترة -->
         <div class="row mb-3" dir="rtl">
@@ -359,111 +360,111 @@
             </div>
         </div>
 
-        <!-- الجدول -->
-        <div class="table-container">
-            <table class="custom-table" id="usersTable">
-                <thead>
-                    <tr class="text-center">
-                        <th>رقم الطلب</th>
-                        <th>الرقم الوظيفي</th>
-                        <th>التحويلة</th>
-                        <th>حالة الاستخدام</th>
-                        <th>تاريخ الطلب</th>
-                        <th>عمليات</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (isset($orders) && !empty($orders)): ?>
-                        <?php foreach ($orders as $order): ?>
-                            <tr class="text-center align-middle" data-order-id="<?= $order->order_id ?>">
-                                <td><?= esc($order->order_id ?? '-') ?></td>
-                                <td><?= esc($order->employee_id ?? '-') ?></td>
-                                <td><?= esc($order->extension ?? 'na') ?></td>
-                                <td><?= esc($order->usage_status_name ?? '-') ?></td>
-                                <td><?= isset($order->created_at) ? esc(date('Y-m-d', strtotime($order->created_at))) : '-' ?></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="<?= site_url('InventoryController/showOrder/' . $order->order_id) ?>" class="action-btn view-btn">
-                                            <svg class="btn-icon" viewBox="0 0 24 24">
-                                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-                                            </svg>
-                                            عرض
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="6" class="text-center">لا توجد بيانات متاحة</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
+<!-- الجدول -->
+<div class="table-container">
+<table class="custom-table" id="usersTable">
+<thead>
+<tr class="text-center">
+<th>رقم الطلب</th>
+<th>الرقم الوظيفي</th>
+<th>التحويلة</th>
+<th>حالة الاستخدام</th>
+<th>تاريخ الطلب</th>
+<th>عمليات</th>
+</tr>
+</thead>
+<tbody>
+<?php if (isset($orders) && !empty($orders)): ?>
+<?php foreach ($orders as $order): ?>
+<tr class="text-center align-middle" data-order-id="<?= $order->order_id ?>">
+<td><?= esc($order->order_id ?? '-') ?></td>
+<td><?= esc($order->employee_id ?? '-') ?></td>
+<td><?= esc($order->extension ?? 'na') ?></td>
+<td><?= esc($order->usage_status_name ?? '-') ?></td>
+<td><?= isset($order->created_at) ? esc(date('Y-m-d', strtotime($order->created_at))) : '-' ?></td>
+<td>
+<div class="action-buttons">
+<a href="<?= site_url('InventoryController/showOrder/' . $order->order_id) ?>" class="action-btn view-btn">
+<svg class="btn-icon" viewBox="0 0 24 24">
+<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+</svg>
+عرض
+</a>
+</div>
+</td>
+</tr>
+<?php endforeach; ?>
+<?php else: ?>
+<tr>
+<td colspan="6" class="text-center">لا توجد بيانات متاحة</td>
+</tr>
+<?php endif; ?>
+</tbody>
+</table>
+</div>
+</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const table = document.getElementById("usersTable");
-            const tbody = table.querySelector("tbody");
-            const rowsData = [];
+        const table = document.getElementById("usersTable");
+        const tbody = table.querySelector("tbody");
+        const rowsData = [];
 
-            tbody.querySelectorAll("tr").forEach(row => {
-                const cells = row.querySelectorAll("td");
-                if (cells.length < 5) return;
-                rowsData.push({
-                    rowElement: row,
-                    orderId: cells[0].textContent.trim(),
-                    employeeId: cells[1].textContent.trim().toLowerCase(),
-                    extension: cells[2].textContent.trim(),
-                    status: cells[3].textContent.trim().toLowerCase(),
-                    date: cells[4].textContent.trim(),
-                    text: row.innerText.toLowerCase()
-                });
-            });
+        tbody.querySelectorAll("tr").forEach(row => {
+        const cells = row.querySelectorAll("td");
+        if (cells.length < 5) return;
+        rowsData.push({
+        rowElement: row,
+        orderId: cells[0].textContent.trim(),
+        employeeId: cells[1].textContent.trim().toLowerCase(),
+        extension: cells[2].textContent.trim(),
+        status: cells[3].textContent.trim().toLowerCase(),
+        date: cells[4].textContent.trim(),
+        text: row.innerText.toLowerCase()
+        });
+        });
 
-            // تهيئة Flatpickr للتاريخ
-            flatpickr("#startDate", { dateFormat: "d/m/Y", allowInput: true, onChange: filterTable });
-            flatpickr("#endDate", { dateFormat: "d/m/Y", allowInput: true, onChange: filterTable });
+        // تهيئة Flatpickr للتاريخ
+        flatpickr("#startDate", { dateFormat: "d/m/Y", allowInput: true, onChange: filterTable });
+        flatpickr("#endDate", { dateFormat: "d/m/Y", allowInput: true, onChange: filterTable });
 
-            document.getElementById("searchInput").addEventListener("keyup", filterTable);
-            document.getElementById("employeeFilter").addEventListener("keyup", filterTable);
+        document.getElementById("searchInput").addEventListener("keyup", filterTable);
+        document.getElementById("employeeFilter").addEventListener("keyup", filterTable);
 
-            filterTable(); // عرض الرجيع فقط عند التحميل
+        filterTable(); // عرض الرجيع فقط عند التحميل
 
-            function parseDMY(d) {
-                if (!d) return null;
-                const parts = d.split('/');
-                return new Date(parts[2], parts[1] - 1, parts[0]);
-            }
+        function parseDMY(d) {
+        if (!d) return null;
+        const parts = d.split('/');
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+        }
 
-            function parseRowDate(dateText) {
-                if (!dateText) return null;
-                const dmy = dateText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
-                if (dmy) return parseDMY(dmy[1]);
-                const ymd = dateText.match(/(\d{4}-\d{2}-\d{2})/);
-                if (ymd) return new Date(ymd[1]);
-                return new Date(dateText);
-            }
+        function parseRowDate(dateText) {
+        if (!dateText) return null;
+        const dmy = dateText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+        if (dmy) return parseDMY(dmy[1]);
+        const ymd = dateText.match(/(\d{4}-\d{2}-\d{2})/);
+        if (ymd) return new Date(ymd[1]);
+        return new Date(dateText);
+        }
 
-            function filterTable() {
-                const searchValue = document.getElementById("searchInput").value.trim().toLowerCase();
-                const employeeValue = document.getElementById("employeeFilter").value.trim().toLowerCase();
-                const startDate = document.getElementById("startDate").value ? parseDMY(document.getElementById("startDate").value) : null;
-                const endDate = document.getElementById("endDate").value ? parseDMY(document.getElementById("endDate").value) : null;
-                if (endDate) endDate.setHours(23, 59, 59, 999);
+        function filterTable() {
+        const searchValue = document.getElementById("searchInput").value.trim().toLowerCase();
+        const employeeValue = document.getElementById("employeeFilter").value.trim().toLowerCase();
+        const startDate = document.getElementById("startDate").value ? parseDMY(document.getElementById("startDate").value) : null;
+        const endDate = document.getElementById("endDate").value ? parseDMY(document.getElementById("endDate").value) : null;
+        if (endDate) endDate.setHours(23, 59, 59, 999);
 
-                rowsData.forEach(item => {
-                    const rowDate = parseRowDate(item.date);
-                    const matchSearch = !searchValue || item.text.includes(searchValue);
-                    const matchEmployee = !employeeValue || item.employeeId.includes(employeeValue);
-                    const matchDate = (!startDate && !endDate) || (rowDate && (!startDate || rowDate >= startDate) && (!endDate || rowDate <= endDate));
-                    const matchStatus = item.status === 'رجيع';
+        rowsData.forEach(item => {
+        const rowDate = parseRowDate(item.date);
+        const matchSearch = !searchValue || item.text.includes(searchValue);
+        const matchEmployee = !employeeValue || item.employeeId.includes(employeeValue);
+        const matchDate = (!startDate && !endDate) || (rowDate && (!startDate || rowDate >= startDate) && (!endDate || rowDate <= endDate));
+        const matchStatus = item.status === 'رجيع';
 
-                    item.rowElement.style.display = (matchSearch && matchEmployee && matchDate && matchStatus) ? '' : 'none';
-                });
-            }
+        item.rowElement.style.display = (matchSearch && matchEmployee && matchDate && matchStatus) ? '' : 'none';
+        });
+        }
         });
     </script>
 </body>

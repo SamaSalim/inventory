@@ -61,8 +61,6 @@
                         <div class="info-label">تاريخ الإنشاء</div>
                         <div class="info-value">
                             <?= date('Y-m-d', strtotime($order->created_at)) ?>
-                             
-                        </div>
                     </div>
                 </div>
             </div>
@@ -145,6 +143,7 @@
                                 <div class="item-timestamps">
                                     <div class="detail-item">
                                         <div class="detail-label">تاريخ الإنشاء</div>
+
                                           <div class="detail-value"><?= esc($item->created_at) ?></div>
 
                                     </div>
@@ -152,6 +151,8 @@
                                         <div class="detail-label">آخر تحديث</div>
                                          <div class="detail-value"><?= esc($item->updated_at) ?></div>
 
+
+                                       
                                     </div>
                                 </div>
                             </div>
