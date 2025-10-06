@@ -89,6 +89,8 @@ public function dashboard(): string
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
             ->where('transfer_items.to_user_id', $currentUserId)
+            ->where('item_order.usage_status_id !=', 2) // استبعاد العناصر المرجعة
+            ->where('transfer_items.order_status_id', 1) // إظهار الطلبات قيد الانتظار فقط
             ->orderBy('transfer_items.created_at', 'DESC')
             ->findAll();
 
