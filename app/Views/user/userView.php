@@ -302,7 +302,7 @@
                                     <!-- <td class="checkbox-cell">
                                         <input type="checkbox" class="custom-checkbox row-checkbox">
                                     </td> -->
-                                    <td><?= esc($order->item_order_id ?? '-') ?></td>
+                                    <td><?= esc($order->transfer_item_id ?? '-') ?></td>
                                     <!-- <td><?= esc($order->employee_id ?? '-') ?></td> -->
                                     <td><?= esc($order->from_user_name ?? '-') ?></td>
                                     <td><?= esc($order->from_user_dept ?? '-') ?></td>
