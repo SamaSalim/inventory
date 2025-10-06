@@ -428,6 +428,12 @@ class CreateFinalTables extends Migration
                 'type'       => 'TEXT',
                 'null'       => true,
             ],
+            'is_opened' => [
+                'type'       => 'TINYINT',
+                'constraint' => 1,
+                'default'    => 0,
+                'comment'    => '0 = غير مفتوح، 1 = مفتوح',
+            ],
             'created_at datetime default current_timestamp',
             'updated_at datetime default current_timestamp on update current_timestamp',
         ]);

@@ -12,6 +12,7 @@ class TransferItems extends Entity
         'from_user_id' => null,
         'to_user_id' => null,
         'order_status_id' => null,
+        'is_opened' => 0, // 0 = لم يتم الفتح، 1 = تم الفتح
         'note' => null
 
     ];

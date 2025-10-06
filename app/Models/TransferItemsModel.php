@@ -11,7 +11,7 @@ class  TransferItemsModel extends Model
     protected $primaryKey    = 'transfer_item_id';
     protected $useAutoIncrement = true;
     protected $returnType    = TransferItems::class;
-    protected $allowedFields = ['item_order_id','from_user_id', 'to_user_id', 'order_status_id', 'note'];
+    protected $allowedFields = ['item_order_id','from_user_id', 'to_user_id', 'order_status_id', 'is_opened' , 'note'];
     protected $useTimestamps = true;
 
     protected $validationRules = [

@@ -75,6 +75,7 @@ public function dashboard(): string
                 'transfer_items.transfer_item_id,
                  transfer_items.created_at,
                  transfer_items.item_order_id,
+                 transfer_items.is_opened, 
                  item_order.created_by AS employee_id,
                  item_order.asset_num,
                  item_order.serial_num,
@@ -324,6 +325,59 @@ public function getTransferDetails($transferId)
 
 
 
+public function markAsOpened()
+{
+    if (!$this->request->isAJAX()) {
+        return $this->response->setStatusCode(400);
+    }
+
+    // استقبال transfer_id من POST body بدلاً من URL
+    $json = $this->request->getJSON();
+    $transferId = $json->transfer_id ?? null;
+
+    if (!$transferId) {
+        return $this->response->setJSON([
+            'success' => false, 
+            'message' => 'transfer_id is required'
+        ]);
+    }
+
+    try {
+        $transferModel = new TransferItemsModel();
+        
+        $transfer = $transferModel->find($transferId);
+        
+        if (!$transfer) {
+            return $this->response->setJSON([
+                'success' => false, 
+                'message' => 'السجل غير موجود'
+            ]);
+        }
+
+        $updated = $transferModel->update($transferId, [
+            'is_opened' => 1,
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        if ($updated) {
+            log_message('info', "Transfer {$transferId} marked as opened");
+            return $this->response->setJSON(['success' => true]);
+        } else {
+            log_message('error', "Failed to update transfer {$transferId}");
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'فشل التحديث'
+            ]);
+        }
+
+    } catch (\Exception $e) {
+        log_message('error', 'markAsOpened error: ' . $e->getMessage());
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+}
 
 
 }

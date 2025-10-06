@@ -167,3 +167,328 @@ DEBUG - 2025-10-06 01:57:33 --> Session: Class initialized using 'CodeIgniter\Se
 DEBUG - 2025-10-06 01:57:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2025-10-06 01:57:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2025-10-06 01:57:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 02:13:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 02:13:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 02:31:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-10-06 02:31:36 --> mysqli_sql_exception: Unknown column 'transfer_items.is_opened' in 'field list' in C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\inventory\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT DISTINCT...', 0)
+#1 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT DISTINCT...')
+#2 C:\xampp\htdocs\inventory\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT DISTINCT...')
+#3 C:\xampp\htdocs\inventory\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT DISTINCT...', Array, false)
+#4 C:\xampp\htdocs\inventory\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\inventory\system\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\inventory\app\Controllers\UserController.php(93): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\inventory\system\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+#8 C:\xampp\htdocs\inventory\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+#9 C:\xampp\htdocs\inventory\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\inventory\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\inventory\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\inventory\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-06 02:31:36 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'transfer_items.is_opened' in 'field list'
+[Method: GET, Route: UserController/dashboard]
+in SYSTEMPATH\Database\BaseConnection.php on line 692.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`item_order_id`, `transfer_items`.`is_opened`, `item_order`.`created_by` AS `employee_id`, `item_order`.`asset_num`, `item_order`.`serial_num`, `from_user`.`name` AS `from_user_name`, `from_user`.`user_dept` AS `from_user_dept`, `usage_status`.`usage_status` AS `usage_status_name`, `order_status`.`status` AS `order_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` AS `from_user` ON `from_user`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `item_order`.`usage_status_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `transfer_items`.`order_status_id`
+WHERE `transfer_items`.`to_user_id` IS NULL
+ORDER BY `transfer_items`.`created_at` DESC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\UserController.php(93): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-06 02:31:36 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'transfer_items.is_opened' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`item_order_id`, `transfer_items`.`is_opened`, `item_order`.`created_by` AS `employee_id`, `item_order`.`asset_num`, `item_order`.`serial_num`, `from_user`.`name` AS `from_user_name`, `from_user`.`user_dept` AS `from_user_dept`, `usage_status`.`usage_status` AS `usage_status_name`, `order_status`.`status` AS `order_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` AS `from_user` ON `from_user`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `item_order`.`usage_status_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `transfer_items`.`order_status_id`
+WHERE `transfer_items`.`to_user_id` IS NULL
+ORDER BY `transfer_items`.`created_at` DESC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`item_order_id`, `transfer_items`.`is_opened`, `item_order`.`created_by` AS `employee_id`, `item_order`.`asset_num`, `item_order`.`serial_num`, `from_user`.`name` AS `from_user_name`, `from_user`.`user_dept` AS `from_user_dept`, `usage_status`.`usage_status` AS `usage_status_name`, `order_status`.`status` AS `order_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` AS `from_user` ON `from_user`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `item_order`.`usage_status_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `transfer_items`.`order_status_id`
+WHERE `transfer_items`.`to_user_id` IS NULL
+ORDER BY `transfer_items`.`created_at` DESC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`item_order_id`, `transfer_items`.`is_opened`, `item_order`.`created_by` AS `employee_id`, `item_order`.`asset_num`, `item_order`.`serial_num`, `from_user`.`name` AS `from_user_name`, `from_user`.`user_dept` AS `from_user_dept`, `usage_status`.`usage_status` AS `usage_status_name`, `order_status`.`status` AS `order_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` AS `from_user` ON `from_user`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `item_order`.`usage_status_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `transfer_items`.`order_status_id`
+WHERE `transfer_items`.`to_user_id` IS NULL
+ORDER BY `transfer_items`.`created_at` DESC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\UserController.php(93): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 8 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 9 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-06 02:31:36 --> [Caused by] mysqli_sql_exception: Unknown column 'transfer_items.is_opened' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`item_order_id`, `transfer_items`.`is_opened`, `item_order`.`created_by` AS `employee_id`, `item_order`.`asset_num`, `item_order`.`serial_num`, `from_user`.`name` AS `from_user_name`, `from_user`.`user_dept` AS `from_user_dept`, `usage_status`.`usage_status` AS `usage_status_name`, `order_status`.`status` AS `order_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` AS `from_user` ON `from_user`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `item_order`.`usage_status_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `transfer_items`.`order_status_id`
+WHERE `transfer_items`.`to_user_id` IS NULL
+ORDER BY `transfer_items`.`created_at` DESC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`item_order_id`, `transfer_items`.`is_opened`, `item_order`.`created_by` AS `employee_id`, `item_order`.`asset_num`, `item_order`.`serial_num`, `from_user`.`name` AS `from_user_name`, `from_user`.`user_dept` AS `from_user_dept`, `usage_status`.`usage_status` AS `usage_status_name`, `order_status`.`status` AS `order_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` AS `from_user` ON `from_user`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `item_order`.`usage_status_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `transfer_items`.`order_status_id`
+WHERE `transfer_items`.`to_user_id` IS NULL
+ORDER BY `transfer_items`.`created_at` DESC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`item_order_id`, `transfer_items`.`is_opened`, `item_order`.`created_by` AS `employee_id`, `item_order`.`asset_num`, `item_order`.`serial_num`, `from_user`.`name` AS `from_user_name`, `from_user`.`user_dept` AS `from_user_dept`, `usage_status`.`usage_status` AS `usage_status_name`, `order_status`.`status` AS `order_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` AS `from_user` ON `from_user`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `item_order`.`usage_status_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `transfer_items`.`order_status_id`
+WHERE `transfer_items`.`to_user_id` IS NULL
+ORDER BY `transfer_items`.`created_at` DESC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT DISTINCT `transfer_items`.`transfer_item_id`, `transfer_items`.`created_at`, `transfer_items`.`item_order_id`, `transfer_items`.`is_opened`, `item_order`.`created_by` AS `employee_id`, `item_order`.`asset_num`, `item_order`.`serial_num`, `from_user`.`name` AS `from_user_name`, `from_user`.`user_dept` AS `from_user_dept`, `usage_status`.`usage_status` AS `usage_status_name`, `order_status`.`status` AS `order_status_name`
+FROM `transfer_items`
+LEFT JOIN `item_order` ON `item_order`.`item_order_id` = `transfer_items`.`item_order_id`
+LEFT JOIN `users` AS `from_user` ON `from_user`.`user_id` = `transfer_items`.`from_user_id`
+LEFT JOIN `usage_status` ON `usage_status`.`id` = `item_order`.`usage_status_id`
+LEFT JOIN `order_status` ON `order_status`.`id` = `transfer_items`.`order_status_id`
+WHERE `transfer_items`.`to_user_id` IS NULL
+ORDER BY `transfer_items`.`created_at` DESC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(679): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\UserController.php(93): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-06 02:41:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 02:41:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 02:41:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-06 02:41:29 --> ErrorException: Undefined variable $order
+[Method: GET, Route: UserController/dashboard]
+in APPPATH\Views\user\userView.php on line 283.
+ 1 APPPATH\Views\user\userView.php(283): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $order', 'C:\\xampp\\htdocs\\inventory\\app\\Views\\user\\userView.php', 283)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\xampp\\htdocs\\inventory\\app\\Views\\user\\userView.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('user/userView', [], true)
+ 5 APPPATH\Controllers\UserController.php(95): view('user/userView', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->dashboard()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-06 02:42:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 02:43:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 02:43:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 02:43:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 02:43:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 02:43:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 02:43:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-06 02:43:23 --> CodeIgniter\Database\Exceptions\DataException: There is no data to update.
+[Method: POST, Route: UserController/markAsOpened/1]
+in SYSTEMPATH\BaseModel.php on line 1014.
+ 1 SYSTEMPATH\BaseModel.php(1014): CodeIgniter\Database\Exceptions\DataException::forEmptyDataset('update')
+ 2 SYSTEMPATH\Model.php(863): CodeIgniter\BaseModel->update([...], [])
+ 3 APPPATH\Controllers\UserController.php(332): CodeIgniter\Model->update('1', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->markAsOpened('1')
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-06 02:43:34 --> CodeIgniter\Database\Exceptions\DataException: There is no data to update.
+[Method: POST, Route: UserController/markAsOpened/1]
+in SYSTEMPATH\BaseModel.php on line 1014.
+ 1 SYSTEMPATH\BaseModel.php(1014): CodeIgniter\Database\Exceptions\DataException::forEmptyDataset('update')
+ 2 SYSTEMPATH\Model.php(863): CodeIgniter\BaseModel->update([...], [])
+ 3 APPPATH\Controllers\UserController.php(332): CodeIgniter\Model->update('1', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->markAsOpened('1')
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-06 03:15:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:15:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:20:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-06 03:20:10 --> CodeIgniter\Database\Exceptions\DataException: There is no data to update.
+[Method: POST, Route: UserController/markAsOpened/1]
+in SYSTEMPATH\BaseModel.php on line 1014.
+ 1 SYSTEMPATH\BaseModel.php(1014): CodeIgniter\Database\Exceptions\DataException::forEmptyDataset('update')
+ 2 SYSTEMPATH\Model.php(863): CodeIgniter\BaseModel->update([...], [])
+ 3 APPPATH\Controllers\UserController.php(332): CodeIgniter\Model->update('1', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->markAsOpened('1')
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-06 03:20:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:22:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-06 03:22:34 --> CodeIgniter\Database\Exceptions\DataException: There is no data to update.
+[Method: POST, Route: UserController/markAsOpened/1]
+in SYSTEMPATH\BaseModel.php on line 1014.
+ 1 SYSTEMPATH\BaseModel.php(1014): CodeIgniter\Database\Exceptions\DataException::forEmptyDataset('update')
+ 2 SYSTEMPATH\Model.php(863): CodeIgniter\BaseModel->update([...], [])
+ 3 APPPATH\Controllers\UserController.php(332): CodeIgniter\Model->update('1', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->markAsOpened('1')
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-06 03:22:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:22:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-06 03:22:48 --> CodeIgniter\Database\Exceptions\DataException: There is no data to update.
+[Method: POST, Route: UserController/markAsOpened/1]
+in SYSTEMPATH\BaseModel.php on line 1014.
+ 1 SYSTEMPATH\BaseModel.php(1014): CodeIgniter\Database\Exceptions\DataException::forEmptyDataset('update')
+ 2 SYSTEMPATH\Model.php(863): CodeIgniter\BaseModel->update([...], [])
+ 3 APPPATH\Controllers\UserController.php(332): CodeIgniter\Model->update('1', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->markAsOpened('1')
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-06 03:22:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-06 03:22:54 --> CodeIgniter\Database\Exceptions\DataException: There is no data to update.
+[Method: POST, Route: UserController/markAsOpened/1]
+in SYSTEMPATH\BaseModel.php on line 1014.
+ 1 SYSTEMPATH\BaseModel.php(1014): CodeIgniter\Database\Exceptions\DataException::forEmptyDataset('update')
+ 2 SYSTEMPATH\Model.php(863): CodeIgniter\BaseModel->update([...], [])
+ 3 APPPATH\Controllers\UserController.php(332): CodeIgniter\Model->update('1', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->markAsOpened('1')
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-06 03:22:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:23:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-06 03:23:18 --> CodeIgniter\Database\Exceptions\DataException: There is no data to update.
+[Method: POST, Route: UserController/markAsOpened/1]
+in SYSTEMPATH\BaseModel.php on line 1014.
+ 1 SYSTEMPATH\BaseModel.php(1014): CodeIgniter\Database\Exceptions\DataException::forEmptyDataset('update')
+ 2 SYSTEMPATH\Model.php(863): CodeIgniter\BaseModel->update([...], [])
+ 3 APPPATH\Controllers\UserController.php(332): CodeIgniter\Model->update('1', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->markAsOpened('1')
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-06 03:23:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:23:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-06 03:23:41 --> CodeIgniter\Database\Exceptions\DataException: There is no data to update.
+[Method: POST, Route: UserController/markAsOpened/1]
+in SYSTEMPATH\BaseModel.php on line 1014.
+ 1 SYSTEMPATH\BaseModel.php(1014): CodeIgniter\Database\Exceptions\DataException::forEmptyDataset('update')
+ 2 SYSTEMPATH\Model.php(863): CodeIgniter\BaseModel->update([...], [])
+ 3 APPPATH\Controllers\UserController.php(332): CodeIgniter\Model->update('1', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->markAsOpened('1')
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-06 03:23:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:24:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-06 03:24:10 --> CodeIgniter\Database\Exceptions\DataException: There is no data to update.
+[Method: POST, Route: UserController/markAsOpened/1]
+in SYSTEMPATH\BaseModel.php on line 1014.
+ 1 SYSTEMPATH\BaseModel.php(1014): CodeIgniter\Database\Exceptions\DataException::forEmptyDataset('update')
+ 2 SYSTEMPATH\Model.php(863): CodeIgniter\BaseModel->update([...], [])
+ 3 APPPATH\Controllers\UserController.php(332): CodeIgniter\Model->update('1', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->markAsOpened('1')
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-06 03:24:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:24:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-06 03:24:40 --> CodeIgniter\Database\Exceptions\DataException: There is no data to update.
+[Method: POST, Route: UserController/markAsOpened/1]
+in SYSTEMPATH\BaseModel.php on line 1014.
+ 1 SYSTEMPATH\BaseModel.php(1014): CodeIgniter\Database\Exceptions\DataException::forEmptyDataset('update')
+ 2 SYSTEMPATH\Model.php(863): CodeIgniter\BaseModel->update([...], [])
+ 3 APPPATH\Controllers\UserController.php(332): CodeIgniter\Model->update('1', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\UserController->markAsOpened('1')
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\UserController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-10-06 03:24:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:24:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:28:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:28:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-10-06 03:28:34 --> markAsOpened error: There is no data to update.
+DEBUG - 2025-10-06 03:28:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:31:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:31:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:32:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:32:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-10-06 03:32:31 --> markAsOpened error: There is no data to update.
+DEBUG - 2025-10-06 03:32:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:35:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:35:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-10-06 03:35:50 --> markAsOpened error: There is no data to update.
+DEBUG - 2025-10-06 03:35:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:35:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:36:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:36:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:36:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-10-06 03:36:06 --> markAsOpened error: There is no data to update.
+DEBUG - 2025-10-06 03:36:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:37:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:37:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-10-06 03:37:50 --> markAsOpened error: There is no data to update.
+DEBUG - 2025-10-06 03:37:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:40:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:40:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-10-06 03:40:28 --> Transfer 2 marked as opened
+DEBUG - 2025-10-06 03:40:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:40:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:41:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:41:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:41:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:41:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:41:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:41:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:41:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-10-06 03:41:37 --> Transfer 1 marked as opened
+DEBUG - 2025-10-06 03:41:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:41:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:41:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:41:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:41:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:41:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:41:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:42:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-10-06 03:42:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

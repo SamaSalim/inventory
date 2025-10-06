@@ -218,6 +218,13 @@
         color: #721c24;
     }
 </style>
+<!-- added -->
+<style> 
+    tr.opened-row {
+    background-color: rgba(255, 247, 200, 0.5) !important;
+}
+</style>
+
 </head>
 
 <body>
@@ -289,7 +296,9 @@
                         <?php if (isset($orders) && !empty($orders)): ?>
                             <?php foreach ($orders as $order): ?>
                                 <tr data-transfer-id="<?= $order->transfer_item_id ?>" 
-                                    data-usage="<?= esc($order->usage_status_name ?? '') ?>">
+                                    data-usage="<?= esc($order->usage_status_name ?? '') ?>"
+                                        class="<?= ($order->is_opened == 1) ? 'opened-row' : '' ?>">
+
                                     <!-- <td class="checkbox-cell">
                                         <input type="checkbox" class="custom-checkbox row-checkbox">
                                     </td> -->
@@ -320,13 +329,15 @@
                                     <td><?= isset($order->created_at) ? date('d/m/Y', strtotime($order->created_at)) : '-' ?></td>
                                     <td>
                                         <div class="action-buttons">
-                                            <button onclick="viewTransferDetails(<?= $order->transfer_item_id ?>)" 
-                                                    class="action-btn view-btn">
-                                                <svg class="btn-icon" viewBox="0 0 24 24">
-                                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-                                                </svg>
-                                                عرض
-                                            </button>
+                                           <button 
+    onclick="viewTransferDetails(<?= $order->transfer_item_id ?>, this)" 
+    class="action-btn view-btn">
+    <svg class="btn-icon" viewBox="0 0 24 24">
+        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+    </svg>
+    عرض
+</button>
+
                                         </div>
                                     </td>
                                 </tr>
@@ -364,7 +375,30 @@
     </div>
 
 <script>
-function viewTransferDetails(transferId) {
+function viewTransferDetails(transferId, button) {
+    const row = button.closest('tr');
+    row.classList.add('opened-row');
+    
+    // ✅ إرسال transfer_id في body بدلاً من URL
+    fetch('<?= base_url('UserController/markAsOpened') ?>', {
+        method: 'POST',
+        headers: { 
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ transfer_id: transferId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('تم التحديث بنجاح');
+        } else {
+            console.error('فشل التحديث:', data.message);
+        }
+    })
+    .catch(err => console.error('خطأ:', err));
+    
+    // عرض المودال
     const modal = new bootstrap.Modal(document.getElementById('transferDetailsModal'));
     const modalBody = document.getElementById('modalBody');
     const modalFooter = document.getElementById('modalFooter');
@@ -372,6 +406,7 @@ function viewTransferDetails(transferId) {
     modalBody.innerHTML = '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
     modal.show();
     
+    // جلب التفاصيل
     fetch('<?= base_url('UserController/getTransferDetails/') ?>' + transferId)
         .then(response => response.json())
         .then(data => {
@@ -611,6 +646,10 @@ function toggleAllSelection() {
     document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = master.checked);
 }
 </script>
+
+
+
+
 
 </body>
 </html>
