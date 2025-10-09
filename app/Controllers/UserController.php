@@ -164,17 +164,17 @@ public function dashboard(): string
  * صفحة  userView2
  */
 
-public function userView2(): string
-{
-    $this->checkAuth(); // تحقق من تسجيل الدخول
+// public function userView2(): string
+// {
+//     $this->checkAuth(); // تحقق من تسجيل الدخول
 
-    return view('user/userView2');
-}
+//     return view('user/userView2');
+// }
 
 
 
     /**
-     * جلب تفاصيل طلب التحويل 
+     * جلب تفاصيل العهدة  
      */
 public function getTransferDetails($transferId)
     {
@@ -226,8 +226,10 @@ public function getTransferDetails($transferId)
         ]);
     }
 
+
+
     /**
-     * قبول أو رفض طلب التحويل
+     * قبول أو رفض طلب العهدة
      */
     public function respondToTransfer()
     {
@@ -327,6 +329,9 @@ public function getTransferDetails($transferId)
 
 
 
+    /**
+     * تعليم أن الطلب قد تم فتحه (is_opened = 1)
+     */
 public function markAsOpened()
 {
     if (!$this->request->isAJAX()) {
@@ -379,6 +384,99 @@ public function markAsOpened()
             'message' => $e->getMessage()
         ]);
     }
+}
+
+
+/**
+ * عرض العهد الخاصة بالمستخدم الحالي (من order + transfer_items)
+ */
+public function userView2(): string
+{
+    $this->checkAuth();
+
+    // التحقق من تسجيل الدخول
+    if (!session()->get('isLoggedIn')) {
+        return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
+    }
+
+    // تحديد نوع الحساب والمستخدم الحالي
+    $isEmployee = session()->get('isEmployee');
+    $account_id = session()->get('employee_id');
+    $currentUserId = null;
+
+    if (!$isEmployee) {
+        // مستخدم عادي
+        $currentUserId = $account_id;
+    } else {
+        // موظف لا يدخل هنا
+        return redirect()->to('/dashboard')->with('error', 'هذه الصفحة مخصصة للمستخدمين فقط');
+    }
+
+    // حماية إضافية
+    if (!$currentUserId) {
+        return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
+    }
+
+    //  1. جلب العهد من جدول transfer_items
+    $transferItemsModel = new \App\Models\TransferItemsModel();
+
+    $transferItems = $transferItemsModel
+        ->distinct()
+        ->select(
+            'transfer_items.transfer_item_id AS id,
+             transfer_items.created_at,
+             transfer_items.item_order_id,
+             transfer_items.is_opened, 
+             item_order.asset_num,
+             item_order.serial_num,
+             from_user.name AS from_user_name,
+             from_user.user_dept AS from_user_dept,
+             usage_status.usage_status AS usage_status_name,
+             order_status.status AS order_status_name,
+             "transfer_items" AS source_table'
+        )
+        ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+        ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+        ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
+        ->where('transfer_items.to_user_id', $currentUserId)
+        ->where('item_order.usage_status_id !=', 2)
+        ->orderBy('transfer_items.created_at', 'DESC')
+        ->findAll();
+
+    //  2. جلب العهد من جدول order
+    $orderModel = new \App\Models\OrderModel();
+
+    $orders = $orderModel
+        ->distinct()
+        ->select(
+            'order.order_id AS id,
+             order.created_at,
+             order.to_user_id,
+             order_status.status AS order_status_name,
+             usage_status.usage_status AS usage_status_name,
+             from_user.name AS from_user_name,
+             from_user.user_dept AS from_user_dept,
+             item_order.asset_num,
+             item_order.serial_num,
+             "orders" AS source_table'
+        )
+        ->join('item_order', 'item_order.order_id = order.order_id', 'left')
+        ->join('users AS from_user', 'from_user.user_id = order.from_user_id', 'left') // JOIN مع users
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+        ->join('order_status', 'order_status.id = order.order_status_id', 'left')
+        ->where('order.to_user_id', $currentUserId)
+        ->where('item_order.usage_status_id !=', 2)
+        ->orderBy('order.created_at', 'DESC')
+        ->findAll();
+
+    //  3. دمج النتائج
+    $allOrders = array_merge($orders, $transferItems);
+
+    //  4. تمرير البيانات للواجهة
+    return view('user/userView2', [
+        'orders' => $allOrders
+    ]);
 }
 
 

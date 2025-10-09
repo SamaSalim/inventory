@@ -121,7 +121,7 @@
         </a>
     <?php endif; ?>
 
-    <?php if ($role === 'admin' || $role === 'assets'): ?>
+    <?php if ($role === 'admin' || $role === 'assets' || $role === 'user'): ?>
         <a href="<?= base_url('UserController/userView2') ?>"
            class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'userView2') ? 'active' : '' ?>">
             <i class="fa-solid fa-file-circle-plus"></i> <span> العهد الخاصة بي</span>
