@@ -24,14 +24,14 @@
                     $userName = session()->get('name') ?? 'م م';
                     $nameParts = explode(' ', trim($userName));
                     $initials = '';
-                    
+
                     if (count($nameParts) >= 2) {
                         $initials = mb_substr($nameParts[0], 0, 1, 'UTF-8') . mb_substr($nameParts[count($nameParts) - 1], 0, 1, 'UTF-8');
                     } else {
                         $initials = mb_substr($nameParts[0], 0, 1, 'UTF-8');
-                    }   
+                    }
                     echo strtoupper($initials);
-                ?>
+                    ?>
                 </div>
                 <span><?= esc(session()->get('name')) ?></span>
             </div>
@@ -87,10 +87,20 @@
                 <h2 class="section-title">قائمة المخزون</h2>
                 <div class="buttons-group">
                     <!-- هنا زر لإنشاء طلب لتصنيفات مختلفة -->
-                    <a href="<?= site_url('OrderController/index') ?>" class="add-btn ">
+                    <!-- <a href="<ظ?= site_url('OrderController/index') ?>" class="add-btn ">
                         <i class="fas fa-layer-group"></i> إنشاء طلب  
-                    </a>
-           
+                    </a> -->
+                    <div class="buttons-group">
+                        <?php if (canCreateOrder()): ?>
+                            <a href="<?= site_url('OrderController/index') ?>" class="add-btn">
+                                <i class="fas fa-layer-group"></i> إنشاء طلب
+                            </a>
+                        <?php else: ?>
+                            <button class="add-btn" disabled style="opacity: 0.5; cursor: not-allowed;" title="ليس لديك صلاحية">
+                                <i class="fas fa-layer-group"></i> إنشاء طلب
+                            </button>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
 
@@ -103,10 +113,18 @@
                     <span>طلب</span>
                 </div>
                 <div class="bulk-buttons">
-                    <button class="bulk-btn bulk-delete-btn" onclick="bulkDelete()">
-                        <i class="fas fa-trash"></i>
-                        حذف جماعي
-                    </button>
+                    <?php if (canDeleteOrder()): ?>
+                        <button class="bulk-btn bulk-delete-btn" onclick="bulkDelete()">
+                            <i class="fas fa-trash"></i>
+                            حذف جماعي
+                        </button>
+                    <?php else: ?>
+                        <button class="bulk-btn bulk-delete-btn" disabled style="opacity: 0.5; cursor: not-allowed;" title="ليس لديك صلاحية">
+                            <i class="fas fa-trash"></i>
+                            حذف جماعي
+                        </button>
+                    <?php endif; ?>
+
                     <button class="bulk-btn bulk-cancel-btn" onclick="clearSelection()">
                         <i class="fas fa-times"></i>
                         إلغاء الاختيار
@@ -125,8 +143,8 @@
                         </h3>
                         <div class="search-bar-wrapper">
                             <input type="text" class="main-search-input" name="search" id="mainSearchInput"
-                                   value="<?= esc($filters['search'] ?? '') ?>" 
-                                   placeholder="ابحث في جميع الحقول...">
+                                value="<?= esc($filters['search'] ?? '') ?>"
+                                placeholder="ابحث في جميع الحقول...">
                             <i class="fas fa-search search-icon" onclick="document.querySelector('form').submit();" title="بحث"></i>
                         </div>
                     </div>
@@ -145,8 +163,8 @@
                                 الصنف
                             </label>
                             <input type="text" class="filter-input" name="item_type"
-                                   value="<?= esc($filters['item_type'] ?? '') ?>" 
-                                   placeholder="اكتب نوع الصنف">
+                                value="<?= esc($filters['item_type'] ?? '') ?>"
+                                placeholder="اكتب نوع الصنف">
                         </div>
 
                         <!-- التصنيف -->
@@ -175,8 +193,8 @@
                                 الرقم التسلسلي
                             </label>
                             <input type="text" class="filter-input" name="serial_number"
-                                   value="<?= esc($filters['serial_number'] ?? '') ?>" 
-                                   placeholder="رقم تسلسلي محدد">
+                                value="<?= esc($filters['serial_number'] ?? '') ?>"
+                                placeholder="رقم تسلسلي محدد">
                         </div>
 
                         <!-- الرقم الوظيفي -->
@@ -186,8 +204,8 @@
                                 الرقم الوظيفي
                             </label>
                             <input type="text" class="filter-input" name="employee_id"
-                                   value="<?= esc($filters['employee_id'] ?? '') ?>" 
-                                   placeholder="رقم الموظف">
+                                value="<?= esc($filters['employee_id'] ?? '') ?>"
+                                placeholder="رقم الموظف">
                         </div>
 
                         <!-- الموقع -->
@@ -197,8 +215,8 @@
                                 الموقع
                             </label>
                             <input type="text" class="filter-input" name="location"
-                                   value="<?= esc($filters['location'] ?? '') ?>" 
-                                   placeholder="اكتب اسم الموقع">
+                                value="<?= esc($filters['location'] ?? '') ?>"
+                                placeholder="اكتب اسم الموقع">
                         </div>
                     </div>
 
@@ -223,10 +241,10 @@
                             <th class="checkbox-cell">
                                 <input type="checkbox" class="master-checkbox" id="masterCheckbox" onchange="toggleAllSelection()">
                             </th>
-                                     <th>رقم الطلب</th>
+                            <th>رقم الطلب</th>
                             <!-- <th>الرقم الوظيفي</th> -->
                             <!-- <th>التحويلة</th> -->
-                            <th>حالة الاستخدام</th> 
+                            <th>حالة الاستخدام</th>
                             <th>تاريخ الطلب</th>
                             <!-- <th>رمز الموقع</th> -->
                             <th>مدخل البيانات</th>
@@ -249,22 +267,43 @@
                                     <td><?= esc($order->created_by_name ?? '-') ?></td>
                                     <td>
                                         <div class="action-buttons">
+                                            <!-- زر العرض - متاح للجميع -->
                                             <a href="<?= site_url('InventoryController/showOrder/' . $order->order_id) ?>" class="action-btn view-btn">
                                                 <svg class="btn-icon" viewBox="0 0 24 24">
                                                     <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
                                                 </svg>
                                                 عرض
                                             </a>
-                                            <a href="<?= site_url('OrderController/editOrder/' . $order->order_id) ?>" class="action-btn edit-btn">
-                                                <svg class="btn-icon" viewBox="0 0 24 24">
-                                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                                                </svg>
-                                                تعديل
-                                            </a>
-                                            <button class="action-btn delete-btn" onclick="deleteOrderConfirm(<?= $order->order_id ?>)" title="حذف الطلب كاملاً">
-                                                <i class="fas fa-trash"></i>
-                                                حذف
-                                            </button>
+
+                                            <!-- زر التعديل - فقط Warehouse -->
+                                            <?php if (canEditOrder()): ?>
+                                                <a href="<?= site_url('OrderController/editOrder/' . $order->order_id) ?>" class="action-btn edit-btn">
+                                                    <svg class="btn-icon" viewBox="0 0 24 24">
+                                                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                                                    </svg>
+                                                    تعديل
+                                                </a>
+                                            <?php else: ?>
+                                                <button class="action-btn edit-btn" disabled style="opacity: 0.5; cursor: not-allowed;" title="ليس لديك صلاحية">
+                                                    <svg class="btn-icon" viewBox="0 0 24 24">
+                                                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                                                    </svg>
+                                                    تعديل
+                                                </button>
+                                            <?php endif; ?>
+
+                                            <!-- زر الحذف - فقط Warehouse -->
+                                            <?php if (canDeleteOrder()): ?>
+                                                <button class="action-btn delete-btn" onclick="deleteOrderConfirm(<?= $order->order_id ?>)" title="حذف الطلب كاملاً">
+                                                    <i class="fas fa-trash"></i>
+                                                    حذف
+                                                </button>
+                                            <?php else: ?>
+                                                <button class="action-btn delete-btn" disabled style="opacity: 0.5; cursor: not-allowed;" title="ليس لديك صلاحية">
+                                                    <i class="fas fa-trash"></i>
+                                                    حذف
+                                                </button>
+                                            <?php endif; ?>
                                         </div>
                                     </td>
                                 </tr>
@@ -277,10 +316,10 @@
                     </tbody>
                 </table>
             </div>
-    <div class="d-flex justify-content-end mt-3">
-    <?= $pager->links('orders', 'custom_arabic') ?>
+            <div class="d-flex justify-content-end mt-3">
+                <?= $pager->links('orders', 'custom_arabic') ?>
+            </div>
         </div>
-     </div>
     </div>
 
     <!-- مودال تأكيد الحذف الفردي -->
@@ -1385,15 +1424,15 @@
                 }
             });
 
-        // إغلاق قوائم البحث المنسدلة
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.search-dropdown')) {
+            // إغلاق قوائم البحث المنسدلة
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-dropdown')) {
 
-                document.querySelectorAll('.search-dropdown .dropdown-list').forEach(dropdown => {
-                    dropdown.style.display = 'none';
-                });
-            }
-        });
+                    document.querySelectorAll('.search-dropdown .dropdown-list').forEach(dropdown => {
+                        dropdown.style.display = 'none';
+                    });
+                }
+            });
 
 
         });

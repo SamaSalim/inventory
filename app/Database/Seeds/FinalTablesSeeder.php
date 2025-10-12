@@ -16,8 +16,8 @@ class FinalTablesSeeder extends Seeder
             ['name' => 'warehouse'],
             ['name' => 'assets'],
             ['name' => 'user'],
-            ['name' => 'super assets'],
-            ['name' => 'super warehouse'],
+            ['name' => 'super_assets'],
+            ['name' => 'super_warehouse'],
         ];
         $this->db->table('role')->insertBatch($roles);
 
@@ -34,6 +34,7 @@ class FinalTablesSeeder extends Seeder
             ['usage_status' => 'جديد'],
             ['usage_status' => 'رجيع'],
             ['usage_status' => 'تحويل'],
+             ['usage_status' => 'معاد صرفة'],
         ];
         $this->db->table('usage_status')->insertBatch($usage_statuses);
 

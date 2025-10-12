@@ -24,14 +24,14 @@
                     $userName = session()->get('name') ?? 'م م';
                     $nameParts = explode(' ', trim($userName));
                     $initials = '';
-                    
+
                     if (count($nameParts) >= 2) {
                         $initials = mb_substr($nameParts[0], 0, 1, 'UTF-8') . mb_substr($nameParts[count($nameParts) - 1], 0, 1, 'UTF-8');
                     } else {
                         $initials = mb_substr($nameParts[0], 0, 1, 'UTF-8');
-                    }   
+                    }
                     echo strtoupper($initials);
-                ?>
+                    ?>
                 </div>
                 <span><?= esc(session()->get('name')) ?></span>
             </div>
@@ -85,7 +85,7 @@
 
             <div class="section-header">
                 <h2 class="section-title">قائمة المخزون</h2>
-                <div class="buttons-group">          
+                <div class="buttons-group">
                 </div>
             </div>
 
@@ -120,8 +120,8 @@
                         </h3>
                         <div class="search-bar-wrapper">
                             <input type="text" class="main-search-input" name="search" id="mainSearchInput"
-                                   value="<?= esc($filters['search'] ?? '') ?>" 
-                                   placeholder="ابحث في جميع الحقول...">
+                                value="<?= esc($filters['search'] ?? '') ?>"
+                                placeholder="ابحث في جميع الحقول...">
                             <i class="fas fa-search search-icon" onclick="document.querySelector('form').submit();" title="بحث"></i>
                         </div>
                     </div>
@@ -140,8 +140,8 @@
                                 الصنف
                             </label>
                             <input type="text" class="filter-input" name="item_type"
-                                   value="<?= esc($filters['item_type'] ?? '') ?>" 
-                                   placeholder="اكتب نوع الصنف">
+                                value="<?= esc($filters['item_type'] ?? '') ?>"
+                                placeholder="اكتب نوع الصنف">
                         </div>
 
                         <!-- التصنيف -->
@@ -170,8 +170,8 @@
                                 الرقم التسلسلي
                             </label>
                             <input type="text" class="filter-input" name="serial_number"
-                                   value="<?= esc($filters['serial_number'] ?? '') ?>" 
-                                   placeholder="رقم تسلسلي محدد">
+                                value="<?= esc($filters['serial_number'] ?? '') ?>"
+                                placeholder="رقم تسلسلي محدد">
                         </div>
 
                         <!-- الرقم الوظيفي -->
@@ -181,8 +181,8 @@
                                 الرقم الوظيفي
                             </label>
                             <input type="text" class="filter-input" name="employee_id"
-                                   value="<?= esc($filters['employee_id'] ?? '') ?>" 
-                                   placeholder="رقم الموظف">
+                                value="<?= esc($filters['employee_id'] ?? '') ?>"
+                                placeholder="رقم الموظف">
                         </div>
 
                         <!-- الموقع -->
@@ -192,8 +192,8 @@
                                 الموقع
                             </label>
                             <input type="text" class="filter-input" name="location"
-                                   value="<?= esc($filters['location'] ?? '') ?>" 
-                                   placeholder="اكتب اسم الموقع">
+                                value="<?= esc($filters['location'] ?? '') ?>"
+                                placeholder="اكتب اسم الموقع">
                         </div>
                     </div>
 
@@ -237,19 +237,37 @@
                                     <td><?= esc($order->created_by_name ?? '-') ?></td>
                                     <td>
                                         <div class="action-buttons">
-                                            <a href="<?= site_url('AssetsController/orderDetails/' . $order->order_id) ?>" class="action-btn view-btn">
-                                                <svg class="btn-icon" viewBox="0 0 24 24">
-                                                    <path d="M9 11H3v2h6v3l5-4-5-4v3zm12-8h-6c-1.1 0-2 .9-2 2v3h2V5h6v14h-6v-3h-2v3c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
-                                                </svg>
-                                                إرجاع
-                                            </a>
-                                <a href="<?= site_url('AssetsController/transferView/' . $order->order_id) ?>"
-                                    class="action-btn edit-btn" title="تحويل">
-                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                                        <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/>
-                                    </svg>
-                                    تحويل
-                                </a>
+                                            <?php if (canReturn()): ?>
+                                                <a href="<?= site_url('AssetsController/orderDetails/' . $order->order_id) ?>" class="action-btn view-btn" title="إرجاع الأصول">
+                                                    <svg class="btn-icon" viewBox="0 0 24 24">
+                                                        <path d="M9 11H3v2h6v3l5-4-5-4v3zm12-8h-6c-1.1 0-2 .9-2 2v3h2V5h6v14h-6v-3h-2v3c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+                                                    </svg>
+                                                    إرجاع
+                                                </a>
+                                            <?php else: ?>
+                                                <button class="action-btn view-btn" disabled style="opacity: 0.5; cursor: not-allowed;" title="ليس لديك صلاحية الإرجاع">
+                                                    <svg class="btn-icon" viewBox="0 0 24 24">
+                                                        <path d="M9 11H3v2h6v3l5-4-5-4v3zm12-8h-6c-1.1 0-2 .9-2 2v3h2V5h6v14h-6v-3h-2v3c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+                                                    </svg>
+                                                    إرجاع
+                                                </button>
+                                            <?php endif; ?>
+
+                                            <?php if (canTransfer()): ?>
+                                                <a href="<?= site_url('AssetsController/transferView/' . $order->order_id) ?>" class="action-btn edit-btn" title="تحويل الأصول">
+                                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                                                        <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z" />
+                                                    </svg>
+                                                    تحويل
+                                                </a>
+                                            <?php else: ?>
+                                                <button class="action-btn edit-btn" disabled style="opacity: 0.5; cursor: not-allowed;" title="ليس لديك صلاحية التحويل">
+                                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                                                        <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z" />
+                                                    </svg>
+                                                    تحويل
+                                                </button>
+                                            <?php endif; ?>
 
                                         </div>
                                     </td>
@@ -263,16 +281,16 @@
                     </tbody>
                 </table>
             </div>
-    <div class="d-flex justify-content-end mt-3">
-    <?= $pager->links('orders', 'custom_arabic') ?>
+            <div class="d-flex justify-content-end mt-3">
+                <?= $pager->links('orders', 'custom_arabic') ?>
+            </div>
         </div>
-     </div>
     </div>
 
- 
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
-       
+
     </script>
 
 </body>
