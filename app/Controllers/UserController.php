@@ -50,21 +50,18 @@ class UserController extends BaseController
         $isEmployee = session()->get('isEmployee');
         $account_id = session()->get('employee_id'); // يحتوي على user_id أو emp_id
 
-        // تحديد user_id بناءً على نوع الحساب
-        // $currentUserId = null;
+        $currentUserId = null;
 
-        // if (!$isEmployee) {
-        //     // إذا كان مستخدم عادي، account_id هو user_id مباشرة
-        //     $currentUserId = $account_id;
-        //  }
-        // else {
-        //     // إذا كان موظف، لا يمكنه الوصول لهذه الصفحة (صفحة خاصة بالمستخدمين فقط)
-        //     return redirect()->to('/dashboard')->with('error', 'هذه الصفحة مخصصة للمستخدمين فقط');
-        // }
+        if (!$isEmployee) {
+            $currentUserId = $account_id;
+        } else {
+            return redirect()->to('/dashboard')->with('error', 'هذه الصفحة مخصصة للمستخدمين فقط');
+        }
 
-        // if (!$currentUserId) {
-        //     return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
-        // }
+        if (!$currentUserId) {
+            return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
+        }
+
 
         $transferItemsModel = new TransferItemsModel();
 

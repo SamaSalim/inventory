@@ -18,215 +18,149 @@ class Attachment extends BaseController
     }
 
 
-    public function upload()
-    {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'يجب تسجيل الدخول أولاً'
-            ]);
-        }
-
-        $loggedEmployeeId = session()->get('employee_id');
-        $assetNums = $this->request->getPost('asset_nums');
-        $comments  = $this->request->getPost('comments');
-
-        if (empty($assetNums) || !is_array($assetNums)) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'لم يتم تحديد أي عناصر للترجيع'
-            ]);
-        }
-
-        $usageStatusModel = new \App\Models\UsageStatusModel();
-        $returnedStatus = $usageStatusModel->where('usage_status', 'رجيع')->first();
-        
-        if (!$returnedStatus) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'حالة "رجيع" غير موجودة في النظام'
-            ]);
-        }
-
-        $uploadPath = WRITEPATH . 'uploads/return_attachments';
-        if (!is_dir($uploadPath)) {
-            mkdir($uploadPath, 0755, true);
-        }
-
-        // Use model's built-in transaction methods
-        $this->model->transStart();
-
-        $successCount = 0;
-        $failedItems  = [];
-        $allFiles = $this->request->getFiles();
-
-        foreach ($assetNums as $assetNum) {
-            // Find the item by asset number
-            $originalItem = $this->model->where('asset_num', $assetNum)->first();
-            
-            if (!$originalItem) {
-                $failedItems[] = "الأصل رقم: $assetNum غير موجود";
-                continue;
-            }
-
-            // === FILE UPLOAD HANDLING ===
-            $uploadedFileNames = [];
-            
-            if (isset($allFiles['attachments'][$assetNum])) {
-                foreach ($allFiles['attachments'][$assetNum] as $file) {
-                    
-                    if (!$file->isValid()) {
-                        $error_code = $file->getError();
-                        if ($error_code !== UPLOAD_ERR_NO_FILE) {
-                            $failedItems[] = "خطأ في الملف للأصل: $assetNum - " . $file->getErrorString();
-                        }
-                        continue;
-                    }
-
-                    // Validate file size (5MB max)
-                    if ($file->getSizeByUnit("mb") > 5) {
-                        $failedItems[] = "الملف كبير جداً للأصل: $assetNum - " . $file->getName();
-                        continue;
-                    }
-
-                    // Validate file type
-                    $allowedMimes = [
-                        "image/png", 
-                        "image/jpeg", 
-                        "image/jpg",
-                        "application/pdf",
-                        "application/msword",
-                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    ];
-
-                    if (!in_array($file->getMimeType(), $allowedMimes)) {
-                        $failedItems[] = "نوع ملف غير مسموح للأصل: $assetNum - " . $file->getName();
-                        continue;
-                    }
-
-                    $newName = $assetNum . '_' . time() . '_' . $file->getRandomName();
-
-                    if ($file->move($uploadPath, $newName)) {
-                        $uploadedFileNames[] = $newName;
-                    } else {
-                        $failedItems[] = "فشل رفع الملف للأصل: $assetNum - " . $file->getName();
-                    }
-                }
-            }
-
-            $attachmentPath = !empty($uploadedFileNames) 
-                ? implode(',', $uploadedFileNames) 
-                : $originalItem->attachment;
-
-            $updateData = [
-                'created_by'      => $loggedEmployeeId,
-                'usage_status_id' => $returnedStatus->id,
-                'note'            => $comments[$assetNum] ?? 'تم الترجيع',
-                'attachment'      => $attachmentPath,
-                'updated_at'      => date('Y-m-d H:i:s')
-            ];
-
-            $updated = $this->model->protect(false)
-                                   ->update($originalItem->item_order_id, $updateData);
-
-            if ($updated) {
-                $successCount++;
-            } else {
-                $failedItems[] = "فشل تحديث الأصل رقم: $assetNum";
-            }
-        }
-
-        $this->model->transComplete();
-
-        if ($this->model->transStatus() === false) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'فشل في حفظ البيانات'
-            ]);
-        }
-
-        $message = "تم تحديث $successCount عنصر بنجاح";
-        if (!empty($failedItems)) {
-            $message .= "\n\nفشل التحديث: " . implode(', ', $failedItems);
-        }
-
+public function upload()
+{
+    if (!session()->get('isLoggedIn')) {
         return $this->response->setJSON([
-            'success'        => true,
-            'message'        => $message,
-            'updated_count'  => $successCount,
-            'failed_count'   => count($failedItems)
+            'success' => false,
+            'message' => 'يجب تسجيل الدخول أولاً'
         ]);
     }
 
-    public function get($itemOrderId)
-    {
-        $item = $this->model->find($itemOrderId);
+    // Get both employee_id and user_id from session
+    $loggedEmployeeId = session()->get('employee_id');
+    $loggedUserId     = session()->get('user_id');
 
-        if (!$item) {
-            throw new PageNotFoundException("Item with id $itemOrderId not found");
-        }
+    // Prioritize employee_id, fallback to user_id
+    $createdBy = $loggedEmployeeId ?? $loggedUserId;
 
-        if ($item->attachment) {
-
-            $files = explode(',', $item->attachment);
-            $firstFile = trim($files[0]);
-            
-            $path = WRITEPATH . "uploads/return_attachments/" . $firstFile;
-
-            if (!is_file($path)) {
-                throw new PageNotFoundException("File not found");
-            }
-
-            $finfo = new finfo(FILEINFO_MIME);
-            $type = $finfo->file($path);
-
-            header("Content-Type: $type");
-            header("Content-Length: " . filesize($path));
-            header("Content-Disposition: inline; filename=\"" . basename($firstFile) . "\"");
-
-            readfile($path);
-            exit;
-        }
-
-        throw new PageNotFoundException("No attachment found for this item");
+    // Validate that at least one ID exists
+    if (empty($createdBy)) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'لم يتم التعرف على المستخدم'
+        ]);
     }
 
+    $assetNums = $this->request->getPost('asset_nums');
+    $comments  = $this->request->getPost('comments');
 
-    public function delete($itemOrderId)
-    {
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->back()->with('error', 'يجب تسجيل الدخول أولاً');
+    if (empty($assetNums) || !is_array($assetNums)) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'لم يتم تحديد أي عناصر للترجيع'
+        ]);
+    }
+
+    $usageStatusModel = new \App\Models\UsageStatusModel();
+    $returnedStatus = $usageStatusModel->where('usage_status', 'رجيع')->first();
+
+    if (!$returnedStatus) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'حالة "رجيع" غير موجودة في النظام'
+        ]);
+    }
+
+    $uploadPath = WRITEPATH . 'uploads/return_attachments';
+    if (!is_dir($uploadPath)) {
+        mkdir($uploadPath, 0755, true);
+    }
+
+    $this->model->transStart();
+
+    $successCount = 0;
+    $failedItems  = [];
+    $allFiles = $this->request->getFiles();
+
+    foreach ($assetNums as $assetNum) {
+        $originalItem = $this->model->where('asset_num', $assetNum)->first();
+
+        if (!$originalItem) {
+            $failedItems[] = "الأصل رقم: $assetNum غير موجود";
+            continue;
         }
 
-        $item = $this->model->find($itemOrderId);
+        $uploadedFileNames = [];
 
-        if (!$item) {
-            throw new PageNotFoundException("Item with id $itemOrderId not found");
-        }
+        if (isset($allFiles['attachments'][$assetNum])) {
+            foreach ($allFiles['attachments'][$assetNum] as $file) {
+                if (!$file->isValid()) {
+                    $error_code = $file->getError();
+                    if ($error_code !== UPLOAD_ERR_NO_FILE) {
+                        $failedItems[] = "خطأ في الملف للأصل: $assetNum - " . $file->getErrorString();
+                    }
+                    continue;
+                }
 
-        if ($item->attachment) {
+                if ($file->getSizeByUnit("mb") > 5) {
+                    $failedItems[] = "الملف كبير جداً للأصل: $assetNum - " . $file->getName();
+                    continue;
+                }
 
-            $files = explode(',', $item->attachment);
-            
-            foreach ($files as $filename) {
-                $filename = trim($filename);
-                $path = WRITEPATH . "uploads/return_attachments/" . $filename;
-                
-                if (is_file($path)) {
-                    unlink($path);
+                $allowedMimes = [
+                    "image/png", "image/jpeg", "image/jpg",
+                    "application/pdf", "application/msword",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                ];
+
+                if (!in_array($file->getMimeType(), $allowedMimes)) {
+                    $failedItems[] = "نوع ملف غير مسموح للأصل: $assetNum - " . $file->getName();
+                    continue;
+                }
+
+                $newName = $assetNum . '_' . time() . '_' . $file->getRandomName();
+                if ($file->move($uploadPath, $newName)) {
+                    $uploadedFileNames[] = $newName;
+                } else {
+                    $failedItems[] = "فشل رفع الملف للأصل: $assetNum - " . $file->getName();
                 }
             }
-
-            $this->model->protect(false)
-                        ->update($itemOrderId, ['attachment' => null]);
-
-            return redirect()->back()
-                             ->with('message', 'تم حذف المرفقات بنجاح');
         }
 
-        return redirect()->back()
-                         ->with('error', 'لا توجد مرفقات لحذفها');
+        $attachmentPath = !empty($uploadedFileNames)
+            ? implode(',', $uploadedFileNames)
+            : ($originalItem->attachment ?? null);
+
+        $updateData = [
+            'usage_status_id' => $returnedStatus->id,
+            'note'            => $comments[$assetNum] ?? 'تم الترجيع',
+            'attachment'      => $attachmentPath,
+            'updated_at'      => date('Y-m-d H:i:s'),
+            'created_by'      => $createdBy 
+        ];
+
+        $updated = $this->model->protect(false)
+                               ->update($originalItem->item_order_id, $updateData);
+
+        if ($updated) {
+            $successCount++;
+        } else {
+            $failedItems[] = "فشل تحديث الأصل رقم: $assetNum";
+        }
     }
+
+    $this->model->transComplete();
+
+    if ($this->model->transStatus() === false) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'فشل في حفظ البيانات'
+        ]);
+    }
+
+    $message = "تم تحديث $successCount عنصر بنجاح";
+    if (!empty($failedItems)) {
+        $message .= "\n\nفشل التحديث: " . implode(', ', $failedItems);
+    }
+
+    return $this->response->setJSON([
+        'success'        => true,
+        'message'        => $message,
+        'updated_count'  => $successCount,
+        'failed_count'   => count($failedItems)
+    ]);
+}
 
 
     public function download($itemOrderId, $fileIndex = 0)
