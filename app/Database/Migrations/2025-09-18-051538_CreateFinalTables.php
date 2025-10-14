@@ -298,7 +298,7 @@ class CreateFinalTables extends Migration
         $this->forge->addKey('from_user_id'); // index
         $this->forge->addKey('to_user_id'); // index
         $this->forge->addKey('order_status_id'); // index
-        $this->forge->addForeignKey('from_user_id', 'users', 'user_id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('from_user_id', 'employee', 'emp_id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('to_user_id', 'users', 'user_id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('order_status_id', 'order_status', 'id', 'CASCADE', 'CASCADE');
 
