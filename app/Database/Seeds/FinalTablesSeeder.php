@@ -408,7 +408,7 @@ class FinalTablesSeeder extends Seeder
             ['emp_id' => '1001', 'role_id' => 1],
             ['emp_id' => '1002', 'role_id' => 2],
             ['emp_id' => '1003', 'role_id' => 3],
-            ['emp_id' => '1004', 'role_id' => 6],
+            ['emp_id' => '1004', 'role_id' => 5],
             ['emp_id' => '1005', 'role_id' => 1],
         ];
         $this->db->table('permission')->insertBatch($permissions);

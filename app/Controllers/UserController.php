@@ -27,12 +27,13 @@ class UserController extends BaseController
     /**
      * دالة خاصة للتحقق من تسجيل الدخول
      */
-    private function checkAuth()
-    {
-        if (! session()->get('isLoggedIn')) {
-            throw new AuthenticationException();
-        }
+  private function checkAuth(): void
+{
+    if (! session()->get('isLoggedIn')) {
+        throw new AuthenticationException();
     }
+}
+
 
     /**
      * عرض الطلبات المحولة للمستخدم الحالي
@@ -42,11 +43,11 @@ class UserController extends BaseController
         $this->checkAuth();
 
         // التحقق من تسجيل الدخول
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
-        }
+        // if (!session()->get('isLoggedIn')) {
+        //     return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
+        // }
 
-        // جلب معلومات الحساب من السيشن (نفس طريقة UserInfo)
+         // جلب معلومات الحساب من السيشن (نفس طريقة UserInfo)
         $isEmployee = session()->get('isEmployee');
         $account_id = session()->get('employee_id'); // يحتوي على user_id أو emp_id
 
@@ -54,13 +55,14 @@ class UserController extends BaseController
 
         if (!$isEmployee) {
             $currentUserId = $account_id;
-        } else {
-            return redirect()->to('/dashboard')->with('error', 'هذه الصفحة مخصصة للمستخدمين فقط');
-        }
+        } 
+        // else {
+        //     return redirect()->to('/dashboard')->with('error', 'هذه الصفحة مخصصة للمستخدمين فقط');
+        // }
 
-        if (!$currentUserId) {
-            return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
-        }
+        // if (!$currentUserId) {
+        //     return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
+        // }
 
 
         $transferItemsModel = new TransferItemsModel();
@@ -85,9 +87,9 @@ class UserController extends BaseController
             ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
-            ->where('transfer_items.to_user_id', $currentUserId)
+            ->where('transfer_items.to_user_id', $currentUserId) 
             ->where('item_order.usage_status_id !=', 2) // استبعاد العناصر المرجعة
-            ->where('transfer_items.order_status_id', 1) // إظهار الطلبات قيد الانتظار فقط
+            // ->where('transfer_items.order_status_id', 1) // إظهار الطلبات قيد الانتظار فقط
             ->orderBy('transfer_items.created_at', 'DESC')
             ->findAll();
 
@@ -402,15 +404,16 @@ class UserController extends BaseController
         if (!$isEmployee) {
             // مستخدم عادي
             $currentUserId = $account_id;
-        } else {
-            // موظف لا يدخل هنا
-            return redirect()->to('/dashboard')->with('error', 'هذه الصفحة مخصصة للمستخدمين فقط');
-        }
+        } 
+        // else {
+        //     // موظف لا يدخل هنا
+        //     return redirect()->to('/dashboard')->with('error', 'هذه الصفحة مخصصة للمستخدمين فقط');
+        // }
 
-        // حماية إضافية
-        if (!$currentUserId) {
-            return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
-        }
+        // // حماية إضافية
+        // if (!$currentUserId) {
+        //     return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
+        // }
 
         //  1. جلب العهد من جدول transfer_items
         $transferItemsModel = new \App\Models\TransferItemsModel();
@@ -434,7 +437,7 @@ class UserController extends BaseController
             ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
-            ->where('transfer_items.to_user_id', $currentUserId)
+            ->where('transfer_items.to_user_id', $currentUserId) 
             ->where('item_order.usage_status_id !=', 2)
             ->orderBy('transfer_items.created_at', 'DESC')
             ->findAll();
@@ -460,7 +463,7 @@ class UserController extends BaseController
             ->join('users AS from_user', 'from_user.user_id = order.from_user_id', 'left') // JOIN مع users
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('order_status', 'order_status.id = order.order_status_id', 'left')
-            ->where('order.to_user_id', $currentUserId)
+            ->where('order.to_user_id', $currentUserId) 
             ->where('item_order.usage_status_id !=', 2)
             ->orderBy('order.created_at', 'DESC')
             ->findAll();

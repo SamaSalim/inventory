@@ -164,14 +164,12 @@
         </a>
     <?php endif; ?>
 
-    <?php if ($role === 'admin' || $role === 'assets' || $role === 'user'): ?>
+    <?php if ($role === 'admin' || $role === 'assets' || $role === 'user' || $role === 'super_warehouse'  || $role === 'super_assets' || $role === 'warehouse'): ?>
         <a href="<?= base_url('UserController/userView2') ?>"
             class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'userView2') ? 'active' : '' ?>">
             <i class="fa-solid fa-file-circle-plus"></i> <span> العهد الخاصة بي</span>
         </a>
-    <?php endif; ?>
-
-    <?php if ($role === 'admin' || $role === 'assets' || $role === 'user' || $role === 'super_assets'): ?>
+   
         <a href="<?= base_url('UserController/dashboard') ?>"
             class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'dashboard') ? 'active' : '' ?>">
             <i class="fa-solid fa-id-card"></i> <span> طلبات العهد</span>
