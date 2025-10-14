@@ -600,7 +600,7 @@ public function validateAssetSerial()
             $orderData = [
                 'from_user_id' => $fromUserId,
                 'to_user_id' => $toUserId,
-                'order_status_id' => 1,
+                'order_status_id' => 2, // مقبول
                 'note' => $notes
             ];
 

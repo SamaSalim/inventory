@@ -227,104 +227,156 @@ class UserController extends BaseController
 
 
 
-    /**
-     * قبول أو رفض طلب العهدة
-     */
-    public function respondToTransfer()
-    {
-        $this->response->setContentType('application/json');
+   /**
+ * قبول أو رفض طلب العهدة
+ */
+public function respondToTransfer()
+{
+    $this->response->setContentType('application/json');
 
-        if (!session()->get('isLoggedIn')) {
+    if (!session()->get('isLoggedIn')) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'يجب تسجيل الدخول أولاً'
+        ]);
+    }
+
+    $json = $this->request->getJSON();
+
+    if (!$json) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'بيانات غير صحيحة'
+        ]);
+    }
+
+    $transferId = $json->transfer_id ?? null;
+    $action = $json->action ?? null; // 'accept' or 'reject'
+
+    if (!$transferId || !$action) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'البيانات المطلوبة غير مكتملة'
+        ]);
+    }
+
+    try {
+        $transferModel = new TransferItemsModel();
+        $orderModel = new OrderModel();
+        $itemOrderModel = new ItemOrderModel();
+
+        // بدء المعاملة
+        $transferModel->transStart();
+
+        // جلب معلومات الطلب
+        $transfer = $transferModel
+            ->select('transfer_items.*, item_order.item_order_id, item_order.order_id')
+            ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+            ->where('transfer_items.transfer_item_id', $transferId)
+            ->first();
+
+        if (!$transfer) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'يجب تسجيل الدخول أولاً'
+                'message' => 'الطلب غير موجود'
             ]);
         }
 
-        $json = $this->request->getJSON();
-
-        if (!$json) {
+        // التحقق من أن المستخدم الحالي هو المستقبل
+        $currentUserId = session()->get('employee_id');
+        if ($transfer->to_user_id !== $currentUserId) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'بيانات غير صحيحة'
+                'message' => 'ليس لديك صلاحية لهذا الإجراء'
             ]);
         }
 
-        $transferId = $json->transfer_id ?? null;
-        $action = $json->action ?? null; // 'accept' or 'reject'
-
-        if (!$transferId || !$action) {
+        // التحقق من أن الطلب في حالة "قيد الانتظار"
+        if ($transfer->order_status_id != 1) {
+            $statusText = $transfer->order_status_id == 2 ? 'مقبول' : 'مرفوض';
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'البيانات المطلوبة غير مكتملة'
+                'message' => 'هذا الطلب ' . $statusText . ' مسبقاً'
             ]);
         }
 
-        try {
-            $transferModel = new TransferItemsModel();
+        // تحديد حالة الطلب: 2 = مقبول, 3 = مرفوض
+        $orderStatusId = ($action === 'accept') ? 2 : 3;
 
-            // جلب معلومات الطلب
-            $transfer = $transferModel->find($transferId);
+        // تحديث حالة طلب التحويل
+        $transferModel->update($transferId, [
+            'order_status_id' => $orderStatusId,
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
 
-            if (!$transfer) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'الطلب غير موجود'
-                ]);
-            }
-
-            // التحقق من أن المستخدم الحالي هو المستقبل
-            $currentUserId = session()->get('employee_id');
-            if ($transfer->to_user_id !== $currentUserId) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'ليس لديك صلاحية لهذا الإجراء'
-                ]);
-            }
-
-            // التحقق من أن الطلب في حالة "قيد الانتظار"
-            if ($transfer->order_status_id != 1) {
-                $statusText = $transfer->order_status_id == 2 ? 'مقبول' : 'مرفوض';
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'هذا الطلب ' . $statusText . ' مسبقاً'
-                ]);
-            }
-
-            // تحديد حالة الطلب: 2 = مقبول, 3 = مرفوض
-            $orderStatusId = ($action === 'accept') ? 2 : 3;
-
-            // تحديث حالة الطلب
-            $updated = $transferModel->update($transferId, [
-                'order_status_id' => $orderStatusId,
+        if ($action === 'accept') {
+            // في حالة القبول: إنشاء سجل جديد في جدول order للمستلم (to_user_id)
+            $orderModel->insert([
+                'from_user_id' => $transfer->from_user_id,
+                'to_user_id' => $transfer->to_user_id,
+                'order_status_id' => 2, // مقبول
+                'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            if (!$updated) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'فشل تحديث حالة الطلب'
-                ]);
-            }
+            $newOrderId = $orderModel->insertID();
 
-            $message = ($action === 'accept')
-                ? 'تم قبول الطلب بنجاح. العهدة الآن في عهدتك'
-                : 'تم رفض الطلب. العهدة ستبقى مع المُرسل';
-
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => $message
+            // تحديث item_order ليشير للطلب الجديد
+            $itemOrderModel->update($transfer->item_order_id, [
+                'order_id' => $newOrderId,
+                'updated_at' => date('Y-m-d H:i:s')
             ]);
-        } catch (\Exception $e) {
-            log_message('error', 'Transfer Response Error: ' . $e->getMessage());
 
+            $message = 'تم قبول الطلب بنجاح. العهدة الآن في عهدتك';
+
+        } else {
+            // في حالة الرفض: إرجاع العهدة للمُرسِل (from_user_id)
+            
+            // إنشاء سجل في جدول order للمُرسِل
+            $orderModel->insert([
+                'from_user_id' => null, // يمكن تركه null
+                'to_user_id' => $transfer->from_user_id, // العهدة ترجع للمُرسِل
+                'order_status_id' => 2, // مقبول (لأن العهدة رجعت له)
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $returnOrderId = $orderModel->insertID();
+
+            // تحديث item_order ليشير للطلب المُرتجع
+            $itemOrderModel->update($transfer->item_order_id, [
+                'order_id' => $returnOrderId,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $message = 'تم رفض الطلب. العهدة أُرجعت للمُرسِل';
+        }
+
+        // إنهاء المعاملة
+        $transferModel->transComplete();
+
+        if ($transferModel->transStatus() === false) {
+            log_message('error', 'Transaction failed in respondToTransfer');
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'حدث خطأ: ' . $e->getMessage()
+                'message' => 'فشل تنفيذ العملية'
             ]);
         }
-    }
 
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => $message
+        ]);
+
+    } catch (\Exception $e) {
+        log_message('error', 'Transfer Response Error: ' . $e->getMessage());
+
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'حدث خطأ: ' . $e->getMessage()
+        ]);
+    }
+}
 
 
     /**
