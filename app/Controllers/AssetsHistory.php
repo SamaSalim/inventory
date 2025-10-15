@@ -218,9 +218,7 @@ class AssetsHistory extends BaseController
         ]);
     }
 
-    /**
-     * عرض دورة حياة أصل معيّن
-     */
+
 public function assetCycle($assetNum = null): string
 {
     $this->checkAuth();
