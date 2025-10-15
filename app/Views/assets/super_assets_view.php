@@ -80,6 +80,41 @@
             color: #666;
             font-size: 14px;
         }
+
+        /* Enhanced Action Button Styling */
+        .action-btn.cycle-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-btn.cycle-btn:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #663b8e 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .action-btn.cycle-btn i {
+            font-size: 16px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 
@@ -288,12 +323,11 @@
                                     <td><?= esc($operation->last_operation_date ?? '-') ?></td>
                                     <td>
                                         <div class="action-buttons">
-                                            <a href="<?= site_url('AssetsHistory/viewDetails/' . $operation->id) ?>" 
-                                               class="action-btn view-btn">
-                                                <svg class="btn-icon" viewBox="0 0 24 24">
-                                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                                                </svg>
-                                                عرض
+                                            <a href="<?= site_url('AssetsHistory/assetCycle/' . $operation->asset_number) ?>" 
+                                               class="action-btn cycle-btn" 
+                                               title="عرض دورة حياة الأصل الكاملة">
+                                                <i class="fas fa-project-diagram"></i>
+                                                 تتبع عمليات الأصل
                                             </a>
                                         </div>
                                     </td>
