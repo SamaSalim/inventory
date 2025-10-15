@@ -362,84 +362,6 @@ body {
   border-radius: 8px;
 }
 
-/* Action Buttons Container */
-.action-buttons-container {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 15px;
-  flex-wrap: nowrap;
-  margin-top: 40px;
-  margin-bottom: 40px;
-  margin-left: 30px;
-  direction: ltr;
-  width: 100%;
-}
-
-/* Button Styling */
-.action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: row;
-  gap: 8px;
-  padding: 12px 24px;
-  min-width: 120px;
-  border: none;
-  border-radius: 50px;
-  font-family: "Cairo", sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.2;
-  color: white;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-}
-
-.action-btn span {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-/* Button Icons */
-.btn-icon {
-  width: 16px;
-  height: 16px;
-  stroke-width: 2.5;
-  margin-top: 0;
-  align-self: center;
-  transition: transform 0.3s ease;
-}
-
-.action-btn:hover .btn-icon {
-  transform: scale(1.1);
-}
-
-/* Back Button */
-.back-btn {
-  background-color: #495057;
-}
-
-.back-btn:hover {
-  background-color: #3a3f44;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
-  color: white;
-}
-
-/* Print Button */
-.print-btn {
-  background-color: #28a745;
-}
-
-.print-btn:hover {
-  background-color: #218838;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-}
-
 .no-items-msg {
   text-align: center;
   padding: 40px;
@@ -508,4 +430,50 @@ body {
   .items-grid {
     grid-template-columns: 1fr;
   }
+}
+.action-buttons-container {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #e9ecef;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.back-btn {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.back-btn:hover {
+  background-color: #dee2e6;
+  color: #212529;
+}
+
+.print-btn {
+  background-color: #057590;
+  color: white;
+}
+
+.print-btn:hover {
+  background-color: #045a74;
+}
+
+.btn-icon {
+  width: 18px;
+  height: 18px;
 }

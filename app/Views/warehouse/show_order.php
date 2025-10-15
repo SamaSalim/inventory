@@ -6,8 +6,11 @@
     <title>تفاصيل الطلب</title>
     <link rel="stylesheet" href="<?= base_url('public/assets/css/order_details.css') ?>">
         <link rel="stylesheet" href="<?= base_url('public/assets/css/order_details.css') ?>">
-        <link rel="stylesheet" href="<?= base_url('public/assets/css/print_order_details.css') ?>">
+        <link rel="stylesheet" href="<?= base_url('public/assets/css/components/print_form_style.css') ?>">
 </head>
+<style>
+   
+</style>
 <body>
     <?= $this->include('layouts/header') ?>
 
@@ -151,12 +154,32 @@
                                 </div>
                             </div>
                         <?php endforeach; ?>
+
+
                     </div>
                 <?php else: ?>
                     <div class="no-items-msg">لا توجد عناصر مرتبطة بهذا الطلب.</div>
                 <?php endif; ?>
+                                    <!-- Action buttons -->
+<div class="action-buttons-container">
+                  <button onclick="window.print()" class="action-btn print-btn">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9V4H18V9M6 14H18V20H6V14Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span>طباعة</span>
+                    </button>
+                    <a href="<?= site_url('assetsHistory/superAssets') ?>" class="action-btn back-btn">
+
+                        <span>العودة</span>
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </a>
+
+                </div>
             </div>
         </div>
+
     </div>
 
  <div class="print-only">
@@ -355,22 +378,6 @@
         </div>
     </div>
 
-    <!-- Action buttons -->
-    <div class="action-buttons-container no-print">
-        <a href="<?= site_url('inventoryController') ?>" class="action-btn back-btn">
-            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 18L9 12L15 6" stroke="currentColor"/>
-            </svg>
-            <span>العودة</span>
-        </a>
-
-        <button onclick="window.print()" class="action-btn print-btn">
-            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M6 9V4H18V9M6 14H18V20H6V14Z" stroke="currentColor"/>
-            </svg>
-            <span>طباعة</span>
-        </button>
-    </div>
 
 </body>
 </html>

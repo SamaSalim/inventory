@@ -430,3 +430,21 @@
     visibility: hidden !important;
   }
 }
+
+.field-line {
+  border-bottom: 1px solid #7f8c8d;
+  flex: 1;
+  height: 1px;
+  min-width: 120px;
+}
+
+/* Fix for text on line alignment */
+.field-value-on-line {
+  border-bottom: 1px solid #7f8c8d;
+  flex: 1;
+  padding-bottom: 2px;
+  min-width: 120px;
+  text-align: right;
+  color: #2c3e50;
+  font-weight: 500;
+}
