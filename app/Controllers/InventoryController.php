@@ -1066,4 +1066,34 @@ public function getOrderDetails($orderId)
     }
 
     
-}}
+}
+
+// ✅ تحديث حالة الطلب (مقبول أو مرفوض)
+public function updateOrderStatus($orderId)
+{
+    $orderModel = new \App\Models\OrderModel();
+
+    // قراءة البيانات القادمة من الجافاسكربت
+    $data = json_decode($this->request->getBody(), true);
+    $status_id = $data['status_id'] ?? null;
+
+    if (!$status_id) {
+        return $this->response->setStatusCode(400)->setJSON(['error' => 'لم يتم تحديد الحالة.']);
+    }
+
+    // التحقق من وجود الطلب
+    $order = $orderModel->find($orderId);
+    if (!$order) {
+        return $this->response->setStatusCode(404)->setJSON(['error' => 'الطلب غير موجود.']);
+    }
+
+    // تحديث الحالة
+    $orderModel->update($orderId, ['order_status_id' => $status_id]);
+
+    return $this->response->setJSON(['success' => true, 'message' => 'تم تحديث حالة الطلب بنجاح.']);
+}
+
+
+
+
+}
