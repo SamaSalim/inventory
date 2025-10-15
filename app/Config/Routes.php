@@ -8,3 +8,4 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'login::index');
 
 $routes->setAutoRoute(true);
+$routes->post('InventoryController/updateOrderStatus/(:num)', 'InventoryController::updateOrderStatus/$1');
