@@ -89,6 +89,8 @@ class login extends BaseController
         } elseif ($roleName === 'user') {
             // التوجيه لصفحة العهد
             return redirect()->to('/UserController/dashboard');
+        }elseif ($roleName === 'super_assets') {
+            return redirect()->to('/AssetsController/index');
         } else {
             return redirect()->back()->with('error', 'دور غير معروف.');
         }

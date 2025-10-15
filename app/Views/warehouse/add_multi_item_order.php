@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-    
+
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     
+
     <title>نموذج طلب متعدد الأصناف</title>
-    
-    
+
+
 
     <style>
         * {
@@ -123,7 +123,9 @@
             font-size: 0.95rem;
         }
 
-        input, select, textarea {
+        input,
+        select,
+        textarea {
             padding: 12px 16px;
             border: 2px solid rgba(59, 130, 182, 0.3);
             background: rgba(232, 244, 253, 0.05);
@@ -133,18 +135,22 @@
             transition: all 0.3s ease;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: #3b82b6;
             background: rgba(59, 130, 182, 0.15);
             box-shadow: 0 0 0 3px rgba(59, 130, 182, 0.2);
         }
 
-        input::placeholder, textarea::placeholder {
+        input::placeholder,
+        textarea::placeholder {
             color: rgba(255, 255, 255, 0.6);
         }
 
-        input:read-only, select:disabled {
+        input:read-only,
+        select:disabled {
             background: rgba(26, 37, 47, 0.3);
             cursor: not-allowed;
             opacity: 0.7;
@@ -346,7 +352,9 @@
             border-top: 1px solid rgba(59, 130, 182, 0.3);
         }
 
-        .cancel-btn, .clear-btn, .submit-btn {
+        .cancel-btn,
+        .clear-btn,
+        .submit-btn {
             padding: 12px 30px;
             border: none;
             border-radius: 8px;
@@ -443,7 +451,7 @@
             position: fixed;
             top: 10px;
             left: 10px;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.8);
             color: white;
             padding: 10px;
             border-radius: 5px;
@@ -452,8 +460,9 @@
             max-width: 300px;
         }
     </style>
-    
+
 </head>
+
 <body>
 
 
@@ -476,36 +485,34 @@
                 <div class="section-header">
                     <h4>بيانات المرسل</h4>
                 </div>
-                
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>رقم المستخدم المرسل <span class="required">*</span></label>
-                        <input type="text" name="from_user_id" id="fromUserId" placeholder="أدخل رقم المستخدم المرسل" required>
-                        <div id="fromUserLoadingMsg" class="status-message loading-msg" style="display: none;">جاري البحث...</div>
-                        <div id="fromUserErrorMsg" class="status-message error-msg" style="display: none;">رقم المستخدم غير موجود</div>
-                        <div id="fromUserSuccessMsg" class="status-message success-msg" style="display: none;">تم العثور على المستخدم</div>
+                        <label>الرقم الوظيفي</label>
+                        <input type="text" value="<?= esc(session()->get('employee_id')) ?>" readonly>
+                        <input type="hidden" id="fromUserId" value="<?= esc(session()->get('employee_id')) ?>">
                     </div>
                     <div class="form-group">
-                        <label>اسم المرسل <span class="required">*</span></label>
-                        <input type="text" name="from_sender_name" id="fromSenderName" placeholder="أدخل اسم المرسل" required readonly>
+                        <label>اسم المرسل</label>
+                        <input type="text" id="fromSenderName" value="<?= esc(session()->get('name')) ?>" readonly>
                     </div>
                     <div class="form-group">
                         <label>البريد الإلكتروني</label>
-                        <input type="email" name="from_email" id="fromUserEmail" placeholder="أدخل البريد الإلكتروني" readonly>
+                        <input type="email" value="<?= esc($sender_data->email ?? '') ?>" readonly>
                     </div>
+
                     <div class="form-group">
                         <label>رقم التحويلة</label>
-                        <input type="text" name="from_transfer_number" id="fromTransferNumber" placeholder="أدخل رقم التحويلة" readonly>
+                        <input type="text" value="<?= esc($sender_data->emp_ext ?? '') ?>" readonly>
+
+                        <input type="hidden" id="fromTransferNumber" value="<?= esc($sender_data->emp_ext ?? '') ?>">
                     </div>
                 </div>
-
                 <hr>
-
                 <!-- قسم بيانات المستلم -->
                 <div class="section-header">
                     <h4>بيانات المستلم</h4>
                 </div>
-                
+
                 <div class="form-grid">
                     <div class="form-group">
                         <label>رقم المستخدم <span class="required">*</span></label>
@@ -534,7 +541,7 @@
                 <div class="section-header">
                     <h4>موقع المستلم</h4>
                 </div>
-                
+
                 <div class="form-grid">
                     <div class="form-group">
                         <label>المبنى <span class="required">*</span></label>
@@ -568,13 +575,13 @@
                 <div class="section-header">
                     <h4>الأصناف المطلوبة</h4>
                 </div>
-                
+
                 <div class="items-section">
                     <button type="button" class="add-item-btn" onclick="addNewItem()">
                         <span>+</span>
                         إضافة صنف جديد
                     </button>
-                    
+
                     <div id="itemsContainer">
                         <!-- سيتم إضافة الأصناف هنا -->
                     </div>
@@ -596,46 +603,46 @@
         </div>
     </div>
 
-    
+
     <script>
- // احصل على اسم المجلد من URL الحالي تلقائياً
-const pathSegments = window.location.pathname.split('/');
-const projectFolder = pathSegments[1] || ''; 
-const SITE_URL = window.location.origin + '/' + projectFolder + '/index.php/';
+        // احصل على اسم المجلد من URL الحالي تلقائياً
+        const pathSegments = window.location.pathname.split('/');
+        const projectFolder = pathSegments[1] || '';
+        const SITE_URL = window.location.origin + '/' + projectFolder + '/index.php/';
 
-console.log('SITE_URL:', SITE_URL); // للتأكد
+        console.log('SITE_URL:', SITE_URL); // للتأكد
 
-// متغيرات عامة
-let savedFormData = {};
-let searchTimeout;
-let debugMode = false;
-let itemCounter = 0;
+        // متغيرات عامة
+        let savedFormData = {};
+        let searchTimeout;
+        let debugMode = false;
+        let itemCounter = 0;
 
-// وظيفة مساعدة لبناء الروابط
-function buildUrl(path) {
-    return SITE_URL + path;
-}
+        // وظيفة مساعدة لبناء الروابط
+        function buildUrl(path) {
+            return SITE_URL + path;
+        }
 
-// وظيفة لإظهار معلومات التصحيح
-function updateDebugInfo(status, request, response) {
-    if (!debugMode) return;
-    
-    document.getElementById('debugInfo').style.display = 'block';
-    document.getElementById('debugStatus').textContent = status;
-    document.getElementById('debugRequest').textContent = request;
-    document.getElementById('debugResponse').textContent = JSON.stringify(response).substring(0, 100) + '...';
-}
+        // وظيفة لإظهار معلومات التصحيح
+        function updateDebugInfo(status, request, response) {
+            if (!debugMode) return;
 
-// وظيفة إضافة صنف جديد
-function addNewItem() {
-    itemCounter++;
-    const container = document.getElementById('itemsContainer');
-    
-    const itemDiv = document.createElement('div');
-    itemDiv.className = 'item-card';
-    itemDiv.id = `item_${itemCounter}`;
-    
-    itemDiv.innerHTML = `
+            document.getElementById('debugInfo').style.display = 'block';
+            document.getElementById('debugStatus').textContent = status;
+            document.getElementById('debugRequest').textContent = request;
+            document.getElementById('debugResponse').textContent = JSON.stringify(response).substring(0, 100) + '...';
+        }
+
+        // وظيفة إضافة صنف جديد
+        function addNewItem() {
+            itemCounter++;
+            const container = document.getElementById('itemsContainer');
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item-card';
+            itemDiv.id = `item_${itemCounter}`;
+
+            itemDiv.innerHTML = `
         <div class="item-header">
             <div class="item-title">الصنف رقم ${itemCounter}</div>
             <button type="button" class="remove-item-btn" onclick="removeItem(${itemCounter})" title="إزالة الصنف">
@@ -683,144 +690,144 @@ function addNewItem() {
             <div id="assetSerialContainer_${itemCounter}"></div>
         </div>
     `;
-    
-    container.appendChild(itemDiv);
-    
-    // تهيئة البحث للصنف الجديد
-    initItemSearchForElement(itemCounter);
-    
-    // تحميل قائمة أنواع العهدة للصنف الجديد
-    loadCustodyTypesForItem(itemCounter);
-}
 
-// وظيفة إزالة صنف
-function removeItem(itemId) {
-    if (confirm('هل أنت متأكد من إزالة هذا الصنف؟')) {
-        const itemElement = document.getElementById(`item_${itemId}`);
-        if (itemElement) {
-            itemElement.remove();
-        }
-        updateItemTitles();
-    }
-}
+            container.appendChild(itemDiv);
 
-// وظيفة تحديث عناوين الأصناف
-function updateItemTitles() {
-    const itemCards = document.querySelectorAll('.item-card');
-    itemCards.forEach((card, index) => {
-        const title = card.querySelector('.item-title');
-        if (title) {
-            title.textContent = `الصنف رقم ${index + 1}`;
-        }
-    });
-}
+            // تهيئة البحث للصنف الجديد
+            initItemSearchForElement(itemCounter);
 
-// وظيفة البحث في الأصناف لعنصر محدد
-function initItemSearchForElement(itemId) {
-    const searchInput = document.querySelector(`input[name="item_${itemId}"]`);
-    const dropdown = document.getElementById(`itemDropdown_${itemId}`);
-    const classificationDisplay = document.getElementById(`classificationDisplay_${itemId}`);
-
-    if (!searchInput || !dropdown || !classificationDisplay) return;
-
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.trim();
-        
-        if (searchTerm.length < 2) {
-            dropdown.style.display = 'none';
-            classificationDisplay.classList.remove('show');
-            return;
+            // تحميل قائمة أنواع العهدة للصنف الجديد
+            loadCustodyTypesForItem(itemCounter);
         }
 
-        dropdown.innerHTML = '<div class="dropdown-item loading">جاري البحث...</div>';
-        dropdown.style.display = 'block';
-
-        updateDebugInfo('البحث في الأصناف...', `searchitems?term=${searchTerm}`, 'انتظار...');
-
-        fetch(buildUrl(`OrderController/searchitems?term=${encodeURIComponent(searchTerm)}`))
-            .then(response => {
-                console.log('Response status:', response.status);
-                updateDebugInfo('استلام الاستجابة', `searchitems?term=${searchTerm}`, `Status: ${response.status}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+        // وظيفة إزالة صنف
+        function removeItem(itemId) {
+            if (confirm('هل أنت متأكد من إزالة هذا الصنف؟')) {
+                const itemElement = document.getElementById(`item_${itemId}`);
+                if (itemElement) {
+                    itemElement.remove();
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Search response:', data);
-                updateDebugInfo('نجح البحث', `searchitems?term=${searchTerm}`, data);
-                
-                dropdown.innerHTML = '';
-                
-                if (data.success && data.data && data.data.length > 0) {
-                    dropdown.innerHTML = data.data
-                        .map(item => `<div class="dropdown-item" data-item-name="${item.name}" data-major-category="${item.major_category}" data-minor-category="${item.minor_category}">${item.name}</div>`)
-                        .join('');
-                    dropdown.style.display = 'block';
-                } else {
-                    dropdown.innerHTML = '<div class="dropdown-item no-results">لا توجد نتائج</div>';
-                    dropdown.style.display = 'block';
+                updateItemTitles();
+            }
+        }
+
+        // وظيفة تحديث عناوين الأصناف
+        function updateItemTitles() {
+            const itemCards = document.querySelectorAll('.item-card');
+            itemCards.forEach((card, index) => {
+                const title = card.querySelector('.item-title');
+                if (title) {
+                    title.textContent = `الصنف رقم ${index + 1}`;
                 }
-            })
-            .catch(error => {
-                console.error('خطأ في البحث عن الأصناف:', error);
-                updateDebugInfo('خطأ في البحث', `searchitems?term=${searchTerm}`, error.message);
-                dropdown.innerHTML = '<div class="dropdown-item error">خطأ في البحث</div>';
-                dropdown.style.display = 'block';
             });
-    });
-
-    dropdown.addEventListener('click', function(e) {
-        if (e.target.classList.contains('dropdown-item') && 
-            !e.target.classList.contains('loading') && 
-            !e.target.classList.contains('no-results') && 
-            !e.target.classList.contains('error')) {
-            
-            const itemName = e.target.dataset.itemName;
-            const majorCategory = e.target.dataset.majorCategory;
-            const minorCategory = e.target.dataset.minorCategory;
-            
-            searchInput.value = itemName;
-            dropdown.style.display = 'none';
-            
-            // عرض التصنيفات
-            document.getElementById(`majorCategory_${itemId}`).textContent = majorCategory || '-';
-            document.getElementById(`minorCategory_${itemId}`).textContent = minorCategory || '-';
-            classificationDisplay.classList.add('show');
         }
-    });
 
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest(`#item_${itemId} .search-dropdown`)) {
-            dropdown.style.display = 'none';
+        // وظيفة البحث في الأصناف لعنصر محدد
+        function initItemSearchForElement(itemId) {
+            const searchInput = document.querySelector(`input[name="item_${itemId}"]`);
+            const dropdown = document.getElementById(`itemDropdown_${itemId}`);
+            const classificationDisplay = document.getElementById(`classificationDisplay_${itemId}`);
+
+            if (!searchInput || !dropdown || !classificationDisplay) return;
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.trim();
+
+                if (searchTerm.length < 2) {
+                    dropdown.style.display = 'none';
+                    classificationDisplay.classList.remove('show');
+                    return;
+                }
+
+                dropdown.innerHTML = '<div class="dropdown-item loading">جاري البحث...</div>';
+                dropdown.style.display = 'block';
+
+                updateDebugInfo('البحث في الأصناف...', `searchitems?term=${searchTerm}`, 'انتظار...');
+
+                fetch(buildUrl(`OrderController/searchitems?term=${encodeURIComponent(searchTerm)}`))
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        updateDebugInfo('استلام الاستجابة', `searchitems?term=${searchTerm}`, `Status: ${response.status}`);
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Search response:', data);
+                        updateDebugInfo('نجح البحث', `searchitems?term=${searchTerm}`, data);
+
+                        dropdown.innerHTML = '';
+
+                        if (data.success && data.data && data.data.length > 0) {
+                            dropdown.innerHTML = data.data
+                                .map(item => `<div class="dropdown-item" data-item-name="${item.name}" data-major-category="${item.major_category}" data-minor-category="${item.minor_category}">${item.name}</div>`)
+                                .join('');
+                            dropdown.style.display = 'block';
+                        } else {
+                            dropdown.innerHTML = '<div class="dropdown-item no-results">لا توجد نتائج</div>';
+                            dropdown.style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('خطأ في البحث عن الأصناف:', error);
+                        updateDebugInfo('خطأ في البحث', `searchitems?term=${searchTerm}`, error.message);
+                        dropdown.innerHTML = '<div class="dropdown-item error">خطأ في البحث</div>';
+                        dropdown.style.display = 'block';
+                    });
+            });
+
+            dropdown.addEventListener('click', function(e) {
+                if (e.target.classList.contains('dropdown-item') &&
+                    !e.target.classList.contains('loading') &&
+                    !e.target.classList.contains('no-results') &&
+                    !e.target.classList.contains('error')) {
+
+                    const itemName = e.target.dataset.itemName;
+                    const majorCategory = e.target.dataset.majorCategory;
+                    const minorCategory = e.target.dataset.minorCategory;
+
+                    searchInput.value = itemName;
+                    dropdown.style.display = 'none';
+
+                    // عرض التصنيفات
+                    document.getElementById(`majorCategory_${itemId}`).textContent = majorCategory || '-';
+                    document.getElementById(`minorCategory_${itemId}`).textContent = minorCategory || '-';
+                    classificationDisplay.classList.add('show');
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest(`#item_${itemId} .search-dropdown`)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+
+            searchInput.addEventListener('input', function() {
+                if (this.value.trim() === '') {
+                    classificationDisplay.classList.remove('show');
+                }
+            });
         }
-    });
 
-    searchInput.addEventListener('input', function() {
-        if (this.value.trim() === '') {
-            classificationDisplay.classList.remove('show');
-        }
-    });
-}
+        // وظيفة إنشاء حقول الأصول والأرقام التسلسلية
+        function createAssetSerialFields(itemId, quantity) {
+            const container = document.getElementById(`assetSerialContainer_${itemId}`);
+            const dynamicSection = document.getElementById(`dynamicFields_${itemId}`);
 
-// وظيفة إنشاء حقول الأصول والأرقام التسلسلية
-function createAssetSerialFields(itemId, quantity) {
-    const container = document.getElementById(`assetSerialContainer_${itemId}`);
-    const dynamicSection = document.getElementById(`dynamicFields_${itemId}`);
-    
-    if (!container || !dynamicSection) return;
-    
-    container.innerHTML = '';
-    
-    const qty = parseInt(quantity) || 0;
-    
-    if (qty > 0) {
-        for (let i = 1; i <= qty; i++) {
-            const fieldDiv = document.createElement('div');
-            fieldDiv.className = 'asset-serial-grid';
-            
-            fieldDiv.innerHTML = `
+            if (!container || !dynamicSection) return;
+
+            container.innerHTML = '';
+
+            const qty = parseInt(quantity) || 0;
+
+            if (qty > 0) {
+                for (let i = 1; i <= qty; i++) {
+                    const fieldDiv = document.createElement('div');
+                    fieldDiv.className = 'asset-serial-grid';
+
+                    fieldDiv.innerHTML = `
                 <div class="asset-serial-header">العنصر رقم ${i}</div>
                 <div class="form-group">
                     <label>رقم الأصول <span class="required">*</span></label>
@@ -852,632 +859,554 @@ function createAssetSerialFields(itemId, quantity) {
                     <input type="text" name="brand_${itemId}_${i}" placeholder="أدخل اسم البراند">
                 </div>
             `;
-            
-            container.appendChild(fieldDiv);
-            
-            // إضافة معالجات التحقق للحقول الجديدة
-            const assetInput = fieldDiv.querySelector(`input[name="asset_num_${itemId}_${i}"]`);
-            const serialInput = fieldDiv.querySelector(`input[name="serial_num_${itemId}_${i}"]`);
-            
-            assetInput.addEventListener('blur', () => validateAssetSerial(assetInput, itemId, i, 'asset'));
-            serialInput.addEventListener('blur', () => validateAssetSerial(serialInput, itemId, i, 'serial'));
-        }
-        
-        dynamicSection.style.display = 'block';
-    } else {
-        dynamicSection.style.display = 'none';
-    }
-}
 
-// وظيفة التحقق من تكرار الأرقام
-function validateAssetSerial(input, itemId, index, type) {
-    const value = input.value.trim();
-    const messageElement = document.querySelector(`.${type}-validation-${itemId}-${index}`);
-    
-    // مسح الرسائل السابقة
-    if (messageElement) {
-        messageElement.style.display = 'none';
-        messageElement.className = `validation-message ${type}-validation-${itemId}-${index}`;
-    }
-    
-    if (!value) {
-        return;
-    }
+                    container.appendChild(fieldDiv);
 
-    // إظهار رسالة التحميل
-    if (messageElement) {
-        messageElement.textContent = 'جاري التحقق...';
-        messageElement.className += ' loading-msg';
-        messageElement.style.display = 'block';
-    }
-    
-    // إعداد البيانات للإرسال
-    const formData = new FormData();
-    if (type === 'asset') {
-        formData.append('asset_num', value);
-        formData.append('check_type', 'asset');
-    } else {
-        formData.append('serial_num', value);
-        formData.append('check_type', 'serial');
-    }
+                    // إضافة معالجات التحقق للحقول الجديدة
+                    const assetInput = fieldDiv.querySelector(`input[name="asset_num_${itemId}_${i}"]`);
+                    const serialInput = fieldDiv.querySelector(`input[name="serial_num_${itemId}_${i}"]`);
 
-    fetch(buildUrl('OrderController/validateAssetSerial'), {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (messageElement) {
-            messageElement.style.display = 'none';
-            
-            if (data.success) {
-                // الرقم متاح
-                messageElement.textContent = '✓ متاح';
-                messageElement.className = `validation-message ${type}-validation-${itemId}-${index} success-msg`;
-                messageElement.style.display = 'block';
-                input.style.borderColor = '#27ae60';
+                    assetInput.addEventListener('blur', () => validateAssetSerial(assetInput, itemId, i, 'asset'));
+                    serialInput.addEventListener('blur', () => validateAssetSerial(serialInput, itemId, i, 'serial'));
+                }
+
+                dynamicSection.style.display = 'block';
             } else {
-                // يوجد خطأ أو تكرار
-                if (data.errors && data.errors.length > 0) {
-                    const error = data.errors.find(e => e.type === type);
-                    if (error) {
-                        messageElement.textContent = '✗ ' + error.message;
+                dynamicSection.style.display = 'none';
+            }
+        }
+
+        // وظيفة التحقق من تكرار الأرقام
+        function validateAssetSerial(input, itemId, index, type) {
+            const value = input.value.trim();
+            const messageElement = document.querySelector(`.${type}-validation-${itemId}-${index}`);
+
+            // مسح الرسائل السابقة
+            if (messageElement) {
+                messageElement.style.display = 'none';
+                messageElement.className = `validation-message ${type}-validation-${itemId}-${index}`;
+            }
+
+            if (!value) {
+                return;
+            }
+
+            // إظهار رسالة التحميل
+            if (messageElement) {
+                messageElement.textContent = 'جاري التحقق...';
+                messageElement.className += ' loading-msg';
+                messageElement.style.display = 'block';
+            }
+
+            // إعداد البيانات للإرسال
+            const formData = new FormData();
+            if (type === 'asset') {
+                formData.append('asset_num', value);
+                formData.append('check_type', 'asset');
+            } else {
+                formData.append('serial_num', value);
+                formData.append('check_type', 'serial');
+            }
+
+            fetch(buildUrl('OrderController/validateAssetSerial'), {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (messageElement) {
+                        messageElement.style.display = 'none';
+
+                        if (data.success) {
+                            // الرقم متاح
+                            messageElement.textContent = '✓ متاح';
+                            messageElement.className = `validation-message ${type}-validation-${itemId}-${index} success-msg`;
+                            messageElement.style.display = 'block';
+                            input.style.borderColor = '#27ae60';
+                        } else {
+                            // يوجد خطأ أو تكرار
+                            if (data.errors && data.errors.length > 0) {
+                                const error = data.errors.find(e => e.type === type);
+                                if (error) {
+                                    messageElement.textContent = '✗ ' + error.message;
+                                    messageElement.className = `validation-message ${type}-validation-${itemId}-${index} error-msg`;
+                                    messageElement.style.display = 'block';
+                                    input.style.borderColor = '#e74c3c';
+                                }
+                            } else {
+                                messageElement.textContent = '✗ ' + data.message;
+                                messageElement.className = `validation-message ${type}-validation-${itemId}-${index} error-msg`;
+                                messageElement.style.display = 'block';
+                                input.style.borderColor = '#e74c3c';
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('خطأ في التحقق:', error);
+                    if (messageElement) {
+                        messageElement.textContent = 'خطأ في التحقق';
                         messageElement.className = `validation-message ${type}-validation-${itemId}-${index} error-msg`;
                         messageElement.style.display = 'block';
                         input.style.borderColor = '#e74c3c';
                     }
-                } else {
-                    messageElement.textContent = '✗ ' + data.message;
-                    messageElement.className = `validation-message ${type}-validation-${itemId}-${index} error-msg`;
-                    messageElement.style.display = 'block';
-                    input.style.borderColor = '#e74c3c';
-                }
-            }
-        }
-    })
-    .catch(error => {
-        console.error('خطأ في التحقق:', error);
-        if (messageElement) {
-            messageElement.textContent = 'خطأ في التحقق';
-            messageElement.className = `validation-message ${type}-validation-${itemId}-${index} error-msg`;
-            messageElement.style.display = 'block';
-            input.style.borderColor = '#e74c3c';
-        }
-    });
-}
-
-// تحميل أنواع العهدة لصنف محدد
-function loadCustodyTypesForItem(itemId) {
-    const custodySelect = document.querySelector(`select[name="custody_type_${itemId}"]`);
-    if (!custodySelect) return;
-
-    fetch(buildUrl('OrderController/getformdata'))
-        .then(response => response.json())
-        .then(data => {
-            if (data.success && data.custody_types && Array.isArray(data.custody_types)) {
-                custodySelect.innerHTML = '<option value="">اختر نوع العهدة</option>';
-                data.custody_types.forEach(type => {
-                    custodySelect.innerHTML += `<option value="${type.id}">${type.name}</option>`;
                 });
-            }
-        })
-        .catch(error => {
-            console.error('خطأ في تحميل أنواع العهدة:', error);
-        });
-}
+        }
 
-// وظيفة البحث عن المستخدم المرسل
-function initFromUserSearch() {
-    const fromUserIdInput = document.getElementById('fromUserId');
-    const fromSenderNameInput = document.getElementById('fromSenderName');
-    const fromEmailInput = document.getElementById('fromUserEmail');
-    const fromTransferInput = document.getElementById('fromTransferNumber');
-    const fromLoadingMsg = document.getElementById('fromUserLoadingMsg');
-    const fromErrorMsg = document.getElementById('fromUserErrorMsg');
-    const fromSuccessMsg = document.getElementById('fromUserSuccessMsg');
+        // تحميل أنواع العهدة لصنف محدد
+        function loadCustodyTypesForItem(itemId) {
+            const custodySelect = document.querySelector(`select[name="custody_type_${itemId}"]`);
+            if (!custodySelect) return;
 
-    fromUserIdInput.addEventListener('input', function() {
-        const userId = this.value.trim();
-        
-        fromLoadingMsg.style.display = 'none';
-        fromErrorMsg.style.display = 'none';
-        fromSuccessMsg.style.display = 'none';
-        
-        fromSenderNameInput.value = '';
-        fromEmailInput.value = '';
-        fromTransferInput.value = '';
-        
-        if (userId.length < 3) return;
-
-        clearTimeout(searchTimeout);
-        
-        fromLoadingMsg.style.display = 'block';
-        updateDebugInfo('البحث عن المستخدم المرسل...', `searchuser?user_id=${userId}`, 'انتظار...');
-        
-        searchTimeout = setTimeout(() => {
-            searchFromUser(userId);
-        }, 500);
-    });
-
-    function searchFromUser(userId) {
-        fetch(buildUrl(`OrderController/searchuser?user_id=${encodeURIComponent(userId)}`))
-            .then(response => {
-                console.log('From User search status:', response.status);
-                updateDebugInfo('استجابة البحث عن المستخدم المرسل', `searchuser?user_id=${userId}`, `Status: ${response.status}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('From User search response:', data);
-                updateDebugInfo('نتيجة البحث عن المستخدم المرسل', `searchuser?user_id=${userId}`, data);
-                
-                fromLoadingMsg.style.display = 'none';
-                
-                if (data.success) {
-                    fromSenderNameInput.value = data.data.name || '';
-                    fromEmailInput.value = data.data.email || '';
-                    fromTransferInput.value = data.data.transfer_number || '';
-                    fromSuccessMsg.style.display = 'block';
-                    
-                    fromSenderNameInput.removeAttribute('readonly');
-                    fromEmailInput.removeAttribute('readonly');
-                    fromTransferInput.removeAttribute('readonly');
-                } else {
-                    fromErrorMsg.textContent = data.message || 'رقم المستخدم المرسل غير موجود';
-                    fromErrorMsg.style.display = 'block';
-                    
-                    fromSenderNameInput.setAttribute('readonly', true);
-                    fromEmailInput.setAttribute('readonly', true);
-                    fromTransferInput.setAttribute('readonly', true);
-                }
-            })
-            .catch(error => {
-                console.error('خطأ في البحث عن المستخدم المرسل:', error);
-                updateDebugInfo('خطأ في البحث عن المستخدم المرسل', `searchuser?user_id=${userId}`, error.message);
-                
-                fromLoadingMsg.style.display = 'none';
-                fromErrorMsg.textContent = 'خطأ في الاتصال بالخادم';
-                fromErrorMsg.style.display = 'block';
-            });
-    }
-}
-
-// وظيفة البحث عن المستخدم المستلم
-function initUserSearch() {
-    const userIdInput = document.getElementById('userId');
-    const receiverNameInput = document.getElementById('receiverName');
-    const emailInput = document.getElementById('userEmail');
-    const transferInput = document.getElementById('transferNumber');
-    const loadingMsg = document.getElementById('userLoadingMsg');
-    const errorMsg = document.getElementById('userErrorMsg');
-    const successMsg = document.getElementById('userSuccessMsg');
-
-    userIdInput.addEventListener('input', function() {
-        const userId = this.value.trim();
-        
-        loadingMsg.style.display = 'none';
-        errorMsg.style.display = 'none';
-        successMsg.style.display = 'none';
-        
-        receiverNameInput.value = '';
-        emailInput.value = '';
-        transferInput.value = '';
-        
-        if (userId.length < 3) return;
-
-        clearTimeout(searchTimeout);
-        
-        loadingMsg.style.display = 'block';
-        updateDebugInfo('البحث عن مستخدم...', `searchuser?user_id=${userId}`, 'انتظار...');
-        
-        searchTimeout = setTimeout(() => {
-            searchUser(userId);
-        }, 500);
-    });
-
-    function searchUser(userId) {
-        fetch(buildUrl(`OrderController/searchuser?user_id=${encodeURIComponent(userId)}`))
-            .then(response => {
-                console.log('User search status:', response.status);
-                updateDebugInfo('استجابة البحث عن مستخدم', `searchuser?user_id=${userId}`, `Status: ${response.status}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('User search response:', data);
-                updateDebugInfo('نتيجة البحث عن مستخدم', `searchuser?user_id=${userId}`, data);
-                
-                loadingMsg.style.display = 'none';
-                
-                if (data.success) {
-                    receiverNameInput.value = data.data.name || '';
-                    emailInput.value = data.data.email || '';
-                    transferInput.value = data.data.transfer_number || '';
-                    successMsg.style.display = 'block';
-                    
-                    receiverNameInput.removeAttribute('readonly');
-                    emailInput.removeAttribute('readonly');
-                    transferInput.removeAttribute('readonly');
-                } else {
-                    errorMsg.textContent = data.message || 'رقم المستخدم غير موجود';
-                    errorMsg.style.display = 'block';
-                    
-                    receiverNameInput.setAttribute('readonly', true);
-                    emailInput.setAttribute('readonly', true);
-                    transferInput.setAttribute('readonly', true);
-                }
-            })
-            .catch(error => {
-                console.error('خطأ في البحث عن المستخدم:', error);
-                updateDebugInfo('خطأ في البحث عن مستخدم', `searchuser?user_id=${userId}`, error.message);
-                
-                loadingMsg.style.display = 'none';
-                errorMsg.textContent = 'خطأ في الاتصال بالخادم';
-                errorMsg.style.display = 'block';
-            });
-    }
-}
-
-// وظائف إدارة المواقع
-function initLocationDropdowns() {
-    const buildingSelect = document.getElementById('buildingSelect');
-    const floorSelect = document.getElementById('floorSelect');
-    const roomSelect = document.getElementById('roomSelect');
-    const sectionSelect = document.getElementById('sectionSelect');
-
-    loadInitialData();
-
-    buildingSelect.addEventListener('change', function() {
-        loadFloors(this.value);
-    });
-
-    floorSelect.addEventListener('change', function() {
-        loadSections(this.value);
-    });
-
-    sectionSelect.addEventListener('change', function() {
-    loadRooms(this.value);
-    });
-
-
-    function loadInitialData() { // buildings, custody types
-        updateDebugInfo('تحميل البيانات الأولية...', 'getformdata', 'انتظار...');
-        
-        fetch(buildUrl('OrderController/getformdata'))
-            .then(response => {
-                console.log('Form data response status:', response.status);
-                updateDebugInfo('استجابة البيانات الأولية', 'getformdata', `Status: ${response.status}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Form data response:', data);
-                updateDebugInfo('نتيجة البيانات الأولية', 'getformdata', data);
-                
-                if (data.success) {
-                    if (data.buildings && Array.isArray(data.buildings)) {
-                        buildingSelect.innerHTML = '<option value="">اختر المبنى</option>';
-                        data.buildings.forEach(building => {
-                            buildingSelect.innerHTML += `<option value="${building.id}">${building.code || building.name}</option>`;
+            fetch(buildUrl('OrderController/getformdata'))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.custody_types && Array.isArray(data.custody_types)) {
+                        custodySelect.innerHTML = '<option value="">اختر نوع العهدة</option>';
+                        data.custody_types.forEach(type => {
+                            custodySelect.innerHTML += `<option value="${type.id}">${type.name}</option>`;
                         });
                     }
-
-
-                }
-            })
-            .catch(error => {
-                console.error('خطأ في تحميل البيانات:', error);
-                updateDebugInfo('خطأ في تحميل البيانات', 'getformdata', error.message);
-            });
-    }
-
-    function loadFloors(buildingId) { // reset dependent dropdowns
-        floorSelect.innerHTML = '<option value="">اختر الطابق</option>';
-        sectionSelect.innerHTML = '<option value="">اختر القسم</option>';
-        roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
-        
-        if (!buildingId) {
-            floorSelect.disabled = true;
-            sectionSelect.disabled = true;
-            roomSelect.disabled = true;
-            return;
-        }
-
-        fetch(buildUrl(`OrderController/getfloorsbybuilding/${buildingId}`))
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Floors response:', data);
-                if (data.success && data.data && Array.isArray(data.data)) {
-                    data.data.forEach(floor => {
-                        floorSelect.innerHTML += `<option value="${floor.id}">${floor.code || floor.name}</option>`;
-                    });
-                    floorSelect.disabled = false;
-                } else {
-                    floorSelect.disabled = true;
-                }
-            })
-            .catch(error => {
-                console.error('خطأ في تحميل الطوابق:', error);
-                floorSelect.disabled = true;
-            });
-    }
-
-    function loadSections(floorId) {
-    sectionSelect.innerHTML = '<option value="">اختر القسم</option>';
-    roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
-    
-    if (!floorId) {
-        sectionSelect.disabled = true;
-        roomSelect.disabled = true;
-        return;
-    }
-
-    fetch(buildUrl(`OrderController/getsectionsbyfloor/${floorId}`))
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Sections response:', data);
-            if (data.success && data.data && Array.isArray(data.data)) {
-                data.data.forEach(section => {
-                    sectionSelect.innerHTML += `<option value="${section.id}">${section.code || section.name}</option>`;
+                })
+                .catch(error => {
+                    console.error('خطأ في تحميل أنواع العهدة:', error);
                 });
-                sectionSelect.disabled = false;
-            } else {
-                sectionSelect.disabled = true;
-            }
-        })
-        .catch(error => {
-            console.error('خطأ في تحميل الأقسام:', error);
-            sectionSelect.disabled = true;
-        });
-}
-
-    
-
-    function loadRooms(sectionId) {
-        roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
-
-        if (!sectionId) {
-            roomSelect.disabled = true;
-            return;
         }
 
-        fetch(buildUrl(`OrderController/getroomsbysection/${sectionId}`))
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Rooms response:', data);
-                if (data.success && data.data && Array.isArray(data.data)) {
-                    roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
-                    data.data.forEach(room => {
-                        roomSelect.innerHTML += `<option value="${room.id}">${room.code || room.name}</option>`;
-                    });
-                    roomSelect.disabled = false;
-                } else {
-                    roomSelect.disabled = true;
-                }
-            })
-            .catch(error => {
-                console.error('خطأ في تحميل الغرف:', error);
-                roomSelect.disabled = true;
+
+        // وظيفة البحث عن المستخدم المستلم
+        function initUserSearch() {
+            const userIdInput = document.getElementById('userId');
+            const receiverNameInput = document.getElementById('receiverName');
+            const emailInput = document.getElementById('userEmail');
+            const transferInput = document.getElementById('transferNumber');
+            const loadingMsg = document.getElementById('userLoadingMsg');
+            const errorMsg = document.getElementById('userErrorMsg');
+            const successMsg = document.getElementById('userSuccessMsg');
+
+            userIdInput.addEventListener('input', function() {
+                const userId = this.value.trim();
+
+                loadingMsg.style.display = 'none';
+                errorMsg.style.display = 'none';
+                successMsg.style.display = 'none';
+
+                receiverNameInput.value = '';
+                emailInput.value = '';
+                transferInput.value = '';
+
+                if (userId.length < 3) return;
+
+                clearTimeout(searchTimeout);
+
+                loadingMsg.style.display = 'block';
+                updateDebugInfo('البحث عن مستخدم...', `searchuser?user_id=${userId}`, 'انتظار...');
+
+                searchTimeout = setTimeout(() => {
+                    searchUser(userId);
+                }, 500);
             });
-    }
-}
 
-// وظائف النموذج
-function openAddForm() {
-    const modal = document.getElementById('addForm');
-    if (modal) {
-        modal.style.display = 'flex';
-    }
-}
+            function searchUser(userId) {
+                fetch(buildUrl(`OrderController/searchuser?user_id=${encodeURIComponent(userId)}`))
+                    .then(response => {
+                        console.log('User search status:', response.status);
+                        updateDebugInfo('استجابة البحث عن مستخدم', `searchuser?user_id=${userId}`, `Status: ${response.status}`);
 
-function closeAddForm() {
-    saveFormData();
-    window.location.href = buildUrl('inventoryController/index');
-    
-}
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('User search response:', data);
+                        updateDebugInfo('نتيجة البحث عن مستخدم', `searchuser?user_id=${userId}`, data);
 
-function clearForm() {
-    if (confirm('هل أنت متأكد من محو جميع البيانات المدخلة؟')) {
-        const form = document.querySelector('#addForm form');
-        if (form) {
-            form.reset();
-            document.getElementById('itemsContainer').innerHTML = '';
-            itemCounter = 0;
-            const statusMessages = form.querySelectorAll('.status-message');
-            statusMessages.forEach(msg => msg.style.display = 'none');
+                        loadingMsg.style.display = 'none';
+
+                        if (data.success) {
+                            receiverNameInput.value = data.data.name || '';
+                            emailInput.value = data.data.email || '';
+                            transferInput.value = data.data.transfer_number || '';
+                            successMsg.style.display = 'block';
+
+                            receiverNameInput.removeAttribute('readonly');
+                            emailInput.removeAttribute('readonly');
+                            transferInput.removeAttribute('readonly');
+                        } else {
+                            errorMsg.textContent = data.message || 'رقم المستخدم غير موجود';
+                            errorMsg.style.display = 'block';
+
+                            receiverNameInput.setAttribute('readonly', true);
+                            emailInput.setAttribute('readonly', true);
+                            transferInput.setAttribute('readonly', true);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('خطأ في البحث عن المستخدم:', error);
+                        updateDebugInfo('خطأ في البحث عن مستخدم', `searchuser?user_id=${userId}`, error.message);
+
+                        loadingMsg.style.display = 'none';
+                        errorMsg.textContent = 'خطأ في الاتصال بالخادم';
+                        errorMsg.style.display = 'block';
+                    });
+            }
+        }
+
+        // وظائف إدارة المواقع
+        function initLocationDropdowns() {
+            const buildingSelect = document.getElementById('buildingSelect');
             const floorSelect = document.getElementById('floorSelect');
             const roomSelect = document.getElementById('roomSelect');
-            floorSelect.disabled = true;
-            roomSelect.disabled = true;
-            floorSelect.innerHTML = '<option value="">اختر الطابق</option>';
-            roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
-            // مسح البيانات المحفوظة
+            const sectionSelect = document.getElementById('sectionSelect');
+
+            loadInitialData();
+
+            buildingSelect.addEventListener('change', function() {
+                loadFloors(this.value);
+            });
+
+            floorSelect.addEventListener('change', function() {
+                loadSections(this.value);
+            });
+
+            sectionSelect.addEventListener('change', function() {
+                loadRooms(this.value);
+            });
+
+
+            function loadInitialData() { // buildings, custody types
+                updateDebugInfo('تحميل البيانات الأولية...', 'getformdata', 'انتظار...');
+
+                fetch(buildUrl('OrderController/getformdata'))
+                    .then(response => {
+                        console.log('Form data response status:', response.status);
+                        updateDebugInfo('استجابة البيانات الأولية', 'getformdata', `Status: ${response.status}`);
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Form data response:', data);
+                        updateDebugInfo('نتيجة البيانات الأولية', 'getformdata', data);
+
+                        if (data.success) {
+                            if (data.buildings && Array.isArray(data.buildings)) {
+                                buildingSelect.innerHTML = '<option value="">اختر المبنى</option>';
+                                data.buildings.forEach(building => {
+                                    buildingSelect.innerHTML += `<option value="${building.id}">${building.code || building.name}</option>`;
+                                });
+                            }
+
+
+                        }
+                    })
+                    .catch(error => {
+                        console.error('خطأ في تحميل البيانات:', error);
+                        updateDebugInfo('خطأ في تحميل البيانات', 'getformdata', error.message);
+                    });
+            }
+
+            function loadFloors(buildingId) { // reset dependent dropdowns
+                floorSelect.innerHTML = '<option value="">اختر الطابق</option>';
+                sectionSelect.innerHTML = '<option value="">اختر القسم</option>';
+                roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
+
+                if (!buildingId) {
+                    floorSelect.disabled = true;
+                    sectionSelect.disabled = true;
+                    roomSelect.disabled = true;
+                    return;
+                }
+
+                fetch(buildUrl(`OrderController/getfloorsbybuilding/${buildingId}`))
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Floors response:', data);
+                        if (data.success && data.data && Array.isArray(data.data)) {
+                            data.data.forEach(floor => {
+                                floorSelect.innerHTML += `<option value="${floor.id}">${floor.code || floor.name}</option>`;
+                            });
+                            floorSelect.disabled = false;
+                        } else {
+                            floorSelect.disabled = true;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('خطأ في تحميل الطوابق:', error);
+                        floorSelect.disabled = true;
+                    });
+            }
+
+            function loadSections(floorId) {
+                sectionSelect.innerHTML = '<option value="">اختر القسم</option>';
+                roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
+
+                if (!floorId) {
+                    sectionSelect.disabled = true;
+                    roomSelect.disabled = true;
+                    return;
+                }
+
+                fetch(buildUrl(`OrderController/getsectionsbyfloor/${floorId}`))
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Sections response:', data);
+                        if (data.success && data.data && Array.isArray(data.data)) {
+                            data.data.forEach(section => {
+                                sectionSelect.innerHTML += `<option value="${section.id}">${section.code || section.name}</option>`;
+                            });
+                            sectionSelect.disabled = false;
+                        } else {
+                            sectionSelect.disabled = true;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('خطأ في تحميل الأقسام:', error);
+                        sectionSelect.disabled = true;
+                    });
+            }
+
+
+
+            function loadRooms(sectionId) {
+                roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
+
+                if (!sectionId) {
+                    roomSelect.disabled = true;
+                    return;
+                }
+
+                fetch(buildUrl(`OrderController/getroomsbysection/${sectionId}`))
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Rooms response:', data);
+                        if (data.success && data.data && Array.isArray(data.data)) {
+                            roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
+                            data.data.forEach(room => {
+                                roomSelect.innerHTML += `<option value="${room.id}">${room.code || room.name}</option>`;
+                            });
+                            roomSelect.disabled = false;
+                        } else {
+                            roomSelect.disabled = true;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('خطأ في تحميل الغرف:', error);
+                        roomSelect.disabled = true;
+                    });
+            }
+        }
+
+        // وظائف النموذج
+        function openAddForm() {
+            const modal = document.getElementById('addForm');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeAddForm() {
+            saveFormData();
+            window.location.href = buildUrl('inventoryController/index');
+
+        }
+
+        function clearForm() {
+            if (confirm('هل أنت متأكد من محو جميع البيانات المدخلة؟')) {
+                const form = document.querySelector('#addForm form');
+                if (form) {
+                    form.reset();
+                    document.getElementById('itemsContainer').innerHTML = '';
+                    itemCounter = 0;
+                    const statusMessages = form.querySelectorAll('.status-message');
+                    statusMessages.forEach(msg => msg.style.display = 'none');
+                    const floorSelect = document.getElementById('floorSelect');
+                    const roomSelect = document.getElementById('roomSelect');
+                    floorSelect.disabled = true;
+                    roomSelect.disabled = true;
+                    floorSelect.innerHTML = '<option value="">اختر الطابق</option>';
+                    roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
+                    // مسح البيانات المحفوظة
                     savedFormData = {};
                     try {
                         localStorage.removeItem('orderFormData');
                     } catch (error) {
                         console.log('تعذر مسح البيانات من التخزين المحلي');
                     }
-                    
+
                     alert('تم محو جميع البيانات بنجاح');
-            
-        }
-    }
-}
 
-// معالج إرسال النموذج
-document.getElementById('orderForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // التحقق من وجود أصناف
-    const itemCards = document.querySelectorAll('.item-card');
-    if (itemCards.length === 0) {
-        alert('يجب إضافة صنف واحد على الأقل');
-        return;
-    }
-    
-    // التحقق من البيانات المطلوبة لكل صنف
-    let hasErrors = false;
-    let confirmationMessage = 'هل أنت متأكد من إنشاء هذا الطلب؟\n\n📋 تفاصيل الطلب:\n';
-    
-    const fromUserName = document.getElementById('fromSenderName').value;
-    const toUserName = document.getElementById('receiverName').value;
-    const building = document.getElementById('buildingSelect').selectedOptions[0]?.text || '';
-    const floor = document.getElementById('floorSelect').selectedOptions[0]?.text || '';
-    const room = document.getElementById('roomSelect').selectedOptions[0]?.text || '';
-    
-    confirmationMessage += `• المرسل: ${fromUserName}\n`;
-    confirmationMessage += `• المستلم: ${toUserName}\n`;
-    confirmationMessage += `• الموقع: ${building} - ${floor} - ${room}\n\n`;
-    confirmationMessage += `📦 الأصناف المطلوبة:\n`;
-    
-    itemCards.forEach((card, cardIndex) => {
-        const itemId = card.id.split('_')[1];
-        const itemName = card.querySelector(`input[name="item_${itemId}"]`)?.value || '';
-        const quantity = parseInt(card.querySelector(`input[name="quantity_${itemId}"]`)?.value) || 0;
-        const custodyType = card.querySelector(`select[name="custody_type_${itemId}"]`)?.value || '';
-        
-        if (!itemName.trim()) {
-            alert(`يجب اختيار الصنف رقم ${cardIndex + 1}`);
-            hasErrors = true;
-            return;
-        }
-        
-        if (quantity <= 0) {
-            alert(`يجب إدخال كمية صحيحة للصنف رقم ${cardIndex + 1}`);
-            hasErrors = true;
-            return;
-        }
-        
-        if (!custodyType) {
-            alert(`يجب اختيار نوع العهدة للصنف رقم ${cardIndex + 1}`);
-            hasErrors = true;
-            return;
-        }
-        
-        confirmationMessage += `• ${itemName} (الكمية: ${quantity})\n`;
-        
-        // التحقق من أرقام الأصول والأرقام التسلسلية
-        for (let i = 1; i <= quantity; i++) {
-            const assetInput = card.querySelector(`input[name="asset_num_${itemId}_${i}"]`);
-            const serialInput = card.querySelector(`input[name="serial_num_${itemId}_${i}"]`);
-            
-            if (!assetInput || !assetInput.value.trim()) {
-                alert(`يجب إدخال رقم الأصول للعنصر رقم ${i} في الصنف رقم ${cardIndex + 1}`);
-                hasErrors = true;
-                return;
-            }
-            
-            if (!serialInput || !serialInput.value.trim()) {
-                alert(`يجب إدخال الرقم التسلسلي للعنصر رقم ${i} في الصنف رقم ${cardIndex + 1}`);
-                hasErrors = true;
-                return;
+                }
             }
         }
-    });
-    
-    if (hasErrors) {
-        return;
-    }
-    
-    // التحقق من وجود أخطاء في التحقق
-    const errorMessages = document.querySelectorAll('.validation-message.error-msg');
-    if (errorMessages.length > 0) {
-        alert('يوجد أخطاء في أرقام الأصول أو الأرقام التسلسلية. يرجى تصحيحها قبل الإرسال.');
-        return;
-    }
-    
-    confirmationMessage += `\nسيتم إرسال الطلب فور التأكيد.`;
-    
-    if (!confirm(confirmationMessage)) {
-        return;
-    }
-    
-    updateDebugInfo('إرسال الطلب...', 'storeMultiItem', 'انتظار...');
-    
-    const formData = new FormData(this);
-    
-    fetch(buildUrl('OrderController/storeMultiItem'), {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        updateDebugInfo('استجابة الإرسال', 'storeMultiItem', `Status: ${response.status}`);
-        return response.json();
-    })
-    .then(data => {
-        updateDebugInfo('نتيجة الإرسال', 'storeMultiItem', data);
-        
-        if (data.success) {
-            alert('تم إرسال الطلب بنجاح! رقم الطلب: ' + data.order_id);
-            
-            // مسح النموذج بالكامل
-            const form = document.querySelector('#addForm form');
-            if (form) {
-                form.reset();
-                
-                // مسح الأصناف
-                document.getElementById('itemsContainer').innerHTML = '';
-                itemCounter = 0;
-                
-                // مسح رسائل الحالة والتحقق
-                const statusMessages = form.querySelectorAll('.status-message, .validation-message');
-                statusMessages.forEach(msg => msg.style.display = 'none');
-                
-                // إعادة تعيين الحقول المعطلة
-                const floorSelect = document.getElementById('floorSelect');
-                const roomSelect = document.getElementById('roomSelect');
-                floorSelect.disabled = true;
-                roomSelect.disabled = true;
-                floorSelect.innerHTML = '<option value="">اختر الطابق</option>';
-                roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
-                
-                // إعادة تعيين حدود الحقول
-                const allInputs = form.querySelectorAll('input, select, textarea');
-                allInputs.forEach(input => {
-                    input.style.borderColor = 'rgba(59, 130, 182, 0.3)';
+
+        // معالج إرسال النموذج
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // التحقق من وجود أصناف
+            const itemCards = document.querySelectorAll('.item-card');
+            if (itemCards.length === 0) {
+                alert('يجب إضافة صنف واحد على الأقل');
+                return;
+            }
+
+            // التحقق من البيانات المطلوبة لكل صنف
+            let hasErrors = false;
+            let confirmationMessage = 'هل أنت متأكد من إنشاء هذا الطلب؟\n\n📋 تفاصيل الطلب:\n';
+
+            const fromUserName = document.getElementById('fromSenderName').value;
+            const toUserName = document.getElementById('receiverName').value;
+            const building = document.getElementById('buildingSelect').selectedOptions[0]?.text || '';
+            const floor = document.getElementById('floorSelect').selectedOptions[0]?.text || '';
+            const room = document.getElementById('roomSelect').selectedOptions[0]?.text || '';
+
+            confirmationMessage += `• المرسل: ${fromUserName}\n`;
+            confirmationMessage += `• المستلم: ${toUserName}\n`;
+            confirmationMessage += `• الموقع: ${building} - ${floor} - ${room}\n\n`;
+            confirmationMessage += `📦 الأصناف المطلوبة:\n`;
+
+            itemCards.forEach((card, cardIndex) => {
+                const itemId = card.id.split('_')[1];
+                const itemName = card.querySelector(`input[name="item_${itemId}"]`)?.value || '';
+                const quantity = parseInt(card.querySelector(`input[name="quantity_${itemId}"]`)?.value) || 0;
+                const custodyType = card.querySelector(`select[name="custody_type_${itemId}"]`)?.value || '';
+
+                if (!itemName.trim()) {
+                    alert(`يجب اختيار الصنف رقم ${cardIndex + 1}`);
+                    hasErrors = true;
+                    return;
+                }
+
+                if (quantity <= 0) {
+                    alert(`يجب إدخال كمية صحيحة للصنف رقم ${cardIndex + 1}`);
+                    hasErrors = true;
+                    return;
+                }
+
+                if (!custodyType) {
+                    alert(`يجب اختيار نوع العهدة للصنف رقم ${cardIndex + 1}`);
+                    hasErrors = true;
+                    return;
+                }
+
+                confirmationMessage += `• ${itemName} (الكمية: ${quantity})\n`;
+
+                // التحقق من أرقام الأصول والأرقام التسلسلية
+                for (let i = 1; i <= quantity; i++) {
+                    const assetInput = card.querySelector(`input[name="asset_num_${itemId}_${i}"]`);
+                    const serialInput = card.querySelector(`input[name="serial_num_${itemId}_${i}"]`);
+
+                    if (!assetInput || !assetInput.value.trim()) {
+                        alert(`يجب إدخال رقم الأصول للعنصر رقم ${i} في الصنف رقم ${cardIndex + 1}`);
+                        hasErrors = true;
+                        return;
+                    }
+
+                    if (!serialInput || !serialInput.value.trim()) {
+                        alert(`يجب إدخال الرقم التسلسلي للعنصر رقم ${i} في الصنف رقم ${cardIndex + 1}`);
+                        hasErrors = true;
+                        return;
+                    }
+                }
+            });
+
+            if (hasErrors) {
+                return;
+            }
+
+            // التحقق من وجود أخطاء في التحقق
+            const errorMessages = document.querySelectorAll('.validation-message.error-msg');
+            if (errorMessages.length > 0) {
+                alert('يوجد أخطاء في أرقام الأصول أو الأرقام التسلسلية. يرجى تصحيحها قبل الإرسال.');
+                return;
+            }
+
+            confirmationMessage += `\nسيتم إرسال الطلب فور التأكيد.`;
+
+            if (!confirm(confirmationMessage)) {
+                return;
+            }
+
+            updateDebugInfo('إرسال الطلب...', 'storeMultiItem', 'انتظار...');
+
+            const formData = new FormData(this);
+
+            fetch(buildUrl('OrderController/storeMultiItem'), {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    updateDebugInfo('استجابة الإرسال', 'storeMultiItem', `Status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    updateDebugInfo('نتيجة الإرسال', 'storeMultiItem', data);
+
+                    if (data.success) {
+                        alert('تم إرسال الطلب بنجاح! رقم الطلب: ' + data.order_id);
+
+                        // مسح النموذج بالكامل
+                        const form = document.querySelector('#addForm form');
+                        if (form) {
+                            form.reset();
+
+                            // مسح الأصناف
+                            document.getElementById('itemsContainer').innerHTML = '';
+                            itemCounter = 0;
+
+                            // مسح رسائل الحالة والتحقق
+                            const statusMessages = form.querySelectorAll('.status-message, .validation-message');
+                            statusMessages.forEach(msg => msg.style.display = 'none');
+
+                            // إعادة تعيين الحقول المعطلة
+                            const floorSelect = document.getElementById('floorSelect');
+                            const roomSelect = document.getElementById('roomSelect');
+                            floorSelect.disabled = true;
+                            roomSelect.disabled = true;
+                            floorSelect.innerHTML = '<option value="">اختر الطابق</option>';
+                            roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
+
+                            // إعادة تعيين حدود الحقول
+                            const allInputs = form.querySelectorAll('input, select, textarea');
+                            allInputs.forEach(input => {
+                                input.style.borderColor = 'rgba(59, 130, 182, 0.3)';
+                            });
+                        }
+
+                        // إعادة التوجيه إلى صفحة المخزون بعد نجاح الطلب
+                        window.location.href = buildUrl('inventoryController/index');
+                    } else {
+                        alert('خطأ: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('خطأ في إرسال الطلب:', error);
+                    updateDebugInfo('خطأ في الإرسال', 'storeMultiItem', error.message);
+                    alert('حدث خطأ في إرسال الطلب: ' + error.message);
                 });
-            }
-            
-            // إعادة التوجيه إلى صفحة المخزون بعد نجاح الطلب
-            window.location.href = buildUrl('inventoryController/index');
-        } else {
-            alert('خطأ: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('خطأ في إرسال الطلب:', error);
-        updateDebugInfo('خطأ في الإرسال', 'storeMultiItem', error.message);
-        alert('حدث خطأ في إرسال الطلب: ' + error.message);
-    });
-});
+        });
 
-// وظيفة الحفظ التلقائي (إضافية)
- function initAutoSave() {
+        // وظيفة الحفظ التلقائي (إضافية)
+        function initAutoSave() {
             const form = document.querySelector('#addForm form');
             if (form) {
                 const inputs = form.querySelectorAll('input, select, textarea');
@@ -1485,22 +1414,22 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
                     input.addEventListener('change', saveFormData);
                     input.addEventListener('input', saveFormData);
                 });
-                
+
                 // حفظ تلقائي كل 30 ثانية
                 setInterval(saveFormData, 30000);
             }
         }
 
-    function saveFormData() {
+        function saveFormData() {
             const form = document.querySelector('#addForm form');
             if (form) {
                 const formData = new FormData(form);
                 savedFormData = {};
-                
+
                 for (let [key, value] of formData.entries()) {
                     savedFormData[key] = value;
                 }
-                
+
                 // حفظ البيانات في localStorage كنسخ احتياطية
                 try {
                     localStorage.setItem('orderFormData', JSON.stringify(savedFormData));
@@ -1509,26 +1438,26 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
                     console.log('تعذر حفظ البيانات في التخزين المحلي');
                 }
             }
-        }        
+        }
 
-// تهيئة جميع الوظائف عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('تحميل الصفحة مكتمل');
-    console.log('SITE_URL المُستخدم:', SITE_URL);
-    
-    updateDebugInfo('تهيئة الصفحة', 'DOMContentLoaded', 'مكتمل');
-    
-    initFromUserSearch();
-    initUserSearch();
-    initLocationDropdowns();
-    initAutoSave(); // تفعيل الحفظ التلقائي
-    
-    // إضافة صنف أول تلقائياً
-    addNewItem();
-});
+        // تهيئة جميع الوظائف عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('تحميل الصفحة مكتمل');
+            console.log('SITE_URL المُستخدم:', SITE_URL);
 
-// فتح النموذج تلقائياً للعرض
-openAddForm();
+            updateDebugInfo('تهيئة الصفحة', 'DOMContentLoaded', 'مكتمل');
+
+            initUserSearch();
+            initLocationDropdowns();
+            initAutoSave(); // تفعيل الحفظ التلقائي
+
+            // إضافة صنف أول تلقائياً
+            addNewItem();
+        });
+
+        // فتح النموذج تلقائياً للعرض
+        openAddForm();
     </script>
 </body>
+
 </html>

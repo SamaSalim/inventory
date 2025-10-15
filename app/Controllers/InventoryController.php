@@ -172,7 +172,7 @@ public function index()
             $orderData = [
                 'from_employee_id' => $this->request->getPost('from_employee_id'),
                 'to_employee_id' => $this->request->getPost('to_employee_id'),
-                'order_status_id' => 1,
+                'order_status_id' => 2,
                 'note' => $this->request->getPost('notes') ?? ''
             ];
 
@@ -285,7 +285,7 @@ public function index()
             $orderData = [
                 'from_employee_id' => $this->request->getPost('from_employee_id'),
                 'to_employee_id' => $this->request->getPost('to_employee_id'),
-                'order_status_id' => 1, // جديد
+                'order_status_id' => 2, // مقبول
                 'note' => $this->request->getPost('notes') ?? ''
             ];
 

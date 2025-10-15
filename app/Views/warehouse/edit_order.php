@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -119,7 +119,9 @@
             font-size: 0.95rem;
         }
 
-        input, select, textarea {
+        input,
+        select,
+        textarea {
             padding: 12px 16px;
             border: 2px solid rgba(59, 130, 182, 0.3);
             background: rgba(232, 244, 253, 0.05);
@@ -129,18 +131,22 @@
             transition: all 0.3s ease;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: #3b82b6;
             background: rgba(59, 130, 182, 0.15);
             box-shadow: 0 0 0 3px rgba(59, 130, 182, 0.2);
         }
 
-        input::placeholder, textarea::placeholder {
+        input::placeholder,
+        textarea::placeholder {
             color: rgba(255, 255, 255, 0.6);
         }
 
-        input:read-only, select:disabled {
+        input:read-only,
+        select:disabled {
             background: rgba(26, 37, 47, 0.3);
             cursor: not-allowed;
             opacity: 0.7;
@@ -341,7 +347,9 @@
             border-top: 1px solid rgba(59, 130, 182, 0.3);
         }
 
-        .cancel-btn, .clear-btn, .submit-btn {
+        .cancel-btn,
+        .clear-btn,
+        .submit-btn {
             padding: 12px 30px;
             border: none;
             border-radius: 8px;
@@ -456,6 +464,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- شاشة التحميل -->
     <div id="loadingOverlay" class="loading-overlay">
@@ -473,41 +482,40 @@
 
             <form id="orderForm">
                 <input type="hidden" id="orderId" name="order_id" value="">
-                
+
                 <!-- قسم بيانات المرسل -->
                 <div class="section-header">
                     <h4>بيانات المرسل</h4>
                 </div>
-                
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>رقم المستخدم المرسل <span class="required">*</span></label>
-                        <input type="text" name="from_user_id" id="fromUserId" placeholder="أدخل رقم المستخدم المرسل" required>
-                        <div id="fromUserLoadingMsg" class="status-message loading-msg" style="display: none;">جاري البحث...</div>
-                        <div id="fromUserErrorMsg" class="status-message error-msg" style="display: none;">رقم المستخدم غير موجود</div>
-                        <div id="fromUserSuccessMsg" class="status-message success-msg" style="display: none;">تم العثور على المستخدم</div>
+                        <label>الرقم الوظيفي</label>
+                        <input type="text" value="<?= esc(session()->get('employee_id')) ?>" readonly>
+                        <input type="hidden" id="fromUserId" value="<?= esc(session()->get('employee_id')) ?>">
                     </div>
                     <div class="form-group">
-                        <label>اسم المرسل <span class="required">*</span></label>
-                        <input type="text" name="from_sender_name" id="fromSenderName" placeholder="أدخل اسم المرسل" required readonly>
+                        <label>اسم المرسل</label>
+                        <input type="text" id="fromSenderName" value="<?= esc(session()->get('name')) ?>" readonly>
                     </div>
                     <div class="form-group">
                         <label>البريد الإلكتروني</label>
-                        <input type="email" name="from_email" id="fromUserEmail" placeholder="أدخل البريد الإلكتروني" readonly>
+                        <input type="email" value="<?= esc($loggedInUser->email ?? '') ?>" readonly>
                     </div>
+
                     <div class="form-group">
                         <label>رقم التحويلة</label>
-                        <input type="text" name="from_transfer_number" id="fromTransferNumber" placeholder="أدخل رقم التحويلة" readonly>
+                        <input type="text" value="<?= esc($loggedInUser->emp_ext ?? '') ?>" readonly>
+
+                        <input type="hidden" id="fromTransferNumber" value="<?= esc($sender_data->emp_ext ?? '') ?>">
                     </div>
                 </div>
-
                 <hr>
 
                 <!-- قسم بيانات المستلم -->
                 <div class="section-header">
                     <h4>بيانات المستلم</h4>
                 </div>
-                
+
                 <div class="form-grid">
                     <div class="form-group">
                         <label>رقم المستخدم <span class="required">*</span></label>
@@ -536,7 +544,7 @@
                 <div class="section-header">
                     <h4>موقع المستلم</h4>
                 </div>
-                
+
                 <div class="form-grid">
                     <div class="form-group">
                         <label>المبنى <span class="required">*</span></label>
@@ -570,13 +578,13 @@
                 <div class="section-header">
                     <h4>الأصناف المطلوبة</h4>
                 </div>
-                
+
                 <div class="items-section">
                     <button type="button" class="add-item-btn" onclick="addNewItem()">
                         <span>+</span>
                         إضافة صنف جديد
                     </button>
-                    
+
                     <div id="itemsContainer">
                         <!-- سيتم إضافة الأصناف هنا -->
                     </div>
@@ -601,12 +609,12 @@
     <script>
         // احصل على اسم المجلد من URL الحالي تلقائياً
         const pathSegments = window.location.pathname.split('/');
-        const projectFolder = pathSegments[1] || ''; 
+        const projectFolder = pathSegments[1] || '';
         const SITE_URL = window.location.origin + '/' + projectFolder + '/index.php/';
 
         // الحصول على رقم الطلب من URL
         const currentOrderId = getCurrentOrderId();
-        
+
         // متغيرات عامة
         let originalOrderData = {};
         let searchTimeout;
@@ -624,12 +632,12 @@
             if (editIndex !== -1 && pathParts[editIndex + 1]) {
                 return pathParts[editIndex + 1];
             }
-            
+
             // إذا لم نجد الطلب في URL، نحاول البحث في المتغير الممرر من الكنترولر
             if (typeof orderId !== 'undefined') {
                 return orderId;
             }
-            
+
             return null;
         }
 
@@ -652,7 +660,7 @@
                 })
                 .then(data => {
                     document.getElementById('loadingOverlay').style.display = 'none';
-                    
+
                     if (data.success) {
                         originalOrderData = data.data;
                         populateForm(data.data);
@@ -671,57 +679,58 @@
 
         // ملء النموذج بالبيانات
         function populateForm(orderData) {
-    // تعبئة معرف الطلب - استخدم order_id
-    document.getElementById('orderId').value = orderData.order.order_id;
-    document.getElementById('orderIdDisplay').textContent = orderData.order.order_id;
+            // تعبئة معرف الطلب - استخدم order_id
+            document.getElementById('orderId').value = orderData.order.order_id;
+            document.getElementById('orderIdDisplay').textContent = orderData.order.order_id;
 
-    // تعبئة بيانات المرسل
-    if (orderData.from_user) {
-        document.getElementById('fromUserId').value = orderData.from_user.user_id || '';
-        document.getElementById('fromSenderName').value = orderData.from_user.name || '';
-        document.getElementById('fromUserEmail').value = orderData.from_user.email || '';
-        document.getElementById('fromTransferNumber').value = orderData.from_user.user_ext || '';
-        
-        document.getElementById('fromUserSuccessMsg').style.display = 'block';
-    }
+            // تعبئة بيانات المرسل
+            // if (orderData.from_user) {
+            //     //  التعديل هنا ليتوافق مع أسماء الحقول في جدول employee
+            //     document.getElementById('fromUserId').value = orderData.from_user.emp_id || '';
+            //     document.getElementById('fromSenderName').value = orderData.from_user.name || '';
+            //     document.getElementById('fromUserEmail').value = orderData.from_user.email || '';
+            //     document.getElementById('fromTransferNumber').value = orderData.from_user.emp_ext || ''; // استخدام emp_ext
 
-    // تعبئة بيانات المستلم
-    if (orderData.to_user) {
-        document.getElementById('userId').value = orderData.to_user.user_id || '';
-        document.getElementById('receiverName').value = orderData.to_user.name || '';
-        document.getElementById('userEmail').value = orderData.to_user.email || '';
-        document.getElementById('transferNumber').value = orderData.to_user.user_ext || '';
-        
-        document.getElementById('userSuccessMsg').style.display = 'block';
-    }
+            //     document.getElementById('fromUserSuccessMsg').style.display = 'block';
+            // }
 
-    // تعبئة الملاحظات
-    document.getElementById('notesTextarea').value = orderData.order.note || '';
+            // تعبئة بيانات المستلم
+            if (orderData.to_user) {
+                document.getElementById('userId').value = orderData.to_user.user_id || '';
+                document.getElementById('receiverName').value = orderData.to_user.name || '';
+                document.getElementById('userEmail').value = orderData.to_user.email || '';
+                document.getElementById('transferNumber').value = orderData.to_user.user_ext || '';
 
-    // تحميل بيانات الموقع والأصناف
-    loadFormData().then(() => {
-        if (orderData.items && orderData.items.length > 0) {
-            orderData.items.forEach((itemGroup, index) => {
-                addItemFromData(itemGroup, index + 1);
-            });
-            
-            if (orderData.items[0]) {
-                const firstItem = orderData.items[0];
-                setLocationFromData(firstItem.building_id, firstItem.floor_id, firstItem.section_id,  firstItem.room_id);
+                document.getElementById('userSuccessMsg').style.display = 'block';
             }
+
+            // تعبئة الملاحظات
+            document.getElementById('notesTextarea').value = orderData.order.note || '';
+
+            // تحميل بيانات الموقع والأصناف
+            loadFormData().then(() => {
+                if (orderData.items && orderData.items.length > 0) {
+                    orderData.items.forEach((itemGroup, index) => {
+                        addItemFromData(itemGroup, index + 1);
+                    });
+
+                    if (orderData.items[0]) {
+                        const firstItem = orderData.items[0];
+                        setLocationFromData(firstItem.building_id, firstItem.floor_id, firstItem.section_id, firstItem.room_id);
+                    }
+                }
+            });
         }
-    });
-}
 
         // إضافة صنف من البيانات المحملة
         function addItemFromData(itemGroup, itemNumber) {
             itemCounter = itemNumber;
             const container = document.getElementById('itemsContainer');
-            
+
             const itemDiv = document.createElement('div');
             itemDiv.className = 'item-card';
             itemDiv.id = `item_${itemCounter}`;
-            
+
             itemDiv.innerHTML = `
                 <div class="item-header">
                     <div class="item-title">الصنف رقم ${itemCounter}</div>
@@ -768,15 +777,15 @@
                     <div id="assetSerialContainer_${itemCounter}"></div>
                 </div>
             `;
-            
+
             container.appendChild(itemDiv);
-            
+
             // تهيئة البحث للصنف
             initItemSearchForElement(itemCounter);
-            
+
             // تحميل قائمة أنواع العهدة وتعيين القيمة الحالية
             loadCustodyTypesForItem(itemCounter, itemGroup.assets_type);
-            
+
             // إنشاء حقول العناصر مع البيانات
             createAssetSerialFieldsFromData(itemCounter, itemGroup.items);
         }
@@ -785,16 +794,16 @@
         function createAssetSerialFieldsFromData(itemId, items) {
             const container = document.getElementById(`assetSerialContainer_${itemId}`);
             const dynamicSection = document.getElementById(`dynamicFields_${itemId}`);
-            
+
             if (!container || !dynamicSection || !items || items.length === 0) return;
-            
+
             container.innerHTML = '';
-            
+
             items.forEach((item, index) => {
                 const i = index + 1;
                 const fieldDiv = document.createElement('div');
                 fieldDiv.className = 'asset-serial-grid';
-                
+
                 fieldDiv.innerHTML = `
                     <div class="asset-serial-header">العنصر رقم ${i}</div>
                     <input type="hidden" name="existing_item_id_${itemId}_${i}" value="${item.id}">
@@ -829,17 +838,17 @@
                         <input type="text" name="brand_${itemId}_${i}" placeholder="أدخل اسم البراند" value="${item.brand || ''}">
                     </div>
                 `;
-                
+
                 container.appendChild(fieldDiv);
-                
+
                 // إضافة معالجات التحقق للحقول
                 const assetInput = fieldDiv.querySelector(`input[name="asset_num_${itemId}_${i}"]`);
                 const serialInput = fieldDiv.querySelector(`input[name="serial_num_${itemId}_${i}"]`);
-                
+
                 assetInput.addEventListener('blur', () => validateAssetSerial(assetInput, itemId, i, 'asset', item.id));
                 serialInput.addEventListener('blur', () => validateAssetSerial(serialInput, itemId, i, 'serial', item.id));
             });
-            
+
             dynamicSection.style.display = 'block';
         }
 
@@ -848,14 +857,14 @@
             if (buildingId) {
                 const buildingSelect = document.getElementById('buildingSelect');
                 buildingSelect.value = buildingId;
-                
+
                 // تحميل الطوابق
                 loadFloors(buildingId).then(() => {
-                   
+
                     if (floorId) {
                         const floorSelect = document.getElementById('floorSelect');
                         floorSelect.value = floorId;
-                        
+
                         // تحميل الأقسام والغرف
                         loadSections(floorId).then(() => {
 
@@ -865,9 +874,9 @@
                             }
                         });
 
-                           // تحميل الأقسام والغرف
+                        // تحميل الأقسام والغرف
                         loadRooms(sectionId).then(() => {
-                            
+
                             if (roomId) {
                                 const roomSelect = document.getElementById('roomSelect');
                                 roomSelect.value = roomId;
@@ -882,11 +891,11 @@
         function addNewItem() {
             itemCounter++;
             const container = document.getElementById('itemsContainer');
-            
+
             const itemDiv = document.createElement('div');
             itemDiv.className = 'item-card';
             itemDiv.id = `item_${itemCounter}`;
-            
+
             itemDiv.innerHTML = `
                 <div class="item-header">
                     <div class="item-title">الصنف رقم ${itemCounter}</div>
@@ -933,12 +942,12 @@
                     <div id="assetSerialContainer_${itemCounter}"></div>
                 </div>
             `;
-            
+
             container.appendChild(itemDiv);
-            
+
             // تهيئة البحث للصنف الجديد
             initItemSearchForElement(itemCounter);
-            
+
             // تحميل قائمة أنواع العهدة للصنف الجديد
             loadCustodyTypesForItem(itemCounter);
         }
@@ -968,13 +977,13 @@
         function validateAssetSerial(input, itemId, index, type, existingItemId = null) {
             const value = input.value.trim();
             const messageElement = document.querySelector(`.${type}-validation-${itemId}-${index}`);
-            
+
             // مسح الرسائل السابقة
             if (messageElement) {
                 messageElement.style.display = 'none';
                 messageElement.className = `validation-message ${type}-validation-${itemId}-${index}`;
             }
-            
+
             if (!value) {
                 return;
             }
@@ -985,7 +994,7 @@
                 messageElement.className += ' loading-msg';
                 messageElement.style.display = 'block';
             }
-            
+
             // إعداد البيانات للإرسال
             const formData = new FormData();
             if (type === 'asset') {
@@ -995,55 +1004,55 @@
                 formData.append('serial_num', value);
                 formData.append('check_type', 'serial');
             }
-            
+
             // إضافة معرف العنصر الحالي للاستثناء
             if (existingItemId) {
                 formData.append('exclude_item_id', existingItemId);
             }
 
             fetch(buildUrl('OrderController/validateAssetSerial'), {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (messageElement) {
-                    messageElement.style.display = 'none';
-                    
-                    if (data.success) {
-                        // الرقم متاح
-                        messageElement.textContent = '✓ متاح';
-                        messageElement.className = `validation-message ${type}-validation-${itemId}-${index} success-msg`;
-                        messageElement.style.display = 'block';
-                        input.style.borderColor = '#27ae60';
-                    } else {
-                        // يوجد خطأ أو تكرار
-                        if (data.errors && data.errors.length > 0) {
-                            const error = data.errors.find(e => e.type === type);
-                            if (error) {
-                                messageElement.textContent = '✗ ' + error.message;
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (messageElement) {
+                        messageElement.style.display = 'none';
+
+                        if (data.success) {
+                            // الرقم متاح
+                            messageElement.textContent = '✓ متاح';
+                            messageElement.className = `validation-message ${type}-validation-${itemId}-${index} success-msg`;
+                            messageElement.style.display = 'block';
+                            input.style.borderColor = '#27ae60';
+                        } else {
+                            // يوجد خطأ أو تكرار
+                            if (data.errors && data.errors.length > 0) {
+                                const error = data.errors.find(e => e.type === type);
+                                if (error) {
+                                    messageElement.textContent = '✗ ' + error.message;
+                                    messageElement.className = `validation-message ${type}-validation-${itemId}-${index} error-msg`;
+                                    messageElement.style.display = 'block';
+                                    input.style.borderColor = '#e74c3c';
+                                }
+                            } else {
+                                messageElement.textContent = '✗ ' + data.message;
                                 messageElement.className = `validation-message ${type}-validation-${itemId}-${index} error-msg`;
                                 messageElement.style.display = 'block';
                                 input.style.borderColor = '#e74c3c';
                             }
-                        } else {
-                            messageElement.textContent = '✗ ' + data.message;
-                            messageElement.className = `validation-message ${type}-validation-${itemId}-${index} error-msg`;
-                            messageElement.style.display = 'block';
-                            input.style.borderColor = '#e74c3c';
                         }
                     }
-                }
-            })
-            .catch(error => {
-                console.error('خطأ في التحقق:', error);
-                if (messageElement) {
-                    messageElement.textContent = 'خطأ في التحقق';
-                    messageElement.className = `validation-message ${type}-validation-${itemId}-${index} error-msg`;
-                    messageElement.style.display = 'block';
-                    input.style.borderColor = '#e74c3c';
-                }
-            });
+                })
+                .catch(error => {
+                    console.error('خطأ في التحقق:', error);
+                    if (messageElement) {
+                        messageElement.textContent = 'خطأ في التحقق';
+                        messageElement.className = `validation-message ${type}-validation-${itemId}-${index} error-msg`;
+                        messageElement.style.display = 'block';
+                        input.style.borderColor = '#e74c3c';
+                    }
+                });
         }
 
         // البحث عن الأصناف (نفس الكود الأصلي)
@@ -1056,7 +1065,7 @@
 
             searchInput.addEventListener('input', function() {
                 const searchTerm = this.value.trim();
-                
+
                 if (searchTerm.length < 2) {
                     dropdown.style.display = 'none';
                     classificationDisplay.classList.remove('show');
@@ -1070,7 +1079,7 @@
                     .then(response => response.json())
                     .then(data => {
                         dropdown.innerHTML = '';
-                        
+
                         if (data.success && data.data && data.data.length > 0) {
                             dropdown.innerHTML = data.data
                                 .map(item => `<div class="dropdown-item" data-item-name="${item.name}" data-major-category="${item.major_category}" data-minor-category="${item.minor_category}">${item.name}</div>`)
@@ -1089,18 +1098,18 @@
             });
 
             dropdown.addEventListener('click', function(e) {
-                if (e.target.classList.contains('dropdown-item') && 
-                    !e.target.classList.contains('loading') && 
-                    !e.target.classList.contains('no-results') && 
+                if (e.target.classList.contains('dropdown-item') &&
+                    !e.target.classList.contains('loading') &&
+                    !e.target.classList.contains('no-results') &&
                     !e.target.classList.contains('error')) {
-                    
+
                     const itemName = e.target.dataset.itemName;
                     const majorCategory = e.target.dataset.majorCategory;
                     const minorCategory = e.target.dataset.minorCategory;
-                    
+
                     searchInput.value = itemName;
                     dropdown.style.display = 'none';
-                    
+
                     // عرض التصنيفات
                     document.getElementById(`majorCategory_${itemId}`).textContent = majorCategory || '-';
                     document.getElementById(`minorCategory_${itemId}`).textContent = minorCategory || '-';
@@ -1119,18 +1128,18 @@
         function createAssetSerialFields(itemId, quantity) {
             const container = document.getElementById(`assetSerialContainer_${itemId}`);
             const dynamicSection = document.getElementById(`dynamicFields_${itemId}`);
-            
+
             if (!container || !dynamicSection) return;
-            
+
             container.innerHTML = '';
-            
+
             const qty = parseInt(quantity) || 0;
-            
+
             if (qty > 0) {
                 for (let i = 1; i <= qty; i++) {
                     const fieldDiv = document.createElement('div');
                     fieldDiv.className = 'asset-serial-grid';
-                    
+
                     fieldDiv.innerHTML = `
                         <div class="asset-serial-header">العنصر رقم ${i}</div>
                         <div class="form-group">
@@ -1163,16 +1172,16 @@
                             <input type="text" name="brand_${itemId}_${i}" placeholder="أدخل اسم البراند">
                         </div>
                     `;
-                    
+
                     container.appendChild(fieldDiv);
-                    
+
                     const assetInput = fieldDiv.querySelector(`input[name="asset_num_${itemId}_${i}"]`);
                     const serialInput = fieldDiv.querySelector(`input[name="serial_num_${itemId}_${i}"]`);
-                    
+
                     assetInput.addEventListener('blur', () => validateAssetSerial(assetInput, itemId, i, 'asset'));
                     serialInput.addEventListener('blur', () => validateAssetSerial(serialInput, itemId, i, 'serial'));
                 }
-                
+
                 dynamicSection.style.display = 'block';
             } else {
                 dynamicSection.style.display = 'none';
@@ -1200,62 +1209,6 @@
                 });
         }
 
-        // البحث عن المستخدمين
-        function initFromUserSearch() {
-            const fromUserIdInput = document.getElementById('fromUserId');
-            const fromSenderNameInput = document.getElementById('fromSenderName');
-            const fromEmailInput = document.getElementById('fromUserEmail');
-            const fromTransferInput = document.getElementById('fromTransferNumber');
-            const fromLoadingMsg = document.getElementById('fromUserLoadingMsg');
-            const fromErrorMsg = document.getElementById('fromUserErrorMsg');
-            const fromSuccessMsg = document.getElementById('fromUserSuccessMsg');
-
-            fromUserIdInput.addEventListener('input', function() {
-                const userId = this.value.trim();
-                
-                fromLoadingMsg.style.display = 'none';
-                fromErrorMsg.style.display = 'none';
-                fromSuccessMsg.style.display = 'none';
-                
-                fromSenderNameInput.value = '';
-                fromEmailInput.value = '';
-                fromTransferInput.value = '';
-                
-                if (userId.length < 3) return;
-
-                clearTimeout(searchTimeout);
-                
-                fromLoadingMsg.style.display = 'block';
-                
-                searchTimeout = setTimeout(() => {
-                    searchFromUser(userId);
-                }, 500);
-            });
-
-            function searchFromUser(userId) {
-                fetch(buildUrl(`OrderController/searchuser?user_id=${encodeURIComponent(userId)}`))
-                    .then(response => response.json())
-                    .then(data => {
-                        fromLoadingMsg.style.display = 'none';
-                        
-                        if (data.success) {
-                            fromSenderNameInput.value = data.data.name || '';
-                            fromEmailInput.value = data.data.email || '';
-                            fromTransferInput.value = data.data.transfer_number || '';
-                            fromSuccessMsg.style.display = 'block';
-                        } else {
-                            fromErrorMsg.textContent = data.message || 'رقم المستخدم المرسل غير موجود';
-                            fromErrorMsg.style.display = 'block';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('خطأ في البحث عن المستخدم المرسل:', error);
-                        fromLoadingMsg.style.display = 'none';
-                        fromErrorMsg.textContent = 'خطأ في الاتصال بالخادم';
-                        fromErrorMsg.style.display = 'block';
-                    });
-            }
-        }
 
         function initUserSearch() {
             const userIdInput = document.getElementById('userId');
@@ -1268,21 +1221,21 @@
 
             userIdInput.addEventListener('input', function() {
                 const userId = this.value.trim();
-                
+
                 loadingMsg.style.display = 'none';
                 errorMsg.style.display = 'none';
                 successMsg.style.display = 'none';
-                
+
                 receiverNameInput.value = '';
                 emailInput.value = '';
                 transferInput.value = '';
-                
+
                 if (userId.length < 3) return;
 
                 clearTimeout(searchTimeout);
-                
+
                 loadingMsg.style.display = 'block';
-                
+
                 searchTimeout = setTimeout(() => {
                     searchUser(userId);
                 }, 500);
@@ -1293,7 +1246,7 @@
                     .then(response => response.json())
                     .then(data => {
                         loadingMsg.style.display = 'none';
-                        
+
                         if (data.success) {
                             receiverNameInput.value = data.data.name || '';
                             emailInput.value = data.data.email || '';
@@ -1359,11 +1312,11 @@
             const floorSelect = document.getElementById('floorSelect');
             const roomSelect = document.getElementById('roomSelect');
             const sectionSelect = document.getElementById('sectionSelect');
-            
+
             floorSelect.innerHTML = '<option value="">اختر الطابق</option>';
             sectionSelect.innerHTML = '<option value="">اختر القسم</option>';
             roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
-            
+
             if (!buildingId) {
                 floorSelect.disabled = true;
                 roomSelect.disabled = true;
@@ -1392,39 +1345,39 @@
 
         function loadSections(floorId) {
             const roomSelect = document.getElementById('roomSelect');
-            
+
             sectionSelect.innerHTML = '<option value="">اختر القسم</option>';
             roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
-            
+
             if (!floorId) {
                 roomSelect.disabled = true;
                 return Promise.resolve();
             }
 
-            return  fetch(buildUrl(`OrderController/getsectionsbyfloor/${floorId}`))
-         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-         })
-            .then(data => {
-            console.log('Sections response:', data);
-            if (data.success && data.data && Array.isArray(data.data)) {
-                data.data.forEach(section => {
-                    sectionSelect.innerHTML += `<option value="${section.id}">${section.code || section.name}</option>`;
+            return fetch(buildUrl(`OrderController/getsectionsbyfloor/${floorId}`))
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Sections response:', data);
+                    if (data.success && data.data && Array.isArray(data.data)) {
+                        data.data.forEach(section => {
+                            sectionSelect.innerHTML += `<option value="${section.id}">${section.code || section.name}</option>`;
+                        });
+                        sectionSelect.disabled = false;
+                    } else {
+                        sectionSelect.disabled = true;
+                    }
+                })
+                .catch(error => {
+                    console.error('خطأ في تحميل الأقسام:', error);
+                    sectionSelect.disabled = true;
                 });
-                sectionSelect.disabled = false;
-            } else {
-                sectionSelect.disabled = true;
-            }
-            })
-            .catch(error => {
-            console.error('خطأ في تحميل الأقسام:', error);
-            sectionSelect.disabled = true;
-            });
 
-          return fetch(buildUrl(`OrderController/getsectionsbyfloor/${floorId}`))
+            return fetch(buildUrl(`OrderController/getsectionsbyfloor/${floorId}`))
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.data && Array.isArray(data.data) && data.data.length > 0) {
@@ -1443,7 +1396,7 @@
 
         function loadRooms(sectionId) {
             const roomSelect = document.getElementById('roomSelect');
-            
+
             if (!sectionId) {
                 roomSelect.disabled = true;
                 return Promise.resolve();
@@ -1482,7 +1435,7 @@
                 // مسح النموذج الحالي
                 document.getElementById('itemsContainer').innerHTML = '';
                 itemCounter = 0;
-                
+
                 // إعادة تحميل البيانات الأصلية
                 if (originalOrderData && Object.keys(originalOrderData).length > 0) {
                     populateForm(originalOrderData);
@@ -1496,74 +1449,74 @@
         // معالج إرسال النموذج
         document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             // التحقق من وجود أصناف
             const itemCards = document.querySelectorAll('.item-card');
             if (itemCards.length === 0) {
                 alert('يجب إضافة صنف واحد على الأقل');
                 return;
             }
-            
+
             // التحقق من وجود أخطاء في التحقق
             const errorMessages = document.querySelectorAll('.validation-message.error-msg');
             if (errorMessages.length > 0) {
                 alert('يوجد أخطاء في أرقام الأصول أو الأرقام التسلسلية. يرجى تصحيحها قبل الحفظ.');
                 return;
             }
-            
+
             if (!confirm('هل أنت متأكد من حفظ التعديلات على هذا الطلب؟')) {
                 return;
             }
-            
+
             const formData = new FormData(this);
-            
+
             // إضافة رقم الطلب للفورم ديتا
             formData.append('order_id', currentOrderId);
-            
+
             // إظهار شاشة التحميل
             document.getElementById('loadingOverlay').style.display = 'flex';
             document.querySelector('.loading-spinner div').textContent = 'جاري حفظ التعديلات...';
-            
+
             fetch(buildUrl(`OrderController/updateMultiItem/${currentOrderId}`), {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('loadingOverlay').style.display = 'none';
-                
-                if (data.success) {
-                    alert('تم حفظ التعديلات بنجاح!');
-                    window.location.href = buildUrl('inventoryController/index');
-                } else {
-                    alert('خطأ: ' + data.message);
-                }
-            })
-            .catch(error => {
-                document.getElementById('loadingOverlay').style.display = 'none';
-                console.error('خطأ في حفظ التعديلات:', error);
-                alert('حدث خطأ في حفظ التعديلات: ' + error.message);
-            });
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+
+                    if (data.success) {
+                        alert('تم حفظ التعديلات بنجاح!');
+                        window.location.href = buildUrl('inventoryController/index');
+                    } else {
+                        alert('خطأ: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    console.error('خطأ في حفظ التعديلات:', error);
+                    alert('حدث خطأ في حفظ التعديلات: ' + error.message);
+                });
         });
 
         // تهيئة جميع الوظائف عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', function() {
             console.log('تحميل صفحة التعديل');
             console.log('رقم الطلب:', currentOrderId);
-            
+
             if (!currentOrderId) {
                 alert('رقم الطلب غير محدد');
                 window.location.href = buildUrl('inventoryController/index');
                 return;
             }
-            
-            initFromUserSearch();
+
             initUserSearch();
             initLocationDropdowns();
-            
+
             // تحميل بيانات الطلب
             loadOrderData();
         });
     </script>
 </body>
+
 </html>

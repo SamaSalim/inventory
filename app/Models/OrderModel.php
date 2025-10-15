@@ -16,7 +16,7 @@ class OrderModel extends Model
     protected $useTimestamps = true;
 
     protected $validationRules = [
-        'from_user_id' => 'required|max_length[50]|is_not_unique[users.user_id]',
+        'from_user_id' => 'required|max_length[50]|is_not_unique[employee.emp_id]',
         'to_user_id' => 'required|max_length[50]|is_not_unique[users.user_id]',
         'order_status_id' => 'required|integer|is_not_unique[order_status.id]',
         'note' => 'permit_empty'
