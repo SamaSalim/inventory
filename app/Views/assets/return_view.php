@@ -334,11 +334,27 @@
 
 <?= $this->include('layouts/header') ?>
 
-<div class="main-content">
-    <div class="header">
-        <h1 class="page-title"> عمليات الإرجاع </h1>
-    </div>
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">  عمليات الإرجاع</h1>
+            <div class="user-info" onclick="location.href='<?= base_url('UserInfo/getUserInfo') ?>'">
+                <div class="user-avatar">
+                    <?php
+                    $userName = session()->get('name') ?? 'م م';
+                    $nameParts = explode(' ', trim($userName));
+                    $initials = '';
 
+                    if (count($nameParts) >= 2) {
+                        $initials = mb_substr($nameParts[0], 0, 1, 'UTF-8') . mb_substr($nameParts[count($nameParts) - 1], 0, 1, 'UTF-8');
+                    } else {
+                        $initials = mb_substr($nameParts[0], 0, 1, 'UTF-8');
+                    }
+                    echo strtoupper($initials);
+                    ?>
+                </div>
+                <span><?= esc(session()->get('name')) ?></span>
+            </div>
+        </div>
     <br><br>
 
     <div class="row mb-3" dir="rtl">
