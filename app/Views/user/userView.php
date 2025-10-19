@@ -513,6 +513,17 @@ function viewTransferDetails(transferId, button) {
 
 function respondToTransfer(transferId, action) {
     if (!confirm(`هل أنت متأكد من ${action === 'accept' ? 'قبول' : 'رفض'} هذا الطلب؟`)) return;
+    if (data.success) {
+    // إضافة إشعار محلي
+    if (window.showNotification) {
+        window.showNotification(
+            'order_status',
+            action === 'accept' ? 'تم قبول التحويل' : 'تم رفض التحويل',
+            data.message,
+            { transfer_id: transferId }
+        );
+    }
+}
     
     document.querySelectorAll('#modalFooter button').forEach(btn => btn.disabled = true);
     
