@@ -607,7 +607,7 @@ function getFileUploadSection(item) {
                         اختر الصور
                     </button>
                     <div style="font-size: 11px; color: #999; text-align: center; margin-top: 8px;">
-                        الحد الأقصى: 5 ميجابايت لكل صورة | صور فقط (JPG, PNG, GIF)
+                        الحد الأقصى: 5 ميجابايت لكل صورة | صور فقط (JPG, PNG)
                     </div>
                     <div id="fileList_${item.assetNum}" style="margin-top: 10px;">
                         <div style="color: #999; font-size: 13px; padding: 10px; text-align: center;">لم يتم رفع أي صور</div>
@@ -650,7 +650,7 @@ function printAllForms() {
     // Build all items data with proper notes mapping by assetNum
     const allItemsData = selectedItems.map(item => {
         const itemActionsData = itemActions[item.assetNum] || {};
-        const commentElement = document.getElementById(`comment_${item.id}`);
+        const commentElement = document.getElementById(`comment_${item.assetNum}`);
         const itemNotes = commentElement ? commentElement.value.trim() : '';
         
         return {
@@ -658,7 +658,7 @@ function printAllForms() {
             name: item.name,
             category: item.category,
             assetType: item.assetType || 'غير محدد',
-            notes: itemNotes || 'تم الترجيع',
+            notes: itemNotes,
             actions: {
                 fix: itemActionsData.fix ? '1' : '0',
                 sell: itemActionsData.sell ? '1' : '0',
@@ -823,7 +823,7 @@ function showSelectedItemsPopup() {
                         ملاحظات الترجيع:
                     </label>
                     <textarea 
-                        id="comment_${item.id}"
+                        id="comment_${item.assetNum}"
                         placeholder="أضف ملاحظة حول حالة الصنف أو سبب الترجيع..."
                         style="width: 100%; min-height: 70px; padding: 10px; border: 2px solid #e8f4f8; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical; transition: border-color 0.2s; box-sizing: border-box; background: linear-gradient(135deg, #ffffff, #f8fdff);"
                         onfocus="this.style.borderColor='#3ac0c3'"
@@ -834,23 +834,11 @@ function showSelectedItemsPopup() {
         `;
     });
     
+ // Check if there are any IT items
     const hasITItems = selectedItems.some(item => item.minorCategory === 'IT');
-    const printButtonHTML = hasITItems ? `
-        <button onclick="printAllForms()" style="flex: 1; padding: 12px 20px; background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);" onmouseover="this.style.background='linear-gradient(135deg, #2980b9, #21618c)'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='linear-gradient(135deg, #3498db, #2980b9)'; this.style.transform='translateY(0)'">
-            <i class="fas fa-print" style="margin-left: 5px;"></i>
-            طباعة النماذج (IT)
-        </button>
-    ` : '';
     
-    popup.innerHTML = `
-        <div style="padding: 20px; background: linear-gradient(135deg, #057590, #3ac0c3); color: white; display: flex; justify-content: space-between; align-items: center;">
-            <h3 style="margin: 0; font-size: 20px;">
-                <i class="fas fa-undo-alt" style="margin-left: 8px;"></i>
-                العناصر المحددة للترجيع (${selectedItems.length})
-            </h3>
-            <button onclick="closeSelectedItemsPopup()" style="background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">✕</button>
-        </div>
-        
+    // Only show return reasons section if there are IT items
+    const returnReasonsHTML = hasITItems ? `
         <div style="padding: 20px; background: linear-gradient(135deg, #f8fdff, #e8f4f8); border-bottom: 2px solid #3ac0c3;">
             <h4 style="margin: 0 0 15px 0; color: #057590; font-size: 16px; text-align: center;">
                 <i class="fas fa-clipboard-list" style="margin-left: 5px;"></i>
@@ -875,6 +863,25 @@ function showSelectedItemsPopup() {
                 </label>
             </div>
         </div>
+    ` : '';
+    
+    const printButtonHTML = hasITItems ? `
+        <button onclick="printAllForms()" style="flex: 1; padding: 12px 20px; background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);" onmouseover="this.style.background='linear-gradient(135deg, #2980b9, #21618c)'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='linear-gradient(135deg, #3498db, #2980b9)'; this.style.transform='translateY(0)'">
+            <i class="fas fa-print" style="margin-left: 5px;"></i>
+            طباعة النماذج (IT)
+        </button>
+    ` : '';
+    
+    popup.innerHTML = `
+        <div style="padding: 20px; background: linear-gradient(135deg, #057590, #3ac0c3); color: white; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-size: 20px;">
+                <i class="fas fa-undo-alt" style="margin-left: 8px;"></i>
+                العناصر المحددة للترجيع (${selectedItems.length})
+            </h3>
+            <button onclick="closeSelectedItemsPopup()" style="background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">✕</button>
+        </div>
+        
+        ${returnReasonsHTML}
         
         <div style="flex: 1; overflow-y: auto; min-height: 0;">
             ${itemsHTML}
@@ -956,7 +963,7 @@ function submitReturn() {
     }
     
     const returnData = selectedItems.map(item => {
-        const commentElement = document.getElementById(`comment_${item.id}`);
+        const commentElement = document.getElementById(`comment_${item.assetNum}`);
         const isIT = item.minorCategory === 'IT';
         
         return {
@@ -1075,7 +1082,7 @@ function confirmBulkReturnWithFiles() {
     
     returnData.forEach((item, index) => {
         formData.append(`asset_nums[${index}]`, item.assetNum);
-        formData.append(`comments[${item.assetNum}]`, item.comment || 'تم الترجيع');
+        formData.append(`comments[${item.assetNum}]`, item.comment || '');
         
         if (item.generateForm) {
             formData.append(`generate_form[${item.assetNum}]`, '1');
@@ -1167,7 +1174,7 @@ function showAlert(type, message) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Return system initialized - Single selection mode for actions and reasons');
+    console.log('Return system initialized - Comments mapped by assetNum');
 });
 </script>
 </body>

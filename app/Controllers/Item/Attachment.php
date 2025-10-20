@@ -86,12 +86,15 @@ class Attachment extends BaseController
 
             $isIT = ($originalItem->minor_category_name === 'IT');
             if ($isIT && isset($generateForm[$assetNum]) && $generateForm[$assetNum] == '1') {
+                // Get the comment for THIS specific asset number
+                $itemComment = isset($comments[$assetNum]) ? trim($comments[$assetNum]) : '';
+                
                 $itItems[] = [
                     'assetNum' => $assetNum,
                     'name' => $itemData[$assetNum]['name'] ?? '',
                     'category' => $itemData[$assetNum]['category'] ?? '',
                     'assetType' => $itemData[$assetNum]['asset_type'] ?? '',
-                    'notes' => $comments[$assetNum] ?? 'تم الترجيع',
+                    'notes' => $itemComment, // Use actual comment, empty if not provided
                     'actions' => $actions[$assetNum] ?? [],
                     'reasons' => $reasons ?? []
                 ];
@@ -117,11 +120,14 @@ class Attachment extends BaseController
             // Generate form for IT items with all items data
             if ($isIT && isset($generateForm[$assetNum]) && $generateForm[$assetNum] == '1') {
                 try {
+                    // Get the comment for THIS specific asset
+                    $itemComment = isset($comments[$assetNum]) ? trim($comments[$assetNum]) : '';
+                    
                     $formPath = $this->generateReturnForm(
                         $assetNum,
                         $itemData[$assetNum] ?? [],
                         $actions[$assetNum] ?? [],
-                        $comments[$assetNum] ?? 'تم الترجيع',
+                        $itemComment, // Pass the actual comment
                         $itItems,
                         $reasons ?? []
                     );
@@ -182,9 +188,12 @@ class Attachment extends BaseController
                 ? implode(',', $uploadedFileNames)
                 : ($originalItem->attachment ?? null);
 
+            // Get the actual comment for database storage
+            $itemComment = isset($comments[$assetNum]) ? trim($comments[$assetNum]) : '';
+            
             $updateData = [
                 'usage_status_id' => $returnedStatus->id,
-                'note'            => $comments[$assetNum] ?? 'تم الترجيع',
+                'note'            => !empty($itemComment) ? $itemComment : 'تم الترجيع',
                 'attachment'      => $attachmentPath,
                 'updated_at'      => date('Y-m-d H:i:s'),
                 'created_by'      => $createdBy 
@@ -250,7 +259,7 @@ class Attachment extends BaseController
         $tableRows = '';
         
         if (!empty($allItems)) {
-            // Multiple items - generate row for each with proper notes mapping
+            // Multiple items - generate row for each with proper notes mapping by assetNum
             foreach ($allItems as $index => $item) {
                 $rowNum = $index + 1;
                 $itemActions = $item['actions'] ?? [];
@@ -259,8 +268,8 @@ class Attachment extends BaseController
                 $itemSellChecked = isset($itemActions['sell']) && $itemActions['sell'] == '1' ? '✓' : '';
                 $itemDestroyChecked = isset($itemActions['destroy']) && $itemActions['destroy'] == '1' ? '✓' : '';
                 
-                // Get notes for THIS specific item by its assetNum - this is the key fix!
-                $itemNotes = 'تم الترجيع';
+                // CRITICAL: Get notes for THIS specific item - leave empty if not provided
+                $itemNotes = '';
                 if (isset($item['notes']) && !empty(trim($item['notes']))) {
                     $itemNotes = htmlspecialchars(trim($item['notes']), ENT_QUOTES, 'UTF-8');
                 }
@@ -293,7 +302,8 @@ class Attachment extends BaseController
             $sellChecked = isset($actions['sell']) && $actions['sell'] == '1' ? '✓' : '';
             $destroyChecked = isset($actions['destroy']) && $actions['destroy'] == '1' ? '✓' : '';
             
-            $displayNotes = !empty($notes) ? htmlspecialchars($notes, ENT_QUOTES, 'UTF-8') : 'تم الترجيع';
+            // Leave empty if no notes provided
+            $displayNotes = !empty($notes) ? htmlspecialchars($notes, ENT_QUOTES, 'UTF-8') : '';
             
             $tableRows = "
                 <tr>
