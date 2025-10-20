@@ -622,7 +622,7 @@ function printAllForms() {
     const itItems = selectedItems.filter(item => item.minorCategory === 'IT');
     
     if (itItems.length === 0) {
-        showAlert('warning', 'لا توجد عناصر IT لطباعة النماذج');
+        showAlert('warning', 'لا توجد عناصر IT معاينة نماذج');
         return;
     }
     
@@ -647,8 +647,8 @@ function printAllForms() {
     printBtn.disabled = true;
     printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
     
-    // Build all items data with proper notes mapping by assetNum
-    const allItemsData = selectedItems.map(item => {
+    // Build IT items data only with proper notes mapping by assetNum
+    const itItemsData = itItems.map(item => {
         const itemActionsData = itemActions[item.assetNum] || {};
         const commentElement = document.getElementById(`comment_${item.assetNum}`);
         const itemNotes = commentElement ? commentElement.value.trim() : '';
@@ -687,8 +687,8 @@ function printAllForms() {
     formData.append('reasons[unfit]', globalReturnReasons.unfit ? '1' : '0');
     formData.append('reasons[damaged]', globalReturnReasons.damaged ? '1' : '0');
     
-    // Send all items with their respective notes mapped by assetNum
-    allItemsData.forEach((item, index) => {
+    // Send only IT items with their respective notes mapped by assetNum
+    itItemsData.forEach((item, index) => {
         formData.append(`all_items[${index}][assetNum]`, item.assetNum);
         formData.append(`all_items[${index}][name]`, item.name);
         formData.append(`all_items[${index}][category]`, item.category);
@@ -709,7 +709,7 @@ function printAllForms() {
     printFrame.style.visibility = 'hidden';
     document.body.appendChild(printFrame);
     
-    fetch('<?= base_url("item/attachment/printForm") ?>', {
+    fetch('<?= base_url("return/attachment/printForm") ?>', {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
@@ -834,7 +834,7 @@ function showSelectedItemsPopup() {
         `;
     });
     
- // Check if there are any IT items
+    // Check if there are any IT items
     const hasITItems = selectedItems.some(item => item.minorCategory === 'IT');
     
     // Only show return reasons section if there are IT items
@@ -845,8 +845,7 @@ function showSelectedItemsPopup() {
                 أسباب الإرجاع
             </h4>
             <div class="action-checkbox-group" style="margin: 0;">
-                <label class="action-checkbox-item" onclick="toggleGlobalReason('purpose_end', event)">
-                    <input type="radio" name="global_reason" id="reason_purpose_end" style="display: none;">
+                <label class="action-checkbox-item" onclick="toggleGlobalReason('purpose_end', event)"><input type="radio" name="global_reason" id="reason_purpose_end" style="display: none;">
                     <div class="label">انتهاء الغرض</div>
                 </label>
                 <label class="action-checkbox-item" onclick="toggleGlobalReason('excess', event)">
@@ -1108,7 +1107,7 @@ function confirmBulkReturnWithFiles() {
         }
     });
     
-    fetch('<?= base_url("item/attachment/upload") ?>', {
+    fetch('<?= base_url("return/attachment/upload") ?>', {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
@@ -1174,7 +1173,7 @@ function showAlert(type, message) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Return system initialized - Comments mapped by assetNum');
+    console.log('Return system initialized - Only IT items in print form');
 });
 </script>
 </body>
