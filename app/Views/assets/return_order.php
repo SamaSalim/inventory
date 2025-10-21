@@ -352,6 +352,11 @@ function updateBulkActionsBar() {
     
     if (selectedItems.length > 0 && !popupExists) {
         bulkActions.classList.add('show');
+        bulkActions.style.position = 'relative';
+        bulkActions.style.bottom = 'auto';
+        bulkActions.style.left = 'auto';
+        bulkActions.style.right = 'auto';
+        bulkActions.style.transform = 'none';
         selectedCount.textContent = selectedItems.length;
     } else {
         bulkActions.classList.remove('show');
@@ -622,7 +627,7 @@ function printAllForms() {
     const itItems = selectedItems.filter(item => item.minorCategory === 'IT');
     
     if (itItems.length === 0) {
-        showAlert('warning', 'لا توجد عناصر IT معاينة نماذج');
+        showAlert('warning', 'لا توجد عناصر IT لمعاينة نماذج');
         return;
     }
     
@@ -647,7 +652,6 @@ function printAllForms() {
     printBtn.disabled = true;
     printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
     
-    // Build IT items data only with proper notes mapping by assetNum
     const itItemsData = itItems.map(item => {
         const itemActionsData = itemActions[item.assetNum] || {};
         const commentElement = document.getElementById(`comment_${item.assetNum}`);
@@ -687,7 +691,6 @@ function printAllForms() {
     formData.append('reasons[unfit]', globalReturnReasons.unfit ? '1' : '0');
     formData.append('reasons[damaged]', globalReturnReasons.damaged ? '1' : '0');
     
-    // Send only IT items with their respective notes mapped by assetNum
     itItemsData.forEach((item, index) => {
         formData.append(`all_items[${index}][assetNum]`, item.assetNum);
         formData.append(`all_items[${index}][name]`, item.name);
@@ -794,7 +797,7 @@ function showSelectedItemsPopup() {
     
     let itemsHTML = '';
     selectedItems.forEach((item, index) => {
-        const categoryBadgeColor = item.minorCategory === 'IT' ? '#3ac0c3' : '#ff6b6b';
+        const categoryBadgeColor = item.minorCategory === 'IT' ? '#3a61c3ff' : '#ff6b6b';
         itemsHTML += `
             <div class="popup-item" style="padding: 15px; border-bottom: 1px solid #e0e6ed; transition: background 0.2s;">
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
@@ -834,10 +837,8 @@ function showSelectedItemsPopup() {
         `;
     });
     
-    // Check if there are any IT items
     const hasITItems = selectedItems.some(item => item.minorCategory === 'IT');
     
-    // Only show return reasons section if there are IT items
     const returnReasonsHTML = hasITItems ? `
         <div style="padding: 20px; background: linear-gradient(135deg, #f8fdff, #e8f4f8); border-bottom: 2px solid #3ac0c3;">
             <h4 style="margin: 0 0 15px 0; color: #057590; font-size: 16px; text-align: center;">
@@ -845,7 +846,8 @@ function showSelectedItemsPopup() {
                 أسباب الإرجاع
             </h4>
             <div class="action-checkbox-group" style="margin: 0;">
-                <label class="action-checkbox-item" onclick="toggleGlobalReason('purpose_end', event)"><input type="radio" name="global_reason" id="reason_purpose_end" style="display: none;">
+                <label class="action-checkbox-item"onclick="toggleGlobalReason('purpose_end', event)">
+                    <input type="radio" name="global_reason" id="reason_purpose_end" style="display: none;">
                     <div class="label">انتهاء الغرض</div>
                 </label>
                 <label class="action-checkbox-item" onclick="toggleGlobalReason('excess', event)">
@@ -864,11 +866,21 @@ function showSelectedItemsPopup() {
         </div>
     ` : '';
     
-    const printButtonHTML = hasITItems ? `
-        <button onclick="printAllForms()" style="flex: 1; padding: 12px 20px; background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);" onmouseover="this.style.background='linear-gradient(135deg, #2980b9, #21618c)'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='linear-gradient(135deg, #3498db, #2980b9)'; this.style.transform='translateY(0)'">
-            <i class="fas fa-print" style="margin-left: 5px;"></i>
-            طباعة النماذج (IT)
-        </button>
+    const printButtonSection = hasITItems ? `
+        <div style="padding: 15px 20px; background: #fffbf0; border-top: 2px solid #f4d03f; border-bottom: 1px solid #e0e6ed;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
+                <div style="flex: 1;">
+                    <div style="font-size: 13px; color: #7d6608; line-height: 1.5;">
+                        <i class="fas fa-info-circle" style="margin-left: 5px; color: #f39c12;"></i>
+                        <strong>معاينة التقرير المُنشأ تلقائياً قبل إرساله لموظفي مستودع الإرجاع</strong>
+                    </div>
+                </div>
+                <button onclick="printAllForms()" style="padding: 10px 20px; background: linear-gradient(135deg, #5f97d6, #3a7bc8); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.3s; box-shadow: 0 3px 8px rgba(58, 123, 200, 0.3); white-space: nowrap; flex-shrink: 0;" onmouseover="this.style.background='linear-gradient(135deg, #3a7bc8, #2563a8)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 12px rgba(58, 123, 200, 0.4)'" onmouseout="this.style.background='linear-gradient(135deg, #5f97d6, #3a7bc8)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 8px rgba(58, 123, 200, 0.3)'">
+                    <i class="fas fa-eye" style="margin-left: 5px;"></i>
+                    عرض التقرير
+                </button>
+            </div>
+        </div>
     ` : '';
     
     popup.innerHTML = `
@@ -885,12 +897,14 @@ function showSelectedItemsPopup() {
         <div style="flex: 1; overflow-y: auto; min-height: 0;">
             ${itemsHTML}
         </div>
+        
+        ${printButtonSection}
+        
         <div style="padding: 15px 20px; background: #f8f9fa; border-top: 2px solid #e0e6ed; display: flex; justify-content: space-between; gap: 10px; flex-shrink: 0;">
             <button onclick="handleCancelSelection()" style="flex: 1; padding: 12px 20px; background: #95a5a6; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.2s;" onmouseover="this.style.background='#7f8c8d'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#95a5a6'; this.style.transform='translateY(0)'">
                 <i class="fas fa-times" style="margin-left: 5px;"></i>
                 إلغاء التحديد
             </button>
-            ${printButtonHTML}
             <button onclick="submitReturn()" style="flex: 1; padding: 12px 20px; background: linear-gradient(135deg, #3ac0c3, #2aa8ab); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(58, 192, 195, 0.3);" onmouseover="this.style.background='linear-gradient(135deg, #2aa8ab, #259a9d)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(58, 192, 195, 0.4)'" onmouseout="this.style.background='linear-gradient(135deg, #3ac0c3, #2aa8ab)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(58, 192, 195, 0.3)'">
                 <i class="fas fa-undo" style="margin-left: 5px;"></i>
                 تأكيد الترجيع
@@ -1173,7 +1187,7 @@ function showAlert(type, message) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Return system initialized - Only IT items in print form');
+    console.log('Return system initialized - View button repositioned after last item');
 });
 </script>
 </body>
