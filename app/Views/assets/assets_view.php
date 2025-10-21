@@ -72,15 +72,15 @@
                     </div>
                 </div>
 
-                <div class="stat-card" style="background: linear-gradient(135deg, #fff3cd, #ffeaa7);">
-                    <div class="stat-number"><?= number_format($stats['low_stock'] ?? 0) ?></div>
-                    <div class="stat-label">
-                        <svg class="stat-icon" viewBox="0 0 24 24">
-                            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
-                        </svg>
-                        مخزون منخفض
-                    </div>
-                </div>
+                <<div class="stat-card" style="background: linear-gradient(135deg, #e8f5e9, #81c784);">
+    <div class="stat-number"><?= number_format($stats['returned_items'] ?? 0) ?></div>
+    <div class="stat-label">
+        <svg class="stat-icon" viewBox="0 0 24 24">
+            <path d="M9 11H3v2h6v3l5-4-5-4v3zm12-8h-6c-1.1 0-2 .9-2 2v3h2V5h6v14h-6v-3h-2v3c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+        </svg>
+        عدد أصناف الرجيع
+    </div>
+</div>
             </div>
 
             <div class="section-header">

@@ -172,29 +172,49 @@ class AssetsController extends BaseController
     {
         $totalQuantityResult = $this->itemOrderModel->selectSum('quantity')->first();
         $totalReceipts = $totalQuantityResult ? (int)$totalQuantityResult->quantity : 0;
+        
         $availableItems = $this->itemOrderModel->countAllResults();
+        
         $totalEntries = $this->itemModel->countAllResults();
-        $lowStock = $this->itemOrderModel->where('quantity <', 10)->where('quantity >', 0)->countAllResults();
-        $topCategoryResult = $this->itemOrderModel->select('items.minor_category_id, minor_category.name, COUNT(*) as count')
+        
+        // ✅ تغيير: عدد الأصناف المرجعة بدلاً من المخزون المنخفض
+        // القديم:
+        // $lowStock = $this->itemOrderModel->where('quantity <', 10)->where('quantity >', 0)->countAllResults();
+        
+        // الجديد:
+        $returnedItemsCount = $this->itemOrderModel
+            ->where('usage_status_id', 2) // 2 = مرجع
+            ->countAllResults();
+        
+        $topCategoryResult = $this->itemOrderModel
+            ->select('items.minor_category_id, minor_category.name, COUNT(*) as count')
             ->join('items', 'items.id = item_order.item_id')
             ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
             ->groupBy('items.minor_category_id')
-            ->orderBy('count', 'ASC')
+            ->orderBy('count', 'DESC')
             ->first();
+        
         $topCategory = $topCategoryResult ? $topCategoryResult->name : 'غير محدد';
-        $lastEntry = $this->itemOrderModel->select('item_order.created_at, items.name')
+        
+        $lastEntry = $this->itemOrderModel
+            ->select('item_order.created_at, items.name')
             ->join('items', 'items.id = item_order.item_id', 'left')
-            ->orderBy('item_order.created_at', 'ASC')
+            ->orderBy('item_order.created_at', 'DESC')
             ->first();
+        
         return [
             'total_receipts' => $totalReceipts,
             'available_items' => $availableItems,
             'total_entries' => $totalEntries,
-            'low_stock' => $lowStock,
+            'returned_items' => $returnedItemsCount, // ✅ اسم جديد
             'top_category' => $topCategory,
-            'last_entry' => $lastEntry ? ['item' => $lastEntry->name ?? 'غير محدد', 'date' => date('Y-m-d H:i', strtotime($lastEntry->created_at))] : null
+            'last_entry' => $lastEntry ? [
+                'item' => $lastEntry->name ?? 'غير محدد', 
+                'date' => date('Y-m-d H:i', strtotime($lastEntry->created_at))
+            ] : null
         ];
     }
+    
 
     public function orderDetails($id)
     {

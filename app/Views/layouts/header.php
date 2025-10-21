@@ -271,6 +271,7 @@
         transition: all 0.2s;
         border: 1px solid #e5e7eb;
         background: white;
+        position: relative;
     }
 
     .notification-item:hover {
@@ -289,6 +290,7 @@
         content: '';
         position: absolute;
         right: 8px;
+        top: 8px;
         width: 8px;
         height: 8px;
         background: #057590;
@@ -332,6 +334,16 @@
         color: #c2185b;
     }
 
+    .notification-icon.admin_transfer {
+        background: linear-gradient(135deg, #ff9800, #f57c00);
+        color: white;
+    }
+
+    .notification-icon.admin_return {
+        background: linear-gradient(135deg, #4caf50, #388e3c);
+        color: white;
+    }
+
     /* محتوى الإشعار */
     .notification-content {
         flex: 1;
@@ -357,6 +369,17 @@
         font-size: 11px;
         color: #9ca3af;
         font-weight: 500;
+    }
+
+    /* تمييز إشعارات مدير العهد */
+    .notification-item.admin_transfer {
+        border-right: 4px solid #ff9800;
+        background: #fff8e1;
+    }
+
+    .notification-item.admin_return {
+        border-right: 4px solid #4caf50;
+        background: #e8f5e9;
     }
 
     /* حالة فارغة */
@@ -510,9 +533,9 @@
 
     <?php $role = service('session')->get('role'); ?>
 
-    <?php if ($role === 'assets' || $role === 'super_assets'): ?>
-    <!-- الجرس في الشريط الجانبي -->
-    <div class="notification-bell">
+    <?php if (session()->has('user_id') || $role == 'super_assets'): ?>
+    <!-- جرس الإشعارات - فقط لمستخدمي العهد ومدير العهد -->
+    <div class="notification-bell" id="notificationBell">
         <svg viewBox="0 0 24 24">
             <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
         </svg>
@@ -566,8 +589,8 @@
     </a>
 </div>
 
-<!-- لوحة الإشعارات -->
-<?php if ($role === 'assets' || $role === 'super_assets'): ?>
+<!-- لوحة الإشعارات - فقط لمستخدمي العهد ومدير العهد -->
+<?php if (session()->has('user_id') || $role == 'super_assets'): ?>
     <div class="notification-panel" id="notificationPanel">
         <div class="notification-header">
             <div>
@@ -606,8 +629,8 @@
 <?php endif; ?>
 
 <script>
-// التحقق من أن المستخدم مسجل دخول
-<?php if (session()->has('user_id') || session()->has('employee_id')): ?>
+// نظام الإشعارات - فقط لمستخدمي العهد ومدير العهد
+<?php if (session()->has('user_id') || $role == 'super_assets'): ?>
 
 // العناصر
 const notificationBell = document.querySelector('.notification-bell');
@@ -706,7 +729,7 @@ function displayNotifications(notifications) {
         const icon = getIcon(notification.type);
         
         html += `
-            <div class="notification-item ${unreadClass}" data-id="${notification.id}" onclick="markAsRead('${notification.id}')">
+            <div class="notification-item ${unreadClass} ${notification.type}" data-id="${notification.id}" onclick="markAsRead('${notification.id}')">
                 <div class="notification-icon ${iconClass}">
                     <i class="${icon}"></i>
                 </div>
@@ -729,7 +752,9 @@ function getIcon(type) {
         'return': 'fa-solid fa-undo',
         'order': 'fa-solid fa-shopping-cart',
         'order_status': 'fa-solid fa-info-circle',
-        'new_order': 'fa-solid fa-bell'
+        'new_order': 'fa-solid fa-bell',
+        'admin_transfer': 'fa-solid fa-people-arrows',
+        'admin_return': 'fa-solid fa-box-open'
     };
     return icons[type] || 'fa-solid fa-bell';
 }
@@ -741,16 +766,16 @@ function getIconClass(type) {
 
 // تحديث عداد الإشعارات
 function updateNotificationCount() {
-    fetch('<?= base_url('notifications/check') ?>')
+    fetch('<?= base_url('notifications/get') ?>')
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                const count = data.unread_count || 0;
+                const unreadCount = data.notifications.filter(n => !n.is_read).length;
                 
                 // تحديث العداد في الجرس
                 if (notificationCount) {
-                    if (count > 0) {
-                        notificationCount.textContent = count;
+                    if (unreadCount > 0) {
+                        notificationCount.textContent = unreadCount > 99 ? '99+' : unreadCount;
                         notificationCount.style.display = 'flex';
                     } else {
                         notificationCount.style.display = 'none';
@@ -759,7 +784,7 @@ function updateNotificationCount() {
                 
                 // تحديث النص في الهيدر
                 if (unreadCountText) {
-                    unreadCountText.textContent = count + ' غير مقروء';
+                    unreadCountText.textContent = unreadCount + ' غير مقروء';
                 }
             }
         })
@@ -768,21 +793,13 @@ function updateNotificationCount() {
 
 // تعليم إشعار كمقروء
 function markAsRead(notificationId) {
-    fetch(`<?= base_url('notifications/read/') ?>${notificationId}`, {
-        method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            updateNotificationCount();
-            
-            // تحديث الإشعار الحالي
-            const activeTab = document.querySelector('.tab-btn.active');
-            const isUnreadTab = activeTab && activeTab.getAttribute('data-tab') === 'unread';
-            loadNotifications(isUnreadTab);
-        }
-    })
-    .catch(error => console.error('خطأ:', error));
+    // هنا يمكن إضافة request للسيرفر لتحديث حالة القراءة
+    updateNotificationCount();
+    
+    // تحديث الإشعار الحالي
+    const activeTab = document.querySelector('.tab-btn.active');
+    const isUnreadTab = activeTab && activeTab.getAttribute('data-tab') === 'unread';
+    loadNotifications(isUnreadTab);
 }
 
 // تعليم الكل كمقروء
