@@ -78,12 +78,20 @@ public function index()
         MAX(employee.emp_ext) AS extension,
         MAX(items.name) AS item_name,
         MAX(minor_category.name) AS category_name,
-        MAX(usage_status.usage_status) AS usage_status_name
+        MAX(usage_status.usage_status) AS usage_status_name,
+        COUNT(DISTINCT item_order.item_order_id) as items_count,
+        MAX(users.name) as receiver_name,
+        MAX(order_status.status) as order_status_name
     ')
     ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
     ->join('items', 'items.id = item_order.item_id', 'left')
     ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
     ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+    ->join('order', 'order.order_id = item_order.order_id', 'left')
+    ->join('users', 'users.user_id = order.to_user_id', 'left')
+    ->join('order_status', 'order_status.id = order.order_status_id', 'left')
+    ->groupBy('item_order.order_id')
+    ->orderBy('MAX(item_order.created_at)', 'DESC')
     ->groupBy('item_order.order_id')
     ->orderBy('MAX(item_order.created_at)', 'DESC');
     // فلترة البحث
@@ -532,12 +540,17 @@ public function bulkDeleteOrders()
         ];
         
         $orderUpdateResult = $this->orderModel->update($orderId, $orderMainData);
-        if (!$orderUpdateResult) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'فشل في تحديث بيانات الطلب الأساسية.'
-            ]);
-        }
+        $existingOrder = $this->orderModel->find($orderId);
+if (!$existingOrder) {
+    return $this->response->setJSON([
+        'success' => false,
+        'message' => 'الطلب غير موجود.'
+    ]);
+}
+if ($existingOrder->from_employee_id !== session()->get('employee_id')) {
+    log_message('warning', 'محاولة تعديل طلب من موظف آخر: ' . $orderId);
+}
+
 
         // ✅ تحديث العناصر المرسلة من الواجهة باستخدام الدالة الجديدة
         if (!empty($existingItemsData) && is_array($existingItemsData)) {
@@ -680,34 +693,53 @@ public function bulkDeleteOrders()
         $this->itemModel->save($entity);
         return redirect()->to('/warehouse')->with('success', 'تم تحديث العنصر بنجاح');
     }
-
     private function getWarehouseStats(): array
     {
         $totalQuantityResult = $this->itemOrderModel->selectSum('quantity')->first();
         $totalReceipts = $totalQuantityResult ? (int)$totalQuantityResult->quantity : 0;
+        
         $availableItems = $this->itemOrderModel->countAllResults();
+        
         $totalEntries = $this->itemModel->countAllResults();
-        $lowStock = $this->itemOrderModel->where('quantity <', 10)->where('quantity >', 0)->countAllResults();
-        $topCategoryResult = $this->itemOrderModel->select('items.minor_category_id, minor_category.name, COUNT(*) as count')
+        
+        // ✅ تغيير: عدد الأصناف المرجعة بدلاً من المخزون المنخفض
+        // القديم:
+        // $lowStock = $this->itemOrderModel->where('quantity <', 10)->where('quantity >', 0)->countAllResults();
+        
+        // الجديد:
+        $returnedItemsCount = $this->itemOrderModel
+            ->where('usage_status_id', 2) // 2 = مرجع
+            ->countAllResults();
+        
+        $topCategoryResult = $this->itemOrderModel
+            ->select('items.minor_category_id, minor_category.name, COUNT(*) as count')
             ->join('items', 'items.id = item_order.item_id')
             ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
             ->groupBy('items.minor_category_id')
-            ->orderBy('count', 'ASC')
+            ->orderBy('count', 'DESC')
             ->first();
+        
         $topCategory = $topCategoryResult ? $topCategoryResult->name : 'غير محدد';
-        $lastEntry = $this->itemOrderModel->select('item_order.created_at, items.name')
+        
+        $lastEntry = $this->itemOrderModel
+            ->select('item_order.created_at, items.name')
             ->join('items', 'items.id = item_order.item_id', 'left')
-            ->orderBy('item_order.created_at', 'ASC')
+            ->orderBy('item_order.created_at', 'DESC')
             ->first();
+        
         return [
             'total_receipts' => $totalReceipts,
             'available_items' => $availableItems,
             'total_entries' => $totalEntries,
-            'low_stock' => $lowStock,
+            'returned_items' => $returnedItemsCount, // ✅ اسم جديد
             'top_category' => $topCategory,
-            'last_entry' => $lastEntry ? ['item' => $lastEntry->name ?? 'غير محدد', 'date' => date('Y-m-d H:i', strtotime($lastEntry->created_at))] : null
+            'last_entry' => $lastEntry ? [
+                'item' => $lastEntry->name ?? 'غير محدد', 
+                'date' => date('Y-m-d H:i', strtotime($lastEntry->created_at))
+            ] : null
         ];
     }
+    
 
     public function searchitems()
     {

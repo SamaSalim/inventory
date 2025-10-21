@@ -1,205 +1,230 @@
 <?php
-// app/Controllers/NotificationController.php
-
 namespace App\Controllers;
 
-class NotificationController extends BaseController
+use CodeIgniter\Controller;
+
+class NotificationController extends Controller
 {
+    protected $db;
+    
     public function __construct()
     {
-        helper('notification');
+        $this->db = \Config\Database::connect();
     }
     
     /**
-     * جلب إشعارات المستخدم من الجلسة
+     * التحقق من صلاحية الوصول
+     */
+    private function checkAccess()
+    {
+        // للمستخدمين العاديين
+        if (session()->has('user_id')) {
+            return [
+                'allowed' => true,
+                'type' => 'user',
+                'id' => session()->get('user_id')
+            ];
+        }
+        
+        // للموظفين - فقط مدير العهد
+        if (session()->has('employee_id')) {
+            $employee = $this->db->table('employees')
+                ->where('id', session()->get('employee_id'))
+                ->get()
+                ->getRow();
+                
+            if ($employee && $employee->department === 'super assets') {
+                return [
+                    'allowed' => true,
+                    'type' => 'super_assets',
+                    'id' => $employee->id
+                ];
+            }
+        }
+        
+        return ['allowed' => false];
+    }
+    
+    /**
+     * جلب الإشعارات
      */
     public function getUserNotifications()
     {
-        $userId = session()->get('user_id');
-        $employeeId = session()->get('employee_id');
+        $access = $this->checkAccess();
         
-        if (!$userId && !$employeeId) {
+        if (!$access['allowed']) {
             return $this->response->setJSON([
                 'success' => false,
                 'message' => 'غير مصرح'
-            ])->setStatusCode(401);
+            ])->setStatusCode(403);
         }
         
-        $unreadOnly = $this->request->getGet('unread') === 'true';
-        $notifications = getNotifications($unreadOnly);
-        
-        // إضافة الوقت النسبي
-        foreach ($notifications as &$notification) {
-            $notification['time_ago'] = $this->timeAgo($notification['created_at']);
-        }
+        $notifications = $this->getNotificationsForUser($access['type'], $access['id']);
         
         return $this->response->setJSON([
             'success' => true,
-            'notifications' => array_values($notifications)
+            'notifications' => $notifications
         ]);
     }
     
     /**
-     * جلب الإشعارات الجديدة من قاعدة البيانات
+     * جلب الإشعارات حسب نوع المستخدم
      */
-    public function checkNewEvents()
+    private function getNotificationsForUser($type, $userId)
     {
-        $userId = session()->get('user_id');
-        $employeeId = session()->get('employee_id');
+        $notifications = [];
         
-        if (!$userId && !$employeeId) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'غير مصرح'
-            ])->setStatusCode(401);
+        if ($type === 'user') {
+            // إشعارات المستخدم العادي
+            $notifications = $this->getUserTransferNotifications($userId);
+            
+        } elseif ($type === 'super_assets') {
+            // إشعارات مدير العهد - كل الحركات
+            $notifications = $this->getSuperAssetsNotifications();
         }
         
-        $userId = session()->get('employee_id');
-        $isEmployee = session()->get('isEmployee');
-        $lastCheck = session()->get('last_notification_check') ?? date('Y-m-d H:i:s', strtotime('-1 hour'));
-        
-        $newEvents = [];
-        
-        // فحص التحويلات الجديدة للمستخدمين
-        if (!$isEmployee) {
-            $transferModel = new \App\Models\TransferItemsModel();
-            
-            // التحويلات الواردة الجديدة
-            $newTransfers = $transferModel
-                ->select('transfer_items.*, from_user.name as from_name')
-                ->join('users as from_user', 'from_user.user_id = transfer_items.from_user_id')
-                ->where('to_user_id', $userId)
-                ->where('transfer_items.created_at >', $lastCheck)
-                ->where('order_status_id', 1) // قيد الانتظار
-                ->findAll();
-                
-            foreach ($newTransfers as $transfer) {
-                addNotification(
-                    'transfer',
-                    'طلب تحويل جديد',
-                    'لديك طلب تحويل جديد من ' . $transfer->from_name,
-                    ['transfer_id' => $transfer->transfer_item_id]
-                );
-                $newEvents[] = 'transfer';
-            }
-            
-            // التحويلات المقبولة/المرفوضة
-            $statusUpdates = $transferModel
-                ->where('from_user_id', $userId)
-                ->where('updated_at >', $lastCheck)
-                ->whereIn('order_status_id', [2, 3])
-                ->findAll();
-                
-            foreach ($statusUpdates as $update) {
-                $status = $update->order_status_id == 2 ? 'مقبول' : 'مرفوض';
-                addNotification(
-                    'order_status',
-                    'تحديث حالة التحويل',
-                    'تم ' . $status . ' طلب التحويل الخاص بك',
-                    ['transfer_id' => $update->transfer_item_id]
-                );
-                $newEvents[] = 'status';
-            }
-        }
-        
-        // فحص العمليات للموظفين
-        if ($isEmployee) {
-            $orderModel = new \App\Models\OrderModel();
-            
-            $newOrders = $orderModel
-                ->where('to_employee_id', $userId)
-                ->where('created_at >', $lastCheck)
-                ->findAll();
-                
-            foreach ($newOrders as $order) {
-                addNotification(
-                    'new_order',
-                    'طلب جديد',
-                    'لديك طلب جديد رقم ' . $order->order_id,
-                    ['order_id' => $order->order_id]
-                );
-                $newEvents[] = 'order';
-            }
-        }
-        
-        // تحديث آخر وقت فحص
-        session()->set('last_notification_check', date('Y-m-d H:i:s'));
-        
-        return $this->response->setJSON([
-            'success' => true,
-            'new_events' => count($newEvents),
-            'unread_count' => getUnreadCount()
-        ]);
+        return $notifications;
     }
     
     /**
-     * تحديد إشعار كمقروء
+     * إشعارات المستخدم العادي
      */
-    public function markAsRead($id)
+    private function getUserTransferNotifications($userId)
     {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'غير مصرح'
-            ]);
+        $notifications = [];
+        
+        // جلب التحويلات المرسلة
+        $sentTransfers = $this->db->table('orders')
+            ->select('orders.*, users.name as to_user_name')
+            ->join('users', 'users.id = orders.to_user_id', 'left')
+            ->where('orders.from_user_id', $userId)
+            ->where('orders.type', 'transfer')
+            ->orderBy('orders.created_at', 'DESC')
+            ->limit(20)
+            ->get()
+            ->getResult();
+            
+        foreach ($sentTransfers as $transfer) {
+            $notifications[] = [
+                'id' => 'transfer_sent_' . $transfer->id,
+                'type' => 'transfer',
+                'title' => 'طلب تحويل مرسل',
+                'message' => "تم إرسال طلب تحويل إلى {$transfer->to_user_name} - الحالة: {$this->getStatusText($transfer->status)}",
+                'time_ago' => $this->timeAgo($transfer->created_at),
+                'is_read' => false,
+                'data' => ['order_id' => $transfer->id]
+            ];
         }
         
-        markNotificationAsRead($id);
+        // جلب التحويلات المستلمة
+        $receivedTransfers = $this->db->table('orders')
+            ->select('orders.*, users.name as from_user_name')
+            ->join('users', 'users.id = orders.from_user_id', 'left')
+            ->where('orders.to_user_id', $userId)
+            ->where('orders.type', 'transfer')
+            ->orderBy('orders.created_at', 'DESC')
+            ->limit(20)
+            ->get()
+            ->getResult();
+            
+        foreach ($receivedTransfers as $transfer) {
+            $notifications[] = [
+                'id' => 'transfer_received_' . $transfer->id,
+                'type' => 'transfer',
+                'title' => 'طلب تحويل وارد',
+                'message' => "تم استلام طلب تحويل من {$transfer->from_user_name}",
+                'time_ago' => $this->timeAgo($transfer->created_at),
+                'is_read' => false,
+                'data' => ['order_id' => $transfer->id]
+            ];
+        }
         
-        return $this->response->setJSON(['success' => true]);
+        return $notifications;
     }
     
     /**
-     * تحديد جميع الإشعارات كمقروءة
+     * إشعارات مدير العهد - كل حركات النظام
      */
-    public function markAllAsRead()
+    private function getSuperAssetsNotifications()
     {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'غير مصرح'
-            ]);
+        $notifications = [];
+        
+        // جلب جميع التحويلات بين المستخدمين
+        $transfers = $this->db->table('orders')
+            ->select('orders.*, 
+                     from_user.name as from_user_name, 
+                     to_user.name as to_user_name')
+            ->join('users as from_user', 'from_user.id = orders.from_user_id', 'left')
+            ->join('users as to_user', 'to_user.id = orders.to_user_id', 'left')
+            ->where('orders.type', 'transfer')
+            ->orderBy('orders.created_at', 'DESC')
+            ->limit(50)
+            ->get()
+            ->getResult();
+            
+        foreach ($transfers as $transfer) {
+            $statusIcon = $this->getStatusIcon($transfer->status);
+            $notifications[] = [
+                'id' => 'admin_transfer_' . $transfer->id,
+                'type' => 'admin_transfer',
+                'title' => $statusIcon . ' تحويل عهدة بين مستخدمين',
+                'message' => "من: {$transfer->from_user_name} → إلى: {$transfer->to_user_name} | الحالة: {$this->getStatusText($transfer->status)}",
+                'time_ago' => $this->timeAgo($transfer->created_at),
+                'is_read' => false,
+                'data' => [
+                    'order_id' => $transfer->id,
+                    'from_user' => $transfer->from_user_name,
+                    'to_user' => $transfer->to_user_name,
+                    'status' => $transfer->status
+                ]
+            ];
         }
         
-        $notifications = session()->get('notifications') ?? [];
-        
-        foreach ($notifications as &$notification) {
-            $notification['is_read'] = true;
+        // جلب عمليات الإرجاع
+        $returns = $this->db->table('returns')
+            ->select('returns.*, users.name as user_name')
+            ->join('users', 'users.id = returns.user_id', 'left')
+            ->orderBy('returns.created_at', 'DESC')
+            ->limit(30)
+            ->get()
+            ->getResult();
+            
+        foreach ($returns as $return) {
+            $notifications[] = [
+                'id' => 'admin_return_' . $return->id,
+                'type' => 'admin_return',
+                'title' => '↩️ إرجاع عهدة',
+                'message' => "المستخدم: {$return->user_name} قام بإرجاع عهدة",
+                'time_ago' => $this->timeAgo($return->created_at),
+                'is_read' => false,
+                'data' => [
+                    'return_id' => $return->id,
+                    'user_name' => $return->user_name
+                ]
+            ];
         }
         
-        session()->set('notifications', $notifications);
+        // ترتيب الإشعارات حسب التاريخ
+        usort($notifications, function($a, $b) {
+            return strtotime($b['time_ago']) - strtotime($a['time_ago']);
+        });
         
-        return $this->response->setJSON(['success' => true]);
+        return array_slice($notifications, 0, 50);
     }
     
     /**
-     * مسح جميع الإشعارات
+     * تحويل الوقت إلى صيغة منذ
      */
-    public function clearAll()
-    {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'غير مصرح'
-            ]);
-        }
-        
-        clearNotifications();
-        
-        return $this->response->setJSON(['success' => true]);
-    }
-    
     private function timeAgo($datetime)
     {
-        $time = strtotime($datetime);
-        $now = time();
-        $diff = $now - $time;
+        $timestamp = strtotime($datetime);
+        $diff = time() - $timestamp;
         
         if ($diff < 60) {
             return 'الآن';
         } elseif ($diff < 3600) {
-            $minutes = floor($diff / 60);
-            return "منذ {$minutes} دقيقة";
+            $mins = floor($diff / 60);
+            return "منذ {$mins} دقيقة";
         } elseif ($diff < 86400) {
             $hours = floor($diff / 3600);
             return "منذ {$hours} ساعة";
@@ -207,7 +232,80 @@ class NotificationController extends BaseController
             $days = floor($diff / 86400);
             return "منذ {$days} يوم";
         } else {
-            return date('Y-m-d', $time);
+            return date('Y-m-d', $timestamp);
         }
+    }
+    
+    /**
+     * نص الحالة بالعربي
+     */
+    private function getStatusText($status)
+    {
+        $statuses = [
+            'pending' => 'قيد الانتظار',
+            'accepted' => 'مقبول',
+            'rejected' => 'مرفوض',
+            'completed' => 'مكتمل'
+        ];
+        
+        return $statuses[$status] ?? $status;
+    }
+    
+    /**
+     * أيقونة الحالة
+     */
+    private function getStatusIcon($status)
+    {
+        $icons = [
+            'pending' => '⏳',
+            'accepted' => '✅',
+            'rejected' => '❌',
+            'completed' => '🎉'
+        ];
+        
+        return $icons[$status] ?? '📋';
+    }
+    
+    /**
+     * تعليم الكل كمقروء
+     */
+    public function markAllAsRead()
+    {
+        $access = $this->checkAccess();
+        
+        if (!$access['allowed']) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'غير مصرح'
+            ])->setStatusCode(403);
+        }
+        
+        // حفظ في Session أن كل الإشعارات مقروءة
+        session()->set('notifications_last_read_' . $access['id'], time());
+        
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'تم تعليم جميع الإشعارات كمقروءة'
+        ]);
+    }
+    
+    /**
+     * مسح جميع الإشعارات
+     */
+    public function clearAll()
+    {
+        $access = $this->checkAccess();
+        
+        if (!$access['allowed']) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'غير مصرح'
+            ])->setStatusCode(403);
+        }
+        
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'تم مسح جميع الإشعارات'
+        ]);
     }
 }
