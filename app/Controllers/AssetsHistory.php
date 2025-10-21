@@ -8,6 +8,8 @@ use App\Models\TransferItemsModel;
 use App\Models\MinorCategoryModel;
 use App\Models\UsageStatusModel;
 use App\Exceptions\AuthenticationException;
+use App\Models\OrderModel; 
+use App\Models\UsersModel;
 
 class AssetsHistory extends BaseController
 {
@@ -85,6 +87,184 @@ class AssetsHistory extends BaseController
             ]
         ]);
     }
+
+    /**
+     * تحديث حالة الاستخدام لطلب معين
+     */
+ public function updateUsageStatus($orderId)
+    {
+        $db = \Config\Database::connect();
+
+        try {
+            $order = $db->table('order')->where('order_id', $orderId)->get()->getRow();
+            if (!$order) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "الطلب برقم $orderId غير موجود."
+                ]);
+            }
+
+            $data = json_decode($this->request->getBody());
+            if (!$data) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'بيانات الطلب غير صحيحة.'
+                ]);
+            }
+
+            $usage_status_id = $data->usage_status_id ?? null;
+            $note = $data->note ?? '';
+
+            if (empty($usage_status_id)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'حالة الاستخدام غير محددة.'
+                ]);
+            }
+
+            // تحديث item_order
+            $db->table('item_order')
+                ->where('order_id', $orderId)
+                ->update([
+                    'usage_status_id' => $usage_status_id,
+                    'note' => $note,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+
+            // تحديث note فقط في order الرئيسي
+            $db->table('order')
+                ->where('order_id', $orderId)
+                ->update([
+                    'note' => $note,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'تمت إعادة الصرف وتحديث البيانات بنجاح بدون تعديل المستخدمين.'
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'خطأ: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /** إعادة صرف كل العهد المرتبطة بالطلب بدون تغيير المستخدمين */
+    public function reDistribute($orderId)
+    {
+        $db = \Config\Database::connect();
+
+        try {
+            $order = $db->table('order')->where('order_id', $orderId)->get()->getRow();
+            if (!$order) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "الطلب برقم $orderId غير موجود."
+                ]);
+            }
+
+            $data = json_decode($this->request->getBody());
+            $note = $data->note ?? '';
+
+            // تحديث جميع item_order المرتبطة بالطلب
+            $db->table('item_order')
+                ->where('order_id', $orderId)
+                ->update([
+                    'usage_status_id' => 4, // معاد صرفه
+                    'note' => $note,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+
+            // تحديث note فقط في order الرئيسي
+            $db->table('order')
+                ->where('order_id', $orderId)
+                ->update([
+                    'note' => $note,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'تمت إعادة الصرف وتحديث الملاحظات بنجاح بدون تعديل المستخدمين.'
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'حدث خطأ: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /** إعادة صرف مجموعة محددة من العهد فقط */
+    public function reDistributeItems()
+    {
+        $data = json_decode($this->request->getBody());
+        $orderId = $data->order_id ?? null;
+        $items = $data->items ?? [];
+        $note = $data->note ?? null;
+
+        if (!$orderId || empty($items)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'بيانات غير مكتملة'
+            ]);
+        }
+
+        $db = \Config\Database::connect();
+
+        foreach ($items as $itemId) {
+            $db->table('item_order')
+                ->where('item_order_id', $itemId)
+                ->update([
+                    'usage_status_id' => 4, // معاد صرفه
+                    'note' => $note,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+        }
+
+        // تحديث note فقط في الطلب الرئيسي بدون تغيير المستخدمين
+        $db->table('order')
+            ->where('order_id', $orderId)
+            ->update([
+                'note' => $note,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'تمت إعادة صرف العهد المحددة بنجاح بدون تعديل المستخدمين.'
+        ]);
+    }
+
+    /** جلب العناصر حسب الطلب */
+    public function getItemsByOrder($orderId)
+    {
+        $db = \Config\Database::connect();
+        $items = $db->table('item_order')->where('order_id', $orderId)->get()->getResultArray();
+
+        if ($items) {
+            return $this->response->setJSON([
+                'success' => true,
+                'items' => $items
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'لا توجد عهد مرتبطة بهذا الطلب'
+            ]);
+        }
+    }
+
+
+
+
+
+
+
     /**
      * عرض صفحة super_assets_view - تحتوي على الإحصائيات والتحويلات والإرجاعات
      */
