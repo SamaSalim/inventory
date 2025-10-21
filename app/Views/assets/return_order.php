@@ -264,8 +264,7 @@
 <script>
 let selectedItems = [];
 let uploadedFiles = {};
-let itemActions = {};
-let globalReturnReasons = {};
+let itemReasons = {}; // Changed from itemActions to itemReasons
 
 function updateSelection() {
     selectedItems = [];
@@ -372,8 +371,7 @@ function clearSelection() {
     });
     selectedItems = [];
     uploadedFiles = {};
-    itemActions = {};
-    globalReturnReasons = {};
+    itemReasons = {};
     updateBulkActionsBar();
     const masterCheckbox = document.getElementById('masterCheckbox');
     if (masterCheckbox) {
@@ -445,56 +443,35 @@ function removeFile(assetNum, fileIndex) {
     }
 }
 
-function toggleAction(assetNum, action, event) {
+function toggleReason(assetNum, reason, event) {
     if (event) {
         event.preventDefault();
         event.stopPropagation();
     }
     
-    if (!itemActions[assetNum]) {
-        itemActions[assetNum] = {};
+    if (!itemReasons[assetNum]) {
+        itemReasons[assetNum] = {};
     }
     
-    ['fix', 'sell', 'destroy'].forEach(act => {
-        itemActions[assetNum][act] = false;
-        const otherCheckbox = document.getElementById(`action_${act}_${assetNum}`);
+    // Clear all other reasons for this item
+    ['purpose_end', 'excess', 'unfit', 'damaged'].forEach(r => {
+        itemReasons[assetNum][r] = false;
+        const otherCheckbox = document.getElementById(`reason_${r}_${assetNum}`);
         const otherLabel = otherCheckbox?.closest('.action-checkbox-item');
         if (otherCheckbox) otherCheckbox.checked = false;
         if (otherLabel) otherLabel.classList.remove('selected');
     });
     
-    itemActions[assetNum][action] = true;
+    // Set the selected reason
+    itemReasons[assetNum][reason] = true;
     
-    const checkbox = document.getElementById(`action_${action}_${assetNum}`);
+    const checkbox = document.getElementById(`reason_${reason}_${assetNum}`);
     const label = checkbox.closest('.action-checkbox-item');
     
     label.classList.add('selected');
     checkbox.checked = true;
     
     updateFormPreview(assetNum);
-}
-
-function toggleGlobalReason(reason, event) {
-    if (event) {
-        event.preventDefault();
-        event.stopPropagation();
-    }
-    
-    Object.keys(globalReturnReasons).forEach(key => {
-        globalReturnReasons[key] = false;
-        const otherCheckbox = document.getElementById(`reason_${key}`);
-        const otherLabel = otherCheckbox?.closest('.action-checkbox-item');
-        if (otherCheckbox) otherCheckbox.checked = false;
-        if (otherLabel) otherLabel.classList.remove('selected');
-    });
-    
-    globalReturnReasons[reason] = true;
-    
-    const checkbox = document.getElementById(`reason_${reason}`);
-    const label = checkbox.closest('.action-checkbox-item');
-    
-    label.classList.add('selected');
-    checkbox.checked = true;
 }
 
 function updateFormPreview(assetNum) {
@@ -504,27 +481,28 @@ function updateFormPreview(assetNum) {
     const item = selectedItems.find(i => i.assetNum === assetNum);
     if (!item) return;
     
-    const actions = itemActions[assetNum] || {};
-    const selectedActions = Object.keys(actions).filter(key => actions[key]);
+    const reasons = itemReasons[assetNum] || {};
+    const selectedReasons = Object.keys(reasons).filter(key => reasons[key]);
     
-    if (selectedActions.length === 0) {
-        preview.innerHTML = '<div style="color: #999; font-style: italic;">لم يتم تحديد أي إجراء</div>';
+    if (selectedReasons.length === 0) {
+        preview.innerHTML = '<div style="color: #999; font-style: italic;">لم يتم تحديد سبب الإرجاع</div>';
         return;
     }
     
-    const actionLabels = {
-        fix: 'للإصلاح',
-        sell: 'للبيع',
-        destroy: 'للإتلاف'
+    const reasonLabels = {
+        purpose_end: 'انتهاء الغرض',
+        excess: 'فائض',
+        unfit: 'عدم الصلاحية',
+        damaged: 'تالف'
     };
     
     preview.innerHTML = `
         <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #3ac0c3;">
-            <strong style="color: #057590;">الإجراءات المحددة:</strong>
+            <strong style="color: #057590;">سبب الإرجاع المحدد:</strong>
             <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
-                ${selectedActions.map(action => `
+                ${selectedReasons.map(reason => `
                     <span style="background: #3ac0c3; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px;">
-                        ${actionLabels[action]}
+                        ${reasonLabels[reason]}
                     </span>
                 `).join('')}
             </div>
@@ -549,31 +527,35 @@ function getFileUploadSection(item) {
                 <div style="border: 2px dashed #e0e6ed; border-radius: 8px; padding: 15px; background: #f8fdff; transition: border-color 0.2s;">
                     <div style="margin-bottom: 15px;">
                         <strong style="color: #057590; font-size: 14px; display: block; margin-bottom: 10px;">
-                            <i class="fas fa-tasks" style="margin-left: 5px;"></i>
-                            حدد توصياتك:
+                            <i class="fas fa-clipboard-list" style="margin-left: 5px;"></i>
+                            حدد سبب الإرجاع:
                         </strong>
                         <div class="action-checkbox-group">
-                            <label class="action-checkbox-item" onclick="toggleAction('${item.assetNum}', 'fix', event)">
-                                <input type="radio" name="action_${item.assetNum}" id="action_fix_${item.assetNum}" style="display: none;">
-                                <div class="label">للإصلاح</div>
+                            <label class="action-checkbox-item" onclick="toggleReason('${item.assetNum}', 'purpose_end', event)">
+                                <input type="radio" name="reason_${item.assetNum}" id="reason_purpose_end_${item.assetNum}" style="display: none;">
+                                <div class="label">انتهاء الغرض</div>
                             </label>
-                            <label class="action-checkbox-item" onclick="toggleAction('${item.assetNum}', 'sell', event)">
-                                <input type="radio" name="action_${item.assetNum}" id="action_sell_${item.assetNum}" style="display: none;">
-                                <div class="label">للبيع</div>
+                            <label class="action-checkbox-item" onclick="toggleReason('${item.assetNum}', 'excess', event)">
+                                <input type="radio" name="reason_${item.assetNum}" id="reason_excess_${item.assetNum}" style="display: none;">
+                                <div class="label">فائض</div>
                             </label>
-                            <label class="action-checkbox-item" onclick="toggleAction('${item.assetNum}', 'destroy', event)">
-                                <input type="radio" name="action_${item.assetNum}" id="action_destroy_${item.assetNum}" style="display: none;">
-                                <div class="label">للإتلاف</div>
+                            <label class="action-checkbox-item" onclick="toggleReason('${item.assetNum}', 'unfit', event)">
+                                <input type="radio" name="reason_${item.assetNum}" id="reason_unfit_${item.assetNum}" style="display: none;">
+                                <div class="label">عدم الصلاحية</div>
+                            </label>
+                            <label class="action-checkbox-item" onclick="toggleReason('${item.assetNum}', 'damaged', event)">
+                                <input type="radio" name="reason_${item.assetNum}" id="reason_damaged_${item.assetNum}" style="display: none;">
+                                <div class="label">تالف</div>
                             </label>
                         </div>
                     </div>
                     <div class="form-preview-container">
                         <div class="form-preview-title">
                             <i class="fas fa-check-circle"></i>
-                            الإجراءات المحددة:
+                            السبب المحدد:
                         </div>
                         <div class="form-preview-content" id="formPreview_${item.assetNum}">
-                            <div style="color: #999; font-style: italic;">لم يتم تحديد أي إجراء</div>
+                            <div style="color: #999; font-style: italic;">لم يتم تحديد سبب الإرجاع</div>
                         </div>
                     </div>
                     
@@ -631,19 +613,13 @@ function printAllForms() {
         return;
     }
     
-    const itemsWithoutActions = itItems.filter(item => {
-        const actions = itemActions[item.assetNum] || {};
-        return Object.keys(actions).filter(k => actions[k]).length === 0;
+    const itemsWithoutReasons = itItems.filter(item => {
+        const reasons = itemReasons[item.assetNum] || {};
+        return Object.keys(reasons).filter(k => reasons[k]).length === 0;
     });
     
-    if (itemsWithoutActions.length > 0) {
-        showAlert('warning', `يجب تحديد إجراء لجميع عناصر IT (${itemsWithoutActions.length} عنصر بدون إجراء)`);
-        return;
-    }
-    
-    const hasAnyReasonSelected = Object.keys(globalReturnReasons).some(key => globalReturnReasons[key]);
-    if (!hasAnyReasonSelected) {
-        showAlert('warning', 'يجب تحديد سبب واحد للإرجاع');
+    if (itemsWithoutReasons.length > 0) {
+        showAlert('warning', 'يجب تحديد سبب الإرجاع قبل عرض التقرير أو إرجاع العنصر');
         return;
     }
     
@@ -653,7 +629,7 @@ function printAllForms() {
     printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
     
     const itItemsData = itItems.map(item => {
-        const itemActionsData = itemActions[item.assetNum] || {};
+        const itemReasonsData = itemReasons[item.assetNum] || {};
         const commentElement = document.getElementById(`comment_${item.assetNum}`);
         const itemNotes = commentElement ? commentElement.value.trim() : '';
         
@@ -663,10 +639,11 @@ function printAllForms() {
             category: item.category,
             assetType: item.assetType || 'غير محدد',
             notes: itemNotes,
-            actions: {
-                fix: itemActionsData.fix ? '1' : '0',
-                sell: itemActionsData.sell ? '1' : '0',
-                destroy: itemActionsData.destroy ? '1' : '0'
+            reasons: {
+                purpose_end: itemReasonsData.purpose_end ? '1' : '0',
+                excess: itemReasonsData.excess ? '1' : '0',
+                unfit: itemReasonsData.unfit ? '1' : '0',
+                damaged: itemReasonsData.damaged ? '1' : '0'
             }
         };
     });
@@ -681,25 +658,16 @@ function printAllForms() {
     formData.append('item_data[asset_type]', itItems[0].assetType || 'غير محدد');
     formData.append('item_data[category]', itItems[0].category);
     
-    const firstActions = itemActions[itItems[0].assetNum] || {};
-    formData.append('actions[fix]', firstActions.fix ? '1' : '0');
-    formData.append('actions[sell]', firstActions.sell ? '1' : '0');
-    formData.append('actions[destroy]', firstActions.destroy ? '1' : '0');
-    
-    formData.append('reasons[purpose_end]', globalReturnReasons.purpose_end ? '1' : '0');
-    formData.append('reasons[excess]', globalReturnReasons.excess ? '1' : '0');
-    formData.append('reasons[unfit]', globalReturnReasons.unfit ? '1' : '0');
-    formData.append('reasons[damaged]', globalReturnReasons.damaged ? '1' : '0');
-    
     itItemsData.forEach((item, index) => {
         formData.append(`all_items[${index}][assetNum]`, item.assetNum);
         formData.append(`all_items[${index}][name]`, item.name);
         formData.append(`all_items[${index}][category]`, item.category);
         formData.append(`all_items[${index}][assetType]`, item.assetType);
         formData.append(`all_items[${index}][notes]`, item.notes);
-        formData.append(`all_items[${index}][actions][fix]`, item.actions.fix);
-        formData.append(`all_items[${index}][actions][sell]`, item.actions.sell);
-        formData.append(`all_items[${index}][actions][destroy]`, item.actions.destroy);
+        formData.append(`all_items[${index}][reasons][purpose_end]`, item.reasons.purpose_end);
+        formData.append(`all_items[${index}][reasons][excess]`, item.reasons.excess);
+        formData.append(`all_items[${index}][reasons][unfit]`, item.reasons.unfit);
+        formData.append(`all_items[${index}][reasons][damaged]`, item.reasons.damaged);
     });
     
     const printFrame = document.createElement('iframe');
@@ -839,33 +807,6 @@ function showSelectedItemsPopup() {
     
     const hasITItems = selectedItems.some(item => item.minorCategory === 'IT');
     
-    const returnReasonsHTML = hasITItems ? `
-        <div style="padding: 20px; background: linear-gradient(135deg, #f8fdff, #e8f4f8); border-bottom: 2px solid #3ac0c3;">
-            <h4 style="margin: 0 0 15px 0; color: #057590; font-size: 16px; text-align: center;">
-                <i class="fas fa-clipboard-list" style="margin-left: 5px;"></i>
-                أسباب الإرجاع
-            </h4>
-            <div class="action-checkbox-group" style="margin: 0;">
-                <label class="action-checkbox-item"onclick="toggleGlobalReason('purpose_end', event)">
-                    <input type="radio" name="global_reason" id="reason_purpose_end" style="display: none;">
-                    <div class="label">انتهاء الغرض</div>
-                </label>
-                <label class="action-checkbox-item" onclick="toggleGlobalReason('excess', event)">
-                    <input type="radio" name="global_reason" id="reason_excess" style="display: none;">
-                    <div class="label">فائض</div>
-                </label>
-                <label class="action-checkbox-item" onclick="toggleGlobalReason('unfit', event)">
-                    <input type="radio" name="global_reason" id="reason_unfit" style="display: none;">
-                    <div class="label">عدم الصلاحية</div>
-                </label>
-                <label class="action-checkbox-item" onclick="toggleGlobalReason('damaged', event)">
-                    <input type="radio" name="global_reason" id="reason_damaged" style="display: none;">
-                    <div class="label">تالف</div>
-                </label>
-            </div>
-        </div>
-    ` : '';
-    
     const printButtonSection = hasITItems ? `
         <div style="padding: 15px 20px; background: #fffbf0; border-top: 2px solid #f4d03f; border-bottom: 1px solid #e0e6ed;">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
@@ -891,8 +832,6 @@ function showSelectedItemsPopup() {
             </h3>
             <button onclick="closeSelectedItemsPopup()" style="background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">✕</button>
         </div>
-        
-        ${returnReasonsHTML}
         
         <div style="flex: 1; overflow-y: auto; min-height: 0;">
             ${itemsHTML}
@@ -955,7 +894,7 @@ function removeItemFromSelection(itemId) {
         const item = selectedItems.find(i => i.id === itemId);
         if (item && item.assetNum) {
             delete uploadedFiles[item.assetNum];
-            delete itemActions[item.assetNum];
+            delete itemReasons[item.assetNum];
         }
         
         updateSelection();
@@ -992,7 +931,7 @@ function submitReturn() {
             minorCategory: item.minorCategory,
             comment: commentElement ? commentElement.value.trim() : '',
             files: uploadedFiles[item.assetNum] || [],
-            actions: isIT ? (itemActions[item.assetNum] || {}) : null,
+            reasons: isIT ? (itemReasons[item.assetNum] || {}) : null,
             generateForm: isIT
         };
     });
@@ -1004,20 +943,12 @@ function submitReturn() {
         return;
     }
     
-    const itItemsWithoutActions = returnData.filter(item => 
-        item.generateForm && (!item.actions || Object.keys(item.actions).filter(k => item.actions[k]).length === 0)
+    const itItemsWithoutReasons = returnData.filter(item => 
+        item.generateForm && (!item.reasons || Object.keys(item.reasons).filter(k => item.reasons[k]).length === 0)
     );
     
-    if (itItemsWithoutActions.length > 0) {
-        showAlert('warning', `يجب تحديد إجراء واحد لعناصر IT (${itItemsWithoutActions.length} عنصر)`);
-        return;
-    }
-    
-    const hasAnyITItem = returnData.some(item => item.generateForm);
-    const hasAnyReasonSelected = Object.keys(globalReturnReasons).some(key => globalReturnReasons[key]);
-    
-    if (hasAnyITItem && !hasAnyReasonSelected) {
-        showAlert('warning', 'يجب تحديد سبب واحد للإرجاع');
+    if (itItemsWithoutReasons.length > 0) {
+        showAlert('warning', 'يجب تحديد سبب الإرجاع قبل عرض التقرير أو إرجاع العنصر');
         return;
     }
     
@@ -1039,11 +970,16 @@ function showReturnConfirmation(returnData) {
         let attachmentInfo = '';
         
         if (item.generateForm) {
-            const actions = item.actions || {};
-            const selectedActions = Object.keys(actions).filter(k => actions[k]);
-            const actionLabels = { fix: 'للإصلاح', sell: 'للبيع', destroy: 'للإتلاف' };
-            const actionsText = selectedActions.map(a => actionLabels[a]).join(', ');
-            attachmentInfo = `<br><small style="color: #3ac0c3;">📄 نموذج تلقائي: ${actionsText}</small>`;
+            const reasons = item.reasons || {};
+            const selectedReasons = Object.keys(reasons).filter(k => reasons[k]);
+            const reasonLabels = { 
+                purpose_end: 'انتهاء الغرض', 
+                excess: 'فائض', 
+                unfit: 'عدم الصلاحية', 
+                damaged: 'تالف' 
+            };
+            const reasonsText = selectedReasons.map(r => reasonLabels[r]).join(', ');
+            attachmentInfo = `<br><small style="color: #3ac0c3;">📄 نموذج تلقائي: ${reasonsText}</small>`;
         } else if (item.files.length > 0) {
             attachmentInfo = `<br><small style="color: #ff6b6b;">📷 ${item.files.length} صورة</small>`;
         }
@@ -1088,11 +1024,6 @@ function confirmBulkReturnWithFiles() {
     
     const formData = new FormData();
     
-    formData.append('reasons[purpose_end]', globalReturnReasons.purpose_end ? '1' : '0');
-    formData.append('reasons[excess]', globalReturnReasons.excess ? '1' : '0');
-    formData.append('reasons[unfit]', globalReturnReasons.unfit ? '1' : '0');
-    formData.append('reasons[damaged]', globalReturnReasons.damaged ? '1' : '0');
-    
     returnData.forEach((item, index) => {
         formData.append(`asset_nums[${index}]`, item.assetNum);
         formData.append(`comments[${item.assetNum}]`, item.comment || '');
@@ -1107,10 +1038,11 @@ function confirmBulkReturnWithFiles() {
             formData.append(`item_data[${item.assetNum}][asset_type]`, item.assetType);
             formData.append(`item_data[${item.assetNum}][category]`, item.category);
             
-            const actions = item.actions || {};
-            formData.append(`actions[${item.assetNum}][fix]`, actions.fix ? '1' : '0');
-            formData.append(`actions[${item.assetNum}][sell]`, actions.sell ? '1' : '0');
-            formData.append(`actions[${item.assetNum}][destroy]`, actions.destroy ? '1' : '0');
+            const reasons = item.reasons || {};
+            formData.append(`reasons[${item.assetNum}][purpose_end]`, reasons.purpose_end ? '1' : '0');
+            formData.append(`reasons[${item.assetNum}][excess]`, reasons.excess ? '1' : '0');
+            formData.append(`reasons[${item.assetNum}][unfit]`, reasons.unfit ? '1' : '0');
+            formData.append(`reasons[${item.assetNum}][damaged]`, reasons.damaged ? '1' : '0');
         }
         
         if (item.files && item.files.length > 0) {
@@ -1135,8 +1067,7 @@ function confirmBulkReturnWithFiles() {
             
             selectedItems = [];
             uploadedFiles = {};
-            itemActions = {};
-            globalReturnReasons = {};
+            itemReasons = {};
             closeDeleteModal();
             delete window.tempReturnData;
             
@@ -1162,7 +1093,34 @@ function closeDeleteModal() {
 }
 
 function showAlert(type, message) {
-    const alertContainer = document.getElementById('alertContainer');
+    // Use native browser alert for popup scenarios to ensure visibility
+    const popup = document.getElementById('selectedItemsPopup');
+    
+    if (popup) {
+        // If popup is open, use native alert to guarantee visibility
+        const icon = type === 'warning' ? '⚠️' : type === 'error' ? '❌' : '✅';
+        alert(`${icon} ${message}`);
+        return;
+    }
+    
+    // Otherwise use styled alert
+    let alertContainer = document.getElementById('alertContainer');
+    
+    if (!alertContainer) {
+        alertContainer = document.createElement('div');
+        alertContainer.id = 'alertContainer';
+        alertContainer.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        `;
+        document.body.appendChild(alertContainer);
+    }
     
     const existingAlerts = alertContainer.querySelectorAll('.alert');
     for (let alert of existingAlerts) {
@@ -1174,20 +1132,58 @@ function showAlert(type, message) {
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type}`;
     
+    const bgColor = type === 'success' ? '#2ecc71' : type === 'warning' ? '#f39c12' : '#e74c3c';
+    
+    alertDiv.style.cssText = `
+        background: ${bgColor};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        font-size: 14px;
+        font-weight: 500;
+        min-width: 300px;
+        max-width: 400px;
+        pointer-events: auto;
+        animation: slideInRight 0.3s ease;
+        opacity: 1;
+        transform: translateX(0);
+        transition: all 0.3s ease;
+    `;
+    
     const icon = type === 'success' ? '✓' : type === 'warning' ? '⚠' : '✕';
-    alertDiv.innerHTML = `<strong>${icon}</strong> ${message}`;
+    alertDiv.innerHTML = `<strong style="margin-left: 8px; font-size: 16px;">${icon}</strong> ${message}`;
     
     alertContainer.appendChild(alertDiv);
-    setTimeout(() => alertDiv.classList.add('show'), 10);
     
     setTimeout(() => {
-        alertDiv.classList.remove('show');
+        alertDiv.style.opacity = '0';
+        alertDiv.style.transform = 'translateX(20px)';
         setTimeout(() => alertDiv.remove(), 300);
     }, 4000);
+    
+    // Add animation keyframes if not exists
+    if (!document.getElementById('alertAnimationStyles')) {
+        const style = document.createElement('style');
+        style.id = 'alertAnimationStyles';
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    opacity: 0;
+                    transform: translateX(100px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Return system initialized - View button repositioned after last item');
+    console.log('Return system initialized - Reasons now per asset');
 });
 </script>
 </body>

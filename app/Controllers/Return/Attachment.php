@@ -39,7 +39,6 @@ class Attachment extends BaseController
         $comments  = $this->request->getPost('comments');
         $generateForm = $this->request->getPost('generate_form');
         $itemData = $this->request->getPost('item_data');
-        $actions = $this->request->getPost('actions');
         $reasons = $this->request->getPost('reasons');
 
         if (empty($assetNums) || !is_array($assetNums)) {
@@ -86,7 +85,6 @@ class Attachment extends BaseController
 
             $isIT = ($originalItem->minor_category_name === 'IT');
             if ($isIT && isset($generateForm[$assetNum]) && $generateForm[$assetNum] == '1') {
-                // Get the comment for THIS specific asset number
                 $itemComment = isset($comments[$assetNum]) ? trim($comments[$assetNum]) : '';
                 
                 $itItems[] = [
@@ -94,9 +92,8 @@ class Attachment extends BaseController
                     'name' => $itemData[$assetNum]['name'] ?? '',
                     'category' => $itemData[$assetNum]['category'] ?? '',
                     'assetType' => $itemData[$assetNum]['asset_type'] ?? '',
-                    'notes' => $itemComment, // Use actual comment, empty if not provided
-                    'actions' => $actions[$assetNum] ?? [],
-                    'reasons' => $reasons ?? []
+                    'notes' => $itemComment,
+                    'reasons' => $reasons[$assetNum] ?? []
                 ];
             }
         }
@@ -120,16 +117,13 @@ class Attachment extends BaseController
             // Generate form for IT items with all items data
             if ($isIT && isset($generateForm[$assetNum]) && $generateForm[$assetNum] == '1') {
                 try {
-                    // Get the comment for THIS specific asset
                     $itemComment = isset($comments[$assetNum]) ? trim($comments[$assetNum]) : '';
                     
                     $formPath = $this->generateReturnForm(
                         $assetNum,
                         $itemData[$assetNum] ?? [],
-                        $actions[$assetNum] ?? [],
-                        $itemComment, // Pass the actual comment
-                        $itItems,
-                        $reasons ?? []
+                        $itemComment,
+                        $itItems
                     );
                     
                     if ($formPath) {
@@ -188,7 +182,6 @@ class Attachment extends BaseController
                 ? implode(',', $uploadedFileNames)
                 : ($originalItem->attachment ?? null);
 
-            // Get the actual comment for database storage
             $itemComment = isset($comments[$assetNum]) ? trim($comments[$assetNum]) : '';
             
             $updateData = [
@@ -231,11 +224,11 @@ class Attachment extends BaseController
         ]);
     }
 
-    public function generateReturnForm($assetNum, $itemData, $actions, $notes, $allItems = [], $reasons = [])
+    public function generateReturnForm($assetNum, $itemData, $notes, $allItems = [])
     {
         $uploadPath = WRITEPATH . 'uploads/return_attachments';
         
-        $html = $this->buildFormHTML($assetNum, $itemData, $actions, $notes, $allItems, $reasons);
+        $html = $this->buildFormHTML($assetNum, $itemData, $notes, $allItems);
         
         $filename = 'form_' . $assetNum . '_' . time() . '.html';
         $fullPath = $uploadPath . '/' . $filename;
@@ -247,7 +240,7 @@ class Attachment extends BaseController
         return $fullPath;
     }
 
-    private function buildFormHTML($assetNum, $itemData, $actions, $notes, $allItems = [], $reasons = [])
+    private function buildFormHTML($assetNum, $itemData, $notes, $allItems = [])
     {
         $currentDate = date('Y-m-d');
         $currentTime = date('H:i:s');
@@ -255,20 +248,31 @@ class Attachment extends BaseController
         $logoUrl = $baseUrl . 'public/assets/images/Kamc Logo Guideline-04.png';
         $cssUrl = $baseUrl . 'public/assets/css/components/print_form_style.css';
         
+        // Get employee info who created the return
+        $createdBy = session()->get('employee_id') ?? session()->get('user_id');
+        $employeeName = '';
+        
+        if ($createdBy) {
+            $employeeModel = new \App\Models\EmployeeModel();
+            $employee = $employeeModel->where('emp_id', $createdBy)->first();
+            if ($employee) {
+                $employeeName = $employee->name;
+            }
+        }
+        
         // Build table rows dynamically
         $tableRows = '';
         
         if (!empty($allItems)) {
-            // Multiple items - generate row for each with proper notes mapping by assetNum
             foreach ($allItems as $index => $item) {
                 $rowNum = $index + 1;
-                $itemActions = $item['actions'] ?? [];
+                $itemReasons = $item['reasons'] ?? [];
                 
-                $itemFixChecked = isset($itemActions['fix']) && $itemActions['fix'] == '1' ? '✓' : '';
-                $itemSellChecked = isset($itemActions['sell']) && $itemActions['sell'] == '1' ? '✓' : '';
-                $itemDestroyChecked = isset($itemActions['destroy']) && $itemActions['destroy'] == '1' ? '✓' : '';
+                $purposeEnd = isset($itemReasons['purpose_end']) && $itemReasons['purpose_end'] == '1' ? '✓' : '';
+                $excess = isset($itemReasons['excess']) && $itemReasons['excess'] == '1' ? '✓' : '';
+                $unfit = isset($itemReasons['unfit']) && $itemReasons['unfit'] == '1' ? '✓' : '';
+                $damaged = isset($itemReasons['damaged']) && $itemReasons['damaged'] == '1' ? '✓' : '';
                 
-                // CRITICAL: Get notes for THIS specific item - leave empty if not provided
                 $itemNotes = '';
                 if (isset($item['notes']) && !empty(trim($item['notes']))) {
                     $itemNotes = htmlspecialchars(trim($item['notes']), ENT_QUOTES, 'UTF-8');
@@ -290,19 +294,14 @@ class Attachment extends BaseController
                     <td>{$itemAssetType}</td>
                     <td>قطعة</td>
                     <td>1</td>
-                    <td class=\"check-mark\">{$itemFixChecked}</td>
-                    <td class=\"check-mark\">{$itemSellChecked}</td>
-                    <td class=\"check-mark\">{$itemDestroyChecked}</td>
+                    <td class=\"check-mark\">{$purposeEnd}</td>
+                    <td class=\"check-mark\">{$excess}</td>
+                    <td class=\"check-mark\">{$unfit}</td>
+                    <td class=\"check-mark\">{$damaged}</td>
                     <td class=\"notes-cell\">{$itemNotes}</td>
                 </tr>";
             }
         } else {
-            // Single item fallback
-            $fixChecked = isset($actions['fix']) && $actions['fix'] == '1' ? '✓' : '';
-            $sellChecked = isset($actions['sell']) && $actions['sell'] == '1' ? '✓' : '';
-            $destroyChecked = isset($actions['destroy']) && $actions['destroy'] == '1' ? '✓' : '';
-            
-            // Leave empty if no notes provided
             $displayNotes = !empty($notes) ? htmlspecialchars($notes, ENT_QUOTES, 'UTF-8') : '';
             
             $tableRows = "
@@ -316,40 +315,13 @@ class Attachment extends BaseController
                     <td>{$itemData['asset_type']}</td>
                     <td>قطعة</td>
                     <td>1</td>
-                    <td class=\"check-mark\">{$fixChecked}</td>
-                    <td class=\"check-mark\">{$sellChecked}</td>
-                    <td class=\"check-mark\">{$destroyChecked}</td>
+                    <td class=\"check-mark\"></td>
+                    <td class=\"check-mark\"></td>
+                    <td class=\"check-mark\"></td>
+                    <td class=\"check-mark\"></td>
                     <td class=\"notes-cell\">{$displayNotes}</td>
                 </tr>";
         }
-        
-        // Build reasons table
-        $reasonsPurposeEnd = (isset($reasons['purpose_end']) && $reasons['purpose_end'] == '1') ? '✓' : '';
-        $reasonsExcess = (isset($reasons['excess']) && $reasons['excess'] == '1') ? '✓' : '';
-        $reasonsUnfit = (isset($reasons['unfit']) && $reasons['unfit'] == '1') ? '✓' : '';
-        $reasonsDamaged = (isset($reasons['damaged']) && $reasons['damaged'] == '1') ? '✓' : '';
-        
-        $reasonsTable = "
-        <div style=\"display: flex; justify-content: center; margin: 15px 0;\">
-            <table style=\"width: 50%; border-collapse: collapse; text-align: center;\">
-                <thead>
-                    <tr style=\"background: #2c3e50; color: white; border: 1px solid #2c3e50;\">
-                        <th style=\"padding: 8px; border: 1px solid #2c3e50; font-weight: bold; font-size: 12px;\">انتهاء الغرض</th>
-                        <th style=\"padding: 8px; border: 1px solid #2c3e50; font-weight: bold; font-size: 12px;\">فائض</th>
-                        <th style=\"padding: 8px; border: 1px solid #2c3e50; font-weight: bold; font-size: 12px;\">عدم الصلاحية</th>
-                        <th style=\"padding: 8px; border: 1px solid #2c3e50; font-weight: bold; font-size: 12px;\">تالف</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr style=\"border: 1px solid #2c3e50;\">
-                        <td style=\"padding: 15px; border: 1px solid #2c3e50; font-size: 18px; font-weight: bold;\">{$reasonsPurposeEnd}</td>
-                        <td style=\"padding: 15px; border: 1px solid #2c3e50; font-size: 18px; font-weight: bold;\">{$reasonsExcess}</td>
-                        <td style=\"padding: 15px; border: 1px solid #2c3e50; font-size: 18px; font-weight: bold;\">{$reasonsUnfit}</td>
-                        <td style=\"padding: 15px; border: 1px solid #2c3e50; font-size: 18px; font-weight: bold;\">{$reasonsDamaged}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>";
         
         $html = <<<HTML
 <!DOCTYPE html>
@@ -379,6 +351,20 @@ class Attachment extends BaseController
             body { margin: 0; padding: 0; }
             .print-container { box-shadow: none; }
         }
+        .field-value {
+            display: inline-block;
+            min-width: 200px;
+            border-bottom: 1px solid #333;
+            padding: 0 10px;
+            font-weight: bold;
+        }
+        .signature-value {
+            display: inline-block;
+            min-width: 150px;
+            font-weight: bold;
+            border-bottom: 1px solid #333;
+            padding: 2px 5px;
+        }
     </style>
 </head>
 <body>
@@ -401,19 +387,14 @@ class Attachment extends BaseController
                     <div class="header-fields">
                         <div class="header-field">
                             <span class="field-label">الجهة المرجعة:</span>
-                            <div class="field-line"></div>
+                            <span class="field-value">ادارة العهد</span>
                         </div>
                         <div class="header-field">
                             <span class="field-label">التاريخ:</span>
-                            <div class="field-line"></div>
+                            <span class="field-value">{$currentDate}</span>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div style="text-align: center;">
-                <h3 style="color: #040f49ff; margin-top: -10px; font-size: 20px;">اسباب الارجاع</h3>
-                {$reasonsTable}
             </div>
 
             <table class="main-table">
@@ -425,9 +406,10 @@ class Attachment extends BaseController
                         <th class="col-model">نوع الصنف</th>
                         <th class="col-quantity-available">الوحدة</th>
                         <th class="col-quantity-requested">الكمية</th>
-                        <th class="col-unit-price">للإصلاح</th>
-                        <th class="col-unit-price">للبيع</th>
-                        <th class="col-unit-price">للإتلاف</th>
+                        <th class="col-unit-price">انتهاء الغرض</th>
+                        <th class="col-unit-price">فائض</th>
+                        <th class="col-unit-price">عدم الصلاحية</th>
+                        <th class="col-unit-price">تالف</th>
                         <th class="col-notes">ملاحظات</th>
                     </tr>
                 </thead>
@@ -442,8 +424,8 @@ class Attachment extends BaseController
                         <td>
                             <div class="signature-title-cell">المسئول في الجهة المرجعة</div>
                             <div class="signature-fields">
-                                الاسم: <span class="signature-line"></span><br>
-                                التاريخ: <span class="signature-line"></span>
+                                الاسم: <span class="signature-value">{$employeeName}</span><br>
+                                التاريخ: <span class="signature-value">{$currentDate}</span>
                             </div>
                         </td>
                         <td>
@@ -453,34 +435,11 @@ class Attachment extends BaseController
                                 التاريخ: <span class="signature-line"></span>
                             </div>
                         </td>
-                        <td>
-                            <div class="signature-title-cell">مدير إدارة المستودعات</div>
-                            <div class="signature-fields">
-                                الاسم: <span class="signature-line"></span><br>
-                                التاريخ: <span class="signature-line"></span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="signature-title-cell">لجنة فحص الرجيع</div>
-                            <div class="signature-fields">
-                                الاسم: <span class="signature-line"></span><br>
-                                التاريخ: <span class="signature-line"></span>
-                            </div>
-                        </td>
+
                     </tr>
                 </table>
             </div>
 
-            <div class="header-fields">
-                <div class="header-field">
-                    <span class="field-label">صاحب الصلاحية:</span>
-                    <div class="field-line"></div>
-                </div>
-                <div class="header-field">
-                    <span class="field-label">التوقيع:</span>
-                    <div class="field-line"></div>
-                </div>
-            </div>
 
             <div class="form-footer">
                 <div class="footer-warning">
@@ -503,8 +462,6 @@ HTML;
     {
         $assetNum = $this->request->getPost('asset_num');
         $itemData = $this->request->getPost('item_data');
-        $actions = $this->request->getPost('actions');
-        $reasons = $this->request->getPost('reasons');
         $allItems = $this->request->getPost('all_items');
         
         if (empty($assetNum) || empty($itemData)) {
@@ -517,7 +474,7 @@ HTML;
         }
         
         try {
-            $html = $this->buildFormHTML($assetNum, $itemData, $actions, '', $allItems ?? [], $reasons ?? []);
+            $html = $this->buildFormHTML($assetNum, $itemData, '', $allItems ?? []);
             
             return $this->response
                 ->setContentType('application/json')
