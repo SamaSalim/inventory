@@ -26,10 +26,10 @@ class Database extends Config
      */
     public array $default = [
         'DSN'          => '',
-        'hostname'     => 'localhost',
-        'username'     => '',
-        'password'     => '',
-        'database'     => '', //Keep it empty
+        'hostname'     => 'db',
+        'username'     => 'user',
+        'password'     => 'password',
+        'database'     => 'inventory',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,
@@ -44,12 +44,8 @@ class Database extends Config
         'port'         => 3306,
         'numberNative' => false,
         'foundRows'    => false,
-        'dateFormat'   => [
-            'date'     => 'Y-m-d',
-            'datetime' => 'Y-m-d H:i:s',
-            'time'     => 'H:i:s',
-        ],
     ];
+    
 
     //    /**
     //     * Sample database connection for SQLite3.

@@ -352,6 +352,7 @@
                 <h3 class="section-title">تحويل الأصول</h3>
 
                 <?php if (!empty($items)): ?>
+
                     <div class="select-all-container">
                         <input type="checkbox" class="master-checkbox" id="masterCheckbox" onchange="toggleAllSelection()">
                         <label for="masterCheckbox">تحديد الكل</label>
