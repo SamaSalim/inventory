@@ -72,7 +72,7 @@
                     </div>
                 </div>
 
-                <<div class="stat-card" style="background: linear-gradient(135deg, #e8f5e9, #81c784);">
+                <div class="stat-card" style="background: linear-gradient(135deg, #e8f5e9, #81c784);">
     <div class="stat-number"><?= number_format($stats['returned_items'] ?? 0) ?></div>
     <div class="stat-label">
         <svg class="stat-icon" viewBox="0 0 24 24">
