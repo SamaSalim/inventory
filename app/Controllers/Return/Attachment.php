@@ -98,6 +98,10 @@ class Attachment extends BaseController
             }
         }
 
+        // ✅ Collect all successfully returned item order IDs for ONE email
+        $returnedItemOrderIds = [];
+        $allItemsNotes = '';
+
         foreach ($assetNums as $assetNum) {
             $originalItem = $this->model
                 ->select('item_order.*, minor_category.name as minor_category_name')
@@ -197,6 +201,13 @@ class Attachment extends BaseController
 
             if ($updated) {
                 $successCount++;
+                // ✅ Collect the item order ID for the consolidated email
+                $returnedItemOrderIds[] = $originalItem->item_order_id;
+                
+                // Collect notes if any
+                if (!empty($itemComment)) {
+                    $allItemsNotes .= "أصل {$assetNum}: {$itemComment}\n";
+                }
             } else {
                 $failedItems[] = "فشل تحديث الأصل رقم: $assetNum";
             }
@@ -211,7 +222,22 @@ class Attachment extends BaseController
             ]);
         }
 
-        $message = "تم تحديث $successCount عنصر بنجاح";
+        // ✅ Send ONE email with all returned items
+        if (!empty($returnedItemOrderIds)) {
+            try {
+                $emailController = new \App\Controllers\Return\Email();
+                $emailController->sendReturnNotification(
+                    $returnedItemOrderIds,  // Array of all item order IDs
+                    trim($allItemsNotes),   // Combined notes
+                    null                    // Attachments handled per item
+                );
+            } catch (\Exception $e) {
+                log_message('error', "Failed to send consolidated email: " . $e->getMessage());
+                // Don't fail the entire operation if email fails
+            }
+        }
+
+        $message = "تم تحديث $successCount عنصر بنجاح وإرسال إشعار بريد إلكتروني واحد";
         if (!empty($failedItems)) {
             $message .= "\n\nفشل التحديث: " . implode(', ', $failedItems);
         }
