@@ -18,53 +18,53 @@ use App\Models\TransferItemsModel;
 class UserController extends BaseController
 {
     protected $orderModel;
-    protected $transferItemsModel;
+
     public function __construct()
     {
         $this->orderModel = new OrderModel();
-        $this->transferItemsModel = new TransferItemsModel();
     }
 
     /**
      * دالة خاصة للتحقق من تسجيل الدخول
      */
-    private function checkAuth(): void
+    private function checkAuth()
     {
         if (! session()->get('isLoggedIn')) {
             throw new AuthenticationException();
         }
     }
 
-
     /**
      * عرض الطلبات المحولة للمستخدم الحالي
      */
-    public function dashboard(): string
+public function dashboard(): string
     {
         $this->checkAuth();
 
         // التحقق من تسجيل الدخول
-        // if (!session()->get('isLoggedIn')) {
-        //     return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
-        // }
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
+        }
 
         // جلب معلومات الحساب من السيشن (نفس طريقة UserInfo)
         $isEmployee = session()->get('isEmployee');
         $account_id = session()->get('employee_id'); // يحتوي على user_id أو emp_id
-
+        
+        // تحديد user_id بناءً على نوع الحساب
         $currentUserId = null;
-
+        
         if (!$isEmployee) {
+            // إذا كان مستخدم عادي، account_id هو user_id مباشرة
             $currentUserId = $account_id;
-        }
-        // else {
+         }
+         // else {
+        //     // إذا كان موظف، لا يمكنه الوصول لهذه الصفحة (صفحة خاصة بالمستخدمين فقط)
         //     return redirect()->to('/dashboard')->with('error', 'هذه الصفحة مخصصة للمستخدمين فقط');
         // }
 
         // if (!$currentUserId) {
         //     return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
         // }
-
 
         $transferItemsModel = new TransferItemsModel();
 
@@ -90,7 +90,7 @@ class UserController extends BaseController
             ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
             ->where('transfer_items.to_user_id', $currentUserId)
             ->where('item_order.usage_status_id !=', 2) // استبعاد العناصر المرجعة
-            // ->where('transfer_items.order_status_id', 1) // إظهار الطلبات قيد الانتظار فقط
+            ->where('transfer_items.order_status_id', 1) // إظهار الطلبات قيد الانتظار فقط
             ->orderBy('transfer_items.created_at', 'DESC')
             ->findAll();
 
@@ -98,7 +98,7 @@ class UserController extends BaseController
             'orders' => $myOrders
         ]);
     }
-
+  
     private function getWarehouseStats(): array
     {
         $itemOrderModel = new ItemOrderModel();
@@ -161,22 +161,22 @@ class UserController extends BaseController
 
 
     /**
-     * صفحة  userView2
-     */
+ * صفحة  userView2
+ */
 
-    // public function userView2(): string
-    // {
-    //     $this->checkAuth(); // تحقق من تسجيل الدخول
+// public function userView2(): string
+// {
+//     $this->checkAuth(); // تحقق من تسجيل الدخول
 
-    //     return view('user/userView2');
-    // }
+//     return view('user/userView2');
+// }
 
 
 
     /**
      * جلب تفاصيل العهدة  
      */
-    public function getTransferDetails($transferId)
+public function getTransferDetails($transferId)
     {
         if (!session()->get('isLoggedIn')) {
             return $this->response->setJSON([
@@ -186,7 +186,7 @@ class UserController extends BaseController
         }
 
         $transferModel = new TransferItemsModel();
-
+        
         $transfer = $transferModel
             ->select(
                 'transfer_items.*,
@@ -243,7 +243,7 @@ class UserController extends BaseController
         }
 
         $json = $this->request->getJSON();
-
+        
         if (!$json) {
             return $this->response->setJSON([
                 'success' => false,
@@ -263,19 +263,10 @@ class UserController extends BaseController
 
         try {
             $transferModel = new TransferItemsModel();
-            $orderModel = new OrderModel();
-            $itemOrderModel = new ItemOrderModel();
-
-            // بدء المعاملة
-            $transferModel->transStart();
 
             // جلب معلومات الطلب
-            $transfer = $transferModel
-                ->select('transfer_items.*, item_order.item_order_id, item_order.order_id')
-                ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
-                ->where('transfer_items.transfer_item_id', $transferId)
-                ->first();
-
+            $transfer = $transferModel->find($transferId);
+            
             if (!$transfer) {
                 return $this->response->setJSON([
                     'success' => false,
@@ -304,72 +295,31 @@ class UserController extends BaseController
             // تحديد حالة الطلب: 2 = مقبول, 3 = مرفوض
             $orderStatusId = ($action === 'accept') ? 2 : 3;
 
-            // تحديث حالة طلب التحويل
-            $transferModel->update($transferId, [
+            // تحديث حالة الطلب
+            $updated = $transferModel->update($transferId, [
                 'order_status_id' => $orderStatusId,
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            if ($action === 'accept') {
-                // في حالة القبول: إنشاء سجل جديد في جدول order للمستلم (to_user_id)
-                $orderModel->insert([
-                    'from_user_id' => $transfer->from_user_id,
-                    'to_user_id' => $transfer->to_user_id,
-                    'order_status_id' => 2, // مقبول
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-
-                $newOrderId = $orderModel->insertID();
-
-                // تحديث item_order ليشير للطلب الجديد
-                $itemOrderModel->update($transfer->item_order_id, [
-                    'order_id' => $newOrderId,
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-
-                $message = 'تم قبول الطلب بنجاح. العهدة الآن في عهدتك';
-            } else {
-                // في حالة الرفض: إرجاع العهدة للمُرسِل (from_user_id)
-
-                // إنشاء سجل في جدول order للمُرسِل
-                $orderModel->insert([
-                    'from_user_id' => null, // يمكن تركه null
-                    'to_user_id' => $transfer->from_user_id, // العهدة ترجع للمُرسِل
-                    'order_status_id' => 2, // مقبول (لأن العهدة رجعت له)
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-
-                $returnOrderId = $orderModel->insertID();
-
-                // تحديث item_order ليشير للطلب المُرتجع
-                $itemOrderModel->update($transfer->item_order_id, [
-                    'order_id' => $returnOrderId,
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-
-                $message = 'تم رفض الطلب. العهدة أُرجعت للمُرسِل';
-            }
-
-            // إنهاء المعاملة
-            $transferModel->transComplete();
-
-            if ($transferModel->transStatus() === false) {
-                log_message('error', 'Transaction failed in respondToTransfer');
+            if (!$updated) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'فشل تنفيذ العملية'
+                    'message' => 'فشل تحديث حالة الطلب'
                 ]);
             }
+
+            $message = ($action === 'accept') 
+                ? 'تم قبول الطلب بنجاح. العهدة الآن في عهدتك' 
+                : 'تم رفض الطلب. العهدة ستبقى مع المُرسل';
 
             return $this->response->setJSON([
                 'success' => true,
                 'message' => $message
             ]);
+
         } catch (\Exception $e) {
             log_message('error', 'Transfer Response Error: ' . $e->getMessage());
-
+            
             return $this->response->setJSON([
                 'success' => false,
                 'message' => 'حدث خطأ: ' . $e->getMessage()
@@ -378,101 +328,102 @@ class UserController extends BaseController
     }
 
 
+
     /**
      * تعليم أن الطلب قد تم فتحه (is_opened = 1)
      */
-    public function markAsOpened()
-    {
-        if (!$this->request->isAJAX()) {
-            return $this->response->setStatusCode(400);
-        }
-
-        // استقبال transfer_id من POST body بدلاً من URL
-        $json = $this->request->getJSON();
-        $transferId = $json->transfer_id ?? null;
-
-        if (!$transferId) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'transfer_id is required'
-            ]);
-        }
-
-        try {
-            $transferModel = new TransferItemsModel();
-
-            $transfer = $transferModel->find($transferId);
-
-            if (!$transfer) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'السجل غير موجود'
-                ]);
-            }
-
-            $updated = $transferModel->update($transferId, [
-                'is_opened' => 1,
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
-
-            if ($updated) {
-                log_message('info', "Transfer {$transferId} marked as opened");
-                return $this->response->setJSON(['success' => true]);
-            } else {
-                log_message('error', "Failed to update transfer {$transferId}");
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'فشل التحديث'
-                ]);
-            }
-        } catch (\Exception $e) {
-            log_message('error', 'markAsOpened error: ' . $e->getMessage());
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => $e->getMessage()
-            ]);
-        }
+public function markAsOpened()
+{
+    if (!$this->request->isAJAX()) {
+        return $this->response->setStatusCode(400);
     }
 
+    // استقبال transfer_id من POST body بدلاً من URL
+    $json = $this->request->getJSON();
+    $transferId = $json->transfer_id ?? null;
 
-    /**
-     * عرض العهد الخاصة بالمستخدم الحالي (من order + transfer_items)
-     */
-    public function userView2(): string
-    {
-        $this->checkAuth();
+    if (!$transferId) {
+        return $this->response->setJSON([
+            'success' => false, 
+            'message' => 'transfer_id is required'
+        ]);
+    }
 
-        // التحقق من تسجيل الدخول
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
+    try {
+        $transferModel = new TransferItemsModel();
+        
+        $transfer = $transferModel->find($transferId);
+        
+        if (!$transfer) {
+            return $this->response->setJSON([
+                'success' => false, 
+                'message' => 'السجل غير موجود'
+            ]);
         }
 
-        // تحديد نوع الحساب والمستخدم الحالي
-        $isEmployee = session()->get('isEmployee');
-        $account_id = session()->get('employee_id');
-        $currentUserId = null;
-        // problem here
-        if (!$isEmployee) {
-            // مستخدم عادي
-            $currentUserId = $account_id;
+        $updated = $transferModel->update($transferId, [
+            'is_opened' => 1,
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        if ($updated) {
+            log_message('info', "Transfer {$transferId} marked as opened");
+            return $this->response->setJSON(['success' => true]);
+        } else {
+            log_message('error', "Failed to update transfer {$transferId}");
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'فشل التحديث'
+            ]);
         }
-        // else {
-        //     // موظف لا يدخل هنا
-        //     return redirect()->to('/dashboard')->with('error', 'هذه الصفحة مخصصة للمستخدمين فقط');
-        // }
 
-        // // حماية إضافية
-        // if (!$currentUserId) {
-        //     return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
-        // }
+    } catch (\Exception $e) {
+        log_message('error', 'markAsOpened error: ' . $e->getMessage());
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+}
 
-        //  1. جلب العهد من جدول transfer_items
-        $transferItemsModel = new \App\Models\TransferItemsModel();
 
-        $transferItems = $transferItemsModel
-            ->distinct()
-            ->select(
-                'transfer_items.transfer_item_id AS id,
+/**
+ * عرض العهد الخاصة بالمستخدم الحالي (من order + transfer_items)
+ */
+public function userView2(): string
+{
+    $this->checkAuth();
+
+    // التحقق من تسجيل الدخول
+    if (!session()->get('isLoggedIn')) {
+        return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
+    }
+
+    // تحديد نوع الحساب والمستخدم الحالي
+    $isEmployee = session()->get('isEmployee');
+    $account_id = session()->get('employee_id');
+    $currentUserId = null;
+
+    if (!$isEmployee) {
+        // مستخدم عادي
+        $currentUserId = $account_id;
+    } else {
+        // موظف لا يدخل هنا
+        return redirect()->to('/dashboard')->with('error', 'هذه الصفحة مخصصة للمستخدمين فقط');
+    }
+
+    // حماية إضافية
+    if (!$currentUserId) {
+        return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
+    }
+
+    //  1. جلب العهد من جدول transfer_items
+    $transferItemsModel = new \App\Models\TransferItemsModel();
+
+    $transferItems = $transferItemsModel
+        ->distinct()
+        ->select(
+            'transfer_items.transfer_item_id AS id,
              transfer_items.created_at,
              transfer_items.item_order_id,
              transfer_items.is_opened, 
@@ -483,23 +434,23 @@ class UserController extends BaseController
              usage_status.usage_status AS usage_status_name,
              order_status.status AS order_status_name,
              "transfer_items" AS source_table'
-            )
-            ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
-            ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
-            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-            ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
-            ->where('transfer_items.to_user_id', $currentUserId)
-            ->where('item_order.usage_status_id !=', 2)
-            ->orderBy('transfer_items.created_at', 'DESC')
-            ->findAll();
+        )
+        ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+        ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+        ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
+        ->where('transfer_items.to_user_id', $currentUserId)
+        ->where('item_order.usage_status_id !=', 2)
+        ->orderBy('transfer_items.created_at', 'DESC')
+        ->findAll();
 
-        //  2. جلب العهد من جدول order
-        $orderModel = new \App\Models\OrderModel();
+    //  2. جلب العهد من جدول order
+    $orderModel = new \App\Models\OrderModel();
 
-        $orders = $orderModel
-            ->distinct()
-            ->select(
-                'order.order_id AS id,
+    $orders = $orderModel
+        ->distinct()
+        ->select(
+            'order.order_id AS id,
              order.created_at,
              order.to_user_id,
              order_status.status AS order_status_name,
@@ -509,22 +460,24 @@ class UserController extends BaseController
              item_order.asset_num,
              item_order.serial_num,
              "orders" AS source_table'
-            )
-            ->join('item_order', 'item_order.order_id = order.order_id', 'left')
-            ->join('users AS from_user', 'from_user.user_id = order.from_user_id', 'left') // JOIN مع users
-            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-            ->join('order_status', 'order_status.id = order.order_status_id', 'left')
-            ->where('order.to_user_id', $currentUserId)
-            ->where('item_order.usage_status_id !=', 2)
-            ->orderBy('order.created_at', 'DESC')
-            ->findAll();
+        )
+        ->join('item_order', 'item_order.order_id = order.order_id', 'left')
+        ->join('users AS from_user', 'from_user.user_id = order.from_user_id', 'left') // JOIN مع users
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+        ->join('order_status', 'order_status.id = order.order_status_id', 'left')
+        ->where('order.to_user_id', $currentUserId)
+        ->where('item_order.usage_status_id !=', 2)
+        ->orderBy('order.created_at', 'DESC')
+        ->findAll();
 
-        //  3. دمج النتائج
-        $allOrders = array_merge($orders, $transferItems);
+    //  3. دمج النتائج
+    $allOrders = array_merge($orders, $transferItems);
 
-        //  4. تمرير البيانات للواجهة
-        return view('user/userView2', [
-            'orders' => $allOrders
-        ]);
-    }
+    //  4. تمرير البيانات للواجهة
+    return view('user/userView2', [
+        'orders' => $allOrders
+    ]);
+}
+
+
 }
