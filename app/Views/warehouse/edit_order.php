@@ -722,7 +722,9 @@
             });
         }
 
-        // إضافة صنف من البيانات المحملة
+        // edit_order.php
+
+        // وظيفة إضافة صنف من البيانات المحملة
         function addItemFromData(itemGroup, itemNumber) {
             itemCounter = itemNumber;
             const container = document.getElementById('itemsContainer');
@@ -732,51 +734,50 @@
             itemDiv.id = `item_${itemCounter}`;
 
             itemDiv.innerHTML = `
-                <div class="item-header">
-                    <div class="item-title">الصنف رقم ${itemCounter}</div>
-                    <button type="button" class="remove-item-btn" onclick="removeItem(${itemCounter})" title="إزالة الصنف">
-                        ×
-                    </button>
+        <div class="item-header">
+            <div class="item-title">الصنف رقم ${itemCounter}</div>
+            <button type="button" class="remove-item-btn" onclick="removeItem(${itemCounter})" title="إزالة الصنف">
+                ×
+            </button>
+        </div>
+        
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label>الصنف <span class="required">*</span></label>
+                <div class="search-dropdown">
+                    <input type="text" name="item_${itemCounter}" class="search-input" placeholder="ابحث عن الصنف..." required autocomplete="off" value="${itemGroup.item_name}">
+                    <div class="dropdown-list" id="itemDropdown_${itemCounter}"></div>
                 </div>
-                
-                <div class="form-grid">
-                    <div class="form-group full-width">
-                        <label>الصنف <span class="required">*</span></label>
-                        <div class="search-dropdown">
-                            <input type="text" name="item_${itemCounter}" class="search-input" placeholder="ابحث عن الصنف..." required autocomplete="off" value="${itemGroup.item_name}">
-                            <div class="dropdown-list" id="itemDropdown_${itemCounter}"></div>
-                        </div>
-                        <div class="classification-display show" id="classificationDisplay_${itemCounter}">
-                            <div class="classification-item">
-                                <span class="classification-label">التصنيف الرئيسي:</span>
-                                <span class="classification-value" id="majorCategory_${itemCounter}">-</span>
-                            </div>
-                            <div class="classification-item">
-                                <span class="classification-label">التصنيف الفرعي:</span>
-                                <span class="classification-value" id="minorCategory_${itemCounter}">-</span>
-                            </div>
-                        </div>
+                <div class="classification-display show" id="classificationDisplay_${itemCounter}">
+                    <div class="classification-item">
+                        <span class="classification-label">التصنيف الرئيسي:</span>
+                        <span class="classification-value" id="majorCategory_${itemCounter}">-</span>
                     </div>
-                    <div class="form-group">
-                        <label>الكمية <span class="required">*</span></label>
-                        <input type="number" name="quantity_${itemCounter}" min="1" max="100" placeholder="أدخل الكمية" required value="${itemGroup.quantity}" onchange="createAssetSerialFields(${itemCounter}, this.value)">
-                    </div>
-                    <div class="form-group">
-                        <label>نوع العهدة <span class="required">*</span></label>
-                        <select name="custody_type_${itemCounter}" class="custody-type-select" required>
-                            <option value="">اختر نوع العهدة</option>
-                        </select>
+                    <div class="classification-item">
+                        <span class="classification-label">التصنيف الفرعي:</span>
+                        <span class="classification-value" id="minorCategory_${itemCounter}">-</span>
                     </div>
                 </div>
-                
-                <!-- قسم أرقام الأصول والأرقام التسلسلية -->
-                <div class="dynamic-fields" id="dynamicFields_${itemCounter}">
-                    <div class="section-header">
-                        <h4>أرقام الأصول والأرقام التسلسلية</h4>
-                    </div>
-                    <div id="assetSerialContainer_${itemCounter}"></div>
-                </div>
-            `;
+            </div>
+            <div class="form-group">
+                <label>الكمية <span class="required">*</span></label>
+                <input type="number" name="quantity_${itemCounter}" min="1" max="100" placeholder="أدخل الكمية" required value="${itemGroup.quantity}" onchange="updateAssetSerialFields(${itemCounter}, this.value)">
+            </div>
+            <div class="form-group">
+                <label>نوع العهدة <span class="required">*</span></label>
+                <select name="custody_type_${itemCounter}" class="custody-type-select" required>
+                    <option value="">اختر نوع العهدة</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="dynamic-fields" id="dynamicFields_${itemCounter}">
+            <div class="section-header">
+                <h4>أرقام الأصول والأرقام التسلسلية</h4>
+            </div>
+            <div id="assetSerialContainer_${itemCounter}"></div>
+        </div>
+    `;
 
             container.appendChild(itemDiv);
 
@@ -786,71 +787,70 @@
             // تحميل قائمة أنواع العهدة وتعيين القيمة الحالية
             loadCustodyTypesForItem(itemCounter, itemGroup.assets_type);
 
-            // إنشاء حقول العناصر مع البيانات
-            createAssetSerialFieldsFromData(itemCounter, itemGroup.items);
+            // تم تمرير مصفوفة items (البيانات القديمة) كمدخل ثانٍ للدالة.
+            updateAssetSerialFields(itemCounter, itemGroup.items);
         }
+        // // إنشاء حقول الأصول والأرقام التسلسلية من البيانات
+        // function createAssetSerialFieldsFromData(itemId, items) {
+        //     const container = document.getElementById(`assetSerialContainer_${itemId}`);
+        //     const dynamicSection = document.getElementById(`dynamicFields_${itemId}`);
 
-        // إنشاء حقول الأصول والأرقام التسلسلية من البيانات
-        function createAssetSerialFieldsFromData(itemId, items) {
-            const container = document.getElementById(`assetSerialContainer_${itemId}`);
-            const dynamicSection = document.getElementById(`dynamicFields_${itemId}`);
+        //     if (!container || !dynamicSection || !items || items.length === 0) return;
 
-            if (!container || !dynamicSection || !items || items.length === 0) return;
+        //     container.innerHTML = '';
 
-            container.innerHTML = '';
+        //     items.forEach((item, index) => {
+        //         const i = index + 1;
+        //         const fieldDiv = document.createElement('div');
+        //         fieldDiv.className = 'asset-serial-grid';
 
-            items.forEach((item, index) => {
-                const i = index + 1;
-                const fieldDiv = document.createElement('div');
-                fieldDiv.className = 'asset-serial-grid';
+        //         fieldDiv.innerHTML = `
+        //             <div class="asset-serial-header">العنصر رقم ${i}</div>
+        //             <input type="hidden" name="existing_item_id_${itemId}_${i}" value="${item.id}">
+        //             <div class="form-group">
+        //                 <label>رقم الأصول <span class="required">*</span></label>
+        //                 <input type="text" 
+        //                     name="asset_num_${itemId}_${i}" 
+        //                     placeholder="أدخل 12 رقم فقط" 
+        //                     pattern="[0-9]{12}" 
+        //                     maxlength="12" 
+        //                     inputmode="numeric"
+        //                     title="يجب إدخال 12 رقم بالضبط"
+        //                     value="${item.asset_num}"
+        //                     required>
+        //                 <div class="validation-message asset-validation-${itemId}-${i}" style="display: none;"></div>
+        //             </div>
+        //             <div class="form-group">
+        //                 <label>الرقم التسلسلي <span class="required">*</span></label>
+        //                 <input type="text" name="serial_num_${itemId}_${i}" placeholder="أدخل الرقم التسلسلي" value="${item.serial_num}" required>
+        //                 <div class="validation-message serial-validation-${itemId}-${i}" style="display: none;"></div>
+        //             </div>
+        //             <div class="form-group">
+        //                 <label>رقم المودل</label>
+        //                 <input type="text" name="model_num_${itemId}_${i}" placeholder="أدخل رقم المودل" value="${item.model_num || ''}">
+        //             </div>
+        //             <div class="form-group">
+        //                 <label>رقم الأصول القديمة</label>
+        //                 <input type="text" name="old_asset_num_${itemId}_${i}" placeholder="أدخل رقم الأصول القديمة" value="${item.old_asset_num || ''}">
+        //             </div>
+        //             <div class="form-group">
+        //                 <label>البراند</label>
+        //                 <input type="text" name="brand_${itemId}_${i}" placeholder="أدخل اسم البراند" value="${item.brand || ''}">
+        //             </div>
+        //         `;
 
-                fieldDiv.innerHTML = `
-                    <div class="asset-serial-header">العنصر رقم ${i}</div>
-                    <input type="hidden" name="existing_item_id_${itemId}_${i}" value="${item.id}">
-                    <div class="form-group">
-                        <label>رقم الأصول <span class="required">*</span></label>
-                        <input type="text" 
-                            name="asset_num_${itemId}_${i}" 
-                            placeholder="أدخل 12 رقم فقط" 
-                            pattern="[0-9]{12}" 
-                            maxlength="12" 
-                            inputmode="numeric"
-                            title="يجب إدخال 12 رقم بالضبط"
-                            value="${item.asset_num}"
-                            required>
-                        <div class="validation-message asset-validation-${itemId}-${i}" style="display: none;"></div>
-                    </div>
-                    <div class="form-group">
-                        <label>الرقم التسلسلي <span class="required">*</span></label>
-                        <input type="text" name="serial_num_${itemId}_${i}" placeholder="أدخل الرقم التسلسلي" value="${item.serial_num}" required>
-                        <div class="validation-message serial-validation-${itemId}-${i}" style="display: none;"></div>
-                    </div>
-                    <div class="form-group">
-                        <label>رقم المودل</label>
-                        <input type="text" name="model_num_${itemId}_${i}" placeholder="أدخل رقم المودل" value="${item.model_num || ''}">
-                    </div>
-                    <div class="form-group">
-                        <label>رقم الأصول القديمة</label>
-                        <input type="text" name="old_asset_num_${itemId}_${i}" placeholder="أدخل رقم الأصول القديمة" value="${item.old_asset_num || ''}">
-                    </div>
-                    <div class="form-group">
-                        <label>البراند</label>
-                        <input type="text" name="brand_${itemId}_${i}" placeholder="أدخل اسم البراند" value="${item.brand || ''}">
-                    </div>
-                `;
+        //         container.appendChild(fieldDiv);
 
-                container.appendChild(fieldDiv);
+        //         // إضافة معالجات التحقق للحقول
+        //         const assetInput = fieldDiv.querySelector(`input[name="asset_num_${itemId}_${i}"]`);
+        //         const serialInput = fieldDiv.querySelector(`input[name="serial_num_${itemId}_${i}"]`);
 
-                // إضافة معالجات التحقق للحقول
-                const assetInput = fieldDiv.querySelector(`input[name="asset_num_${itemId}_${i}"]`);
-                const serialInput = fieldDiv.querySelector(`input[name="serial_num_${itemId}_${i}"]`);
+        //         assetInput.addEventListener('blur', () => validateAssetSerial(assetInput, itemId, i, 'asset', item.id));
+        //         serialInput.addEventListener('blur', () => validateAssetSerial(serialInput, itemId, i, 'serial', item.id));
+        //     });
 
-                assetInput.addEventListener('blur', () => validateAssetSerial(assetInput, itemId, i, 'asset', item.id));
-                serialInput.addEventListener('blur', () => validateAssetSerial(serialInput, itemId, i, 'serial', item.id));
-            });
-
-            dynamicSection.style.display = 'block';
-        }
+        //     dynamicSection.style.display = 'block';
+        // }
 
         // تعيين الموقع من البيانات
         function setLocationFromData(buildingId, floorId, sectionId, roomId) {
@@ -1516,6 +1516,126 @@
             // تحميل بيانات الطلب
             loadOrderData();
         });
+        // edit_order.php -> قسم <script>
+
+        // edit_order.php
+
+        /**
+         * وظيفة تحديث/إعادة بناء حقول الأصول والأرقام التسلسلية ديناميكياً.
+         * يمكن أن تقبل رقماً جديداً للكمية (من تغيير يدوي) أو مصفوفة بيانات (من تحميل الطلب).
+         * @param {number} itemId - معرف الصنف (1، 2، 3، إلخ).
+         * @param {number | Array<Object>} quantityOrItems - الكمية الجديدة أو مصفوفة البيانات المحملة.
+         */
+        function updateAssetSerialFields(itemId, quantityOrItems) {
+            const container = document.getElementById(`assetSerialContainer_${itemId}`);
+            const dynamicSection = document.getElementById(`dynamicFields_${itemId}`);
+
+            if (!container || !dynamicSection) return;
+
+            let initialItemsData = [];
+            let qty = 0;
+
+            if (Array.isArray(quantityOrItems)) {
+                // حالة التحميل الأولي: تم تمرير مصفوفة البيانات القديمة (itemGroup.items)
+                initialItemsData = quantityOrItems;
+                qty = quantityOrItems.length;
+            } else {
+                // حالة تغيير الكمية: تم تمرير الرقم الجديد (this.value)
+                qty = parseInt(quantityOrItems) || 0;
+
+                // 1. جمع البيانات الحالية للحقول الموجودة (للحفاظ على المدخلات اليدوية)
+                const existingFieldGrids = container.querySelectorAll('.asset-serial-grid');
+                existingFieldGrids.forEach((grid) => {
+                    const existingItemId = grid.querySelector('input[type="hidden"]')?.value || null;
+                    const assetNum = grid.querySelector('input[name^="asset_num_"]')?.value || '';
+                    const serialNum = grid.querySelector('input[name^="serial_num_"]')?.value || '';
+                    const modelNum = grid.querySelector('input[name^="model_num_"]')?.value || '';
+                    const oldAssetNum = grid.querySelector('input[name^="old_asset_num_"]')?.value || '';
+                    const brand = grid.querySelector('input[name^="brand_"]')?.value || '';
+
+                    initialItemsData.push({
+                        id: existingItemId,
+                        asset_num: assetNum,
+                        serial_num: serialNum,
+                        model_num: modelNum,
+                        old_asset_num: oldAssetNum,
+                        brand: brand
+                    });
+                });
+            }
+
+            // 2. مسح الحقول وإعادة بنائها
+            container.innerHTML = '';
+
+            if (qty > 0) {
+                for (let i = 1; i <= qty; i++) {
+                    const itemData = initialItemsData[i - 1] || { // استخدام البيانات القديمة أو بيانات فارغة
+                        id: null,
+                        asset_num: '',
+                        serial_num: '',
+                        model_num: '',
+                        old_asset_num: '',
+                        brand: ''
+                    };
+
+                    const fieldDiv = document.createElement('div');
+                    fieldDiv.className = 'asset-serial-grid';
+
+                    // إذا كان هذا العنصر القديم موجودًا في البيانات المحفوظة، أعد استخدام ID الخاص به
+                    const existingItemIdValue = itemData.id || '';
+
+                    fieldDiv.innerHTML = `
+                <div class="asset-serial-header">العنصر رقم ${i}</div>
+                <input type="hidden" name="existing_item_id_${itemId}_${i}" value="${existingItemIdValue}">
+                <div class="form-group">
+                    <label>رقم الأصول <span class="required">*</span></label>
+                    <input type="text" 
+                        name="asset_num_${itemId}_${i}" 
+                        placeholder="أدخل 12 رقم فقط" 
+                        pattern="[0-9]{12}" 
+                        maxlength="12" 
+                        inputmode="numeric"
+                        title="يجب إدخال 12 رقم بالضبط"
+                        value="${itemData.asset_num}"
+                        required>
+                    <div class="validation-message asset-validation-${itemId}-${i}" style="display: none;"></div>
+                </div>
+                <div class="form-group">
+                    <label>الرقم التسلسلي <span class="required">*</span></label>
+                    <input type="text" name="serial_num_${itemId}_${i}" placeholder="أدخل الرقم التسلسلي" value="${itemData.serial_num}" required>
+                    <div class="validation-message serial-validation-${itemId}-${i}" style="display: none;"></div>
+                </div>
+                <div class="form-group">
+                    <label>رقم المودل</label>
+                    <input type="text" name="model_num_${itemId}_${i}" placeholder="أدخل رقم المودل" value="${itemData.model_num}">
+                </div>
+                <div class="form-group">
+                    <label>رقم الأصول القديمة</label>
+                    <input type="text" name="old_asset_num_${itemId}_${i}" placeholder="أدخل رقم الأصول القديمة" value="${itemData.old_asset_num}">
+                </div>
+                <div class="form-group">
+                    <label>البراند</label>
+                    <input type="text" name="brand_${itemId}_${i}" placeholder="أدخل اسم البراند" value="${itemData.brand}">
+                </div>
+            `;
+
+                    container.appendChild(fieldDiv);
+
+                    // إضافة معالجات التحقق للحقول الجديدة
+                    const assetInput = fieldDiv.querySelector(`input[name="asset_num_${itemId}_${i}"]`);
+                    const serialInput = fieldDiv.querySelector(`input[name="serial_num_${itemId}_${i}"]`);
+
+                    const excludeId = existingItemIdValue || null;
+
+                    assetInput.addEventListener('blur', () => validateAssetSerial(assetInput, itemId, i, 'asset', excludeId));
+                    serialInput.addEventListener('blur', () => validateAssetSerial(serialInput, itemId, i, 'serial', excludeId));
+                }
+
+                dynamicSection.style.display = 'block'; // ✅ هذا هو السطر الحاسم لإظهار القسم
+            } else {
+                dynamicSection.style.display = 'none';
+            }
+        }
     </script>
 </body>
 

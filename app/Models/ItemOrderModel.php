@@ -30,7 +30,9 @@ class ItemOrderModel extends Model
 
     // Dates
     protected $useTimestamps = true;
-
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    
     // ✅ Validation rules محسنة
     protected $validationRules = [
         'order_id' => 'required|integer|is_not_unique[order.order_id]',

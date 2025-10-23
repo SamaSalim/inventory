@@ -14,6 +14,8 @@ class OrderModel extends Model
     protected $returnType    = Order::class;
     protected $allowedFields = ['from_user_id', 'to_user_id', 'order_status_id', 'note'];
     protected $useTimestamps = true;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
 
     protected $validationRules = [
         'from_user_id' => 'required|max_length[50]|is_not_unique[employee.emp_id]',

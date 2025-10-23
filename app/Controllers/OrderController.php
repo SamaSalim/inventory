@@ -14,6 +14,7 @@ use App\Models\{
     RoomModel,
     SectionModel,
     UserModel, // إضافة UserModel
+    TransferItemsModel,
     UsageStatusModel
 };
 
@@ -31,6 +32,7 @@ class OrderController extends BaseController
     protected $sectionModel;
     protected $roomModel;
     protected $majorCategoryModel;
+    protected $transferItemsModel;
     protected $usageStatusModel; // إضافة نموذج حالة الاستخدام
 
     public function __construct()
@@ -45,6 +47,7 @@ class OrderController extends BaseController
         $this->sectionModel = new SectionModel();
         $this->roomModel = new RoomModel();
         $this->majorCategoryModel = new MajorCategoryModel();
+        $this->transferItemsModel = new TransferItemsModel();
         $this->usageStatusModel = new UsageStatusModel(); // تهيئة نموذج حالة الاستخدام
     }
 
@@ -592,7 +595,7 @@ class OrderController extends BaseController
             $orderData = [
                 'from_user_id' => $loggedEmployeeId, // من السيشن مباشرة
                 'to_user_id' => $toUserId,
-                'order_status_id' => 2, // مقبول
+                'order_status_id' => 1, // قيد الانتظار
                 'note' => $notes
             ];
 
@@ -634,7 +637,22 @@ class OrderController extends BaseController
                     ]);
                 }
             }
-
+                $transferItemData = [
+                    'item_order_id' => $itemOrderId,
+                    'from_user_id' => $loggedEmployeeId,
+                    'to_user_id' => $toUserId,
+                    'order_status_id' => 1, // قيد الانتظار (في جدول transfer_items)
+                    'is_opened' => 0 
+                ];
+                
+                if (!$this->transferItemsModel->insert($transferItemData)) {
+                    $this->orderModel->transRollback();
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => 'فشل في إنشاء سجل التحويل عبر النموذج.'
+                    ]);
+                }
+            
             // إنهاء المعاملة
             $this->orderModel->transComplete();
 
@@ -711,6 +729,9 @@ class OrderController extends BaseController
     /**
      * جلب بيانات الطلب للتعديل
      */
+    /**
+     * جلب بيانات الطلب للتعديل
+     */
     public function getOrderData($orderId = null)
     {
         try {
@@ -725,8 +746,6 @@ class OrderController extends BaseController
             $this->orderModel->asArray();
             $order = $this->orderModel->find($orderId);
 
-            log_message('info', 'Order data: ' . print_r($order, true));
-
             if (!$order) {
                 return $this->response->setJSON([
                     'success' => false,
@@ -734,12 +753,11 @@ class OrderController extends BaseController
                 ]);
             }
 
-            // جلب بيانات المرسل كمصفوفة
+            // جلب بيانات المرسل والمستلم (يبقى كما هو)
             $fromUser = null;
             if (isset($order['from_user_id']) && $order['from_user_id']) {
-                $this->employeeModel->asArray(); //  استخدام EmployeeModel
-                $fromUser = $this->employeeModel->where('emp_id', $order['from_user_id'])->first(); // ✅ استخدام حقل 'emp_id'
-                //  إعادة تسمية الحقول لتطابق ما يتوقعه JavaScript (user_id و user_ext)
+                $this->employeeModel->asArray();
+                $fromUser = $this->employeeModel->where('emp_id', $order['from_user_id'])->first();
 
                 if ($fromUser) {
                     $fromUser['user_id'] = $fromUser['emp_id'];
@@ -747,24 +765,23 @@ class OrderController extends BaseController
                 }
             }
 
-            // جلب بيانات المستلم كمصفوفة
             $toUser = null;
             if (isset($order['to_user_id']) && $order['to_user_id']) {
                 $this->userModel->asArray();
                 $toUser = $this->userModel->where('user_id', $order['to_user_id'])->first();
             }
 
-            // جلب عناصر الطلب - استخدم order_id بدلاً من id
+            // جلب عناصر الطلب - استخدم item_order_id هنا
             $builder = $this->itemOrderModel->builder();
             $orderItems = $builder
-                ->select('item_order.*, items.name as item_name, room.id as room_id, room.code as room_code, 
+                ->select('item_order.*, item_order.item_order_id, items.name as item_name, room.id as room_id, room.code as room_code, 
                      section.id as section_id, floor.id as floor_id, building.id as building_id')
                 ->join('items', 'item_order.item_id = items.id', 'left')
                 ->join('room', 'item_order.room_id = room.id', 'left')
                 ->join('section', 'room.section_id = section.id', 'left')
                 ->join('floor', 'section.floor_id = floor.id', 'left')
                 ->join('building', 'floor.building_id = building.id', 'left')
-                ->where('item_order.order_id', $order['order_id'])  // استخدم order_id هنا
+                ->where('item_order.order_id', $order['order_id'])
                 ->get()
                 ->getResultArray();
 
@@ -790,7 +807,7 @@ class OrderController extends BaseController
 
                 $groupedItems[$itemKey]['quantity']++;
                 $groupedItems[$itemKey]['items'][] = [
-                    'id' => $item['order_id'],
+                    'id' => $item['item_order_id'], // ✅ التصحيح هنا
                     'asset_num' => $item['asset_num'],
                     'serial_num' => $item['serial_num'],
                     'model_num' => $item['model_num'],
@@ -821,6 +838,9 @@ class OrderController extends BaseController
         }
     }
 
+    /**
+     * تحديث الطلب متعدد الأصناف
+     */
     /**
      * تحديث الطلب متعدد الأصناف
      */
@@ -875,7 +895,7 @@ class OrderController extends BaseController
                 ]);
             }
 
-            // جمع بيانات الأصناف من النموذج (نفس الطريقة في storeMultiItem)
+            // ✅ 1. جمع بيانات الأصناف المُرسلة وتخزينها
             $items = [];
             $allPostData = $this->request->getPost();
 
@@ -894,7 +914,7 @@ class OrderController extends BaseController
                 $custodyType = $this->request->getPost("custody_type_{$itemNum}");
 
                 if (empty($itemName) || $quantity <= 0 || empty($custodyType)) {
-                    continue; // تجاهل الأصناف غير المكتملة
+                    continue;
                 }
 
                 // العثور على الصنف في قاعدة البيانات
@@ -913,6 +933,8 @@ class OrderController extends BaseController
                     $modelNum = trim($this->request->getPost("model_num_{$itemNum}_{$i}") ?? '');
                     $oldAssetNum = trim($this->request->getPost("old_asset_num_{$itemNum}_{$i}") ?? '');
                     $brand = trim($this->request->getPost("brand_{$itemNum}_{$i}") ?? 'غير محدد');
+
+                    //  يتم جمع ID العنصر الموجود
                     $existingItemId = $this->request->getPost("existing_item_id_{$itemNum}_{$i}") ?? null;
 
                     if (empty($assetNum) || empty($serialNum)) {
@@ -944,14 +966,14 @@ class OrderController extends BaseController
                 ]);
             }
 
-            // التحقق من عدم تكرار الأرقام (نفس التحقق في storeMultiItem)
+            //  2. التحقق من التكرار (داخل الطلب الحالي وفي قاعدة البيانات مع استثناء العناصر القديمة)
             $assetNumbers = [];
             $serialNumbers = [];
 
             foreach ($items as $index => $item) {
                 $assetNum = $item['asset_number'];
                 $serialNum = $item['serial_number'];
-                $existingItemId = $item['existing_item_id'];
+                $existingItemId = $item['existing_item_id']; // ID العنصر الحالي (item_order_id)
 
                 // التحقق من صحة تنسيق الأرقام
                 $assetValidation = $this->validateAssetNumber($assetNum);
@@ -970,7 +992,7 @@ class OrderController extends BaseController
                     ]);
                 }
 
-                // التحقق من التكرار في الطلب الحالي
+                // التحقق من التكرار في الطلب الحالي (لمنع إرسال رقم مكرر في نفس الدفعة)
                 if (in_array($assetNum, $assetNumbers)) {
                     return $this->response->setJSON([
                         'success' => false,
@@ -985,10 +1007,10 @@ class OrderController extends BaseController
                     ]);
                 }
 
-                // التحقق من التكرار في قاعدة البيانات (استثناء العنصر الحالي)
+                // التحقق من التكرار في قاعدة البيانات (مع استثناء العنصر الحالي)
                 $assetQuery = $this->itemOrderModel->where('asset_num', $assetNum);
                 if ($existingItemId) {
-                    $assetQuery->where('order_id !=', $existingItemId);
+                    $assetQuery->where('item_order_id !=', $existingItemId); // ✅ استثناء ID العنصر نفسه
                 }
                 $existingAsset = $assetQuery->first();
 
@@ -1001,7 +1023,7 @@ class OrderController extends BaseController
 
                 $serialQuery = $this->itemOrderModel->where('serial_num', $serialNum);
                 if ($existingItemId) {
-                    $serialQuery->where('order_id !=', $existingItemId);
+                    $serialQuery->where('item_order_id !=', $existingItemId); //  استثناء ID العنصر نفسه
                 }
                 $existingSerial = $serialQuery->first();
 
@@ -1016,22 +1038,26 @@ class OrderController extends BaseController
                 $serialNumbers[] = $serialNum;
             }
 
-            // بدء المعاملة
+            //  3. منطق التحديث الانتقائي 
             $this->orderModel->transStart();
 
             // تحديث الطلب الرئيسي
             $orderData = [
-                'from_user_id' => $loggedEmployeeId, // من السيشن مباشرة
+                'from_user_id' => $loggedEmployeeId,
                 'to_user_id' => $toUserId,
                 'note' => $notes
             ];
-
+            unset($orderData['created_at']);
             $this->orderModel->update($orderId, $orderData);
 
-            // حذف العناصر القديمة
-            $this->itemOrderModel->where('order_id', $orderId)->delete();
+            // جلب العناصر القديمة
+            $oldItemOrders = $this->itemOrderModel->where('order_id', $orderId)->findAll();
+            $oldItemOrderIds = array_map(function ($item) {
+                return (string)$item->item_order_id;
+            }, $oldItemOrders);
+            $submittedItemOrderIds = [];
 
-            // إضافة العناصر الجديدة
+            // التحديث والإضافة
             foreach ($items as $item) {
                 $itemOrderData = [
                     'order_id' => $orderId,
@@ -1049,15 +1075,39 @@ class OrderController extends BaseController
                     'note' => $notes
                 ];
 
-                $itemOrderId = $this->itemOrderModel->insert($itemOrderData);
+                $existingItemId = $item['existing_item_id'] ?? null;
 
-                if (!$itemOrderId) {
-                    $this->orderModel->transRollback();
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => 'فشل في تحديث أحد العناصر'
-                    ]);
+                if (!empty($existingItemId) && in_array((string)$existingItemId, $oldItemOrderIds)) {
+                    // العنصر موجود: تحديث (يحافظ على created_at)
+                    $updateResult = $this->itemOrderModel->updateWithUniqueCheck($existingItemId, $itemOrderData);
+
+                    if (!$updateResult['success']) {
+                        $this->orderModel->transRollback();
+                        return $this->response->setJSON([
+                            'success' => false,
+                            'message' => 'فشل في تحديث العنصر رقم ' . $existingItemId . ': ' . $updateResult['message']
+                        ]);
+                    }
+                    $submittedItemOrderIds[] = (string)$existingItemId;
+                } else {
+                    // العنصر جديد: إدراج (يُعين created_at جديد)
+                    $insertResult = $this->itemOrderModel->insertWithUniqueCheck($itemOrderData);
+
+                    if (!$insertResult['success']) {
+                        $this->orderModel->transRollback();
+                        return $this->response->setJSON([
+                            'success' => false,
+                            'message' => 'فشل في إضافة العنصر الجديد: ' . $insertResult['message']
+                        ]);
+                    }
                 }
+            }
+
+            // الحذف: حذف العناصر القديمة التي لم تعد موجودة
+            $itemsToDelete = array_diff($oldItemOrderIds, $submittedItemOrderIds);
+
+            if (!empty($itemsToDelete)) {
+                $this->itemOrderModel->delete($itemsToDelete);
             }
 
             // إنهاء المعاملة
