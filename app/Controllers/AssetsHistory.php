@@ -54,7 +54,7 @@ class AssetsHistory extends BaseController
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('order', 'order.order_id = item_order.order_id', 'left')
             ->join('order_status', 'order_status.id = order.order_status_id', 'left')
-            ->where('usage_status.usage_status LIKE', '%رجيع%'); // <-- فقط الرجيع من حالة الاستخدام
+            ->where('usage_status.usage_status LIKE', '%رجيع%'); // فقط الرجيع
 
         if ($startDate) {
             $itemOrdersQuery->where('item_order.created_at >=', $startDate . ' 00:00:00');
@@ -91,7 +91,7 @@ class AssetsHistory extends BaseController
     /**
      * تحديث حالة الاستخدام لطلب معين
      */
- public function updateUsageStatus($orderId)
+    public function updateUsageStatus($orderId)
     {
         $db = \Config\Database::connect();
 
@@ -131,7 +131,7 @@ class AssetsHistory extends BaseController
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
 
-            // تحديث note فقط في order الرئيسي
+            // تحديث note في order الرئيسي
             $db->table('order')
                 ->where('order_id', $orderId)
                 ->update([
@@ -141,7 +141,7 @@ class AssetsHistory extends BaseController
 
             return $this->response->setJSON([
                 'success' => true,
-                'message' => 'تمت إعادة الصرف وتحديث البيانات بنجاح بدون تعديل المستخدمين.'
+                'message' => 'تمت إعادة الصرف وتحديث البيانات بنجاح.'
             ]);
 
         } catch (\Exception $e) {
@@ -188,7 +188,7 @@ class AssetsHistory extends BaseController
 
             return $this->response->setJSON([
                 'success' => true,
-                'message' => 'تمت إعادة الصرف وتحديث الملاحظات بنجاح بدون تعديل المستخدمين.'
+                'message' => 'تمت إعادة الصرف وتحديث الملاحظات بنجاح.'
             ]);
 
         } catch (\Exception $e) {
@@ -226,7 +226,7 @@ class AssetsHistory extends BaseController
                 ]);
         }
 
-        // تحديث note فقط في الطلب الرئيسي بدون تغيير المستخدمين
+        // تحديث note فقط في الطلب الرئيسي
         $db->table('order')
             ->where('order_id', $orderId)
             ->update([
@@ -236,7 +236,7 @@ class AssetsHistory extends BaseController
 
         return $this->response->setJSON([
             'success' => true,
-            'message' => 'تمت إعادة صرف العهد المحددة بنجاح بدون تعديل المستخدمين.'
+            'message' => 'تمت إعادة صرف العهد المحددة بنجاح.'
         ]);
     }
 
@@ -258,6 +258,48 @@ class AssetsHistory extends BaseController
             ]);
         }
     }
+
+    /** تحديث حالة الطلب (قبول / رفض) */
+    public function updateOrderStatus($orderId)
+    {
+        $this->checkAuth();
+
+        $data = json_decode($this->request->getBody());
+        if (!$data || !isset($data->status_id)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'بيانات الحالة غير صحيحة'
+            ]);
+        }
+
+        $statusId = (int)$data->status_id;
+
+        $db = \Config\Database::connect();
+        $order = $db->table('order')->where('order_id', $orderId)->get()->getRow();
+        if (!$order) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => "الطلب برقم $orderId غير موجود"
+            ]);
+        }
+
+        $db->table('order')->where('order_id', $orderId)->update([
+            'order_status_id' => $statusId,
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        $statusText = match($statusId) {
+            2 => 'مقبول',
+            3 => 'مرفوض',
+            default => 'قيد الانتظار'
+        };
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => "تم تغيير الحالة إلى $statusText"
+        ]);
+    }
+
 
 
 
