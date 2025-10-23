@@ -34,7 +34,7 @@ class FinalTablesSeeder extends Seeder
             ['usage_status' => 'جديد'],
             ['usage_status' => 'رجيع'],
             ['usage_status' => 'تحويل'],
-             ['usage_status' => 'معاد صرفة'],
+            ['usage_status' => 'معاد صرفة'],
         ];
         $this->db->table('usage_status')->insertBatch($usage_statuses);
 
@@ -324,7 +324,7 @@ class FinalTablesSeeder extends Seeder
                 'email'    => 'layan@example.com',
                 'password' => password_hash('123455', PASSWORD_DEFAULT),
             ],
-                 [
+            [
                 'emp_id'   => '1006',
                 'name'     => ' ليالي العلياني',
                 'emp_dept' => 'المستودعات',
@@ -385,6 +385,14 @@ class FinalTablesSeeder extends Seeder
                 'email'     => 'sama.alwafi3@gmail.com',
                 'password'  => password_hash('123455', PASSWORD_DEFAULT),
             ],
+            [
+                'emp_id'   => '1002',
+                'name'     => 'حميدة اختر',
+                'emp_dept' => 'العهد',
+                'emp_ext'  => 5678,
+                'email'    => 'hmd@example.com',
+                'password' => password_hash('123457', PASSWORD_DEFAULT),
+            ],
         ];
         $this->db->table('users')->insertBatch($users);
 
@@ -418,7 +426,7 @@ class FinalTablesSeeder extends Seeder
             ['emp_id' => '1003', 'role_id' => 3],
             ['emp_id' => '1004', 'role_id' => 5],
             ['emp_id' => '1005', 'role_id' => 1],
-             ['emp_id' => '1006', 'role_id' => 6],
+            ['emp_id' => '1006', 'role_id' => 6],
         ];
         $this->db->table('permission')->insertBatch($permissions);
 
