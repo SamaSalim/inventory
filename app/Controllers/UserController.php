@@ -407,15 +407,16 @@ public function userView2(): string
     if (!$isEmployee) {
         // مستخدم عادي
         $currentUserId = $account_id;
-    } else {
-        // موظف لا يدخل هنا
-        return redirect()->to('/dashboard')->with('error', 'هذه الصفحة مخصصة للمستخدمين فقط');
-    }
+    } 
+    // else {
+    //     // موظف لا يدخل هنا
+    //     return redirect()->to('/dashboard')->with('error', 'هذه الصفحة مخصصة للمستخدمين فقط');
+    // }
 
-    // حماية إضافية
-    if (!$currentUserId) {
-        return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
-    }
+    // // حماية إضافية
+    // if (!$currentUserId) {
+    //     return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
+    // }
 
     //  1. جلب العهد من جدول transfer_items
     $transferItemsModel = new \App\Models\TransferItemsModel();
