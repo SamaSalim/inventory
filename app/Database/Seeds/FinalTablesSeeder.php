@@ -386,12 +386,20 @@ class FinalTablesSeeder extends Seeder
                 'password'  => password_hash('123455', PASSWORD_DEFAULT),
             ],
             [
-                'emp_id'   => '1002',
+                'user_id'   => '1002',
                 'name'     => 'حميدة اختر',
-                'emp_dept' => 'العهد',
-                'emp_ext'  => 5678,
+                'user_dept' => 'العهد',
+                'user_ext'  => 5678,
                 'email'    => 'hmd@example.com',
                 'password' => password_hash('123457', PASSWORD_DEFAULT),
+            ],
+            [
+                'user_id'   => '1006',
+                'name'     => ' ليالي العلياني',
+                'user_dept' => 'المستودعات',
+                'user_ext'  => 5000,
+                'email'    => 'layalialalyani@gmail.com',
+                'password' => password_hash('123445', PASSWORD_DEFAULT),
             ],
         ];
         $this->db->table('users')->insertBatch($users);

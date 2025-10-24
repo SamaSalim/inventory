@@ -4,12 +4,9 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\ItemOrderModel;
-use App\Models\TransferItemsModel;
 use App\Models\MinorCategoryModel;
 use App\Models\UsageStatusModel;
 use App\Exceptions\AuthenticationException;
-use App\Models\OrderModel; 
-use App\Models\UsersModel;
 
 class AssetsHistory extends BaseController
 {
@@ -24,7 +21,17 @@ class AssetsHistory extends BaseController
     }
 
     /**
-     * عرض صفحة return_view مع بيانات الأصول مع فلترة
+     * دالة لتبديل المستخدمين تلقائياً: ليالي ↔ حميدة
+     */
+    private function swapUserId($userId)
+    {
+        if ($userId == 1002) return 1006; // ليالي → حميدة
+        if ($userId == 1006) return 1002; // حميدة → ليالي
+        return $userId; // أي مستخدم آخر يبقى كما هو
+    }
+
+    /**
+     * عرض صفحة الأصول المرتجعة مع الفلترة
      */
     public function index(): string
     {
@@ -36,6 +43,7 @@ class AssetsHistory extends BaseController
         $endDate = $this->request->getGet('end_date');
         $usageStatusId = $this->request->getGet('usage_status_id');
 
+        // بناء الاستعلام لجلب الطلبات المرتجعة
         $itemOrdersQuery = $itemOrderModel
             ->distinct()
             ->select(
@@ -47,26 +55,29 @@ class AssetsHistory extends BaseController
                  employee.emp_id AS employee_id, 
                  employee.emp_ext AS extension,
                  usage_status.usage_status AS usage_status_name,
-                 order_status.status AS order_status_name'
+                 order_status.status AS order_status_name,
+                 `order`.from_user_id,
+                 `order`.to_user_id'
             )
             ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
             ->join('room', 'room.id = item_order.room_id', 'left')
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('order', 'order.order_id = item_order.order_id', 'left')
             ->join('order_status', 'order_status.id = order.order_status_id', 'left')
-            ->where('usage_status.usage_status LIKE', '%رجيع%'); // فقط الرجيع
+            ->where('usage_status.usage_status LIKE', '%رجيع%');
 
-        if ($startDate) {
-            $itemOrdersQuery->where('item_order.created_at >=', $startDate . ' 00:00:00');
-        }
-        if ($endDate) {
-            $itemOrdersQuery->where('item_order.created_at <=', $endDate . ' 23:59:59');
-        }
-        if ($usageStatusId) {
-            $itemOrdersQuery->where('item_order.usage_status_id', $usageStatusId);
-        }
+        if ($startDate) $itemOrdersQuery->where('item_order.created_at >=', $startDate . ' 00:00:00');
+        if ($endDate) $itemOrdersQuery->where('item_order.created_at <=', $endDate . ' 23:59:59');
+        if ($usageStatusId) $itemOrdersQuery->where('item_order.usage_status_id', $usageStatusId);
 
         $itemOrders = $itemOrdersQuery->orderBy('item_order.created_at', 'DESC')->findAll();
+
+        // تعديل الأسماء للعرض بعد swap
+        foreach ($itemOrders as &$order) {
+            $order->created_by_name = ($order->created_by == 1002) ? 'ليالي العلياني' : (($order->created_by == 1006) ? 'حميدة اختر' : $order->created_by_name);
+            $order->from_user_name = ($order->from_user_id == 1002) ? 'ليالي العلياني' : (($order->from_user_id == 1006) ? 'حميدة اختر' : $order->from_user_id);
+            $order->to_user_name = ($order->to_user_id == 1002) ? 'ليالي العلياني' : (($order->to_user_id == 1006) ? 'حميدة اختر' : $order->to_user_id);
+        }
 
         $minorCategoryModel = new MinorCategoryModel();
         $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
@@ -90,6 +101,7 @@ class AssetsHistory extends BaseController
 
     /**
      * تحديث حالة الاستخدام لطلب معين
+     * يقوم أيضاً بتبديل المستخدمين تلقائياً
      */
     public function updateUsageStatus($orderId)
     {
@@ -97,109 +109,88 @@ class AssetsHistory extends BaseController
 
         try {
             $order = $db->table('order')->where('order_id', $orderId)->get()->getRow();
-            if (!$order) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => "الطلب برقم $orderId غير موجود."
-                ]);
-            }
+            if (!$order) return $this->response->setJSON(['success' => false, 'message' => "الطلب برقم $orderId غير موجود."]);
 
             $data = json_decode($this->request->getBody());
-            if (!$data) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'بيانات الطلب غير صحيحة.'
-                ]);
-            }
+            if (!$data) return $this->response->setJSON(['success' => false, 'message' => 'بيانات الطلب غير صحيحة.']);
 
             $usage_status_id = $data->usage_status_id ?? null;
             $note = $data->note ?? '';
+            if (empty($usage_status_id)) return $this->response->setJSON(['success' => false, 'message' => 'حالة الاستخدام غير محددة.']);
 
-            if (empty($usage_status_id)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'حالة الاستخدام غير محددة.'
-                ]);
+            // تحديث كل العناصر المرتبطة بالطلب
+            $items = $db->table('item_order')->where('order_id', $orderId)->get()->getResult();
+            foreach ($items as $item) {
+                $db->table('item_order')
+                    ->where('item_order_id', $item->item_order_id)
+                    ->update([
+                        'usage_status_id' => $usage_status_id,
+                        'note' => $note,
+                        'created_by' => $this->swapUserId($item->created_by),
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
             }
 
-            // تحديث item_order
-            $db->table('item_order')
-                ->where('order_id', $orderId)
-                ->update([
-                    'usage_status_id' => $usage_status_id,
-                    'note' => $note,
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-
-            // تحديث note في order الرئيسي
-            $db->table('order')
-                ->where('order_id', $orderId)
-                ->update([
-                    'note' => $note,
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'تمت إعادة الصرف وتحديث البيانات بنجاح.'
+            // تحديث الطلب الرئيسي
+            $db->table('order')->where('order_id', $orderId)->update([
+                'from_user_id' => $this->swapUserId($order->from_user_id),
+                'to_user_id' => $this->swapUserId($order->to_user_id),
+                'note' => $note,
+                'updated_at' => date('Y-m-d H:i:s')
             ]);
+
+            return $this->response->setJSON(['success' => true, 'message' => 'تمت إعادة الصرف وتحديث البيانات بنجاح مع تحويل المستخدمين.']);
 
         } catch (\Exception $e) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'خطأ: ' . $e->getMessage()
-            ]);
+            return $this->response->setJSON(['success' => false, 'message' => 'خطأ: ' . $e->getMessage()]);
         }
     }
 
-    /** إعادة صرف كل العهد المرتبطة بالطلب بدون تغيير المستخدمين */
+    /**
+     * إعادة صرف كل العهد المرتبطة بالطلب بدون تغيير المستخدمين
+     * مع التبديل التلقائي أيضاً
+     */
     public function reDistribute($orderId)
     {
         $db = \Config\Database::connect();
 
         try {
             $order = $db->table('order')->where('order_id', $orderId)->get()->getRow();
-            if (!$order) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => "الطلب برقم $orderId غير موجود."
-                ]);
-            }
+            if (!$order) return $this->response->setJSON(['success' => false, 'message' => "الطلب برقم $orderId غير موجود."]);
 
             $data = json_decode($this->request->getBody());
             $note = $data->note ?? '';
 
-            // تحديث جميع item_order المرتبطة بالطلب
-            $db->table('item_order')
-                ->where('order_id', $orderId)
-                ->update([
-                    'usage_status_id' => 4, // معاد صرفه
-                    'note' => $note,
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
+            $items = $db->table('item_order')->where('order_id', $orderId)->get()->getResult();
+            foreach ($items as $item) {
+                $db->table('item_order')
+                    ->where('item_order_id', $item->item_order_id)
+                    ->update([
+                        'usage_status_id' => 4,
+                        'note' => $note,
+                        'created_by' => $this->swapUserId($item->created_by),
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+            }
 
-            // تحديث note فقط في order الرئيسي
-            $db->table('order')
-                ->where('order_id', $orderId)
-                ->update([
-                    'note' => $note,
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'تمت إعادة الصرف وتحديث الملاحظات بنجاح.'
+            $db->table('order')->where('order_id', $orderId)->update([
+                'from_user_id' => $this->swapUserId($order->from_user_id),
+                'to_user_id' => $this->swapUserId($order->to_user_id),
+                'note' => $note,
+                'updated_at' => date('Y-m-d H:i:s')
             ]);
+
+            return $this->response->setJSON(['success' => true, 'message' => 'تمت إعادة الصرف وتحديث الملاحظات بنجاح مع تحويل المستخدمين.']);
 
         } catch (\Exception $e) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'حدث خطأ: ' . $e->getMessage()
-            ]);
+            return $this->response->setJSON(['success' => false, 'message' => 'حدث خطأ: ' . $e->getMessage()]);
         }
     }
 
-    /** إعادة صرف مجموعة محددة من العهد فقط */
+    /**
+     * إعادة صرف مجموعة محددة من العهد فقط
+     * مع تبديل المستخدمين تلقائياً
+     */
     public function reDistributeItems()
     {
         $data = json_decode($this->request->getBody());
@@ -207,81 +198,64 @@ class AssetsHistory extends BaseController
         $items = $data->items ?? [];
         $note = $data->note ?? null;
 
-        if (!$orderId || empty($items)) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'بيانات غير مكتملة'
-            ]);
-        }
+        if (!$orderId || empty($items)) return $this->response->setJSON(['success' => false, 'message' => 'بيانات غير مكتملة']);
 
         $db = \Config\Database::connect();
 
         foreach ($items as $itemId) {
+            $item = $db->table('item_order')->where('item_order_id', $itemId)->get()->getRow();
+            if (!$item) continue;
+
             $db->table('item_order')
                 ->where('item_order_id', $itemId)
                 ->update([
-                    'usage_status_id' => 4, // معاد صرفه
+                    'usage_status_id' => 4,
                     'note' => $note,
+                    'created_by' => $this->swapUserId($item->created_by),
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
         }
 
-        // تحديث note فقط في الطلب الرئيسي
-        $db->table('order')
-            ->where('order_id', $orderId)
-            ->update([
+        $order = $db->table('order')->where('order_id', $orderId)->get()->getRow();
+        if ($order) {
+            $db->table('order')->where('order_id', $orderId)->update([
+                'from_user_id' => $this->swapUserId($order->from_user_id),
+                'to_user_id' => $this->swapUserId($order->to_user_id),
                 'note' => $note,
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
+        }
 
-        return $this->response->setJSON([
-            'success' => true,
-            'message' => 'تمت إعادة صرف العهد المحددة بنجاح.'
-        ]);
+        return $this->response->setJSON(['success' => true, 'message' => 'تمت إعادة صرف العهد المحددة بنجاح مع تحويل المستخدمين.']);
     }
 
-    /** جلب العناصر حسب الطلب */
+    /**
+     * جلب العناصر حسب الطلب
+     */
     public function getItemsByOrder($orderId)
     {
         $db = \Config\Database::connect();
         $items = $db->table('item_order')->where('order_id', $orderId)->get()->getResultArray();
-
-        if ($items) {
-            return $this->response->setJSON([
-                'success' => true,
-                'items' => $items
-            ]);
-        } else {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'لا توجد عهد مرتبطة بهذا الطلب'
-            ]);
-        }
+        return $items
+            ? $this->response->setJSON(['success' => true, 'items' => $items])
+            : $this->response->setJSON(['success' => false, 'message' => 'لا توجد عهد مرتبطة بهذا الطلب']);
     }
 
-    /** تحديث حالة الطلب (قبول / رفض) */
+    /**
+     * تحديث حالة الطلب (قبول / رفض)
+     */
     public function updateOrderStatus($orderId)
     {
         $this->checkAuth();
 
         $data = json_decode($this->request->getBody());
-        if (!$data || !isset($data->status_id)) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'بيانات الحالة غير صحيحة'
-            ]);
-        }
+        if (!$data || !isset($data->status_id)) return $this->response->setJSON(['success' => false, 'message' => 'بيانات الحالة غير صحيحة']);
 
         $statusId = (int)$data->status_id;
 
         $db = \Config\Database::connect();
         $order = $db->table('order')->where('order_id', $orderId)->get()->getRow();
-        if (!$order) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => "الطلب برقم $orderId غير موجود"
-            ]);
-        }
+        if (!$order) return $this->response->setJSON(['success' => false, 'message' => "الطلب برقم $orderId غير موجود"]);
 
         $db->table('order')->where('order_id', $orderId)->update([
             'order_status_id' => $statusId,
@@ -294,11 +268,9 @@ class AssetsHistory extends BaseController
             default => 'قيد الانتظار'
         };
 
-        return $this->response->setJSON([
-            'success' => true,
-            'message' => "تم تغيير الحالة إلى $statusText"
-        ]);
+        return $this->response->setJSON(['success' => true, 'message' => "تم تغيير الحالة إلى $statusText"]);
     }
+
 
 
 

@@ -588,7 +588,6 @@
     </div>
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -607,6 +606,23 @@ document.addEventListener('DOMContentLoaded', function () {
             date: cells[5].textContent.trim(),
             text: row.innerText.toLowerCase()
         });
+    });
+
+    // ✅ إخفاء زر إعادة الصرف للطلبات غير المقبولة + باهت للطلبات المرفوضة
+    rowsData.forEach(item => {
+        const reissueBtn = item.rowElement.querySelector('.reissue-btn');
+        if(item.status !== 'مقبول'){
+            reissueBtn.style.display = 'none';
+        } else {
+            reissueBtn.style.display = '';
+        }
+
+        // 🟡 جعل الصف باهت إذا كان مرفوض
+        if(item.status === 'مرفوض'){
+            item.rowElement.style.opacity = '0.5';
+        } else {
+            item.rowElement.style.opacity = '1';
+        }
     });
 
     function parseDMY(d) { if (!d) return null; const p=d.split('/'); return new Date(p[2], p[1]-1, p[0]); }
@@ -655,8 +671,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     rejectBtn.dataset.id = orderId;
 
                     const row = document.querySelector(`tr[data-order-id='${orderId}']`);
-                    approveBtn.style.display = '';
-                    rejectBtn.style.display = '';
+                    const status = row.dataset.status;
+
+                    // إظهار أو إخفاء أزرار القبول والرفض حسب الحالة
+                    if(status === 'قيد الانتظار') {
+                        approveBtn.style.display = '';
+                        rejectBtn.style.display = '';
+                    } else {
+                        approveBtn.style.display = 'none';
+                        rejectBtn.style.display = 'none';
+                    }
                 })
                 .catch(() => detailsDiv.innerHTML = '<div class="text-danger text-center">حدث خطأ أثناء التحميل.</div>');
         });
@@ -670,9 +694,37 @@ document.addEventListener('DOMContentLoaded', function () {
         row.rowElement.dataset.status = newStatus.toLowerCase();
         row.status = newStatus.toLowerCase();
         row.text = row.rowElement.innerText.toLowerCase();
-        if(newStatus==='مقبول') statusCell.className = 'text-success fw-bold';
-        else if(newStatus==='مرفوض') statusCell.className = 'text-danger fw-bold';
-        else statusCell.className = 'text-secondary fw-bold';
+
+        statusCell.className = '';
+        if(newStatus==='مقبول') statusCell.classList.add('text-success','fw-bold');
+        else if(newStatus==='مرفوض') statusCell.classList.add('text-danger','fw-bold');
+        else statusCell.classList.add('text-secondary','fw-bold');
+
+        // إخفاء أو إظهار أزرار القبول والرفض بعد التحديث
+        const approveBtn = document.getElementById('approveBtn');
+        const rejectBtn = document.getElementById('rejectBtn');
+        if(newStatus.toLowerCase() === 'قيد الانتظار'){
+            approveBtn.style.display = '';
+            rejectBtn.style.display = '';
+        } else {
+            approveBtn.style.display = 'none';
+            rejectBtn.style.display = 'none';
+        }
+
+        // ✅ إظهار أو إخفاء زر إعادة الصرف حسب الحالة
+        const reissueBtn = row.rowElement.querySelector('.reissue-btn');
+        if(newStatus.toLowerCase() === 'مقبول'){
+            reissueBtn.style.display = '';
+        } else {
+            reissueBtn.style.display = 'none';
+        }
+
+        // 🟡 جعل الصف باهت إذا كان مرفوض
+        if(newStatus.toLowerCase() === 'مرفوض'){
+            row.rowElement.style.opacity = '0.5';
+        } else {
+            row.rowElement.style.opacity = '1';
+        }
     }
 
     function updateStatus(orderId, statusId, statusText) {
@@ -774,6 +826,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 </script>
+
 
 </body>
 </html>
