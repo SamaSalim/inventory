@@ -649,7 +649,7 @@ class OrderController extends BaseController
                     $this->orderModel->transRollback();
                     return $this->response->setJSON([
                         'success' => false,
-                        'message' => 'فشل في إنشاء سجل التحويل عبر النموذج.'
+                        'message' => 'فشل في إنشاء سجل التحويل للعنصر.'
                     ]);
                 }
             
@@ -807,7 +807,7 @@ class OrderController extends BaseController
 
                 $groupedItems[$itemKey]['quantity']++;
                 $groupedItems[$itemKey]['items'][] = [
-                    'id' => $item['item_order_id'], // ✅ التصحيح هنا
+                    'id' => $item['item_order_id'], 
                     'asset_num' => $item['asset_num'],
                     'serial_num' => $item['serial_num'],
                     'model_num' => $item['model_num'],
@@ -838,9 +838,7 @@ class OrderController extends BaseController
         }
     }
 
-    /**
-     * تحديث الطلب متعدد الأصناف
-     */
+  
     /**
      * تحديث الطلب متعدد الأصناف
      */
@@ -895,7 +893,7 @@ class OrderController extends BaseController
                 ]);
             }
 
-            // ✅ 1. جمع بيانات الأصناف المُرسلة وتخزينها
+            //  1. جمع بيانات الأصناف المُرسلة وتخزينها
             $items = [];
             $allPostData = $this->request->getPost();
 
@@ -1010,7 +1008,7 @@ class OrderController extends BaseController
                 // التحقق من التكرار في قاعدة البيانات (مع استثناء العنصر الحالي)
                 $assetQuery = $this->itemOrderModel->where('asset_num', $assetNum);
                 if ($existingItemId) {
-                    $assetQuery->where('item_order_id !=', $existingItemId); // ✅ استثناء ID العنصر نفسه
+                    $assetQuery->where('item_order_id !=', $existingItemId); //  استثناء ID العنصر نفسه
                 }
                 $existingAsset = $assetQuery->first();
 
