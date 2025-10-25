@@ -9,7 +9,36 @@
         <link rel="stylesheet" href="<?= base_url('public/assets/css/components/print_form_style.css') ?>">
 </head>
 <style>
-   
+    .header-field {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        justify-content: flex-end;
+    }
+    
+    .field-label {
+        white-space: nowrap;
+    }
+    
+    .field-value-text {
+        border-bottom: 1px solid #000;
+        padding: 2px 5px;
+        min-width: 200px;
+        text-align: center;
+    }
+    
+    .signature-fields {
+        text-align: right;
+    }
+    
+    .signature-value {
+        border-bottom: 1px solid #000;
+        display: inline-block;
+        min-width: 150px;
+        padding: 2px 5px;
+        text-align: center;
+        margin-right: 5px;
+    }
 </style>
 <body>
     <?= $this->include('layouts/header') ?>
@@ -145,11 +174,11 @@
                                 <div class="item-timestamps">
                                     <div class="detail-item">
                                         <div class="detail-label">تاريخ الإنشاء</div>
-                                        <div class="detail-value"><?= esc($item->created_at) ?></div>
+                                         <div class="detail-value"><?= date('Y-m-d', strtotime($item->updated_at)) ?></div>
                                     </div>
                                     <div class="detail-item">
                                         <div class="detail-label">آخر تحديث</div>
-                                        <div class="detail-value"><?= esc($item->updated_at) ?></div>
+                                         <div class="detail-value"><?= date('Y-m-d', strtotime($item->updated_at)) ?></div>
                                     </div>
                                 </div>
                             </div>
@@ -168,7 +197,7 @@
                         </svg>
                         <span>طباعة</span>
                     </button>
-                    <a href="<?= site_url('assetsHistory/superAssets') ?>" class="action-btn back-btn">
+                    <a href="<?= site_url('inventoryController/') ?>" class="action-btn back-btn">
 
                         <span>العودة</span>
                         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -202,39 +231,17 @@
                     <div style="width:60px;"></div> <!-- Spacer for balance -->
                 </div>
                 
+
+                
                 <!-- Header fields row 1 -->
                 <div class="header-fields">
                     <div class="header-field">
-                        <span class="field-label">الوزارة:</span>
-                        <div class="field-line"></div>
-                    </div>
-                    <div class="header-field">
-                        <span class="field-label">المستودع:</span>
-                        <div class="field-line"></div>
-                    </div>
-                </div>
-                
-                <!-- Header fields row 2 -->
-                <div class="header-fields">
-                    <div class="header-field">
-                        <span class="field-label">إدارة المستودعات:</span>
-                        <div class="field-line"></div>
-                    </div>
-                    <div class="header-field">
-                        <span class="field-label">الرقم الخاص:</span>
-                        <div class="field-line"></div>
-                    </div>
-                </div>
-                
-                <!-- Header fields row 3 -->
-                <div class="header-fields">
-                    <div class="header-field">
                         <span class="field-label">الجهة الطالبة:</span>
-                        <div class="field-line"></div>
+                        <div class="field-value-text">ادارة العهد</div>
                     </div>
                     <div class="header-field">
                         <span class="field-label">التاريخ:</span>
-                        <div class="field-line"></div>
+                        <div class="field-value-text"><?= date('Y-m-d', strtotime($order->created_at)) ?></div>
                     </div>
                 </div>
                 
@@ -245,13 +252,11 @@
         <tr>
             <th>رقم الطلب</th>
             <th>رقم الصنف</th>
+            <th>الرقم التسلسلي</th>
             <th>اسم الصنف وتصنيفه</th>
+            <th>الموديل</th>
+            <th>الماركة</th>
             <th>نوع الصنف</th>
-            <th>الوحدة</th>
-            <th>الكمية المطلوبة</th>
-            <th>الكمية المصروفة</th>
-            <th>سعر الوحدة</th>
-            <th>القيمة الكلية</th>
             <th>ملاحظات</th>
         </tr>
     </thead>
@@ -265,38 +270,27 @@
                     <!-- Asset Number -->
                     <td><?= esc($item->asset_num) ?></td>
 
+                    <!-- Serial Number -->
+                    <td><?= esc($item->serial_num) ?></td>
+
                     <!-- Item Name + Categories -->
                     <td>
                         <?= esc($item->item_name) ?>
-                        <?php if (!empty($item->model_num)): ?>
-                            <br><small>موديل: <?= esc($item->model_num) ?></small>
-                        <?php endif; ?>
-                        <?php if (!empty($item->brand)): ?>
-                            <br><small>ماركة: <?= esc($item->brand) ?></small>
-                        <?php endif; ?>
                         <?php if (!empty($item->minor_category_name) || !empty($item->major_category_name)): ?>
                             <br><small><?= esc($item->minor_category_name) ?> / <?= esc($item->major_category_name) ?></small>
                         <?php endif; ?>
                     </td>
 
+                    <!-- Model -->
+                    <td><?= esc($item->model_num) ?></td>
+
+                    <!-- Brand -->
+                    <td><?= esc($item->brand) ?></td>
+
                     <!-- Asset Type -->
                     <td><?= esc($item->assets_type) ?></td>
 
-                    <!-- Unit -->
-                    <td></td>
-
-                    <!-- Quantity Requested -->
-                    <td><?= esc($item->quantity) ?></td>
-
-                    <!-- Quantity Issued -->
-                    <td></td>
-
-                    <!-- Unit Price -->
-                    <td></td>
-
-                    <!-- Total Price -->
-                    <td></td>
-
+                    <!-- Notes -->
                     <td><?= esc($item->note) ?></td>
                 </tr>
             <?php endforeach; ?>
@@ -306,7 +300,6 @@
                 <tr class="empty-row">
                     <td></td><td></td><td></td><td></td>
                     <td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td>
                 </tr>
             <?php endfor; ?>
         <?php endif; ?>
@@ -319,30 +312,14 @@
             <div class="signature-section">
                 <table class="signature-table">
                     <tr>
-                         <td>
-                            <div class="signature-title-cell">رئيس الجهة الطالبة</div>
-                            <div class="signature-fields">
-                                الاسم: <span class="signature-line"></span><br>
-                                التاريخ: <span class="signature-line"></span>
-                            </div>
-                        </td>
-
-
                         <td>
-                            <div class="signature-title-cell">إدارة المستودعات</div>
-                            <div class="signature-fields">
-                                الاسم: <span class="signature-line"></span><br>
-                                التاريخ: <span class="signature-line"></span>
-                            </div>
-                        </td>
-                                                <td>
                             <div class="signature-title-cell">أمين المستودع</div>
                             <div class="signature-fields">
-                                الاسم: <span class="signature-line"></span><br>
-                                التاريخ: <span class="signature-line"></span>
+                                الاسم: <span class="signature-value"><?= esc($order->from_name) ?></span><br>
+                                التاريخ: <span class="signature-value"><?= date('Y-m-d', strtotime($order->created_at)) ?></span>
                             </div>
                         </td>
-                                               <td>
+                        <td>
                             <div class="signature-title-cell">المستلم</div>
                             <div class="signature-fields">
                                 الاسم: <span class="signature-line"></span><br>
@@ -352,24 +329,13 @@
                     </tr>
                 </table>
             </div>
-        <div class="header-fields">
-            <div class="header-field" style="border-left:none;">
-                <span class="field-label">صاحب الصلاحية:</span>
-                <div class="field-line"></div>
-            </div>
-        </div>
-        <div class="header-fields">
-            <div class="header-field" style="border-left:none;">
-                <span class="field-label">التوقيع:</span>
-                <div class="field-line"></div>
-            </div>
-        </div>
+
 
 
             <!-- Footer -->
             <div class="form-footer">
                 <div class="footer-warning">
-                    تنبيه مهم: يرجى مراجعة جميع البنود بدقة والتأكد من صحة البيانات قبل التوقيع والاستلام
+                    تنبيه مهم: يرجى مراجعة جميع البنود بدقة والتأكد من صحة البيانات قبل الاستلام
                 </div>
                 <div class="footer-note">
                     هذا المستند رسمي ويجب الاحتفاظ به للمراجعة والتدقيق
