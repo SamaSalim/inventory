@@ -277,7 +277,7 @@
                         <td style="width: 20%; vertical-align: top; padding: 10px;">
                             <div style="font-weight: bold; text-align: center; margin-bottom: 15px; border-bottom: 2px solid #333; padding-bottom: 8px;">المسلم</div>
                             <div style="line-height: 2;">
-                                الاسم: ..................................<br>
+                                الاسم: <?= esc($transfer->from_name) ?><br>
                                 التوقيع: ..................................<br>
                                 الرقم الوظيفي: ..................................
                             </div>
@@ -285,7 +285,7 @@
                         <td style="width: 20%; vertical-align: top; padding: 10px;">
                             <div style="font-weight: bold; text-align: center; margin-bottom: 15px; border-bottom: 2px solid #333; padding-bottom: 8px;">المستلم</div>
                             <div style="line-height: 2;">
-                                الاسم: ..................................<br>
+                                الاسم: <?= esc($transfer->to_name) ?><br>
                                 التوقيع: ..................................<br>
                                 الرقم الوظيفي: ..................................
                             </div>
