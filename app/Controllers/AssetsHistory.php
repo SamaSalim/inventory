@@ -429,9 +429,12 @@ public function assetCycle($assetNum = null): string
 
     $itemOrderModel = new ItemOrderModel();
     $transferItemsModel = new TransferItemsModel();
+    $employeeModel = new \App\Models\EmployeeModel();
+
 
     $assetInfo = $itemOrderModel
-        ->select('item_order.item_order_id, item_order.asset_num, item_order.created_at,
+        ->select('item_order.item_order_id, item_order.asset_num, item_order.created_at, 
+                  item_order.created_by, item_order.updated_at,
                   item_order.usage_status_id, items.name as item_name, usage_status.usage_status as status_name')
         ->join('items', 'items.id = item_order.item_id', 'left')
         ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
@@ -442,6 +445,7 @@ public function assetCycle($assetNum = null): string
         return redirect()->back()->with('error', 'الأصل غير موجود');
     }
 
+ 
     $transfers = $transferItemsModel
         ->select('transfer_items.*, from_user.name as from_user_name, from_user.user_dept as from_user_dept,
                   from_user.user_ext as from_user_ext, to_user.name as to_user_name, to_user.user_dept as to_user_dept,
@@ -454,7 +458,7 @@ public function assetCycle($assetNum = null): string
         ->findAll();
 
     $timeline = [];
-
+    
     foreach ($transfers as $t) {
         $timeline[] = [
             'type' => 'transfer',
@@ -473,14 +477,9 @@ public function assetCycle($assetNum = null): string
         ];
     }
 
+    
     if ($assetInfo->usage_status_id == 2) {
-        $db = \Config\Database::connect();
         
-        $returnInfo = $db->table('returned_items')
-            ->select('returned_items.*')
-            ->where('returned_items.item_order_id', $assetInfo->item_order_id)
-            ->get()->getRow();
-
         $lastTransfer = $transferItemsModel
             ->select('transfer_items.*, users.name as user_name, users.user_dept, users.user_ext')
             ->join('users', 'users.user_id = transfer_items.to_user_id', 'left')
@@ -488,30 +487,29 @@ public function assetCycle($assetNum = null): string
             ->orderBy('transfer_items.created_at', 'DESC')
             ->first();
 
+        
         if (!$lastTransfer) {
-            $creatorInfo = $db->table('item_order')
-                ->select('item_order.created_by, employee.name as user_name, 
-                         employee.emp_dept as user_dept, employee.emp_ext as user_ext')
-                ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
-                ->where('item_order.item_order_id', $assetInfo->item_order_id)
-                ->get()->getRow();
+            $creatorInfo = $employeeModel
+                ->where('emp_id', $assetInfo->created_by)
+                ->first();
 
             $timeline[] = [
                 'type' => 'returned',
-                'date' => $returnInfo ? $returnInfo->return_date : $assetInfo->updated_at,
-                'status_date' => $returnInfo ? $returnInfo->return_date : $assetInfo->updated_at,
-                'note' => $returnInfo ? $returnInfo->notes : 'تم إرجاع الأصل إلى المستودع',
-                'returned_by_name' => $creatorInfo->user_name ?? 'غير محدد',
-                'returned_by_dept' => $creatorInfo->user_dept ?? 'غير محدد',
-                'returned_by_ext' => $creatorInfo->user_ext ?? '-',
+                'date' => $assetInfo->updated_at,
+                'status_date' => $assetInfo->updated_at,
+                'note' => 'تم إرجاع الأصل إلى المستودع',
+                'returned_by_name' => $creatorInfo ? $creatorInfo->name : 'غير محدد',
+                'returned_by_dept' => $creatorInfo ? $creatorInfo->emp_dept : 'غير محدد',
+                'returned_by_ext' => $creatorInfo ? $creatorInfo->emp_ext : '-',
                 'status' => 'تم الإرجاع'
             ];
         } else {
+            
             $timeline[] = [
                 'type' => 'returned',
-                'date' => $returnInfo ? $returnInfo->return_date : $assetInfo->updated_at,
-                'status_date' => $returnInfo ? $returnInfo->return_date : $assetInfo->updated_at,
-                'note' => $returnInfo ? $returnInfo->notes : 'تم إرجاع الأصل إلى المستودع',
+                'date' => $assetInfo->updated_at,
+                'status_date' => $assetInfo->updated_at,
+                'note' => 'تم إرجاع الأصل إلى المستودع',
                 'returned_by_name' => $lastTransfer->user_name ?? 'غير محدد',
                 'returned_by_dept' => $lastTransfer->user_dept ?? 'غير محدد',
                 'returned_by_ext' => $lastTransfer->user_ext ?? '-',
@@ -526,13 +524,11 @@ public function assetCycle($assetNum = null): string
         'total_operations' => count($timeline)
     ]);
 }
-    /**
-     * (اختياري لاحقاً) عرض تفاصيل العملية الواحدة
-     */
+
     public function viewDetails($id)
     {
         $this->checkAuth();
-        // يمكنك تطوير التفاصيل لاحقاً
+       
     }
 
 

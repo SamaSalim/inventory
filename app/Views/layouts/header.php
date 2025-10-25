@@ -576,6 +576,12 @@
             <i class="fa-solid fa-id-card"></i> <span> طلبات العهد</span>
         </a>
     <?php endif; ?>
+    <?php if ($role === 'assets' || $role === 'user' || $role === 'super_assets'): ?>
+        <a href="<?= base_url('AssetsHistory/assetsHistory') ?>"
+            class="<?= (service('uri')->getSegment(1) == 'AssetsHistory' && service('uri')->getSegment(2) == 'assetsHistory') ? 'active' : '' ?>">
+            <i class="fa-solid fa-file-lines"></i> <span>سجلات العهد</span>
+        </a>
+    <?php endif; ?>
 
     <?php if ($role === 'admin'): ?>
         <a href="<?= base_url('AdminController/dashboard') ?>"
