@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سجلات التحويل والإرجاع </title>
+    <title>سجلات  تتبع العهد </title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -124,7 +124,7 @@
 
     <div class="main-content">
         <div class="header">
-            <h1 class="page-title">سجلات التحويل والإرجاع</h1>
+            <h1 class="page-title">سجلات تتبع العهد </h1>
             <div class="user-info" onclick="location.href='<?= base_url('UserInfo/getUserInfo') ?>'">
                 <div class="user-avatar">
                     <?php
@@ -237,7 +237,7 @@
                         <div class="filter-group">
                             <label class="filter-label">
                                 <i class="fas fa-box"></i>
-                                اسم الطلب
+                                اسم الصنف
                             </label>
                             <input type="text" class="filter-input" name="item_name"
                                    value="<?= esc($filters['item_name'] ?? '') ?>" 

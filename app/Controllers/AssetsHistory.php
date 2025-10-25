@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\ItemOrderModel;
 use App\Models\MinorCategoryModel;
 use App\Models\UsageStatusModel;
+use App\Models\TransferItemsModel;  
 use App\Exceptions\AuthenticationException;
 
 class AssetsHistory extends BaseController

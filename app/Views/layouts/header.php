@@ -558,6 +558,13 @@
         </a>
     <?php endif; ?>
 
+   <?php if ($role === 'super_assets'): ?>
+        <a href="<?= base_url('AssetsHistory/superAssets') ?>"
+            class="<?= (service('uri')->getSegment(1) == 'AssetsHistory' && service('uri')->getSegment(2) == 'superAssets') ? 'active' : '' ?>">
+            <i class="fa-solid fa-diagram-project"></i> <span>تتبع العهد</span>
+        </a>
+    <?php endif; ?>
+
     <?php if ($role === 'admin' || $role === 'assets' || $role === 'user' || $role === 'super_warehouse'  || $role === 'super_assets' || $role === 'warehouse'): ?>
         <a href="<?= base_url('UserController/userView2') ?>"
             class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'userView2') ? 'active' : '' ?>">
