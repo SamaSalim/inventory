@@ -11,7 +11,7 @@ use App\Exceptions\AuthenticationException;
 
 class AssetsHistory extends BaseController
 {
-    /**
+    /**s
      * دالة خاصة للتحقق من تسجيل الدخول
      */
     private function checkAuth()
@@ -411,6 +411,7 @@ class AssetsHistory extends BaseController
             'filters' => $filters,
             'pager' => $pager,
         ]);
+        
     }
 
 
@@ -532,5 +533,181 @@ public function assetCycle($assetNum = null): string
     {
         $this->checkAuth();
         // يمكنك تطوير التفاصيل لاحقاً
+    }
+
+
+public function assetsHistory(): string
+    {
+        $this->checkAuth();
+
+        $itemOrderModel = new ItemOrderModel();
+        $transferItemsModel = new TransferItemsModel();
+
+        $filters = [
+            'search' => $this->request->getGet('search'),
+            'asset_number' => $this->request->getGet('asset_number'),
+            'item_name' => $this->request->getGet('item_name'),
+            'operation_type' => $this->request->getGet('operation_type'),
+            'date_from' => $this->request->getGet('date_from'),
+            'date_to' => $this->request->getGet('date_to'),
+        ];
+
+        // العهد الجديدة (مباشرة)
+        $newItemsQuery = $itemOrderModel
+            ->select('item_order.asset_num as asset_number, items.name as item_name,
+                      item_order.created_at as last_operation_date, item_order.item_order_id as id')
+            ->join('items', 'items.id = item_order.item_id', 'left')
+            ->where('item_order.usage_status_id', 1);
+
+        if (!empty($filters['asset_number'])) {
+            $newItemsQuery->like('item_order.asset_num', $filters['asset_number']);
+        }
+        if (!empty($filters['item_name'])) {
+            $newItemsQuery->like('items.name', $filters['item_name']);
+        }
+        if (!empty($filters['date_from'])) {
+            $newItemsQuery->where('item_order.created_at >=', $filters['date_from'] . ' 00:00:00');
+        }
+        if (!empty($filters['date_to'])) {
+            $newItemsQuery->where('item_order.created_at <=', $filters['date_to'] . ' 23:59:59');
+        }
+        if (!empty($filters['search'])) {
+            $newItemsQuery->groupStart()
+                ->like('item_order.asset_num', $filters['search'])
+                ->orLike('items.name', $filters['search'])
+                ->groupEnd();
+        }
+
+        $newItems = $newItemsQuery->orderBy('item_order.created_at', 'DESC')->findAll();
+
+        // التحويلات
+        $transfersQuery = $transferItemsModel
+            ->select('item_order.asset_num as asset_number, items.name as item_name,
+                      transfer_items.created_at as last_operation_date, item_order.item_order_id as id')
+            ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+            ->join('items', 'items.id = item_order.item_id', 'left');
+
+        if (!empty($filters['asset_number'])) {
+            $transfersQuery->like('item_order.asset_num', $filters['asset_number']);
+        }
+        if (!empty($filters['item_name'])) {
+            $transfersQuery->like('items.name', $filters['item_name']);
+        }
+        if (!empty($filters['date_from'])) {
+            $transfersQuery->where('transfer_items.created_at >=', $filters['date_from'] . ' 00:00:00');
+        }
+        if (!empty($filters['date_to'])) {
+            $transfersQuery->where('transfer_items.created_at <=', $filters['date_to'] . ' 23:59:59');
+        }
+        if (!empty($filters['search'])) {
+            $transfersQuery->groupStart()
+                ->like('item_order.asset_num', $filters['search'])
+                ->orLike('items.name', $filters['search'])
+                ->groupEnd();
+        }
+
+        $transfers = $transfersQuery->orderBy('transfer_items.created_at', 'DESC')->findAll();
+
+        // الإرجاعات
+        $returnsQuery = $itemOrderModel
+            ->select('item_order.asset_num as asset_number, items.name as item_name,
+                      item_order.updated_at as last_operation_date, item_order.item_order_id as id')
+            ->join('items', 'items.id = item_order.item_id', 'left')
+            ->where('item_order.usage_status_id', 2);
+
+        if (!empty($filters['asset_number'])) {
+            $returnsQuery->like('item_order.asset_num', $filters['asset_number']);
+        }
+        if (!empty($filters['item_name'])) {
+            $returnsQuery->like('items.name', $filters['item_name']);
+        }
+        if (!empty($filters['date_from'])) {
+            $returnsQuery->where('item_order.updated_at >=', $filters['date_from'] . ' 00:00:00');
+        }
+        if (!empty($filters['date_to'])) {
+            $returnsQuery->where('item_order.updated_at <=', $filters['date_to'] . ' 23:59:59');
+        }
+        if (!empty($filters['search'])) {
+            $returnsQuery->groupStart()
+                ->like('item_order.asset_num', $filters['search'])
+                ->orLike('items.name', $filters['search'])
+                ->groupEnd();
+        }
+
+        $returns = $returnsQuery->orderBy('item_order.updated_at', 'DESC')->findAll();
+
+        $operations = [];
+        $uniqueAssets = [];
+
+        // إضافة العهد الجديدة
+        if (empty($filters['operation_type']) || $filters['operation_type'] == 'new') {
+            foreach ($newItems as $n) {
+                if (!isset($uniqueAssets[$n->asset_number])) {
+                    $operations[] = (object)[
+                        'id' => $n->id,
+                        'asset_number' => $n->asset_number,
+                        'item_name' => $n->item_name,
+                        'operation_type' => 'new',
+                        'last_operation_date' => $n->last_operation_date,
+                    ];
+                    $uniqueAssets[$n->asset_number] = true;
+                }
+            }
+        }
+
+        if (empty($filters['operation_type']) || $filters['operation_type'] == 'transfer') {
+            foreach ($transfers as $t) {
+                if (!isset($uniqueAssets[$t->asset_number])) {
+                    $operations[] = (object)[
+                        'id' => $t->id,
+                        'asset_number' => $t->asset_number,
+                        'item_name' => $t->item_name,
+                        'operation_type' => 'transfer',
+                        'last_operation_date' => $t->last_operation_date,
+                    ];
+                    $uniqueAssets[$t->asset_number] = true;
+                }
+            }
+        }
+
+        if (empty($filters['operation_type']) || $filters['operation_type'] == 'return') {
+            foreach ($returns as $r) {
+                if (!isset($uniqueAssets[$r->asset_number])) {
+                    $operations[] = (object)[
+                        'id' => $r->id,
+                        'asset_number' => $r->asset_number,
+                        'item_name' => $r->item_name,
+                        'operation_type' => 'return',
+                        'last_operation_date' => $r->last_operation_date,
+                    ];
+                    $uniqueAssets[$r->asset_number] = true;
+                }
+            }
+        }
+
+        // ترتيب حسب التاريخ
+        usort($operations, fn($a, $b) => strtotime($b->last_operation_date) - strtotime($a->last_operation_date));
+
+        $perPage = 20;
+        $page = $this->request->getGet('page') ?? 1;
+        $offset = ($page - 1) * $perPage;
+        $paginatedOperations = array_slice($operations, $offset, $perPage);
+
+        $pager = \Config\Services::pager();
+        $pager->store('operations', $page, $perPage, count($operations));
+
+        return view('assets/assets_history', [
+            'operations' => $paginatedOperations,
+            'stats' => [
+                'total_new' => count($newItems),
+                'total_transfers' => count($transfers),
+                'total_returns' => count($returns),
+                'total_operations' => count($operations),
+                'total_assets' => count($uniqueAssets),
+            ],
+            'filters' => $filters,
+            'pager' => $pager,
+        ]);
+        
     }
 }
