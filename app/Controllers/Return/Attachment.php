@@ -4,6 +4,8 @@ namespace App\Controllers\Return;
 
 use App\Controllers\BaseController;
 use App\Models\ItemOrderModel;
+use App\Models\EmployeeModel;
+use App\Models\UserModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 
 class Attachment extends BaseController
@@ -98,7 +100,7 @@ class Attachment extends BaseController
             }
         }
 
-        // ✅ Collect all successfully returned item order IDs for ONE email
+        // Collect all successfully returned item order IDs for ONE email
         $returnedItemOrderIds = [];
         $allItemsNotes = '';
 
@@ -127,7 +129,8 @@ class Attachment extends BaseController
                         $assetNum,
                         $itemData[$assetNum] ?? [],
                         $itemComment,
-                        $itItems
+                        $itItems,
+                        $createdBy
                     );
                     
                     if ($formPath) {
@@ -201,10 +204,8 @@ class Attachment extends BaseController
 
             if ($updated) {
                 $successCount++;
-                // ✅ Collect the item order ID for the consolidated email
                 $returnedItemOrderIds[] = $originalItem->item_order_id;
                 
-                // Collect notes if any
                 if (!empty($itemComment)) {
                     $allItemsNotes .= "أصل {$assetNum}: {$itemComment}\n";
                 }
@@ -222,18 +223,17 @@ class Attachment extends BaseController
             ]);
         }
 
-        // ✅ Send ONE email with all returned items
+        // Send ONE email with all returned items
         if (!empty($returnedItemOrderIds)) {
             try {
                 $emailController = new \App\Controllers\Return\Email();
                 $emailController->sendReturnNotification(
-                    $returnedItemOrderIds,  // Array of all item order IDs
-                    trim($allItemsNotes),   // Combined notes
-                    null                    // Attachments handled per item
+                    $returnedItemOrderIds,
+                    trim($allItemsNotes),
+                    null
                 );
             } catch (\Exception $e) {
                 log_message('error', "Failed to send consolidated email: " . $e->getMessage());
-                // Don't fail the entire operation if email fails
             }
         }
 
@@ -250,11 +250,11 @@ class Attachment extends BaseController
         ]);
     }
 
-    public function generateReturnForm($assetNum, $itemData, $notes, $allItems = [])
+    public function generateReturnForm($assetNum, $itemData, $notes, $allItems = [], $createdBy = null)
     {
         $uploadPath = WRITEPATH . 'uploads/return_attachments';
         
-        $html = $this->buildFormHTML($assetNum, $itemData, $notes, $allItems);
+        $html = $this->buildFormHTML($assetNum, $itemData, $notes, $allItems, $createdBy);
         
         $filename = 'form_' . $assetNum . '_' . time() . '.html';
         $fullPath = $uploadPath . '/' . $filename;
@@ -266,7 +266,37 @@ class Attachment extends BaseController
         return $fullPath;
     }
 
-    private function buildFormHTML($assetNum, $itemData, $notes, $allItems = [])
+    private function getCreatorName($createdBy = null)
+    {
+        // If no createdBy provided, get from session
+        if (empty($createdBy)) {
+            $createdBy = session()->get('employee_id') ?? session()->get('user_id');
+        }
+        
+        if (empty($createdBy)) {
+            return 'غير معروف';
+        }
+
+        // Check if it's an employee (starts with number like '1002')
+        $employeeModel = new EmployeeModel();
+        $employee = $employeeModel->where('emp_id', $createdBy)->first();
+        
+        if ($employee) {
+            return $employee->name ?? $employee['name'];
+        }
+
+        // Otherwise check users table (like 'U101', 'U102')
+        $userModel = new UserModel();
+        $user = $userModel->where('user_id', $createdBy)->first();
+        
+        if ($user) {
+            return $user->name ?? $user['name'];
+        }
+
+        return 'غير معروف';
+    }
+
+    private function buildFormHTML($assetNum, $itemData, $notes, $allItems = [], $createdBy = null)
     {
         $currentDate = date('Y-m-d');
         $currentTime = date('H:i:s');
@@ -274,17 +304,13 @@ class Attachment extends BaseController
         $logoUrl = $baseUrl . 'public/assets/images/Kamc Logo Guideline-04.png';
         $cssUrl = $baseUrl . 'public/assets/css/components/print_form_style.css';
         
-        // Get employee info who created the return
-        $createdBy = session()->get('employee_id') ?? session()->get('user_id');
-        $employeeName = '';
-        
-        if ($createdBy) {
-            $employeeModel = new \App\Models\EmployeeModel();
-            $employee = $employeeModel->where('emp_id', $createdBy)->first();
-            if ($employee) {
-                $employeeName = $employee->name;
-            }
+        // Get the name from session if createdBy not provided
+        if (empty($createdBy)) {
+            $createdBy = session()->get('employee_id') ?? session()->get('user_id');
         }
+        
+        // Get the name of person who created the return
+        $employeeName = $this->getCreatorName($createdBy);
         
         // Build table rows dynamically
         $tableRows = '';
@@ -489,6 +515,7 @@ HTML;
         $assetNum = $this->request->getPost('asset_num');
         $itemData = $this->request->getPost('item_data');
         $allItems = $this->request->getPost('all_items');
+        $createdBy = $this->request->getPost('created_by');
         
         if (empty($assetNum) || empty($itemData)) {
             return $this->response
@@ -500,7 +527,7 @@ HTML;
         }
         
         try {
-            $html = $this->buildFormHTML($assetNum, $itemData, '', $allItems ?? []);
+            $html = $this->buildFormHTML($assetNum, $itemData, '', $allItems ?? [], $createdBy);
             
             return $this->response
                 ->setContentType('application/json')

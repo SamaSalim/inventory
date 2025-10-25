@@ -387,9 +387,7 @@ public function markAsOpened()
 }
 
 
-/**
- * عرض العهد الخاصة بالمستخدم الحالي (من order + transfer_items)
- */
+
 public function userView2(): string
 {
     $this->checkAuth();
@@ -417,11 +415,10 @@ public function userView2(): string
         return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
     }
 
-    //  1. جلب العهد من جدول transfer_items
+    // 1. جلب العهد من جدول transfer_items - WITH ALL REQUIRED FIELDS
     $transferItemsModel = new \App\Models\TransferItemsModel();
 
     $transferItems = $transferItemsModel
-        ->distinct()
         ->select(
             'transfer_items.transfer_item_id AS id,
              transfer_items.created_at,
@@ -429,6 +426,14 @@ public function userView2(): string
              transfer_items.is_opened, 
              item_order.asset_num,
              item_order.serial_num,
+             item_order.model_num AS model,
+             item_order.brand,
+             item_order.old_asset_num,
+             item_order.assets_type,
+             item_order.usage_status_id,
+             items.name AS item_name,
+             minor_category.name AS minor_category_name,
+             major_category.name AS major_category_name,
              from_user.name AS from_user_name,
              from_user.user_dept AS from_user_dept,
              usage_status.usage_status AS usage_status_name,
@@ -436,46 +441,75 @@ public function userView2(): string
              "transfer_items" AS source_table'
         )
         ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+        ->join('items', 'items.id = item_order.item_id', 'left')
+        ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
         ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
         ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
         ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
         ->where('transfer_items.to_user_id', $currentUserId)
-        ->where('item_order.usage_status_id !=', 2)
+        ->where('transfer_items.order_status_id', 2) // قيد الانتظار أو مقبول
+        ->groupBy('transfer_items.transfer_item_id') // تجنب التكرار
         ->orderBy('transfer_items.created_at', 'DESC')
         ->findAll();
 
-    //  2. جلب العهد من جدول order
+    // 2. جلب العهد من جدول order - WITH ALL REQUIRED FIELDS
     $orderModel = new \App\Models\OrderModel();
 
     $orders = $orderModel
-        ->distinct()
         ->select(
             'order.order_id AS id,
              order.created_at,
              order.to_user_id,
+             order.order_status_id,
              order_status.status AS order_status_name,
              usage_status.usage_status AS usage_status_name,
              from_user.name AS from_user_name,
              from_user.user_dept AS from_user_dept,
              item_order.asset_num,
              item_order.serial_num,
+             item_order.model_num AS model,
+             item_order.brand,
+             item_order.old_asset_num,
+             item_order.assets_type,
+             item_order.item_order_id,
+             item_order.usage_status_id,
+             items.name AS item_name,
+             minor_category.name AS minor_category_name,
+             major_category.name AS major_category_name,
              "orders" AS source_table'
         )
         ->join('item_order', 'item_order.order_id = order.order_id', 'left')
-        ->join('users AS from_user', 'from_user.user_id = order.from_user_id', 'left') // JOIN مع users
+        ->join('items', 'items.id = item_order.item_id', 'left')
+        ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+        ->join('users AS from_user', 'from_user.user_id = order.from_user_id', 'left')
         ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
         ->join('order_status', 'order_status.id = order.order_status_id', 'left')
         ->where('order.to_user_id', $currentUserId)
-        ->where('item_order.usage_status_id !=', 2)
+        ->where('order.order_status_id', 2) // مقبول فقط
+        ->groupBy('item_order.item_order_id') // تجنب التكرار
         ->orderBy('order.created_at', 'DESC')
         ->findAll();
 
-    //  3. دمج النتائج
+    // 3. دمج النتائج وفلترة العناصر المرجعة
     $allOrders = array_merge($orders, $transferItems);
+    
+    // 4. فلترة العناصر المرجعة (usage_status_id = 2) بعد الجلب
+    $filteredOrders = array_filter($allOrders, function($item) {
+        return isset($item->usage_status_id) && $item->usage_status_id != 2;
+    });
+    
+    // 5. إعادة فهرسة المصفوفة بعد الفلترة
+    $filteredOrders = array_values($filteredOrders);
 
-    //  4. تمرير البيانات للواجهة
+    // تسجيل للتتبع
+    log_message('info', 'UserView2 - Total items before filter: ' . count($allOrders));
+    log_message('info', 'UserView2 - Total items after filter: ' . count($filteredOrders));
+
+    // 6. تمرير البيانات للواجهة
     return view('user/userView2', [
-        'orders' => $allOrders
+        'orders' => $filteredOrders
     ]);
 }
 
