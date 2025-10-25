@@ -253,12 +253,7 @@
         </div>
 
         <div class="content-area">
-            <div class="mb-3 d-flex justify-content-center gap-2">
-                <button type="button" class="custom-btn" onclick="filterTable('تحويل')">عمليات التحويل</button>
-                <button type="button" class="custom-btn" onclick="filterTable('رجيع')">عمليات الإرجاع</button>
-                <button type="button" class="custom-btn" onclick="filterTable('جديد')">العهد الجديدة</button>
-                <button type="button" class="custom-btn active" onclick="filterTable('all')">عرض الكل</button>
-            </div>
+           
 
             <div class="row mb-3">
                 <div class="col-md-3">
