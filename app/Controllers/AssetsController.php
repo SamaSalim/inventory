@@ -269,6 +269,174 @@ class AssetsController extends BaseController
     }
 
 
+// اكواد تحويل العهدة
+// public function transferView($orderId)
+// {
+//     if (!session()->get('isLoggedIn')) {
+//         throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
+//     }
+
+//     $itemOrderModel = new \App\Models\ItemOrderModel();
+//     $itemModel = new \App\Models\ItemModel();
+//     $minorCatModel = new \App\Models\MinorCategoryModel();
+//     $majorCatModel = new \App\Models\MajorCategoryModel();
+//     $usageStatusModel = new \App\Models\UsageStatusModel();
+//     $userModel = new \App\Models\UserModel();
+//     $orderModel = new \App\Models\OrderModel(); // إضافة OrderModel
+    
+//     // جلب بيانات العهدة
+//     $order = $orderModel->find($orderId);
+    
+//     if (!$order) {
+//         throw new \Exception('العهدة غير موجودة');
+//     }
+
+//     // جلب الأصول المرتبطة بالطلب والتي ليست مرجعة
+//     $items = $itemOrderModel
+//         ->where('order_id', $orderId)
+//         ->where('usage_status_id !=', 2) // ليست مرجعة
+//         ->findAll();
+
+//     foreach ($items as $item) {
+//         $itemData = $itemModel->find($item->item_id);
+//         $minor = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
+//         $major = $minor ? $majorCatModel->find($minor->major_category_id) : null;
+
+        
+//         $item->item_name = $itemData->name ?? 'غير معروف';
+//         $item->minor_category_name = $minor->name ?? 'غير معروف';
+//         $item->major_category_name = $major->name ?? 'غير معروف';
+//         $item->usage_status_name = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
+//     }
+
+//     // جلب جميع المستخدمين
+//     $users = $userModel->findAll();
+
+//     return view('assets/transfer_order', [
+//         'items' => $items,
+//         'users' => $users,
+//         'order_id' => $orderId,
+//         'order' => $order // إضافة بيانات العهدة
+//     ]);
+// }
+
+/**
+ * معالجة طلب التحويل
+ */
+// public function processTransfer()
+// {
+//     if (!session()->get('isLoggedIn')) {
+//         return $this->response->setJSON([
+//             'success' => false,
+//             'message' => 'يجب تسجيل الدخول أولاً'
+//         ]);
+//     }
+
+//     $json = $this->request->getJSON();
+    
+//     if (!$json) {
+//         return $this->response->setJSON([
+//             'success' => false,
+//             'message' => 'بيانات غير صحيحة'
+//         ]);
+//     }
+
+//     $itemOrderIds = $json->items ?? [];
+//     $fromUserId = $json->from_user_id ?? null;
+//     $toUserId = $json->to_user_id ?? null;
+//     $note = $json->note ?? '';
+
+//     // التحقق من البيانات
+//     if (empty($itemOrderIds) || !$fromUserId || !$toUserId) {
+//         return $this->response->setJSON([
+//             'success' => false,
+//             'message' => 'جميع الحقول مطلوبة'
+//         ]);
+//     }
+
+//     if ($fromUserId === $toUserId) {
+//         return $this->response->setJSON([
+//             'success' => false,
+//             'message' => 'لا يمكن التحويل لنفس الشخص'
+//         ]);
+//     }
+
+//     try {
+//         $itemOrderModel = new \App\Models\ItemOrderModel();
+//         $transferItemsModel = new \App\Models\TransferItemsModel();
+//         $userModel = new \App\Models\UserModel();
+
+//         // Get user details for email
+//         $fromUser = $userModel->where('user_id', $fromUserId)->first();
+//         $toUser = $userModel->where('user_id', $toUserId)->first();
+
+//         if (!$fromUser || !$toUser) {
+//             return $this->response->setJSON([
+//                 'success' => false,
+//                 'message' => 'المستخدم غير موجود'
+//             ]);
+//         }
+
+//         // Get items details for email
+//         $itemsDetails = [];
+//         $firstItemOrderId = null; // لحفظ أول item_order_id
+        
+//         // معالجة كل أصل محدد
+//         foreach ($itemOrderIds as $itemOrderId) {
+//             // حفظ أول item_order_id
+//             if ($firstItemOrderId === null) {
+//                 $firstItemOrderId = $itemOrderId;
+//             }
+            
+//             $currentItem = $itemOrderModel
+//                 ->select('item_order.*, items.name as item_name')
+//                 ->join('items', 'items.id = item_order.item_id')
+//                 ->find($itemOrderId);
+            
+//             if (!$currentItem) {
+//                 log_message('warning', "Item order {$itemOrderId} not found");
+//                 continue;
+//             }
+
+//             $itemsDetails[] = $currentItem;
+
+//             // تحديث حالة الأصل إلى "قيد التحويل"
+//             $itemOrderModel->update($itemOrderId, [
+//                 'usage_status_id' => 5,
+//                 'updated_at' => date('Y-m-d H:i:s')
+//             ]);
+
+//             // إضافة سجل في جدول transfer_items
+//             $transferData = [
+//                 'item_order_id' => $itemOrderId,
+//                 'from_user_id' => $fromUserId,
+//                 'to_user_id' => $toUserId,
+//                 'order_status_id' => 1, // قيد الانتظار
+//                 'note' => $note,
+//                 'created_at' => date('Y-m-d H:i:s'),
+//                 'updated_at' => date('Y-m-d H:i:s')
+//             ];
+
+//             $transferItemsModel->insert($transferData);
+//         }
+
+//         // Send email notification مع أول item_order_id
+//         $this->sendTransferEmail($toUser, $fromUser, $itemsDetails, $note, $firstItemOrderId);
+
+//         return $this->response->setJSON([
+//             'success' => true,
+//             'message' => 'تم إنشاء طلب التحويل بنجاح'
+//         ]);
+
+//     } catch (\Exception $e) {
+//         log_message('error', 'Transfer Error: ' . $e->getMessage());
+        
+//         return $this->response->setJSON([
+//             'success' => false,
+//             'message' => 'حدث خطأ: ' . $e->getMessage()
+//         ]);
+//     }
+// }
 
 //  transferView - عرض صفحة تحويل العهدة
 public function transferView($orderId)
@@ -611,84 +779,5 @@ private function sendTransferEmail($toUser, $fromUser, $itemsDetails, $note, $or
         log_message('error', 'Email Error: ' . $e->getMessage());
         return false;
     }
-}
-
-
-public function showTransfer($orderId)
-{
-    $transferItemsModel = new \App\Models\TransferItemsModel();
-    $itemOrderModel     = new \App\Models\ItemOrderModel();
-    $userModel          = new \App\Models\UserModel();
-    $itemModel          = new \App\Models\ItemModel();
-    $minorCatModel      = new \App\Models\MinorCategoryModel();
-    $majorCatModel      = new \App\Models\MajorCategoryModel();
-    $roomModel          = new \App\Models\RoomModel();
-    $usageStatusModel   = new \App\Models\UsageStatusModel();
-
-    // جلب كل item_order_id للطلب
-    $itemOrders = $itemOrderModel->where('order_id', $orderId)->findAll();
-    
-    if (empty($itemOrders)) {
-        return redirect()->back()->with('error', 'لا توجد عناصر لهذا الطلب');
-    }
-
-    // جلب كل item_order_id
-    $itemOrderIds = array_column($itemOrders, 'item_order_id');
-    
-    // جلب كل التحويلات المرتبطة بهذه العناصر
-    $transfers = $transferItemsModel->whereIn('item_order_id', $itemOrderIds)->findAll();
-
-    if (empty($transfers)) {
-        return redirect()->back()->with('error', 'لا توجد تحويلات لهذا الطلب');
-    }
-
-    // جلب معلومات المستخدمين من أول تحويل
-    $firstTransfer = $transfers[0];
-    $fromUser = $userModel->where('user_id', $firstTransfer->from_user_id)->first();
-    $toUser   = $userModel->where('user_id', $firstTransfer->to_user_id)->first();
-
-    $transferInfo = (object)[
-        'order_id'   => $orderId,
-        'from_name'  => $fromUser->name ?? 'غير معروف',
-        'to_name'    => $toUser->name ?? 'غير معروف',
-        'created_at' => $firstTransfer->created_at,
-    ];
-
-    // جلب تفاصيل كل الأصناف المحولة
-    $items = [];
-    foreach ($transfers as $transfer) {
-        $itemOrder = $itemOrderModel->find($transfer->item_order_id);
-        
-        if (!$itemOrder) continue;
-
-        $itemData = $itemModel->find($itemOrder->item_id);
-        $minor    = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
-        $major    = $minor ? $majorCatModel->find($minor->major_category_id) : null;
-        $usageStatus = $usageStatusModel->find($itemOrder->usage_status_id);
-
-        $items[] = (object)[
-            'transfer_item_id'     => $transfer->transfer_item_id,
-            'item_name'            => $itemData->name ?? 'غير معروف',
-            'minor_category_name'  => $minor->name ?? 'غير معروف',
-            'major_category_name'  => $major->name ?? 'غير معروف',
-            'model_num'            => $itemOrder->model_num,
-            'serial_num'           => $itemOrder->serial_num,
-            'asset_num'            => $itemOrder->asset_num,
-            'old_asset_num'        => $itemOrder->old_asset_num,
-            'brand'                => $itemOrder->brand,
-            'assets_type'          => $itemOrder->assets_type,
-            'location_code'        => $roomModel->getFullLocationCode($itemOrder->room_id),
-            'usage_status_name'    => $usageStatus->usage_status ?? 'غير معروف',
-            'note'                 => $transfer->note,
-            'created_at'           => $transfer->created_at,
-            'updated_at'           => $transfer->updated_at,
-        ];
-    }
-
-    return view('assets/show_transfer', [
-        'transfer'   => $transferInfo,
-        'items'      => $items,
-        'item_count' => count($items),
-    ]);
 }
 }

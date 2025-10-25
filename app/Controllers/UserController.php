@@ -60,14 +60,6 @@ class UserController extends BaseController
             // إذا كان مستخدم عادي، account_id هو user_id مباشرة
             $currentUserId = $account_id;
         }
-        // else {
-        //     // إذا كان موظف، لا يمكنه الوصول لهذه الصفحة (صفحة خاصة بالمستخدمين فقط)
-        //     return redirect()->to('/dashboard')->with('error', 'هذه الصفحة مخصصة للمستخدمين فقط');
-        // }
-
-        // if (!$currentUserId) {
-        //     return redirect()->to('/login')->with('error', 'خطأ في جلسة المستخدم');
-        // }
 
         $transferItemsModel = new TransferItemsModel();
 
@@ -144,39 +136,6 @@ class UserController extends BaseController
     }
 
     /**
-     * عرض تفاصيل طلب محدد
-     */
-    // public function showOrder($order_id)
-    // {
-    //     $this->checkAuth(); // تحقق من تسجيل الدخول
-
-    //     $itemOrderModel = new ItemOrderModel();
-    //     $order = $itemOrderModel->find($order_id);
-
-    //     if (!$order) {
-    //         return redirect()->back()->with('error', 'الطلب غير موجود');
-    //     }
-
-    //     $data['order'] = $order;
-    //     return view('warehouse/showOrderView', $data); // فيو تفصيلي للطلب
-    // }
-
-
-
-    /**
-     * صفحة  userView2
-     */
-
-    // public function userView2(): string
-    // {
-    //     $this->checkAuth(); // تحقق من تسجيل الدخول
-
-    //     return view('user/userView2');
-    // }
-
-
-
-    /**
      * جلب تفاصيل العهدة  
      */
     public function getTransferDetails($transferId)
@@ -189,29 +148,21 @@ class UserController extends BaseController
         }
 
         $transferModel = new TransferItemsModel();
+        $itemOrderModel = new ItemOrderModel();
 
+        // جلب معلومات الطلب الأساسية
         $transfer = $transferModel
             ->select(
                 'transfer_items.*,
-                 item_order.item_id,
-                 item_order.brand,
-                 item_order.model_num,
-                 item_order.asset_num,
-                 item_order.serial_num,
-                 item_order.quantity,
-                 item_order.note as item_note,
-                 items.name as item_name,
                  from_user.name AS from_user_name,
                  from_user.user_dept AS from_user_dept,
                  from_user.user_ext AS from_user_ext,
                  from_user.email AS from_user_email,
-                 usage_status.usage_status AS usage_status_name,
-                 order_status.status AS order_status_name'
+                 order_status.status AS order_status_name,
+                 item_order.order_id'
             )
             ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
-            ->join('items', 'items.id = item_order.item_id', 'left')
             ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
-            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
             ->where('transfer_items.transfer_item_id', $transferId)
             ->first();
@@ -223,13 +174,27 @@ class UserController extends BaseController
             ]);
         }
 
+        // جلب جميع الأصناف المرتبطة بنفس order_id
+        $items = $itemOrderModel
+            ->select(
+                'item_order.item_order_id,
+                 item_order.asset_num,
+                 item_order.serial_num,
+                 item_order.assets_type,
+                 items.name as item_name,
+                 usage_status.usage_status AS usage_status_name'
+            )
+            ->join('items', 'items.id = item_order.item_id', 'left')
+            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+            ->where('item_order.order_id', $transfer->order_id)
+            ->findAll();
+
         return $this->response->setJSON([
             'success' => true,
-            'data' => $transfer
+            'data' => $transfer,
+            'items' => $items
         ]);
     }
-
-
 
     /**
      * قبول أو رفض طلب العهدة
@@ -255,7 +220,7 @@ class UserController extends BaseController
         }
 
         $transferId = $json->transfer_id ?? null;
-        $action = $json->action ?? null; // 'accept' or 'reject'
+        $action = $json->action ?? null;
 
         if (!$transferId || !$action) {
             return $this->response->setJSON([
@@ -268,7 +233,7 @@ class UserController extends BaseController
             $transferModel = $this->transferItemsModel;
             $itemOrderModel = $this->itemOrderModel;
             $orderModel = $this->orderModel;
-            // جلب معلومات الطلب
+            
             $transfer = $transferModel->find($transferId);
 
             if (!$transfer) {
@@ -278,7 +243,6 @@ class UserController extends BaseController
                 ]);
             }
 
-            // التحقق من أن المستخدم الحالي هو المستقبل
             $currentUserId = session()->get('employee_id');
             if ($transfer->to_user_id !== $currentUserId) {
                 return $this->response->setJSON([
@@ -287,7 +251,6 @@ class UserController extends BaseController
                 ]);
             }
 
-            // التحقق من أن الطلب في حالة "قيد الانتظار"
             if ($transfer->order_status_id != 1) {
                 $statusText = $transfer->order_status_id == 2 ? 'مقبول' : 'مرفوض';
                 return $this->response->setJSON([
@@ -296,16 +259,13 @@ class UserController extends BaseController
                 ]);
             }
 
-            // تحديد حالة الطلب: 2 = مقبول, 3 = مرفوض
             $orderStatusId = ($action === 'accept') ? 2 : 3;
 
             $orderModel->transStart();
 
-            // تحديث حالة الطلب
             $updated = $transferModel->update($transferId, [
                 'order_status_id' => $orderStatusId,
                 'updated_at' => date('Y-m-d H:i:s'),
-                // إذا كان قبول: سجل وقت الاستلام
                 'received_at' => ($action === 'accept') ? date('Y-m-d H:i:s') : null,
             ]);
 
@@ -315,8 +275,7 @@ class UserController extends BaseController
                     'message' => 'فشل تحديث حالة الطلب'
                 ]);
             }
-            // 2. الحصول على Order ID الرئيسي
-            // item_order_id موجود في سجل التحويل
+            
             $itemOrder = $itemOrderModel->find($transfer->item_order_id);
             $orderId = $itemOrder->order_id ?? null;
             if (!$orderId) {
@@ -324,7 +283,6 @@ class UserController extends BaseController
             }
 
             if ($action === 'accept') {
-                // 3. التحقق من حالة جميع سجلات التحويل لنفس الطلب الرئيسي
                 $allTransferItems = $transferModel
                     ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id')
                     ->where('item_order.order_id', $orderId)
@@ -332,28 +290,25 @@ class UserController extends BaseController
 
                 $allAccepted = true;
                 foreach ($allTransferItems as $item) {
-                    // إذا كان أي سجل (بما في ذلك السجل الحالي) ليس مقبولاً (ID=2)، فستصبح القيمة False
                     if ($item->order_status_id != 2) {
                         $allAccepted = false;
                         break;
                     }
                 }
 
-                // 4. تحديث حالة الطلب الرئيسي إذا تم قبول جميع العناصر
                 if ($allAccepted) {
-                    $orderModel->update($orderId, ['order_status_id' => 2]); // 2: مقبول
+                    $orderModel->update($orderId, ['order_status_id' => 2]);
                 }
             } else {
-                // 5. إذا تم رفض أي عنصر، يتم تحديث حالة الطلب الرئيسي إلى "مرفوض" (3) مباشرةً
                 $orderModel->update($orderId, ['order_status_id' => 3]);
             }
 
-            // إنهاء المعاملة
             $orderModel->transComplete();
 
             if ($orderModel->transStatus() === FALSE) {
                 throw new \Exception('فشل في المعاملة الكلية.');
             }
+            
             $message = ($action === 'accept')
                 ? 'تم قبول الطلب بنجاح. العهدة الآن في عهدتك'
                 : 'تم رفض الطلب. العهدة ستبقى مع المُرسل';
@@ -372,8 +327,6 @@ class UserController extends BaseController
         }
     }
 
-
-
     /**
      * تعليم أن الطلب قد تم فتحه (is_opened = 1)
      */
@@ -383,7 +336,6 @@ class UserController extends BaseController
             return $this->response->setStatusCode(400);
         }
 
-        // استقبال transfer_id من POST body بدلاً من URL
         $json = $this->request->getJSON();
         $transferId = $json->transfer_id ?? null;
 
@@ -430,18 +382,14 @@ class UserController extends BaseController
         }
     }
 
-
-
     public function userView2(): string
     {
         $this->checkAuth();
 
-        // التحقق من تسجيل الدخول
         if (!session()->get('isLoggedIn')) {
             return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
         }
 
-        // تحديد نوع الحساب والمستخدم الحالي
         $isEmployee = session()->get('isEmployee');
         $account_id = session()->get('employee_id');
         $currentUserId = null;
@@ -450,8 +398,7 @@ class UserController extends BaseController
             $currentUserId = $account_id;
         }
 
-        // 1. جلب العهد المحولة (transferItems)
-        $transferItemsModel = $this->transferItemsModel; // استخدام المهيأ
+        $transferItemsModel = $this->transferItemsModel;
 
         $transferItems = $transferItemsModel
             ->select(
@@ -483,13 +430,12 @@ class UserController extends BaseController
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
             ->where('transfer_items.to_user_id', $currentUserId)
-            ->where('transfer_items.order_status_id',  2) //  والمقبولة (2)
-            ->groupBy('transfer_items.transfer_item_id') // تجنب التكرار
+            ->where('transfer_items.order_status_id',  2)
+            ->groupBy('transfer_items.transfer_item_id')
             ->orderBy('transfer_items.created_at', 'ASC')
             ->findAll();
 
-        // 2. جلب العهد من جدول order (المباشرة)
-        $orderModel = $this->orderModel; // استخدام المهيأ
+        $orderModel = $this->orderModel;
 
         $orders = $orderModel
             ->select(
@@ -512,7 +458,7 @@ class UserController extends BaseController
              items.name AS item_name,
              minor_category.name AS minor_category_name,
              major_category.name AS major_category_name,
-             "orders" AS source_table' //  هذا هو الحقل الذي يحدد أنه "مباشر"
+             "orders" AS source_table'
             )
             ->join('item_order', 'item_order.order_id = order.order_id', 'left')
             ->join('items', 'items.id = item_order.item_id', 'left')
@@ -522,19 +468,16 @@ class UserController extends BaseController
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('order_status', 'order_status.id = order.order_status_id', 'left')
             ->where('order.to_user_id', $currentUserId)
-            ->where('order.order_status_id', 2) // مقبول فقط
+            ->where('order.order_status_id', 2)
             ->groupBy('item_order.item_order_id')
             ->orderBy('order.created_at', 'ASC')
             ->findAll();
 
-        //  3. الدمج مع إعطاء الأولوية وحذف التكرار
         $combinedItems = [];
         $assetNums = [];
 
-        // أ. معالجة الطلبات المباشرة أولاً (الأولوية لـ "orders")
         foreach ($orders as $order) {
             $assetNum = $order->asset_num;
-            // نستخدم item_order_id ليكون أدق إذا كان متوفراً في كلا السجلين
             $key = $order->item_order_id ?? $assetNum;
 
             if (!isset($assetNums[$key])) {
@@ -543,27 +486,22 @@ class UserController extends BaseController
             }
         }
 
-        // ب. معالجة الطلبات المحولة (يتم تجاهلها إذا كان رقم الأصل موجوداً بالفعل)
         foreach ($transferItems as $transfer) {
             $assetNum = $transfer->asset_num;
             $key = $transfer->item_order_id ?? $assetNum;
 
-            // إذا كان هذا العنصر موجوداً في قائمة الطلبات المباشرة (orders)، تجاهله
             if (!isset($assetNums[$key])) {
                 $combinedItems[] = $transfer;
                 $assetNums[$key] = true;
             }
         }
 
-        // 4. فلترة العناصر المرجعة (usage_status_id = 2)
         $filteredOrders = array_filter($combinedItems, function ($item) {
             return isset($item->usage_status_id) && $item->usage_status_id != 2;
         });
 
-        // 5. إعادة فهرسة المصفوفة بعد الفلترة
         $filteredOrders = array_values($filteredOrders);
 
-        // 6. تمرير البيانات للواجهة
         return view('user/userView2', [
             'orders' => $filteredOrders
         ]);

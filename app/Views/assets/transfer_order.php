@@ -398,15 +398,18 @@
                 <?php else: ?>
                     <div class="no-items-msg">لا توجد عناصر متاحة للتحويل.</div>
                 <?php endif; ?>
+
+                <div class="action-buttons-container">
+                    <a href="<?= site_url('AssetsController') ?>" class="action-btn back-btn">
+                        <span>العودة</span>
+                    </a>
+                </div>
+                
             </div>
         </div>
     </div>
 
-    <div class="action-buttons-container">
-        <a href="<?= site_url('inventoryController') ?>" class="action-btn back-btn">
-            <span>العودة</span>
-        </a>
-    </div>
+   
 
     <div class="bulk-actions-bar" id="bulkActionsBar">
         <div class="bulk-counter">

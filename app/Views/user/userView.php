@@ -218,14 +218,71 @@
             background: #f8d7da;
             color: #721c24;
         }
-    </style>
-    <!-- added -->
-    <style>
+
         tr.opened-row {
             background-color: rgba(255, 247, 200, 0.5) !important;
         }
-    </style>
 
+        /* تنسيق جدول الأصناف في المودال */
+        .items-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .items-table thead {
+            background: linear-gradient(135deg, #057590, #3AC0C3);
+        }
+
+        .items-table thead th {
+            color: white;
+            padding: 12px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            border: none;
+        }
+
+        .items-table tbody td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #e8f4f8;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .items-table tbody tr:nth-child(even) {
+            background-color: #f8fcfd;
+        }
+
+        .items-table tbody tr:hover {
+            background-color: #e8f4f8;
+            transition: background-color 0.2s ease;
+        }
+
+        .items-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .section-title {
+            color: #057590;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #3AC0C3;
+        }
+    </style>
 </head>
 
 <body>
@@ -254,8 +311,6 @@
         </div>
 
         <div class="content-area">
-
-
             <div class="row mb-3">
                 <div class="col-md-3">
                     <input type="text" id="searchInput" class="form-control" placeholder="ابحث في كل الأعمدة...">
@@ -275,11 +330,7 @@
                 <table class="custom-table" id="usersTable">
                     <thead>
                         <tr>
-                            <!-- <th class="checkbox-cell">
-                                <input type="checkbox" class="custom-checkbox" id="masterCheckbox" onchange="toggleAllSelection()">
-                            </th> -->
                             <th>رقم الطلب</th>
-                            <!-- <th>الرقم الوظيفي</th> -->
                             <th>محول من</th>
                             <th>القسم</th>
                             <th>حالة الاستخدام</th>
@@ -295,11 +346,7 @@
                                     data-usage="<?= esc($order->usage_status_name ?? '') ?>"
                                     class="<?= ($order->is_opened == 1) ? 'opened-row' : '' ?>">
 
-                                    <!-- <td class="checkbox-cell">
-                                        <input type="checkbox" class="custom-checkbox row-checkbox">
-                                    </td> -->
                                     <td><?= esc($order->transfer_item_id ?? '-') ?></td>
-                                    <!-- <td><?= esc($order->employee_id ?? '-') ?></td> -->
                                     <td><?= esc($order->from_user_name ?? '-') ?></td>
                                     <td><?= esc($order->from_user_dept ?? '-') ?></td>
                                     <td>
@@ -333,14 +380,13 @@
                                                 </svg>
                                                 عرض
                                             </button>
-
                                         </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="9" class="text-center py-4">لا توجد طلبات محولة إليك</td>
+                                <td colspan="7" class="text-center py-4">لا توجد طلبات محولة إليك</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -350,10 +396,12 @@
     </div>
 
     <div class="modal fade" id="transferDetailsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content" style="border-radius: 15px; border: none;">
                 <div class="modal-header" style="background: linear-gradient(135deg, #057590, #3AC0C3); color: white; border-radius: 15px 15px 0 0;">
-                    <h5 class="modal-title">تفاصيل طلب التحويل</h5>
+                    <h5 class="modal-title">
+                        <i class="fas fa-exchange-alt"></i> تفاصيل طلب التحويل
+                    </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" style="padding: 30px;" id="modalBody">
@@ -375,7 +423,6 @@
             const row = button.closest('tr');
             row.classList.add('opened-row');
 
-            // ✅ إرسال transfer_id في body بدلاً من URL
             fetch('<?= base_url('UserController/markAsOpened') ?>', {
                     method: 'POST',
                     headers: {
@@ -396,7 +443,6 @@
                 })
                 .catch(err => console.error('خطأ:', err));
 
-            // عرض المودال
             const modal = new bootstrap.Modal(document.getElementById('transferDetailsModal'));
             const modalBody = document.getElementById('modalBody');
             const modalFooter = document.getElementById('modalFooter');
@@ -404,13 +450,54 @@
             modalBody.innerHTML = '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
             modal.show();
 
-            // جلب التفاصيل
             fetch('<?= base_url('UserController/getTransferDetails/') ?>' + transferId)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         const t = data.data;
+                        const items = data.items || [];
                         const isPending = t.order_status_id == 1;
+
+                        let itemsTableHtml = '';
+                        if (items.length > 0) {
+                            itemsTableHtml = `
+                                <div class="items-section">
+                                    <h6 class="section-title">
+                                        <i class="fas fa-boxes"></i>
+                                        الأصناف المرتبطة بهذا الطلب
+                                    </h6>
+                                    <table class="items-table">
+                                        <thead>
+                                            <tr>
+                                                <th>اسم الصنف</th>
+                                                <th>رقم الأصل</th>
+                                                <th>الرقم التسلسلي</th>
+                                                <th>حالة الاستخدام</th>
+                                                <th>نوع العهدة</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>`;
+                            
+                            items.forEach(item => {
+                                itemsTableHtml += `
+                                    <tr>
+                                        <td><strong>${item.item_name || '-'}</strong></td>
+                                        <td>${item.asset_num || '-'}</td>
+                                        <td>${item.serial_num || '-'}</td>
+                                        <td>
+                                            <span class="status-badge ${getUsageStatusClass(item.usage_status_name)}">
+                                                ${item.usage_status_name || '-'}
+                                            </span>
+                                        </td>
+                                        <td>${item.assets_type || '-'}</td>
+                                    </tr>`;
+                            });
+                            
+                            itemsTableHtml += `
+                                        </tbody>
+                                    </table>
+                                </div>`;
+                        }
 
                         modalBody.innerHTML = `
                     <div class="row g-3">
@@ -448,43 +535,12 @@
                             <label class="form-label fw-bold text-muted">البريد الإلكتروني</label>
                             <p class="form-control-plaintext">${t.from_user_email || '-'}</p>
                         </div>
-                        <div class="col-12"><hr></div>
-                        <div class="col-12">
-                            <label class="form-label fw-bold text-muted">اسم الصنف</label>
-                            <p class="form-control-plaintext">${t.item_name || '-'}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-muted">العلامة التجارية</label>
-                            <p class="form-control-plaintext">${t.brand || '-'}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-muted">رقم الموديل</label>
-                            <p class="form-control-plaintext">${t.model_num || '-'}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-muted">رقم الأصل</label>
-                            <p class="form-control-plaintext">${t.asset_num || '-'}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-muted">الرقم التسلسلي</label>
-                            <p class="form-control-plaintext">${t.serial_num || '-'}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-muted">الكمية</label>
-                            <p class="form-control-plaintext">${t.quantity || '-'}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-muted">حالة الاستخدام</label>
-                            <p class="form-control-plaintext">
-                                <span class="status-badge ${getUsageStatusClass(t.usage_status_name)}">${t.usage_status_name}</span>
-                            </p>
-                        </div>
-                        ${t.note ? `<div class="col-12"><label class="form-label fw-bold text-muted">ملاحظات</label><p class="form-control-plaintext">${t.note}</p></div>` : ''}
                         <div class="col-12">
                             <label class="form-label fw-bold text-muted">تاريخ الطلب</label>
                             <p class="form-control-plaintext">${formatDate(t.created_at)}</p>
                         </div>
                     </div>
+                    ${itemsTableHtml}
                 `;
 
                         if (isPending) {
@@ -549,7 +605,7 @@
                                 }
                                 const tbody = document.querySelector('#usersTable tbody');
                                 if (tbody.querySelectorAll('tr').length === 0) {
-                                    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4">لا توجد طلبات محولة إليك</td></tr>';
+                                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4">لا توجد طلبات محولة إليك</td></tr>';
                                 }
                             }, 300);
                         }
@@ -606,7 +662,7 @@
                     text: Array.from(cells).map(td => td.textContent.trim().toLowerCase()).join(" "),
                     employee: cells[2]?.textContent.trim().toLowerCase() || "",
                     usage: row.dataset.usage?.toLowerCase() || "",
-                    date: parseRowDate(cells[7]?.textContent.trim() || "")
+                    date: parseRowDate(cells[5]?.textContent.trim() || "")
                 };
             });
             window.currentFilterType = 'all';
@@ -661,11 +717,6 @@
             document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = master.checked);
         }
     </script>
-
-
-
-
-
 </body>
 
 </html>
