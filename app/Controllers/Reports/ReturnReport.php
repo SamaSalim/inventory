@@ -34,7 +34,7 @@ class ReturnReport extends BaseController
             $returnedBy = $userId;
         }
 
-        // Build query for returned items
+        // Build query for returned items with ACCEPTED status only
         $builder = $this->model
             ->select('
                 item_order.item_order_id,
@@ -43,6 +43,7 @@ class ReturnReport extends BaseController
                 item_order.attachment,
                 item_order.updated_at as return_date,
                 item_order.created_by,
+                item_order.order_id,
                 items.name as item_name,
                 minor_category.name as category,
                 item_order.assets_type,
@@ -51,14 +52,19 @@ class ReturnReport extends BaseController
                 employee.name as employee_name,
                 employee.emp_id,
                 users.name as user_name,
-                users.user_id
+                users.user_id,
+                order_status.status as order_status_name,
+                order_status.id as order_status_id
             ')
             ->join('items', 'items.id = item_order.item_id')
             ->join('minor_category', 'minor_category.id = items.minor_category_id')
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id')
+            ->join('order', 'order.order_id = item_order.order_id', 'left')
+            ->join('order_status', 'order_status.id = order.order_status_id', 'left')
             ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
             ->join('users', 'users.user_id = item_order.created_by', 'left')
-            ->where('usage_status.usage_status', 'رجيع');
+            ->where('usage_status.usage_status', 'رجيع')
+            ->where('order_status.id', 2); // Only accepted items (status_id = 2)
 
         // Apply filters
         if (!empty($assetNumber)) {
@@ -103,6 +109,7 @@ class ReturnReport extends BaseController
                 'return_date' => $item->return_date,
                 'notes' => $item->note ?? '',
                 'created_by' => $item->created_by,
+                'order_status' => $item->order_status_name ?? 'غير محدد',
                 'reasons' => $reasons
             ];
         }
