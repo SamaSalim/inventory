@@ -18,11 +18,21 @@ class ReturnReport extends BaseController
 
     public function index()
     {
+        // Get user role
+        $userRole = session()->get('role');
+        $userId = session()->get('employee_id') ?? session()->get('user_id');
+
         // Get filter parameters
         $assetNumber = $this->request->getGet('asset_number');
         $itemName = $this->request->getGet('item_name');
         $dateFrom = $this->request->getGet('date_from');
         $dateTo = $this->request->getGet('date_to');
+        $returnedBy = $this->request->getGet('returned_by');
+
+        // If user is not assets or super_assets, force filter to their own ID
+        if (!in_array($userRole, ['assets', 'super_assets'])) {
+            $returnedBy = $userId;
+        }
 
         // Build query for returned items
         $builder = $this->model
@@ -37,11 +47,17 @@ class ReturnReport extends BaseController
                 minor_category.name as category,
                 item_order.assets_type,
                 item_order.brand,
-                item_order.model_num
+                item_order.model_num,
+                employee.name as employee_name,
+                employee.emp_id,
+                users.name as user_name,
+                users.user_id
             ')
             ->join('items', 'items.id = item_order.item_id')
             ->join('minor_category', 'minor_category.id = items.minor_category_id')
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id')
+            ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
+            ->join('users', 'users.user_id = item_order.created_by', 'left')
             ->where('usage_status.usage_status', 'رجيع');
 
         // Apply filters
@@ -59,6 +75,15 @@ class ReturnReport extends BaseController
 
         if (!empty($dateTo)) {
             $builder->where('DATE(item_order.updated_at) <=', $dateTo);
+        }
+
+        // Filter by returned_by (employee ID or user ID)
+        if (!empty($returnedBy)) {
+            $builder->groupStart()
+                ->like('employee.emp_id', $returnedBy)
+                ->orLike('users.user_id', $returnedBy)
+                ->orLike('item_order.created_by', $returnedBy)
+                ->groupEnd();
         }
 
         $returnedItems = $builder->orderBy('item_order.updated_at', 'DESC')->findAll();
@@ -100,7 +125,8 @@ class ReturnReport extends BaseController
                 'asset_number' => $assetNumber,
                 'item_name' => $itemName,
                 'date_from' => $dateFrom,
-                'date_to' => $dateTo
+                'date_to' => $dateTo,
+                'returned_by' => $returnedBy
             ]
         ];
 

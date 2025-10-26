@@ -11,7 +11,7 @@ use App\Exceptions\AuthenticationException;
 
 class AssetsHistory extends BaseController
 {
-    /**s
+    /**
      * دالة خاصة للتحقق من تسجيل الدخول
      */
     private function checkAuth()
@@ -272,14 +272,6 @@ class AssetsHistory extends BaseController
         return $this->response->setJSON(['success' => true, 'message' => "تم تغيير الحالة إلى $statusText"]);
     }
 
-
-
-
-
-
-
-
-
     /**
      * عرض صفحة super_assets_view - تحتوي على الإحصائيات والتحويلات والإرجاعات
      */
@@ -414,130 +406,133 @@ class AssetsHistory extends BaseController
         
     }
 
+    public function assetCycle($assetNum = null): string
+    {
+        $this->checkAuth();
 
-public function assetCycle($assetNum = null): string
-{
-    $this->checkAuth();
+        if (!$assetNum) {
+            $assetNum = $this->request->getGet('asset_num');
+        }
 
-    if (!$assetNum) {
-        $assetNum = $this->request->getGet('asset_num');
-    }
+        if (!$assetNum) {
+            return redirect()->back()->with('error', 'رقم الأصل مطلوب');
+        }
 
-    if (!$assetNum) {
-        return redirect()->back()->with('error', 'رقم الأصل مطلوب');
-    }
+        $itemOrderModel = new ItemOrderModel();
+        $transferItemsModel = new TransferItemsModel();
+        $employeeModel = new \App\Models\EmployeeModel();
 
-    $itemOrderModel = new ItemOrderModel();
-    $transferItemsModel = new TransferItemsModel();
-    $employeeModel = new \App\Models\EmployeeModel();
-
-
-    $assetInfo = $itemOrderModel
-        ->select('item_order.item_order_id, item_order.asset_num, item_order.created_at, 
-                  item_order.created_by, item_order.updated_at,
-                  item_order.usage_status_id, items.name as item_name, usage_status.usage_status as status_name')
-        ->join('items', 'items.id = item_order.item_id', 'left')
-        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-        ->where('item_order.asset_num', $assetNum)
-        ->first();
-
-    if (!$assetInfo) {
-        return redirect()->back()->with('error', 'الأصل غير موجود');
-    }
-
- 
-    $transfers = $transferItemsModel
-        ->select('transfer_items.*, from_user.name as from_user_name, from_user.user_dept as from_user_dept,
-                  from_user.user_ext as from_user_ext, to_user.name as to_user_name, to_user.user_dept as to_user_dept,
-                  to_user.user_ext as to_user_ext, order_status.status as status_name')
-        ->join('users as from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
-        ->join('users as to_user', 'to_user.user_id = transfer_items.to_user_id', 'left')
-        ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
-        ->where('transfer_items.item_order_id', $assetInfo->item_order_id)
-        ->orderBy('transfer_items.created_at', 'ASC')
-        ->findAll();
-
-    $timeline = [];
-    
-    foreach ($transfers as $t) {
-        $timeline[] = [
-            'type' => 'transfer',
-            'transfer_id' => $t->transfer_item_id,
-            'date' => $t->created_at,
-            'from_user_name' => $t->from_user_name ?? 'غير محدد',
-            'from_user_dept' => $t->from_user_dept ?? 'غير محدد',
-            'from_user_ext' => $t->from_user_ext ?? '-',
-            'to_user_name' => $t->to_user_name ?? 'غير محدد',
-            'to_user_dept' => $t->to_user_dept ?? 'غير محدد',
-            'to_user_ext' => $t->to_user_ext ?? '-',
-            'status' => $t->status_name ?? 'غير محدد',
-            'status_date' => $t->updated_at,
-            'note' => $t->note,
-            'is_opened' => $t->is_opened
-        ];
-    }
-
-    
-    if ($assetInfo->usage_status_id == 2) {
-        
-        $lastTransfer = $transferItemsModel
-            ->select('transfer_items.*, users.name as user_name, users.user_dept, users.user_ext')
-            ->join('users', 'users.user_id = transfer_items.to_user_id', 'left')
-            ->where('transfer_items.item_order_id', $assetInfo->item_order_id)
-            ->orderBy('transfer_items.created_at', 'DESC')
+        $assetInfo = $itemOrderModel
+            ->select('item_order.item_order_id, item_order.asset_num, item_order.created_at, 
+                      item_order.created_by, item_order.updated_at,
+                      item_order.usage_status_id, items.name as item_name, usage_status.usage_status as status_name')
+            ->join('items', 'items.id = item_order.item_id', 'left')
+            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+            ->where('item_order.asset_num', $assetNum)
             ->first();
 
-        
-        if (!$lastTransfer) {
-            $creatorInfo = $employeeModel
-                ->where('emp_id', $assetInfo->created_by)
-                ->first();
+        if (!$assetInfo) {
+            return redirect()->back()->with('error', 'الأصل غير موجود');
+        }
 
+        $transfers = $transferItemsModel
+            ->select('transfer_items.*, from_user.name as from_user_name, from_user.user_dept as from_user_dept,
+                      from_user.user_ext as from_user_ext, to_user.name as to_user_name, to_user.user_dept as to_user_dept,
+                      to_user.user_ext as to_user_ext, order_status.status as status_name')
+            ->join('users as from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
+            ->join('users as to_user', 'to_user.user_id = transfer_items.to_user_id', 'left')
+            ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
+            ->where('transfer_items.item_order_id', $assetInfo->item_order_id)
+            ->orderBy('transfer_items.created_at', 'ASC')
+            ->findAll();
+
+        $timeline = [];
+        
+        foreach ($transfers as $t) {
             $timeline[] = [
-                'type' => 'returned',
-                'date' => $assetInfo->updated_at,
-                'status_date' => $assetInfo->updated_at,
-                'note' => 'تم إرجاع الأصل إلى المستودع',
-                'returned_by_name' => $creatorInfo ? $creatorInfo->name : 'غير محدد',
-                'returned_by_dept' => $creatorInfo ? $creatorInfo->emp_dept : 'غير محدد',
-                'returned_by_ext' => $creatorInfo ? $creatorInfo->emp_ext : '-',
-                'status' => 'تم الإرجاع'
-            ];
-        } else {
-            
-            $timeline[] = [
-                'type' => 'returned',
-                'date' => $assetInfo->updated_at,
-                'status_date' => $assetInfo->updated_at,
-                'note' => 'تم إرجاع الأصل إلى المستودع',
-                'returned_by_name' => $lastTransfer->user_name ?? 'غير محدد',
-                'returned_by_dept' => $lastTransfer->user_dept ?? 'غير محدد',
-                'returned_by_ext' => $lastTransfer->user_ext ?? '-',
-                'status' => 'تم الإرجاع'
+                'type' => 'transfer',
+                'transfer_id' => $t->transfer_item_id,
+                'date' => $t->created_at,
+                'from_user_name' => $t->from_user_name ?? 'غير محدد',
+                'from_user_dept' => $t->from_user_dept ?? 'غير محدد',
+                'from_user_ext' => $t->from_user_ext ?? '-',
+                'to_user_name' => $t->to_user_name ?? 'غير محدد',
+                'to_user_dept' => $t->to_user_dept ?? 'غير محدد',
+                'to_user_ext' => $t->to_user_ext ?? '-',
+                'status' => $t->status_name ?? 'غير محدد',
+                'status_date' => $t->updated_at,
+                'note' => $t->note,
+                'is_opened' => $t->is_opened
             ];
         }
-    }
 
-    return view('assets/assets_cycle', [
-        'asset_info' => $assetInfo,
-        'timeline' => $timeline,
-        'total_operations' => count($timeline)
-    ]);
-}
+        if ($assetInfo->usage_status_id == 2) {
+            $lastTransfer = $transferItemsModel
+                ->select('transfer_items.*, users.name as user_name, users.user_dept, users.user_ext')
+                ->join('users', 'users.user_id = transfer_items.to_user_id', 'left')
+                ->where('transfer_items.item_order_id', $assetInfo->item_order_id)
+                ->orderBy('transfer_items.created_at', 'DESC')
+                ->first();
+
+            if (!$lastTransfer) {
+                $creatorInfo = $employeeModel
+                    ->where('emp_id', $assetInfo->created_by)
+                    ->first();
+
+                $timeline[] = [
+                    'type' => 'returned',
+                    'date' => $assetInfo->updated_at,
+                    'status_date' => $assetInfo->updated_at,
+                    'note' => 'تم إرجاع الأصل إلى المستودع',
+                    'returned_by_name' => $creatorInfo ? $creatorInfo->name : 'غير محدد',
+                    'returned_by_dept' => $creatorInfo ? $creatorInfo->emp_dept : 'غير محدد',
+                    'returned_by_ext' => $creatorInfo ? $creatorInfo->emp_ext : '-',
+                    'status' => 'تم الإرجاع'
+                ];
+            } else {
+                $timeline[] = [
+                    'type' => 'returned',
+                    'date' => $assetInfo->updated_at,
+                    'status_date' => $assetInfo->updated_at,
+                    'note' => 'تم إرجاع الأصل إلى المستودع',
+                    'returned_by_name' => $lastTransfer->user_name ?? 'غير محدد',
+                    'returned_by_dept' => $lastTransfer->user_dept ?? 'غير محدد',
+                    'returned_by_ext' => $lastTransfer->user_ext ?? '-',
+                    'status' => 'تم الإرجاع'
+                ];
+            }
+        }
+
+        return view('assets/assets_cycle', [
+            'asset_info' => $assetInfo,
+            'timeline' => $timeline,
+            'total_operations' => count($timeline)
+        ]);
+    }
 
     public function viewDetails($id)
     {
         $this->checkAuth();
-       
     }
 
-
-public function assetsHistory(): string
+    public function assetsHistory(): string
     {
         $this->checkAuth();
 
         $itemOrderModel = new ItemOrderModel();
         $transferItemsModel = new TransferItemsModel();
+
+        // Get user role
+        $userRole = session()->get('role');
+        $userId = session()->get('employee_id') ?? session()->get('user_id');
+
+        // For regular users, automatically filter by their ID
+        $returnedByFilter = $this->request->getGet('returned_by');
+        
+        // If user is not assets or super_assets, force filter to their own ID
+        if (!in_array($userRole, ['assets', 'super_assets'])) {
+            $returnedByFilter = $userId;
+        }
 
         $filters = [
             'search' => $this->request->getGet('search'),
@@ -546,9 +541,10 @@ public function assetsHistory(): string
             'operation_type' => $this->request->getGet('operation_type'),
             'date_from' => $this->request->getGet('date_from'),
             'date_to' => $this->request->getGet('date_to'),
+            'returned_by' => $returnedByFilter,
+            'user_role' => $userRole,
         ];
 
-        // العهد الجديدة (مباشرة)
         $newItemsQuery = $itemOrderModel
             ->select('item_order.asset_num as asset_number, items.name as item_name,
                       item_order.created_at as last_operation_date, item_order.item_order_id as id')
@@ -604,11 +600,16 @@ public function assetsHistory(): string
 
         $transfers = $transfersQuery->orderBy('transfer_items.created_at', 'DESC')->findAll();
 
-        // الإرجاعات
+        // الإرجاعات مع البحث عن الشخص الذي قام بالإرجاع
         $returnsQuery = $itemOrderModel
             ->select('item_order.asset_num as asset_number, items.name as item_name,
-                      item_order.updated_at as last_operation_date, item_order.item_order_id as id')
+                      item_order.updated_at as last_operation_date, item_order.item_order_id as id,
+                      item_order.created_by,
+                      employee.name as employee_name, employee.emp_id,
+                      users.name as user_name, users.user_id')
             ->join('items', 'items.id = item_order.item_id', 'left')
+            ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
+            ->join('users', 'users.user_id = item_order.created_by', 'left')
             ->where('item_order.usage_status_id', 2);
 
         if (!empty($filters['asset_number'])) {
@@ -629,13 +630,21 @@ public function assetsHistory(): string
                 ->orLike('items.name', $filters['search'])
                 ->groupEnd();
         }
+        
+        // فلتر البحث عن الشخص الذي قام بالإرجاع (بالرقم الوظيفي)
+        if (!empty($filters['returned_by'])) {
+            $returnsQuery->groupStart()
+                ->like('employee.emp_id', $filters['returned_by'])
+                ->orLike('users.user_id', $filters['returned_by'])
+                ->orLike('item_order.created_by', $filters['returned_by'])
+                ->groupEnd();
+        }
 
         $returns = $returnsQuery->orderBy('item_order.updated_at', 'DESC')->findAll();
 
         $operations = [];
         $uniqueAssets = [];
 
-        // إضافة العهد الجديدة
         if (empty($filters['operation_type']) || $filters['operation_type'] == 'new') {
             foreach ($newItems as $n) {
                 if (!isset($uniqueAssets[$n->asset_number])) {
@@ -681,7 +690,6 @@ public function assetsHistory(): string
             }
         }
 
-        // ترتيب حسب التاريخ
         usort($operations, fn($a, $b) => strtotime($b->last_operation_date) - strtotime($a->last_operation_date));
 
         $perPage = 20;
@@ -704,6 +712,5 @@ public function assetsHistory(): string
             'filters' => $filters,
             'pager' => $pager,
         ]);
-        
     }
 }

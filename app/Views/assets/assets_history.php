@@ -192,7 +192,7 @@
             <div id="alertContainer"></div>
 
             <div class="stats-grid">
-                
+                <!-- Operations Card -->
                 <div class="stat-card">
                     <div class="stat-icon operations">
                         <i class="fas fa-clipboard-list"></i>
@@ -234,9 +234,6 @@
                         <p>عمليات الإرجاع</p>
                     </div>
                 </div>
-
-                <!-- Operations Card -->
-
             </div>
 
             <div class="section-header">
@@ -322,6 +319,19 @@
                             <input type="date" class="filter-input" name="date_to"
                                    value="<?= esc($filters['date_to'] ?? '') ?>">
                         </div>
+
+                        <!-- الفلتر السادس: الرقم الوظيفي (يظهر فقط لأصحاب الصلاحيات) -->
+                        <?php if (in_array($filters['user_role'] ?? '', ['assets', 'super_assets'])): ?>
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-id-badge"></i>
+                                الرقم الوظيفي
+                            </label>
+                            <input type="text" class="filter-input" name="returned_by"
+                                   value="<?= esc($filters['returned_by'] ?? '') ?>" 
+                                   placeholder="رقم الموظف">
+                        </div>
+                        <?php endif; ?>
                     </div>
 
                     <!-- أزرار العمليات -->
@@ -408,15 +418,13 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    let isPrinting = false; // Flag to prevent multiple simultaneous prints
+    let isPrinting = false;
     
     window.printCombinedReturn = function () {
-        // Prevent multiple simultaneous print operations
         if (isPrinting) {
             return;
         }
         
-        // Check if operation type is set to 'return'
         const operationType = document.querySelector('select[name="operation_type"]')?.value;
         
         if (operationType !== 'return') {
@@ -426,24 +434,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
         isPrinting = true;
 
-        // Collect all filter parameters
         const params = new URLSearchParams({
             asset_number: document.querySelector('input[name="asset_number"]')?.value || '',
             item_name: document.querySelector('input[name="item_name"]')?.value || '',
             date_from: document.querySelector('input[name="date_from"]')?.value || '',
-            date_to: document.querySelector('input[name="date_to"]')?.value || ''
+            date_to: document.querySelector('input[name="date_to"]')?.value || '',
+            returned_by: document.querySelector('input[name="returned_by"]')?.value || ''
         });
 
-        // Build URL
         const url = '<?= site_url("reports/returnreport") ?>?' + params.toString();
         
-        // Remove any existing print iframe
         const existingIframe = document.getElementById('printIframe');
         if (existingIframe) {
             existingIframe.remove();
         }
         
-        // Create new iframe
         const iframe = document.createElement('iframe');
         iframe.id = 'printIframe';
         iframe.style.position = 'absolute';
@@ -453,13 +458,10 @@ document.addEventListener('DOMContentLoaded', function () {
         iframe.style.visibility = 'hidden';
         iframe.style.left = '-9999px';
         
-        // Add load event listener - only fires once
         iframe.addEventListener('load', function() {
             try {
-                // Trigger print after iframe loads
                 setTimeout(function() {
                     iframe.contentWindow.print();
-                    // Reset flag after print dialog appears
                     setTimeout(function() {
                         isPrinting = false;
                     }, 1000);
@@ -469,13 +471,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('حدث خطأ أثناء الطباعة. يرجى المحاولة مرة أخرى.');
                 isPrinting = false;
             }
-        }, { once: true }); // This ensures the event only fires once
+        }, { once: true });
         
         document.body.appendChild(iframe);
         iframe.src = url;
     }
 
-    // Auto-enable/disable print button based on operation type selection
     const operationTypeSelect = document.querySelector('select[name="operation_type"]');
     const printButton = document.querySelector('button[onclick="printCombinedReturn()"]');
     
@@ -494,7 +495,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
         
-        // Trigger change event on page load
         operationTypeSelect.dispatchEvent(new Event('change'));
     }
 });
