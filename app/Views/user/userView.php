@@ -477,7 +477,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>`;
-                            
+
                             items.forEach(item => {
                                 itemsTableHtml += `
                                     <tr>
@@ -492,7 +492,7 @@
                                         <td>${item.assets_type || '-'}</td>
                                     </tr>`;
                             });
-                            
+
                             itemsTableHtml += `
                                         </tbody>
                                     </table>
@@ -535,10 +535,7 @@
                             <label class="form-label fw-bold text-muted">البريد الإلكتروني</label>
                             <p class="form-control-plaintext">${t.from_user_email || '-'}</p>
                         </div>
-                        <div class="col-12">
-                            <label class="form-label fw-bold text-muted">تاريخ الطلب</label>
-                            <p class="form-control-plaintext">${formatDate(t.created_at)}</p>
-                        </div>
+                     
                     </div>
                     ${itemsTableHtml}
                 `;
@@ -629,15 +626,23 @@
             return name == 'جديد' ? 'status-new' : name == 'تحويل' ? 'status-transfer' : 'status-return';
         }
 
+        // استبدل دالة formatDate في userView.php بهذا الكود:
+
         function formatDate(d) {
             if (!d) return '-';
-            return new Date(d).toLocaleDateString('ar-SA', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            try {
+                const date = new Date(d);
+                if (isNaN(date.getTime())) return '-';
+                return date.toLocaleDateString('ar-SA', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return '-';
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
