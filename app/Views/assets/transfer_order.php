@@ -409,8 +409,6 @@
         </div>
     </div>
 
-   
-
     <div class="bulk-actions-bar" id="bulkActionsBar">
         <div class="bulk-counter">
             <i class="fas fa-check-circle"></i>
@@ -437,23 +435,20 @@
             
             <div id="selectedItemsList" style="max-height: 200px; overflow-y: auto; margin-bottom: 20px; padding: 10px; background: #f8f9fa; border-radius: 8px;"></div>
             
+            <!-- ✅ حقل "من" ثابت وغير قابل للتعديل -->
             <div class="form-group">
-                <label for="fromUserInput">من (المستخدم المحول):</label>
-                <div class="search-select-container">
-                    <input 
-                        type="text" 
-                        id="fromUserInput" 
-                        class="search-select-input"
-                        placeholder="ابحث بالاسم أو رقم المستخدم..."
-                        autocomplete="off"
-                        oninput="filterUsers('from')"
-                        onfocus="showDropdown('from')"
-                    >
-                    <span class="search-icon">🔍</span>
-                    <div id="fromUserDropdown" class="search-dropdown"></div>
-                </div>
+                <label for="fromUserInput">من (المستخدم الحالي):</label>
+                <input 
+                    type="text" 
+                    id="fromUserInput" 
+                    class="search-select-input"
+                    value="<?= esc($current_user->name) ?> (<?= esc($current_user->user_dept ?? 'بدون قسم') ?>)"
+                    readonly
+                    style="background: #f8f9fa; cursor: not-allowed; color: #6c757d;"
+                >
             </div>
             
+            <!-- ✅ حقل "إلى" قابل للبحث والتعديل -->
             <div class="form-group">
                 <label for="toUserInput">إلى (المستخدم المستلم):</label>
                 <div class="search-select-container">
@@ -484,7 +479,11 @@
     </div>
 
     <script>
-        // Users data from PHP
+        // ✅ تعريف المستخدم الحالي من PHP
+        const currentUserId = "<?= esc($current_user->user_id) ?>";
+        const currentUserName = "<?= esc($current_user->name) ?>";
+        
+        // Users data from PHP (بدون المستخدم الحالي)
         const usersData = <?= json_encode(array_map(function($user) {
             return [
                 'user_id' => $user->user_id,
@@ -493,7 +492,6 @@
             ];
         }, $users)) ?>;
         
-        let selectedFromUser = null;
         let selectedToUser = null;
         let selectedItems = [];
 
@@ -543,9 +541,7 @@
             input.value = `${userName} (${dept || 'بدون قسم'})`;
             dropdown.classList.remove('show');
             
-            if (type === 'from') {
-                selectedFromUser = userId;
-            } else {
+            if (type === 'to') {
                 selectedToUser = userId;
             }
         }
@@ -625,10 +621,8 @@
             list.innerHTML = '<strong>الأصول المحددة:</strong><br>' + 
                 selectedItems.map((item, i) => `${i + 1}. ${item.name}`).join('<br>');
             
-            // Reset selections
-            selectedFromUser = null;
+            // ✅ إعادة تعيين حقل "إلى" فقط
             selectedToUser = null;
-            document.getElementById('fromUserInput').value = '';
             document.getElementById('toUserInput').value = '';
             document.getElementById('transferNote').value = '';
             
@@ -652,18 +646,9 @@
         function submitTransfer() {
             const note = document.getElementById('transferNote').value;
             
-            if (!selectedFromUser) {
-                showAlert('warning', 'يرجى اختيار المستخدم المحول');
-                return;
-            }
-            
+            // ✅ التحقق من المستخدم المستلم فقط
             if (!selectedToUser) {
                 showAlert('warning', 'يرجى اختيار المستخدم المستلم');
-                return;
-            }
-            
-            if (selectedFromUser === selectedToUser) {
-                showAlert('warning', 'لا يمكن تحويل الأصول لنفس المستخدم');
                 return;
             }
             
@@ -672,9 +657,10 @@
                 return;
             }
             
+            // ✅ إرسال currentUserId بدلاً من selectedFromUser
             const transferData = {
                 items: selectedItems.map(item => item.id),
-                from_user_id: selectedFromUser,
+                from_user_id: currentUserId,
                 to_user_id: selectedToUser,
                 note: note
             };
