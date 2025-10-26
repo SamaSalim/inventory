@@ -135,66 +135,66 @@ class UserController extends BaseController
         ];
     }
 
-    /**
-     * جلب تفاصيل العهدة  
-     */
-    public function getTransferDetails($transferId)
-    {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'يجب تسجيل الدخول أولاً'
-            ]);
-        }
-
-        $transferModel = new TransferItemsModel();
-        $itemOrderModel = new ItemOrderModel();
-
-        // جلب معلومات الطلب الأساسية
-        $transfer = $transferModel
-            ->select(
-                'transfer_items.*,
-                 from_user.name AS from_user_name,
-                 from_user.user_dept AS from_user_dept,
-                 from_user.user_ext AS from_user_ext,
-                 from_user.email AS from_user_email,
-                 order_status.status AS order_status_name,
-                 item_order.order_id'
-            )
-            ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
-            ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
-            ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
-            ->where('transfer_items.transfer_item_id', $transferId)
-            ->first();
-
-        if (!$transfer) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'الطلب غير موجود'
-            ]);
-        }
-
-        // جلب جميع الأصناف المرتبطة بنفس order_id
-        $items = $itemOrderModel
-            ->select(
-                'item_order.item_order_id,
-                 item_order.asset_num,
-                 item_order.serial_num,
-                 item_order.assets_type,
-                 items.name as item_name,
-                 usage_status.usage_status AS usage_status_name'
-            )
-            ->join('items', 'items.id = item_order.item_id', 'left')
-            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-            ->where('item_order.order_id', $transfer->order_id)
-            ->findAll();
-
+   /**
+ * جلب تفاصيل العهدة  
+ */
+public function getTransferDetails($transferId)
+{
+    if (!session()->get('isLoggedIn')) {
         return $this->response->setJSON([
-            'success' => true,
-            'data' => $transfer,
-            'items' => $items
+            'success' => false,
+            'message' => 'يجب تسجيل الدخول أولاً'
         ]);
     }
+
+    $currentUserId = session()->get('isEmployee') ? null : session()->get('employee_id');
+
+    $transferModel = new TransferItemsModel();
+    $itemOrderModel = new ItemOrderModel();
+
+    // جلب معلومات الطلب الأساسية
+    $transfer = $transferModel
+        ->select('transfer_items.*, from_user.name AS from_user_name, from_user.user_dept AS from_user_dept, 
+                  from_user.user_ext AS from_user_ext, from_user.email AS from_user_email, 
+                  order_status.status AS order_status_name, item_order.order_id')
+        ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+        ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
+        ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
+        ->where('transfer_items.transfer_item_id', $transferId)
+        ->where('transfer_items.to_user_id', $currentUserId)
+        ->first();
+
+    if (!$transfer) {
+        return $this->response->setJSON(['success' => false, 'message' => 'الطلب غير موجود']);
+    }
+
+    // جلب الأصناف من transfer_items
+    $transferItems = $itemOrderModel
+        ->select('item_order.item_order_id, item_order.asset_num, item_order.serial_num, item_order.assets_type,
+                  items.name as item_name, usage_status.usage_status AS usage_status_name')
+        ->join('items', 'items.id = item_order.item_id', 'left')
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+        ->join('transfer_items', 'transfer_items.item_order_id = item_order.item_order_id', 'left')
+        ->where('transfer_items.to_user_id', $currentUserId)
+        ->where('item_order.order_id', $transfer->order_id)
+        ->findAll();
+
+    // جلب الأصناف من order
+    $orderItems = $itemOrderModel
+        ->select('item_order.item_order_id, item_order.asset_num, item_order.serial_num, item_order.assets_type,
+                  items.name as item_name, usage_status.usage_status AS usage_status_name')
+        ->join('items', 'items.id = item_order.item_id', 'left')
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+        ->join('order', 'order.order_id = item_order.order_id', 'left')
+        ->where('order.to_user_id', $currentUserId)
+        ->where('item_order.order_id', $transfer->order_id)
+        ->findAll();
+
+    // دمج وإزالة التكرار
+    $items = array_values(array_unique(array_merge($transferItems, $orderItems), SORT_REGULAR));
+
+    return $this->response->setJSON(['success' => true, 'data' => $transfer, 'items' => $items]);
+}
 
     /**
      * قبول أو رفض طلب العهدة
