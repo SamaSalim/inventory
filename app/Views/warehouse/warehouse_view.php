@@ -68,19 +68,19 @@
                         <svg class="stat-icon" viewBox="0 0 24 24">
                             <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2-7h-3V2h-2v2H8V2H6v2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2z" />
                         </svg>
-                        عدد الإدخالات
+                        عدد الأصناف المحولة
                     </div>
                 </div>
 
                 <div class="stat-card" style="background: linear-gradient(135deg, #e8f5e9, #81c784);">
-    <div class="stat-number"><?= number_format($stats['returned_items'] ?? 0) ?></div>
-    <div class="stat-label">
-        <svg class="stat-icon" viewBox="0 0 24 24">
-            <path d="M9 11H3v2h6v3l5-4-5-4v3zm12-8h-6c-1.1 0-2 .9-2 2v3h2V5h6v14h-6v-3h-2v3c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
-        </svg>
-        عدد أصناف الرجيع
-    </div>
-</div>
+                    <div class="stat-number"><?= number_format($stats['returned_items'] ?? 0) ?></div>
+                    <div class="stat-label">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M9 11H3v2h6v3l5-4-5-4v3zm12-8h-6c-1.1 0-2 .9-2 2v3h2V5h6v14h-6v-3h-2v3c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+                        </svg>
+                        عدد أصناف الرجيع
+                    </div>
+                </div>
             </div>
 
             <div class="section-header">
@@ -244,9 +244,9 @@
                             <th>رقم الطلب</th>
                             <!-- <th>الرقم الوظيفي</th> -->
                             <!-- <th>التحويلة</th> -->
-                            <th>مستلم الطلب</th> 
-                            <th>عدد الأصناف</th> 
-                            <th>حالة الطلب</th> 
+                            <th>مستلم الطلب</th>
+                            <th>عدد الأصناف</th>
+                            <th>حالة الطلب</th>
                             <th>حالة الاستخدام</th>
                             <th>تاريخ الطلب</th>
                             <!-- <th>رمز الموقع</th> -->
@@ -255,81 +255,81 @@
                         </tr>
                     </thead>
                     <tbody>
-    <?php if (isset($orders) && !empty($orders)): ?>
-        <?php foreach ($orders as $order): ?>
-            <tr class="text-center align-middle" data-order-id="<?= $order->order_id ?>">
-                <td class="checkbox-cell">
-                    <input type="checkbox" class="custom-checkbox row-checkbox" onchange="updateSelection()">
-                </td>
-                <td><?= esc($order->order_id ?? '-') ?></td>
-                
-                <!-- ✅ عمود مستلم الطلب -->
-                <td><?= esc($order->receiver_name ?? 'غير محدد') ?></td>
-                
-                <!-- ✅ عمود عدد الأصناف -->
-                <td>
-                    <span class="badge bg-primary">
-                        <?= esc($order->items_count ?? 0) ?>
-                    </span>
-                </td>
-                
-                <!-- ✅ عمود حالة الطلب -->
-                <td>
-                    <?php
-                    $statusClass = 'bg-secondary';
-                    if (isset($order->order_status_name)) {
-                        if (str_contains($order->order_status_name, 'مقبول')) {
-                            $statusClass = 'bg-success';
-                        } elseif (str_contains($order->order_status_name, 'مرفوض')) {
-                            $statusClass = 'bg-danger';
-                        } elseif (str_contains($order->order_status_name, 'انتظار')) {
-                            $statusClass = 'bg-warning';
-                        }
-                    }
-                    ?>
-                    <span class="badge <?= $statusClass ?>">
-                        <?= esc($order->order_status_name ?? 'غير محدد') ?>
-                    </span>
-                </td>
-                
-                <td><?= esc($order->usage_status_name ?? '-') ?></td>
-                <td><?= isset($order->created_at) ? esc(date('Y-m-d', strtotime($order->created_at))) : '-' ?></td>
-                <td><?= esc($order->created_by_name ?? '-') ?></td>
-                <td>
-                    <!-- أزرار العمليات كما هي -->
-                    <div class="action-buttons">
-                        <a href="<?= site_url('InventoryController/showOrder/' . $order->order_id) ?>" class="action-btn view-btn">
-                            <svg class="btn-icon" viewBox="0 0 24 24">
-                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-                            </svg>
-                            عرض
-                        </a>
-                        
-                        <?php if (canEditOrder()): ?>
-                            <a href="<?= site_url('OrderController/editOrder/' . $order->order_id) ?>" class="action-btn edit-btn">
-                                <svg class="btn-icon" viewBox="0 0 24 24">
-                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                                </svg>
-                                تعديل
-                            </a>
+                        <?php if (isset($orders) && !empty($orders)): ?>
+                            <?php foreach ($orders as $order): ?>
+                                <tr class="text-center align-middle" data-order-id="<?= $order->order_id ?>">
+                                    <td class="checkbox-cell">
+                                        <input type="checkbox" class="custom-checkbox row-checkbox" onchange="updateSelection()">
+                                    </td>
+                                    <td><?= esc($order->order_id ?? '-') ?></td>
+
+                                    <!-- ✅ عمود مستلم الطلب -->
+                                    <td><?= esc($order->receiver_name ?? 'غير محدد') ?></td>
+
+                                    <!-- ✅ عمود عدد الأصناف -->
+                                    <td>
+                                        <span class="badge bg-primary">
+                                            <?= esc($order->items_count ?? 0) ?>
+                                        </span>
+                                    </td>
+
+                                    <!-- ✅ عمود حالة الطلب -->
+                                    <td>
+                                        <?php
+                                        $statusClass = 'bg-secondary';
+                                        if (isset($order->order_status_name)) {
+                                            if (str_contains($order->order_status_name, 'مقبول')) {
+                                                $statusClass = 'bg-success';
+                                            } elseif (str_contains($order->order_status_name, 'مرفوض')) {
+                                                $statusClass = 'bg-danger';
+                                            } elseif (str_contains($order->order_status_name, 'انتظار')) {
+                                                $statusClass = 'bg-warning';
+                                            }
+                                        }
+                                        ?>
+                                        <span class="badge <?= $statusClass ?>">
+                                            <?= esc($order->order_status_name ?? 'غير محدد') ?>
+                                        </span>
+                                    </td>
+
+                                    <td><?= esc($order->usage_status_name ?? '-') ?></td>
+                                    <td><?= isset($order->created_at) ? esc(date('Y-m-d', strtotime($order->created_at))) : '-' ?></td>
+                                    <td><?= esc($order->created_by_name ?? '-') ?></td>
+                                    <td>
+                                        <!-- أزرار العمليات كما هي -->
+                                        <div class="action-buttons">
+                                            <a href="<?= site_url('InventoryController/showOrder/' . $order->order_id) ?>" class="action-btn view-btn">
+                                                <svg class="btn-icon" viewBox="0 0 24 24">
+                                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+                                                </svg>
+                                                عرض
+                                            </a>
+
+                                            <?php if (canEditOrder()): ?>
+                                                <a href="<?= site_url('OrderController/editOrder/' . $order->order_id) ?>" class="action-btn edit-btn">
+                                                    <svg class="btn-icon" viewBox="0 0 24 24">
+                                                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                                                    </svg>
+                                                    تعديل
+                                                </a>
+                                            <?php endif; ?>
+
+                                            <?php if (canDeleteOrder()): ?>
+                                                <button class="action-btn delete-btn" onclick="deleteOrderConfirm(<?= $order->order_id ?>)">
+                                                    <i class="fas fa-trash"></i>
+                                                    حذف
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="9" class="text-center">لا توجد بيانات متاحة</td>
+                            </tr>
                         <?php endif; ?>
-                        
-                        <?php if (canDeleteOrder()): ?>
-                            <button class="action-btn delete-btn" onclick="deleteOrderConfirm(<?= $order->order_id ?>)">
-                                <i class="fas fa-trash"></i>
-                                حذف
-                            </button>
-                        <?php endif; ?>
-                    </div>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <tr>
-            <td colspan="9" class="text-center">لا توجد بيانات متاحة</td>
-        </tr>
-    <?php endif; ?>
-</tbody>
+                    </tbody>
                 </table>
             </div>
             <div class="d-flex justify-content-end mt-3">
