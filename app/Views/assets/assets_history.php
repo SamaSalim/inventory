@@ -140,6 +140,55 @@
             font-weight: bold;
             margin-right: 3px;
         }
+
+        /* Custom Alert Styling */
+        .custom-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 350px;
+            max-width: 500px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            animation: slideInRight 0.4s ease-out;
+        }
+
+        .custom-alert.alert-warning {
+            background: linear-gradient(135deg, #ffc107, #ff9800);
+            border: none;
+            color: white;
+        }
+
+        .custom-alert .alert-icon {
+            font-size: 24px;
+            margin-left: 10px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        .custom-alert.fade-out {
+            animation: fadeOut 0.4s ease-out forwards;
+        }
     </style>
 </head>
 
@@ -171,6 +220,7 @@
         <div class="content-area">
             <div id="alertContainer"></div>
 
+            <!-- Statistics Cards -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon operations">
@@ -217,8 +267,10 @@
                 <h2 class="section-title">سجلات العمليات</h2>
             </div>
 
+            <!-- Filters Form -->
             <form method="get" action="<?= base_url('AssetsHistory/assetsHistory') ?>">
                 <div class="filters-section">
+                    <!-- Main Search Bar -->
                     <div class="main-search-container">
                         <h3 class="search-section-title">
                             <i class="fas fa-search"></i>
@@ -236,6 +288,7 @@
                         <span><i class="fas fa-filter"></i> الفلاتر التفصيلية</span>
                     </div>
 
+                    <!-- Detailed Filters -->
                     <div class="detailed-filters">
                         <div class="filter-group">
                             <label class="filter-label">
@@ -311,6 +364,7 @@
                         <?php endif; ?>
                     </div>
 
+                    <!-- Filter Action Buttons -->
                     <div class="filter-actions">
                         <div style="display: flex; gap: 10px;">
                             <button type="submit" class="filter-btn search-btn">
@@ -335,6 +389,7 @@
                 </div>
             </form>
 
+            <!-- Operations Table -->
             <div class="table-container">
                 <table class="custom-table" id="datatable-operations">
                     <thead>
@@ -349,7 +404,9 @@
                     <tbody>
                         <?php if (isset($operations) && !empty($operations)): ?>
                             <?php foreach ($operations as $operation): ?>
-                                <tr class="text-center align-middle">
+                                <tr class="text-center align-middle" 
+                                    data-usage-status="<?= esc($operation->usage_status_id ?? '') ?>"
+                                    data-order-status="<?= esc($operation->order_status_name ?? '') ?>">
                                     <td><?= esc($operation->asset_number ?? '-') ?></td>
                                     <td><?= esc($operation->item_name ?? '-') ?></td>
                                     <td>
@@ -382,11 +439,12 @@
                                         $statusClass = 'bg-secondary';
                                         $statusName = $operation->order_status_name ?? 'غير محدد';
                                         
+                                        // Map status names to badge colors
                                         if (str_contains($statusName, 'مقبول')) {
                                             $statusClass = 'bg-success';
                                         } elseif (str_contains($statusName, 'مرفوض')) {
                                             $statusClass = 'bg-danger';
-                                        } elseif (str_contains($statusName, 'انتظار')) {
+                                        } elseif (str_contains($statusName, 'انتظار') || str_contains($statusName, 'قيد')) {
                                             $statusClass = 'bg-warning';
                                         }
                                         ?>
@@ -405,6 +463,7 @@
                 </table>
             </div>
 
+            <!-- Pagination -->
             <div class="d-flex justify-content-end mt-3">
                 <?= $pager->links('operations', 'custom_arabic') ?>
             </div>
@@ -414,190 +473,204 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        let isPrinting = false;
-        const userRole = '<?= $filters['user_role'] ?? '' ?>';
-        const isAssetsRole = ['assets', 'super_assets'].includes(userRole);
+document.addEventListener('DOMContentLoaded', function () {
+    let isPrinting = false;
+    const userRole = '<?= $filters['user_role'] ?? '' ?>';
+    const isAssetsRole = ['assets', 'super_assets'].includes(userRole);
+    
+    // Function to show browser's native alert
+    function showAlert(message, type = 'warning') {
+        const cleanMessage = message.replace(/<br>/g, '\n').replace(/<[^>]*>/g, '');
+        alert(cleanMessage);
+    }
+    
+    // Unified function to count accepted items based on operation type
+    function countAcceptedItems(operationType) {
+        const tableRows = document.querySelectorAll('#datatable-operations tbody tr');
+        let acceptedCount = 0;
         
-        // Unified print function that handles different operation types
-        window.printReport = function () {
-            if (isPrinting) {
-                console.log('Already printing...');
-                return;
-            }
-            
-            const operationType = document.getElementById('operationTypeSelect')?.value;
-            const toUserIdInput = document.getElementById('toUserIdInput');
-            const toUserId = toUserIdInput?.value.trim();
-            
-            // Validate operation type
-            if (!operationType) {
-                alert('يرجى تحديد نوع العملية أولاً للطباعة');
-                return;
-            }
-
-            // Only validate to_user_id for assets users (regular users have it auto-filled)
-            if (isAssetsRole && !toUserId) {
-                alert('⚠️ يجب إدخال الرقم الوظيفي قبل الطباعة\n\nالرقم الوظيفي مطلوب لتصفية وطباعة العمليات المرتبطة بشخص محدد.');
-                if (toUserIdInput) {
-                    toUserIdInput.classList.add('required-field');
-                    toUserIdInput.focus();
+        tableRows.forEach(row => {
+            if (operationType === 'return') {
+                const usageStatus = row.getAttribute('data-usage-status');
+                if (usageStatus === '4') {
+                    acceptedCount++;
                 }
-                return;
+            } else if (operationType === 'new') {
+                const orderStatus = row.getAttribute('data-order-status');
+                if (orderStatus && orderStatus.includes('مقبول')) {
+                    acceptedCount++;
+                }
             }
+        });
+        
+        return acceptedCount;
+    }
+    
+    // Unified print function that handles different operation types
+    window.printReport = function () {
+        if (isPrinting) {
+            console.log('Already printing...');
+            return;
+        }
+        
+        const operationType = document.getElementById('operationTypeSelect')?.value;
+        const toUserIdInput = document.getElementById('toUserIdInput');
+        const toUserId = toUserIdInput?.value.trim();
+        
+        // Validate operation type
+        if (!operationType) {
+            showAlert('⚠️ يرجى تحديد نوع العملية أولاً للطباعة');
+            return;
+        }
 
-            // Remove required field styling if it was added
+        // Only validate to_user_id for assets users (regular users have it auto-filled)
+        if (isAssetsRole && !toUserId) {
+            showAlert('⚠️ يجب إدخال الرقم الوظيفي قبل الطباعة\nالرقم الوظيفي مطلوب لتصفية وطباعة العمليات المرتبطة بشخص محدد.');
             if (toUserIdInput) {
-                toUserIdInput.classList.remove('required-field');
+                toUserIdInput.classList.add('required-field');
+                toUserIdInput.focus();
             }
+            return;
+        }
 
-            isPrinting = true;
-
-            // Build common filter parameters
-            const params = new URLSearchParams({
-                asset_number: document.getElementById('assetNumberInput')?.value || '',
-                item_name: document.getElementById('itemNameInput')?.value || '',
-                date_from: document.getElementById('dateFromInput')?.value || '',
-                date_to: document.getElementById('dateToInput')?.value || '',
-                returned_by: toUserId || ''
-            });
-
-            // Determine which report URL to use based on operation type
-            let url;
-            switch(operationType) {
-                case 'return':
-                    url = '<?= site_url("reports/returnreport") ?>?' + params.toString();
-                    break;
-                case 'new':
-                    url = '<?= site_url("reports/directordersreport") ?>?' + params.toString();
-                    break;
-                case 'transfer':
-                    alert('طباعة تقرير التحويل غير متاحة حالياً');
-                    isPrinting = false;
-                    return;
-                default:
-                    alert('نوع العملية غير مدعوم للطباعة');
-                    isPrinting = false;
-                    return;
-            }
+        // CRITICAL CHECK: Verify there are accepted items for the selected operation type
+        if (operationType === 'return' || operationType === 'new') {
+            const acceptedCount = countAcceptedItems(operationType);
             
-            console.log('Print URL:', url);
-            console.log('To User ID:', toUserId);
-            
-            // Remove existing iframe if any
-            const existingIframe = document.getElementById('printIframe');
-            if (existingIframe) {
-                existingIframe.remove();
-            }
-            
-            // Create hidden iframe for printing
-            const iframe = document.createElement('iframe');
-            iframe.id = 'printIframe';
-            iframe.style.position = 'absolute';
-            iframe.style.width = '0';
-            iframe.style.height = '0';
-            iframe.style.border = 'none';
-            iframe.style.visibility = 'hidden';
-            iframe.style.left = '-9999px';
-            
-            iframe.addEventListener('load', function() {
-                try {
-                    setTimeout(function() {
-                        iframe.contentWindow.print();
-                        setTimeout(function() {
-                            isPrinting = false;
-                        }, 1000);
-                    }, 500);
-                } catch (e) {
-                    console.error('Print error:', e);
-                    alert('حدث خطأ أثناء الطباعة. يرجى المحاولة مرة أخرى.');
-                    isPrinting = false;
-                }
-            }, { once: true });
-            
-            document.body.appendChild(iframe);
-            iframe.src = url;
-        };
-
-        // Update print button state based on filters (only for assets users)
-        if (isAssetsRole) {
-            const operationTypeSelect = document.getElementById('operationTypeSelect');
-            const toUserIdInput = document.getElementById('toUserIdInput');
-            const printButton = document.getElementById('printButton');
-            
-            function updatePrintButton() {
-                const selectedType = operationTypeSelect.value;
-                const toUserId = toUserIdInput.value.trim();
+            if (acceptedCount === 0) {
+                const operationNameAr = operationType === 'return' ? 'إرجاع' : 'مباشرة';
+                const statusNote = operationType === 'return' 
+                    ? 'يجب أن تكون حالة الإرجاع "مقبول" لطباعة النموذج.' 
+                    : 'يجب أن تكون حالة الطلب "مقبول" لطباعة النموذج.';
                 
-                if (!selectedType) {
-                    printButton.disabled = true;
-                    printButton.title = 'يرجى تحديد نوع العملية أولاً';
-                    printButton.style.opacity = '0.5';
-                    printButton.style.cursor = 'not-allowed';
-                } else if (selectedType === 'transfer') {
-                    printButton.disabled = true;
-                    printButton.title = 'طباعة تقرير التحويل غير متاحة حالياً';
-                    printButton.style.opacity = '0.5';
-                    printButton.style.cursor = 'not-allowed';
-                } else if (!toUserId) {
+                showAlert(`⚠️ لا توجد عمليات ${operationNameAr} مقبولة للطباعة حالياً\n${statusNote}\nالعمليات "قيد الانتظار" أو "مرفوض" لا يمكن طباعتها.`);
+                return;
+            }
+            
+            console.log(`Found ${acceptedCount} accepted ${operationType} items for printing`);
+        }
+
+        // Remove required field styling if it was added
+        if (toUserIdInput) {
+            toUserIdInput.classList.remove('required-field');
+        }
+
+        isPrinting = true;
+
+        // Build common filter parameters
+        const params = new URLSearchParams({
+            asset_number: document.getElementById('assetNumberInput')?.value || '',
+            item_name: document.getElementById('itemNameInput')?.value || '',
+            date_from: document.getElementById('dateFromInput')?.value || '',
+            date_to: document.getElementById('dateToInput')?.value || '',
+            returned_by: toUserId || ''
+        });
+
+        // Determine which report URL to use based on operation type
+        let url;
+        switch(operationType) {
+            case 'return':
+                url = '<?= site_url("reports/returnreport") ?>?' + params.toString();
+                break;
+            case 'new':
+                url = '<?= site_url("reports/directordersreport") ?>?' + params.toString();
+                break;
+            case 'transfer':
+                showAlert('⚠️ طباعة تقرير التحويل غير متاحة حالياً');
+                isPrinting = false;
+                return;
+            default:
+                showAlert('⚠️ نوع العملية غير مدعوم للطباعة');
+                isPrinting = false;
+                return;
+        }
+        
+        console.log('Print URL:', url);
+        console.log('To User ID:', toUserId);
+        
+        // Remove existing iframe if any
+        const existingIframe = document.getElementById('printIframe');
+        if (existingIframe) {
+            existingIframe.remove();
+        }
+        
+        // Create hidden iframe for printing
+        const iframe = document.createElement('iframe');
+        iframe.id = 'printIframe';
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = 'none';
+        iframe.style.visibility = 'hidden';
+        iframe.style.left = '-9999px';
+        
+        iframe.addEventListener('load', function() {
+            try {
+                setTimeout(function() {
+                    iframe.contentWindow.print();
+                    setTimeout(function() {
+                        isPrinting = false;
+                    }, 1000);
+                }, 500);
+            } catch (e) {
+                console.error('Print error:', e);
+                showAlert('⚠️ حدث خطأ أثناء الطباعة. يرجى المحاولة مرة أخرى.');
+                isPrinting = false;
+            }
+        }, { once: true });
+        
+        document.body.appendChild(iframe);
+        iframe.src = url;
+    };
+
+    // Update print button state based on filters (ONLY for assets role users)
+    const operationTypeSelect = document.getElementById('operationTypeSelect');
+    const toUserIdInput = document.getElementById('toUserIdInput');
+    const printButton = document.getElementById('printButton');
+    
+    if (isAssetsRole && operationTypeSelect && toUserIdInput && printButton) {
+        function updatePrintButton() {
+            const selectedType = operationTypeSelect.value;
+            const toUserId = toUserIdInput.value.trim();
+            
+            if (!selectedType) {
+                printButton.disabled = true;
+                printButton.title = 'يرجى تحديد نوع العملية أولاً';
+                printButton.style.opacity = '0.5';
+                printButton.style.cursor = 'not-allowed';
+            } else if (selectedType === 'transfer') {
+                printButton.disabled = true;
+                printButton.title = 'طباعة تقرير التحويل غير متاحة حالياً';
+                printButton.style.opacity = '0.5';
+                printButton.style.cursor = 'not-allowed';
+            } else if (!toUserId) {
+                printButton.disabled = false;
+                printButton.title = 'يجب إدخال الرقم الوظيفي قبل الطباعة';
+                printButton.style.opacity = '0.7';
+                printButton.style.cursor = 'pointer';
+            } else {
+                const acceptedCount = countAcceptedItems(selectedType);
+                const operationNameAr = selectedType === 'return' ? 'الإرجاع' : 'المباشرة';
+                
+                if (acceptedCount === 0) {
                     printButton.disabled = false;
-                    printButton.title = 'يجب إدخال الرقم الوظيفي قبل الطباعة';
+                    printButton.title = `لا توجد عمليات ${operationNameAr} مقبولة للطباعة`;
                     printButton.style.opacity = '0.7';
                     printButton.style.cursor = 'pointer';
                 } else {
                     printButton.disabled = false;
-                    const typeNames = {
-                        'return': 'الإرجاع',
-                        'new': 'المباشرة'
-                    };
-                    printButton.title = 'طباعة نموذج ' + (typeNames[selectedType] || '');
-                    printButton.style.opacity = '1';
-                    printButton.style.cursor = 'pointer';
-                    toUserIdInput.classList.remove('required-field');
-                }
-            }
-            
-            if (operationTypeSelect && toUserIdInput && printButton) {
-                operationTypeSelect.addEventListener('change', updatePrintButton);
-                toUserIdInput.addEventListener('input', updatePrintButton);
-                updatePrintButton();
-            }
-        } else {
-            // For regular users, just check operation type
-            const operationTypeSelect = document.getElementById('operationTypeSelect');
-            const printButton = document.getElementById('printButton');
-            
-            function updatePrintButtonForUser() {
-                const selectedType = operationTypeSelect.value;
-                
-                if (!selectedType) {
-                    printButton.disabled = true;
-                    printButton.title = 'يرجى تحديد نوع العملية أولاً';
-                    printButton.style.opacity = '0.5';
-                    printButton.style.cursor = 'not-allowed';
-                } else if (selectedType === 'transfer') {
-                    printButton.disabled = true;
-                    printButton.title = 'طباعة تقرير التحويل غير متاحة حالياً';
-                    printButton.style.opacity = '0.5';
-                    printButton.style.cursor = 'not-allowed';
-                } else {
-                    printButton.disabled = false;
-                    const typeNames = {
-                        'return': 'الإرجاع',
-                        'new': 'المباشرة'
-                    };
-                    printButton.title = 'طباعة نموذج ' + (typeNames[selectedType] || '');
+                    printButton.title = `طباعة نموذج ${operationNameAr} (${acceptedCount} عملية مقبولة)`;
                     printButton.style.opacity = '1';
                     printButton.style.cursor = 'pointer';
                 }
-            }
-            
-            if (operationTypeSelect && printButton) {
-                operationTypeSelect.addEventListener('change', updatePrintButtonForUser);
-                updatePrintButtonForUser();
             }
         }
-    });
+        
+        operationTypeSelect.addEventListener('change', updatePrintButton);
+        toUserIdInput.addEventListener('input', updatePrintButton);
+        updatePrintButton();
+    }
+});
     </script>
 
 </body>

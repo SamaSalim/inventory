@@ -243,13 +243,6 @@ class UserController extends BaseController
                 ]);
             }
 
-            $currentUserId = session()->get('employee_id');
-            if ($transfer->to_user_id !== $currentUserId) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'ليس لديك صلاحية لهذا الإجراء'
-                ]);
-            }
 
             if ($transfer->order_status_id != 1) {
                 $statusText = $transfer->order_status_id == 2 ? 'مقبول' : 'مرفوض';

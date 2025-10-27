@@ -515,7 +515,7 @@ class AssetsHistory extends BaseController
         $this->checkAuth();
     }
 
-public function assetsHistory(): string
+   public function assetsHistory(): string
 {
     $this->checkAuth();
 
@@ -525,12 +525,10 @@ public function assetsHistory(): string
     $userRole = session()->get('role');
     $userId = session()->get('employee_id') ?? session()->get('user_id');
 
-    // Changed from 'returned_by' to 'to_user_id'
     $toUserIdFilter = $this->request->getGet('to_user_id');
-    
-    // Auto-fill with current user ID for non-assets users
+
     if (!in_array($userRole, ['assets', 'super_assets'])) {
-        $toUserIdFilter = $userId; // Always use current user's ID
+        $toUserIdFilter = $userId;
     }
 
     $filters = [
@@ -544,7 +542,7 @@ public function assetsHistory(): string
         'user_role' => $userRole,
     ];
 
-    // العناصر الجديدة مع حالة الطلب
+    // ==================== NEW ITEMS ====================
     $newItemsQuery = $itemOrderModel
         ->select('item_order.asset_num as asset_number, items.name as item_name,
                   item_order.created_at as last_operation_date, item_order.item_order_id as id,
@@ -565,15 +563,13 @@ public function assetsHistory(): string
             ->orLike('items.name', $filters['search'])
             ->groupEnd();
     }
-    
-    // Apply to_user_id filter for new items
     if (!empty($filters['to_user_id'])) {
         $newItemsQuery->where('order.to_user_id', $filters['to_user_id']);
     }
 
     $newItems = $newItemsQuery->orderBy('item_order.created_at', 'DESC')->findAll();
 
-    // التحويلات مع حالة الطلب
+    // ==================== TRANSFERS ====================
     $transfersQuery = $transferItemsModel
         ->select('item_order.asset_num as asset_number, items.name as item_name,
                   transfer_items.created_at as last_operation_date, item_order.item_order_id as id,
@@ -582,7 +578,7 @@ public function assetsHistory(): string
         ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
         ->join('items', 'items.id = item_order.item_id', 'left')
         ->join('order', 'order.order_id = item_order.order_id', 'left')
-        ->join('order_status', 'order_status.id = order.order_status_id', 'left');
+        ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left');
 
     if (!empty($filters['asset_number'])) $transfersQuery->like('item_order.asset_num', $filters['asset_number']);
     if (!empty($filters['item_name'])) $transfersQuery->like('items.name', $filters['item_name']);
@@ -594,28 +590,24 @@ public function assetsHistory(): string
             ->orLike('items.name', $filters['search'])
             ->groupEnd();
     }
-    
-    // Apply to_user_id filter for transfers
     if (!empty($filters['to_user_id'])) {
         $transfersQuery->where('transfer_items.to_user_id', $filters['to_user_id']);
     }
 
     $transfers = $transfersQuery->orderBy('transfer_items.created_at', 'DESC')->findAll();
 
-    // الإرجاعات مع حالة الطلب
+    // ==================== RETURNS ====================
     $returnsQuery = $itemOrderModel
         ->select('item_order.asset_num as asset_number, items.name as item_name,
                   item_order.updated_at as last_operation_date, item_order.item_order_id as id,
-                  item_order.created_by, item_order.order_id,
+                  item_order.created_by, item_order.order_id, item_order.usage_status_id,
                   employee.name as employee_name, employee.emp_id,
-                  users.name as user_name, users.user_id,
-                  order_status.status as order_status_name')
+                  users.name as user_name, users.user_id')
         ->join('items', 'items.id = item_order.item_id', 'left')
         ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
         ->join('users', 'users.user_id = item_order.created_by', 'left')
         ->join('order', 'order.order_id = item_order.order_id', 'left')
-        ->join('order_status', 'order_status.id = order.order_status_id', 'left')
-        ->where('item_order.usage_status_id', 2);
+        ->whereIn('item_order.usage_status_id', [2, 4, 5]); // Only return-related statuses
 
     if (!empty($filters['asset_number'])) $returnsQuery->like('item_order.asset_num', $filters['asset_number']);
     if (!empty($filters['item_name'])) $returnsQuery->like('items.name', $filters['item_name']);
@@ -627,8 +619,6 @@ public function assetsHistory(): string
             ->orLike('items.name', $filters['search'])
             ->groupEnd();
     }
-    
-    // Apply to_user_id filter for returns (exact match instead of like)
     if (!empty($filters['to_user_id'])) {
         $returnsQuery->groupStart()
             ->where('employee.emp_id', $filters['to_user_id'])
@@ -639,9 +629,11 @@ public function assetsHistory(): string
 
     $returns = $returnsQuery->orderBy('item_order.updated_at', 'DESC')->findAll();
 
+    // ==================== FINAL MERGE ====================
     $operations = [];
     $uniqueAssets = [];
 
+    // NEW ITEMS
     if (empty($filters['operation_type']) || $filters['operation_type'] == 'new') {
         foreach ($newItems as $n) {
             if (!isset($uniqueAssets[$n->asset_number])) {
@@ -651,13 +643,15 @@ public function assetsHistory(): string
                     'item_name' => $n->item_name,
                     'operation_type' => 'new',
                     'last_operation_date' => $n->last_operation_date,
-                    'order_status_name' => $n->order_status_name ?? 'غير محدد'
+                    'order_status_name' => $n->order_status_name ?? 'غير محدد',
+                    'usage_status_id' => null
                 ];
                 $uniqueAssets[$n->asset_number] = true;
             }
         }
     }
 
+    // TRANSFERS
     if (empty($filters['operation_type']) || $filters['operation_type'] == 'transfer') {
         foreach ($transfers as $t) {
             if (!isset($uniqueAssets[$t->asset_number])) {
@@ -667,29 +661,41 @@ public function assetsHistory(): string
                     'item_name' => $t->item_name,
                     'operation_type' => 'transfer',
                     'last_operation_date' => $t->last_operation_date,
-                    'order_status_name' => $t->order_status_name ?? 'غير محدد'
+                    'order_status_name' => $t->order_status_name ?? 'غير محدد',
+                    'usage_status_id' => null
                 ];
                 $uniqueAssets[$t->asset_number] = true;
             }
         }
     }
 
+    // RETURNS - Map usage_status_id to display labels
     if (empty($filters['operation_type']) || $filters['operation_type'] == 'return') {
         foreach ($returns as $r) {
             if (!isset($uniqueAssets[$r->asset_number])) {
+                // Map usage_status_id to display status
+                $displayStatus = match ((int)$r->usage_status_id) {
+                    2 => 'قيد الانتظار',    // رجيع → قيد الانتظار
+                    4 => 'مقبول',           // معاد صرفه → مقبول
+                    5 => 'مرفوض',           // معادة للمرسل → مرفوض
+                    default => 'غير محدد',
+                };
+
                 $operations[] = (object)[
                     'id' => $r->id,
                     'asset_number' => $r->asset_number,
                     'item_name' => $r->item_name,
                     'operation_type' => 'return',
                     'last_operation_date' => $r->last_operation_date,
-                    'order_status_name' => $r->order_status_name ?? 'غير محدد'
+                    'order_status_name' => $displayStatus,
+                    'usage_status_id' => $r->usage_status_id // Keep original for validation
                 ];
                 $uniqueAssets[$r->asset_number] = true;
             }
         }
     }
 
+    // Sort by latest operation date
     usort($operations, fn($a, $b) => strtotime($b->last_operation_date) - strtotime($a->last_operation_date));
 
     $perPage = 10;
@@ -713,4 +719,5 @@ public function assetsHistory(): string
         'pager' => $pager,
     ]);
 }
+
 }

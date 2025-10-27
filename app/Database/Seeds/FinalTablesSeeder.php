@@ -35,6 +35,8 @@ class FinalTablesSeeder extends Seeder
             ['usage_status' => 'رجيع'],
             ['usage_status' => 'تحويل'],
             ['usage_status' => 'معاد صرفة'],
+            ['usage_status' => 'معادة للمرسل'],
+
         ];
         $this->db->table('usage_status')->insertBatch($usage_statuses);
 

@@ -153,17 +153,17 @@
                     <table class="signature-table">
                         <tr>
                             <td>
-                                <div class="signature-title-cell">المسئول في الجهة المرجعة</div>
+                                <div class="signature-title-cell">من / المستودع</div>
                                 <div class="signature-fields">
                                     الاسم: <span class="signature-value"><?= esc($creator_name) ?></span><br>
-                                    التاريخ: <span class="signature-value"><?= esc($current_date) ?></span>
+                                    الرقم: <span class="signature-value"><?= esc($creator_id) ?></span>
                                 </div>
                             </td>
                             <td>
                                 <div class="signature-title-cell">المستلم / أمين / مأمور المستودع</div>
                                 <div class="signature-fields">
-                                    الاسم: <span class="signature-line"></span><br>
-                                    التاريخ: <span class="signature-line"></span>
+                                    الاسم: <span class="signature-value"><?= esc($receiver_name) ?></span><br>
+                                    الرقم: <span class="signature-value"><?= esc($receiver_id) ?></span>
                                 </div>
                             </td>
                         </tr>

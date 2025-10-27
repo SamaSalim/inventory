@@ -18,9 +18,13 @@ class ReturnReport extends BaseController
 
     public function index()
     {
-        // Get user role
+        // Get user role and info
         $userRole = session()->get('role');
         $userId = session()->get('employee_id') ?? session()->get('user_id');
+        $currentUserName = session()->get('name') ?? 'غير معروف';
+
+        // Get super_warehouse user info
+        $superWarehouseInfo = $this->getSuperWarehouseUser();
 
         // Get filter parameters
         $assetNumber = $this->request->getGet('asset_number');
@@ -34,7 +38,7 @@ class ReturnReport extends BaseController
             $returnedBy = $userId;
         }
 
-        // Build query for returned items with ACCEPTED status only
+        // Build query for returned items with ACCEPTED status only (usage_status_id = 4)
         $builder = $this->model
             ->select('
                 item_order.item_order_id,
@@ -44,6 +48,7 @@ class ReturnReport extends BaseController
                 item_order.updated_at as return_date,
                 item_order.created_by,
                 item_order.order_id,
+                item_order.usage_status_id,
                 items.name as item_name,
                 minor_category.name as category,
                 item_order.assets_type,
@@ -63,8 +68,7 @@ class ReturnReport extends BaseController
             ->join('order_status', 'order_status.id = order.order_status_id', 'left')
             ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
             ->join('users', 'users.user_id = item_order.created_by', 'left')
-            ->where('usage_status.usage_status', 'رجيع')
-            ->where('order_status.id', 2); // Only accepted items (status_id = 2)
+            ->where('item_order.usage_status_id', 4); // Only accepted returns (معاد صرفه)
 
         // Apply filters
         if (!empty($assetNumber)) {
@@ -94,6 +98,28 @@ class ReturnReport extends BaseController
 
         $returnedItems = $builder->orderBy('item_order.updated_at', 'DESC')->findAll();
 
+        // Check if there are no accepted returned items
+        if (empty($returnedItems)) {
+            // Return view with no_accepted_items flag
+            return view('assets/reports/return_report_view', [
+                'items' => [],
+                'no_accepted_items' => true,
+                'creator_name' => '',
+                'creator_id' => '',
+                'total_count' => 0,
+                'current_date' => date('Y-m-d'),
+                'receiver_name' => $superWarehouseInfo['name'],
+                'receiver_id' => $superWarehouseInfo['id'],
+                'filters' => [
+                    'asset_number' => $assetNumber,
+                    'item_name' => $itemName,
+                    'date_from' => $dateFrom,
+                    'date_to' => $dateTo,
+                    'returned_by' => $returnedBy
+                ]
+            ]);
+        }
+
         // Process items to extract reasons from attachments
         $processedItems = [];
         foreach ($returnedItems as $item) {
@@ -114,20 +140,23 @@ class ReturnReport extends BaseController
             ];
         }
 
-        // Get creator name from first item or session
-        $creatorName = 'غير معروف';
-        if (!empty($processedItems)) {
-            $creatorName = $this->getCreatorName($processedItems[0]['created_by']);
-        } else {
-            $creatorName = $this->getCreatorName(null);
-        }
+        // Get creator name and ID from first item
+        $creatorInfo = $this->getCreatorInfo($processedItems[0]['created_by']);
+
+        // Get receiver info (super_warehouse user)
+        $receiverName = $superWarehouseInfo['name'];
+        $receiverId = $superWarehouseInfo['id'];
 
         // Prepare data for view
         $data = [
             'items' => $processedItems,
-            'creator_name' => $creatorName,
+            'no_accepted_items' => false,
+            'creator_name' => $creatorInfo['name'],
+            'creator_id' => $creatorInfo['id'],
             'total_count' => count($processedItems),
             'current_date' => date('Y-m-d'),
+            'receiver_name' => $receiverName,
+            'receiver_id' => $receiverId,
             'filters' => [
                 'asset_number' => $assetNumber,
                 'item_name' => $itemName,
@@ -184,14 +213,14 @@ class ReturnReport extends BaseController
         return $reasons;
     }
 
-    private function getCreatorName($createdBy = null)
+    private function getCreatorInfo($createdBy = null)
     {
         if (empty($createdBy)) {
             $createdBy = session()->get('employee_id') ?? session()->get('user_id');
         }
         
         if (empty($createdBy)) {
-            return 'غير معروف';
+            return ['name' => 'غير معروف', 'id' => ''];
         }
 
         // Check if it's an employee
@@ -199,7 +228,10 @@ class ReturnReport extends BaseController
         $employee = $employeeModel->where('emp_id', $createdBy)->first();
         
         if ($employee) {
-            return $employee->name ?? $employee['name'];
+            return [
+                'name' => $employee->name ?? $employee['name'],
+                'id' => $employee->emp_id ?? $employee['emp_id']
+            ];
         }
 
         // Check users table
@@ -207,9 +239,35 @@ class ReturnReport extends BaseController
         $user = $userModel->where('user_id', $createdBy)->first();
         
         if ($user) {
-            return $user->name ?? $user['name'];
+            return [
+                'name' => $user->name ?? $user['name'],
+                'id' => $user->user_id ?? $user['user_id']
+            ];
         }
 
-        return 'غير معروف';
+        return ['name' => 'غير معروف', 'id' => ''];
     }
+
+private function getSuperWarehouseUser()
+{
+
+    $employeeModel = new EmployeeModel();
+
+    $result = $employeeModel
+        ->select('employee.emp_id, employee.name')
+        ->join('permission', 'permission.emp_id = employee.emp_id')
+        ->where('permission.role_id', 6) 
+        ->asArray()
+        ->first();
+
+    if ($result) {
+        return [
+            'name' => $result['name'],
+            'id'   => $result['emp_id']
+        ];
+    }
+
+    return ['name' => 'غير معروف', 'id' => ''];
+}
+
 }
