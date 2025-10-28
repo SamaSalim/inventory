@@ -294,6 +294,7 @@ body {
     font-size: 13px;
   }
 }
+
 main-content {
   margin-right: 80px;
 }
@@ -432,6 +433,7 @@ main-content {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(58, 192, 195, 0.3);
+  position: relative; /* مهم لرمز القفل */
 }
 
 .add-btn:hover {
@@ -473,6 +475,7 @@ main-content {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -619,7 +622,7 @@ main-content {
   transform: translateY(-50%) scale(1.1);
 }
 
-.main-search-input:focus + .search-icon {
+.main-search-input:focus+.search-icon {
   color: #3ac0c3;
 }
 
@@ -793,6 +796,7 @@ main-content {
   max-width: 100%;
   overflow: hidden;
 }
+
 .custom-table {
   width: 100%;
   min-width: 1000px;
@@ -882,6 +886,7 @@ main-content {
   min-width: 70px;
   justify-content: center;
   white-space: nowrap;
+  position: relative; /* مهم لرمز القفل/الممنوع */
 }
 
 .view-btn {
@@ -1255,4 +1260,102 @@ main-content {
 .delete-confirm-modal.show .delete-confirm-content {
   transform: scale(1);
   opacity: 1;
+}
+
+/* =============== أنماط التعطيل للأزرار - المعتمدة على الأنماط المضمنة في PHP =============== */
+
+/* الأنماط العامة لـ disabled-action (لتمكين التلميح ورمز القفل) */
+.disabled-action {
+    /* هذه الأنماط تعمل كحاوية لرمز القفل والتلميح */
+    position: relative; 
+    user-select: none;
+    /* يتم فرض التعطيل الفعلي في الأنماط المضمنة في PHP (opacity, cursor, pointer-events) */
+}
+
+/* 1. نمط رمز القفل (🔒) للأزرار المعطلة بسبب القبول */
+.action-btn[title*="لا يمكن"]::before {
+  content: '🔒';
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 10px;
+  background: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  opacity: 1 !important; 
+  z-index: 1;
+}
+
+/* 2. نمط رمز الممنوع (🚫) للأزرار المعطلة بسبب الصلاحية (مثل إنشاء طلب) */
+.add-btn.disabled-action[title*="ليس لديك صلاحية"]::before,
+.bulk-delete-btn.disabled-action[title*="ليس لديك صلاحية"]::before {
+    content: '🚫'; /* رمز ممنوع - ليناسب الصورة */
+    top: -8px; 
+    right: -8px; 
+    font-size: 12px;
+    background: #e74c3c; /* خلفية حمراء */
+    color: white; 
+    width: 20px;
+    height: 20px;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.5);
+    z-index: 1;
+}
+
+/* 3. إزالة رمز القفل من زر التعديل/الحذف عندما يكون بسبب الصلاحية (لتجنب التضارب مع النمط العام) */
+.action-btn[title*="ليس لديك صلاحية"]::before {
+    content: none !important;
+}
+
+
+/* تنسيق tooltip المخصص للأزرار المعطلة */
+.action-btn[title]:hover::after,
+.add-btn[title]:hover::after,
+.bulk-btn[title]:hover::after { /* إضافة الأزرار الأخرى لضمان التوافق */
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(231, 76, 60, 0.95); /* لون أحمر للتحذير */
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 500;
+  z-index: 1000;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+  pointer-events: none; /* مهم: لمنع حجب العناصر الأخرى */
+  animation: tooltipFadeIn 0.2s ease;
+}
+
+.action-btn[title]:hover::before,
+.add-btn[title]:hover::before,
+.bulk-btn[title]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(231, 76, 60, 0.95);
+  margin-bottom: 2px;
+  pointer-events: none;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
