@@ -168,24 +168,33 @@ class AssetsController extends BaseController
         ]);
     }
 
+    // InventoryController.php
+
     private function getWarehouseStats(): array
     {
+        // إجمالي الكميات المدخلة للنظام (المخزون التاريخي)
         $totalQuantityResult = $this->itemOrderModel->selectSum('quantity')->first();
         $totalReceipts = $totalQuantityResult ? (int)$totalQuantityResult->quantity : 0;
         
-        $availableItems = $this->itemOrderModel->countAllResults();
+        // 1. الأصناف المتوفرة (الأصناف التي لم يتم تعميدها بعد)
+        $availableItems = $this->itemOrderModel
+            ->join('order', 'order.order_id = item_order.order_id', 'left')
+            // استبعاد الأصناف التي حالة الطلب الرئيسي لها 'مقبول' (2)
+            ->where('order.order_status_id !=', 2) 
+            ->countAllResults();
         
-        $totalEntries = $this->itemModel->countAllResults();
+        // 2. عدد الإدخالات (الأصناف المُعمّدة/المحولة بنجاح)
+        $totalEntries = $this->itemOrderModel
+            ->join('order', 'order.order_id = item_order.order_id')
+            ->where('order.order_status_id', 2) // مقبول
+            ->countAllResults();
         
-        // ✅ تغيير: عدد الأصناف المرجعة بدلاً من المخزون المنخفض
-        // القديم:
-        // $lowStock = $this->itemOrderModel->where('quantity <', 10)->where('quantity >', 0)->countAllResults();
-        
-        // الجديد:
+        // 3. عدد أصناف الرجيع
         $returnedItemsCount = $this->itemOrderModel
             ->where('usage_status_id', 2) // 2 = مرجع
             ->countAllResults();
         
+        // 4. التصنيف الأكثر شيوعًا
         $topCategoryResult = $this->itemOrderModel
             ->select('items.minor_category_id, minor_category.name, COUNT(*) as count')
             ->join('items', 'items.id = item_order.item_id')
@@ -196,6 +205,7 @@ class AssetsController extends BaseController
         
         $topCategory = $topCategoryResult ? $topCategoryResult->name : 'غير محدد';
         
+        // 5. آخر إدخال
         $lastEntry = $this->itemOrderModel
             ->select('item_order.created_at, items.name')
             ->join('items', 'items.id = item_order.item_id', 'left')
@@ -204,9 +214,9 @@ class AssetsController extends BaseController
         
         return [
             'total_receipts' => $totalReceipts,
-            'available_items' => $availableItems,
-            'total_entries' => $totalEntries,
-            'returned_items' => $returnedItemsCount, // ✅ اسم جديد
+            'available_items' => $availableItems, 
+            'total_entries' => $totalEntries, 
+            'returned_items' => $returnedItemsCount,
             'top_category' => $topCategory,
             'last_entry' => $lastEntry ? [
                 'item' => $lastEntry->name ?? 'غير محدد', 
@@ -214,7 +224,6 @@ class AssetsController extends BaseController
             ] : null
         ];
     }
-    
 
     public function orderDetails($id)
     {

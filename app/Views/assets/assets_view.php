@@ -68,19 +68,19 @@
                         <svg class="stat-icon" viewBox="0 0 24 24">
                             <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2-7h-3V2h-2v2H8V2H6v2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2z" />
                         </svg>
-                        عدد الإدخالات
+                        عدد الأصناف المحولة
                     </div>
                 </div>
 
                 <div class="stat-card" style="background: linear-gradient(135deg, #e8f5e9, #81c784);">
-    <div class="stat-number"><?= number_format($stats['returned_items'] ?? 0) ?></div>
-    <div class="stat-label">
-        <svg class="stat-icon" viewBox="0 0 24 24">
-            <path d="M9 11H3v2h6v3l5-4-5-4v3zm12-8h-6c-1.1 0-2 .9-2 2v3h2V5h6v14h-6v-3h-2v3c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
-        </svg>
-        عدد أصناف الرجيع
-    </div>
-</div>
+                    <div class="stat-number"><?= number_format($stats['returned_items'] ?? 0) ?></div>
+                    <div class="stat-label">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M9 11H3v2h6v3l5-4-5-4v3zm12-8h-6c-1.1 0-2 .9-2 2v3h2V5h6v14h-6v-3h-2v3c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+                        </svg>
+                        عدد أصناف الرجيع
+                    </div>
+                </div>
             </div>
 
             <div class="section-header">
