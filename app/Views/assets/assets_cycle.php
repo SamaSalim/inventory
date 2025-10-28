@@ -149,9 +149,16 @@
                                             <?= date('Y-m-d', strtotime($operation['date'])) ?>
                                         </div>
                                         <div class="operation-status">
-                                            <span class="status-badge status-received">
-                                                <i class="fas fa-check-circle"></i>
-                                                تم الاستلام
+                                            <span class="status-badge 
+                                                <?php 
+                                                    if ($operation['status'] === 'قيد الانتظار') echo 'status-pending';
+                                                    elseif ($operation['status'] === 'مقبول') echo 'status-approved';
+                                                    elseif ($operation['status'] === 'مرفوض') echo 'status-rejected';
+                                                    else echo 'status-received';
+                                                ?>
+                                            ">
+                                                <i class="fas fa-<?= $operation['status'] === 'قيد الانتظار' ? 'clock' : ($operation['status'] === 'مقبول' ? 'check-circle' : ($operation['status'] === 'مرفوض' ? 'times-circle' : 'info-circle')) ?>"></i>
+                                                <?= esc($operation['status']) ?>
                                             </span>
                                         </div>
                                     </div>
@@ -174,7 +181,14 @@
                                         <div class="warehouse-card">
                                             <i class="fas fa-warehouse"></i>
                                             <h4>المستودع</h4>
-                                            <p style="font-size: 12px; margin: 0; color: #6c757d;">تم استلام الأصل</p>
+                                            <p style="font-size: 12px; margin: 0; color: #6c757d;">
+                                                <?php 
+                                                    if ($operation['status'] === 'قيد الانتظار') echo 'بانتظار المراجعة';
+                                                    elseif ($operation['status'] === 'مقبول') echo 'تم قبول الإرجاع';
+                                                    elseif ($operation['status'] === 'مرفوض') echo 'تم رفض الإرجاع';
+                                                    else echo 'تم استلام الأصل';
+                                                ?>
+                                            </p>
                                         </div>
                                     </div>
 

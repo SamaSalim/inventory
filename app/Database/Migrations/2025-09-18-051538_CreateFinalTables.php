@@ -474,32 +474,40 @@ class CreateFinalTables extends Migration
         $this->forge->createTable('returned_items');
 
         // history
-        $this->forge->addField([
-            'id' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'unsigned'       => true,
-                'auto_increment' => true,
-            ],
-            'item_order_id' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'unsigned'       => true,
-            ],
-            'action' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '255',
-                'null'       => true,
-            ],
+    $this->forge->addField([
+        'id' => [
+            'type'           => 'INT',
+            'constraint'     => 11,
+            'unsigned'       => true,
+            'auto_increment' => true,
+        ],
+        'item_order_id' => [
+            'type'           => 'INT',
+            'constraint'     => 11,
+            'unsigned'       => true,
+        ],
+        'usage_status_id' => [
+            'type'       => 'INT',
+            'constraint' => 11,
+            'unsigned'   => true,
+            'null'       => true,
+        ],
+        'handled_by' => [
+            'type'       => 'VARCHAR',
+            'constraint' => 50,
+            'null'       => true,
+        ],
+        'created_at datetime default current_timestamp',
+        'updated_at datetime default current_timestamp on update current_timestamp',
+    ]);
 
-            'created_at datetime default current_timestamp',
-            'updated_at datetime default current_timestamp on update current_timestamp',
-        ]);
+    $this->forge->addPrimaryKey('id');
+    $this->forge->addKey('item_order_id');
+    $this->forge->addKey('usage_status_id');
+    $this->forge->addForeignKey('item_order_id', 'item_order', 'item_order_id', 'CASCADE', 'CASCADE');
+    $this->forge->addForeignKey('usage_status_id', 'usage_status', 'id', 'SET NULL', 'CASCADE');
+    $this->forge->createTable('history');
 
-        $this->forge->addPrimaryKey('id');
-        $this->forge->addKey('item_order_id'); // index
-        $this->forge->addForeignKey('item_order_id', 'item_order', 'item_order_id', 'CASCADE', 'CASCADE');
-        $this->forge->createTable('history');
 
 
         // permission

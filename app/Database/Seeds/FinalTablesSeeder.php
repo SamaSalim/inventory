@@ -530,19 +530,8 @@ class FinalTablesSeeder extends Seeder
 
         $this->db->table('transfer_items')->insertBatch($transfer_items);
 
-        // Seeder for 'history' table
-        $histories = [
-            [
-                'item_order_id' => 1,
-                'action' => 'تم تسليم العهدة إلى الموظف.'
-            ],
-            [
-                'item_order_id' => 2,
-                'action' => 'تم طلب صيانة الجهاز.'
-            ],
-        ];
-        $this->db->table('history')->insertBatch($histories);
 
-        $this->db->query('SET foreign_key_checks = 1;');
+
+        // $this->db->query('SET foreign_key_checks = 1;');
     }
 }

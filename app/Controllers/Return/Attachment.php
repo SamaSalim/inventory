@@ -6,6 +6,8 @@ use App\Controllers\BaseController;
 use App\Models\ItemOrderModel;
 use App\Models\EmployeeModel;
 use App\Models\UserModel;
+use App\Models\HistoryModel;
+
 use CodeIgniter\Exceptions\PageNotFoundException;
 
 class Attachment extends BaseController
@@ -103,6 +105,9 @@ class Attachment extends BaseController
         // Collect all successfully returned item order IDs for ONE email
         $returnedItemOrderIds = [];
         $allItemsNotes = '';
+
+        // Initialize HistoryModel for logging
+        $historyModel = new \App\Models\HistoryModel();
 
         foreach ($assetNums as $assetNum) {
             $originalItem = $this->model
@@ -208,6 +213,17 @@ class Attachment extends BaseController
                 
                 if (!empty($itemComment)) {
                     $allItemsNotes .= "أصل {$assetNum}: {$itemComment}\n";
+                }
+
+                // Log to history table
+                try {
+                    $historyModel->insert([
+                        'item_order_id'   => $originalItem->item_order_id,
+                        'usage_status_id' => $returnedStatus->id,
+                        'handled_by'      => $createdBy
+                    ]);
+                } catch (\Exception $e) {
+                    log_message('error', "Failed to log history for item_order_id {$originalItem->item_order_id}: " . $e->getMessage());
                 }
             } else {
                 $failedItems[] = "فشل تحديث الأصل رقم: $assetNum";
