@@ -1,5 +1,4 @@
 <?php
-// اضافة طلبات من نفس النوع 
 
 namespace App\Controllers;
 
@@ -52,8 +51,70 @@ class OrderController extends BaseController
     }
 
 
+    /**
+     * البحث عن الأصناف مع التصنيفات
+     */
+    public function searchitems()
+    {
+        try {
+            $term = $this->request->getGet('term');
 
-  
+            log_message('info', 'Search term: ' . $term);
+
+            if (empty($term) || strlen($term) < 2) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'يجب إدخال حرفين على الأقل للبحث',
+                    'data' => []
+                ]);
+            }
+
+            // استخدام query builder للحصول على النتائج مع joins
+            $builder = $this->itemModel->builder();
+            $items = $builder
+                ->select('items.id, items.name, major_category.name as major_category_name, minor_category.name as minor_category_name')
+                ->join('minor_category', 'items.minor_category_id = minor_category.id', 'left')
+                ->join('major_category', 'minor_category.major_category_id = major_category.id', 'left')
+                ->like('items.name', $term)
+                ->limit(20)
+                ->get()
+                ->getResultArray();
+
+            log_message('info', 'Items found: ' . count($items));
+
+            if (empty($items)) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'data' => [],
+                    'count' => 0,
+                    'message' => 'لم يتم العثور على أصناف مطابقة'
+                ]);
+            }
+
+            // تنسيق البيانات
+            $formattedItems = array_map(function ($item) {
+                return [
+                    'name' => $item['name'] ?? 'غير محدد',
+                    'major_category' => $item['major_category_name'] ?? 'غير محدد',
+                    'minor_category' => $item['minor_category_name'] ?? 'غير محدد'
+                ];
+            }, $items);
+
+            return $this->response->setJSON([
+                'success' => true,
+                'data' => $formattedItems,
+                'count' => count($formattedItems)
+            ]);
+        } catch (\Exception $e) {
+            log_message('error', 'Error in searchitems: ' . $e->getMessage() . ' | Line: ' . $e->getLine());
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'خطأ في البحث: ' . $e->getMessage(),
+                'data' => []
+            ]);
+        }
+    }
+
     /**
      * البحث عن المستخدمين (Users) 
      */
@@ -360,7 +421,7 @@ class OrderController extends BaseController
     }
 
     /**
-     * حفظ الطلب متعدد الأصناف
+     * حفظ الطلب متعدد الأصناف (المصحح)
      */
     public function storeMultiItem()
     {
@@ -573,21 +634,23 @@ class OrderController extends BaseController
                         'message' => 'فشل في إضافة أحد العناصر'
                     ]);
                 }
-            }
-            $transferItemData = [
-                'item_order_id' => $itemOrderId,
-                'from_user_id' => $loggedEmployeeId,
-                'to_user_id' => $toUserId,
-                'order_status_id' => 1, // قيد الانتظار (في جدول transfer_items)
-                'is_opened' => 0
-            ];
 
-            if (!$this->transferItemsModel->insert($transferItemData)) {
-                $this->orderModel->transRollback();
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'فشل في إنشاء سجل التحويل للعنصر.'
-                ]);
+                //  التصحيح: نقل منطق إنشاء سجل التحويل إلى داخل الحلقة
+                $transferItemData = [
+                    'item_order_id' => $itemOrderId, // الآن يستخدم ID العنصر الذي تم إدراجه للتو
+                    'from_user_id' => $loggedEmployeeId,
+                    'to_user_id' => $toUserId,
+                    'order_status_id' => 1, // قيد الانتظار
+                    'is_opened' => 0
+                ];
+
+                if (!$this->transferItemsModel->insert($transferItemData)) {
+                    $this->orderModel->transRollback();
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => 'فشل في إنشاء سجل التحويل للعنصر: ' . $item['item_name']
+                    ]);
+                }
             }
 
             // إنهاء المعاملة
@@ -613,7 +676,6 @@ class OrderController extends BaseController
             ]);
         }
     }
-
     public function index()
     {
 
@@ -772,8 +834,6 @@ class OrderController extends BaseController
             ]);
         }
     }
-
-
     /**
      * تحديث الطلب متعدد الأصناف
      */
@@ -813,13 +873,7 @@ class OrderController extends BaseController
             if ($existingOrder->order_status_id == 1) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'لا يمكن حذف الطلب وهو قيد الانتظار.'
-                ]);
-            }
-            if ($existingOrder->order_status_id == 3) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'لا يمكن تعديل الطلب بعد قبوله من قبل المستلم.'
+                    'message' => 'لا يمكن تعديل الطلب وهو قيد الانتظار'
                 ]);
             }
 
