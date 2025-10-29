@@ -704,9 +704,10 @@ class OrderController extends BaseController
         if (!$orderId) {
             return redirect()->to(base_url('inventoryController/index'))->with('error', 'رقم الطلب مطلوب');
         }
-
-        // التحقق من وجود الطلب
+        
         $order = $this->orderModel->find($orderId);
+        $orderStatusId = $order->order_status_id;
+
         if (!$order) {
             return redirect()->to(base_url('inventoryController/index'))->with('error', 'الطلب غير موجود');
         }
@@ -721,6 +722,7 @@ class OrderController extends BaseController
         return view('warehouse/edit_order', [
             'orderId' => $orderId,
             'loggedInUser' => $loggedInUser, //  تمرير بيانات الموظف المسجل دخوله
+            'orderStatusId' => $orderStatusId, // ✅ تمرير حالة الطلب
 
         ]);
     }
@@ -865,7 +867,7 @@ class OrderController extends BaseController
                 ]);
             }
 
-            // منع التعديل إذا كانت حالة الطلب مقبولة (2) أو قيد الانتظار (1)
+            // منع التعديل إذا كانت حالة الطلب مقبولة (2)
             if ($existingOrder->order_status_id == 2) {
                 return $this->response->setJSON([
                     'success' => false,
@@ -873,14 +875,15 @@ class OrderController extends BaseController
                 ]);
             }
 
-            if ($existingOrder->order_status_id == 1) {
+            // ✅ السماح بالتعديل في حالة قيد الانتظار (1) والمرفوض (3)
+            $canEdit = ($existingOrder->order_status_id == 1 || $existingOrder->order_status_id == 3);
+
+            if (!$canEdit) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'لا يمكن تعديل الطلب وهو قيد الانتظار. يجب انتظار رد المستلم أولاً.'
+                    'message' => 'لا يمكن تعديل الطلب إلا إذا كان قيد الانتظار أو مرفوضاً.'
                 ]);
             }
-
-            // السماح بالتعديل فقط للطلبات المرفوضة (3)
 
             $loggedEmployeeId = session()->get('employee_id');
 
@@ -908,6 +911,15 @@ class OrderController extends BaseController
 
             // التحقق من تغيير المستلم
             $receiverChanged = ($existingOrder->to_user_id != $toUserId);
+
+            // ✅ منطق منع تغيير المستلم في حالة قيد الانتظار (1)
+            if ($existingOrder->order_status_id == 1 && $receiverChanged) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'لا يمكن تغيير المستلم أثناء حالة "قيد الانتظار". يمكنك فقط تغيير الأصناف والموقع.'
+                ]);
+            }
+            // ❌ ملاحظة: إذا كان مرفوضاً (3) فسيتم السماح بتغييره.
 
             // جمع بيانات الأصناف المُرسلة وتخزينها
             $items = [];
@@ -1062,8 +1074,8 @@ class OrderController extends BaseController
                 'note' => $notes
             ];
 
-            // إذا تغير المستلم، نعيد الحالة إلى قيد الانتظار
-            if ($receiverChanged) {
+            // إذا تغير المستلم (وهو مسموح به فقط في حالة الرفض)، نعيد الحالة إلى قيد الانتظار
+            if ($receiverChanged && $existingOrder->order_status_id == 3) {
                 $orderData['order_status_id'] = 1; // قيد الانتظار
             }
 
@@ -1111,7 +1123,7 @@ class OrderController extends BaseController
                     $submittedItemOrderIds[] = (string)$existingItemId;
 
                     // تحديث transfer_items للعنصر الموجود
-                    if ($receiverChanged) {
+                    if ($receiverChanged && $existingOrder->order_status_id == 3) { // فقط إذا تغير المستلم (مسموح فقط في المرفوض)
                         $this->transferItemsModel->where('item_order_id', $existingItemId)->set([
                             'to_user_id' => $toUserId,
                             'order_status_id' => 1, // قيد الانتظار
@@ -1175,7 +1187,7 @@ class OrderController extends BaseController
             }
 
             $successMessage = 'تم تحديث الطلب بنجاح';
-            if ($receiverChanged) {
+            if ($receiverChanged && $existingOrder->order_status_id == 3) {
                 $successMessage .= ' وتم إرساله للمستلم الجديد';
             }
 

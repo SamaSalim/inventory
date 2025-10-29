@@ -86,10 +86,6 @@
             <div class="section-header">
                 <h2 class="section-title">قائمة المخزون</h2>
                 <div class="buttons-group">
-                    <!-- هنا زر لإنشاء طلب لتصنيفات مختلفة -->
-                    <!-- <a href="<ظ?= site_url('OrderController/index') ?>" class="add-btn ">
-                        <i class="fas fa-layer-group"></i> إنشاء طلب  
-                    </a> -->
                     <div class="buttons-group">
                         <?php if (canCreateOrder()): ?>
                             <a href="<?= site_url('OrderController/index') ?>" class="add-btn">
@@ -133,7 +129,7 @@
             </div>
 
             <!-- قسم البحث والفلاتر المحدث -->
-            <form method="get" action="<?= base_url('InventoryController/index') ?>">
+            <form method="get" action="<?= base_url('InventoryController/index') ?>" id="searchForm">
                 <div class="filters-section">
                     <!-- شريط البحث الرئيسي -->
                     <div class="main-search-container">
@@ -142,10 +138,15 @@
                             البحث العام
                         </h3>
                         <div class="search-bar-wrapper">
-                            <input type="text" class="main-search-input" name="search" id="mainSearchInput"
+                            <input type="text"
+                                class="main-search-input"
+                                name="search"
+                                id="mainSearchInput"
                                 value="<?= esc($filters['search'] ?? '') ?>"
                                 placeholder="ابحث في جميع الحقول...">
-                            <i class="fas fa-search search-icon" onclick="document.querySelector('form').submit();" title="بحث"></i>
+                            <i class="fas fa-search search-icon"
+                                onclick="document.getElementById('searchForm').submit();"
+                                title="بحث"></i>
                         </div>
                     </div>
 
@@ -156,13 +157,54 @@
 
                     <!-- الفلاتر التفصيلية -->
                     <div class="detailed-filters">
+                        <!-- رقم الأصول - جديد -->
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-hashtag"></i>
+                                رقم الأصول
+                            </label>
+                            <input type="text"
+                                class="filter-input"
+                                name="asset_number"
+                                id="assetNumberInput"
+                                value="<?= esc($filters['asset_number'] ?? '') ?>"
+                                placeholder="ابحث برقم الأصول">
+                        </div>
+                        <!-- الرقم التسلسلي -->
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-barcode"></i>
+                                الرقم التسلسلي
+                            </label>
+                            <input type="text"
+                                class="filter-input"
+                                name="serial_number"
+                                value="<?= esc($filters['serial_number'] ?? '') ?>"
+                                placeholder="رقم تسلسلي محدد">
+                        </div>
+                        <!-- الرقم الوظيفي - محدث -->
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-id-badge"></i>
+                                الرقم الوظيفي
+                            </label>
+                            <input type="text"
+                                class="filter-input"
+                                name="employee_id"
+                                id="employeeIdInput"
+                                value="<?= esc($filters['employee_id'] ?? '') ?>"
+                                placeholder="رقم الموظف (المرسل أو المستلم)">
+                        </div>
+
                         <!-- الصنف -->
                         <div class="filter-group">
                             <label class="filter-label">
                                 <i class="fas fa-tag"></i>
                                 الصنف
                             </label>
-                            <input type="text" class="filter-input" name="item_type"
+                            <input type="text"
+                                class="filter-input"
+                                name="item_type"
                                 value="<?= esc($filters['item_type'] ?? '') ?>"
                                 placeholder="اكتب نوع الصنف">
                         </div>
@@ -186,27 +228,6 @@
                             </select>
                         </div>
 
-                        <!-- الرقم التسلسلي -->
-                        <div class="filter-group">
-                            <label class="filter-label">
-                                <i class="fas fa-barcode"></i>
-                                الرقم التسلسلي
-                            </label>
-                            <input type="text" class="filter-input" name="serial_number"
-                                value="<?= esc($filters['serial_number'] ?? '') ?>"
-                                placeholder="رقم تسلسلي محدد">
-                        </div>
-
-                        <!-- الرقم الوظيفي -->
-                        <div class="filter-group">
-                            <label class="filter-label">
-                                <i class="fas fa-id-badge"></i>
-                                الرقم الوظيفي
-                            </label>
-                            <input type="text" class="filter-input" name="employee_id"
-                                value="<?= esc($filters['employee_id'] ?? '') ?>"
-                                placeholder="رقم الموظف">
-                        </div>
 
                         <!-- الموقع -->
                         <div class="filter-group">
@@ -214,7 +235,9 @@
                                 <i class="fas fa-map-marker-alt"></i>
                                 الموقع
                             </label>
-                            <input type="text" class="filter-input" name="location"
+                            <input type="text"
+                                class="filter-input"
+                                name="location"
                                 value="<?= esc($filters['location'] ?? '') ?>"
                                 placeholder="اكتب اسم الموقع">
                         </div>
@@ -226,14 +249,14 @@
                             <i class="fas fa-search"></i>
                             بحث
                         </button>
-                        <a href="<?= base_url('InventoryController/index') ?>" class="filter-btn reset-btn">
+                        <a href="<?= base_url('InventoryController/index') ?>"
+                            class="filter-btn reset-btn">
                             <i class="fas fa-undo"></i>
                             إعادة تعيين
                         </a>
                     </div>
                 </div>
             </form>
-
             <div class="table-container">
                 <table class="custom-table" id="datatable-orders">
                     <thead>
@@ -261,27 +284,45 @@
                                 // تحديد ما إذا كان الطلب مُعطلاً (مقبول أو قيد الانتظار)
                                 $isAccepted = false;
                                 $isPending = false;
+                                $isRejected = false;
 
                                 if (isset($order->order_status_name)) {
                                     $statusName = strtolower(trim($order->order_status_name));
-                                    // استخدام نفس منطق التعطيل من زر التعديل/الحذف الفردي
+                                    // الحالة 2: ممنوع التعديل والحذف
                                     $isAccepted = ($statusName === 'مقبول' || ($order->order_status_id ?? 0) == 2);
+                                    // الحالة 1: مسموح التعديل فقط
                                     $isPending = ($statusName === 'قيد الانتظار' || ($order->order_status_id ?? 0) == 1);
+                                    // الحالة 3: مسموح التعديل والحذف وتغيير المستلم
+                                    $isRejected = ($statusName === 'مرفوض' || ($order->order_status_id ?? 0) == 3);
                                 }
 
-                                $isDisabled = $isAccepted || $isPending;
-                                $isDisabledAttr = $isDisabled ? 'data-is-disabled="true"' : '';
+                                // ✅ منطق تعطيل التعديل (زر التعديل): فقط إذا كان مقبولاً (2)
+                                $isEditDisabledByStatus = $isAccepted;
+
+                                // ✅ منطق تعطيل الحذف (زر الحذف): إذا كان مقبولاً (2) أو قيد الانتظار (1)
+                                $isDeleteDisabledByStatus = $isAccepted || $isPending;
+
+                                // منطق التعطيل للاختيار الجماعي
+                                $isDisabledForBulk = $isAccepted || $isPending;
+                                $isDisabledAttr = $isDisabledForBulk ? 'data-is-disabled="true"' : '';
                                 ?>
                                 <tr class="text-center align-middle" data-order-id="<?= $order->order_id ?>" <?= $isDisabledAttr ?>>
                                     <td class="checkbox-cell">
-                                        <input type="checkbox" class="custom-checkbox row-checkbox" onchange="updateSelection()" <?= $isDisabled ? 'disabled' : '' ?>>
+                                        <!-- تعطيل الاختيار الجماعي فقط للطلبات المقبولة أو قيد الانتظار -->
+                                        <input type="checkbox" class="custom-checkbox row-checkbox" onchange="updateSelection()" <?= $isDisabledForBulk ? 'disabled' : '' ?>>
                                     </td>
                                     <td><?= esc($order->order_id ?? '-') ?></td>
 
                                     <!--  عمود مستلم الطلب -->
-                                    <td><?= esc($order->receiver_name ?? 'غير محدد') ?></td>
+                                    <td>
+                                        <?= esc($order->receiver_name ?? 'غير محدد') ?>
+                                        <?php if (!empty($order->receiver_employee_id)): ?>
+                                            <br>
+                                            <small class="text-muted"><?= esc($order->receiver_employee_id) ?></small>
+                                        <?php endif; ?>
+                                    </td>
 
-                                    <!--  عمود عدد الأصناف -->
+                                    <!-- عمود عدد الأصناف -->
                                     <td>
                                         <span class="badge bg-primary">
                                             <?= esc($order->items_count ?? 0) ?>
@@ -319,24 +360,11 @@
                                                 عرض
                                             </a>
 
-                                            <?php
-                                            // التحقق من حالة الطلب
-                                            $isAccepted = false;
-                                            $isPending = false;
-
-                                            if (isset($order->order_status_name)) {
-                                                $statusName = strtolower(trim($order->order_status_name));
-                                                $isAccepted = ($statusName === 'مقبول' || $order->order_status_id == 2);
-                                                $isPending = ($statusName === 'قيد الانتظار' || $order->order_status_id == 1);
-                                            }
-
-                                            $isDisabled = $isAccepted || $isPending;
-                                            ?>
-
-                                            <!-- زر التعديل -->
-                                            <?php if (canEditOrder() && !$isDisabled): ?>
+                                            <!-- زر التعديل: مفعّل في حالة قيد الانتظار والمرفوض -->
+                                            <?php if (canEditOrder() && !$isEditDisabledByStatus): ?>
                                                 <a href="<?= site_url('OrderController/editOrder/' . $order->order_id) ?>"
-                                                    class="action-btn edit-btn">
+                                                    class="action-btn edit-btn"
+                                                    title="<?php if ($isPending) echo 'يمكنك تعديل الأصناف والموقع، ولكن ليس المستلم.'; ?>">
                                                     <svg class="btn-icon" viewBox="0 0 24 24">
                                                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
                                                     </svg>
@@ -346,9 +374,14 @@
                                                 <button class="action-btn edit-btn" disabled
                                                     style="opacity: 0.5; cursor: not-allowed;"
                                                     title="<?php
-                                                            if ($isAccepted) echo ' لا يمكن تعديل الطلب بعد قبوله من المستلم';
-                                                            elseif ($isPending) echo ' لا يمكن تعديل الطلب وهو قيد الانتظار';
-                                                            else echo 'ليس لديك صلاحية التعديل';
+                                                            // ✅ منطق التلميح لزر التعديل
+                                                            if (!canEditOrder()) {
+                                                                echo 'ليس لديك صلاحية التعديل';
+                                                            } elseif ($isAccepted) {
+                                                                echo ' لا يمكن تعديل الطلب بعد قبوله من المستلم';
+                                                            } else {
+                                                                echo 'الطلب غير قابل للتعديل حالياً';
+                                                            }
                                                             ?>">
                                                     <svg class="btn-icon" viewBox="0 0 24 24">
                                                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
@@ -357,8 +390,8 @@
                                                 </button>
                                             <?php endif; ?>
 
-                                            <!-- زر الحذف -->
-                                            <?php if (canDeleteOrder() && !$isDisabled): ?>
+                                            <!-- زر الحذف: معطل في حالة المقبول (2) أو قيد الانتظار (1) -->
+                                            <?php if (canDeleteOrder() && !$isDeleteDisabledByStatus): ?>
                                                 <button class="action-btn delete-btn"
                                                     onclick="deleteOrderConfirm(<?= $order->order_id ?>)">
                                                     <i class="fas fa-trash"></i>
@@ -368,9 +401,16 @@
                                                 <button class="action-btn delete-btn" disabled
                                                     style="opacity: 0.5; cursor: not-allowed;"
                                                     title="<?php
-                                                            if ($isAccepted) echo ' لا يمكن حذف الطلب بعد قبوله من المستلم';
-                                                            elseif ($isPending) echo ' لا يمكن حذف الطلب وهو قيد الانتظار';
-                                                            else echo 'ليس لديك صلاحية الحذف';
+                                                            // ✅ منطق التلميح لزر الحذف
+                                                            if (!canDeleteOrder()) {
+                                                                echo 'ليس لديك صلاحية الحذف';
+                                                            } elseif ($isAccepted) {
+                                                                echo ' لا يمكن حذف الطلب بعد قبوله من المستلم';
+                                                            } elseif ($isPending) {
+                                                                echo ' لا يمكن حذف الطلب وهو قيد الانتظار';
+                                                            } else {
+                                                                echo 'الطلب غير قابل للحذف حالياً';
+                                                            }
                                                             ?>">
                                                     <i class="fas fa-trash"></i>
                                                     حذف
@@ -670,7 +710,7 @@
             }, 4000);
         }
 
-        // =================== وظائف النموذج المنبثق الأصلية ===================
+        // =================== وظائف النموذج المنبثق الأصلية (غير ذات صلة بالتعطيل) ===================
 
         function openOrderForm(type = 'single') {
             currentOrderType = type;

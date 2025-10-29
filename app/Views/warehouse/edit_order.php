@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تعديل طلب متعدد الأصناف</title>
-
+    <!-- تضمين الـ CSS (نفس التنسيق المرفق) -->
     <style>
         * {
             margin: 0;
@@ -145,11 +145,13 @@
             color: rgba(255, 255, 255, 0.6);
         }
 
+        /* تنسيق الحقول المعطلة أو للقراءة فقط */
         input:read-only,
         select:disabled {
             background: rgba(26, 37, 47, 0.3);
             cursor: not-allowed;
-            opacity: 0.7;
+            opacity: 0.8;
+            /* لتقليل التعتيم قليلاً */
         }
 
         select option {
@@ -473,6 +475,13 @@
         </div>
     </div>
 
+    <!--  متغير PHP لحالة الطلب لتمكين استخدامه في JavaScript -->
+    <script>
+        const ORDER_STATUS_PENDING = 1; // رقم حالة "قيد الانتظار"
+        const orderStatusId = <?= $orderStatusId ?? 0; ?>;
+    </script>
+
+
     <div class="form-modal" id="editForm">
         <div class="modal-content">
             <div class="modal-header">
@@ -512,11 +521,11 @@
                 <hr>
 
                 <!-- قسم بيانات المستلم -->
-                <div class="section-header">
+                <div class="section-header" id="recipientHeader">
                     <h4>بيانات المستلم</h4>
                 </div>
 
-                <div class="form-grid">
+                <div class="form-grid" id="recipientFields">
                     <div class="form-group">
                         <label>رقم المستخدم <span class="required">*</span></label>
                         <input type="text" name="user_id" id="userId" placeholder="أدخل رقم المستخدم" required>
@@ -664,6 +673,8 @@
                     if (data.success) {
                         originalOrderData = data.data;
                         populateForm(data.data);
+                        //  تشغيل دالة التعطيل بعد تحميل البيانات
+                        disableRecipientFieldsIfPending();
                     } else {
                         alert('خطأ: ' + data.message);
                         window.location.href = buildUrl('inventoryController/index');
@@ -677,22 +688,56 @@
                 });
         }
 
+        // ==========================================================
+        //  الدالة الجديدة لتعطيل حقول المستلم
+        // ==========================================================
+        function disableRecipientFieldsIfPending() {
+            // ORDER_STATUS_PENDING = 1
+            if (orderStatusId === ORDER_STATUS_PENDING) {
+                const userIdInput = document.getElementById('userId'); // حقل رقم المستخدم للتعطيل
+                const receiverNameInput = document.getElementById('receiverName');
+                const emailInput = document.getElementById('userEmail');
+                const transferInput = document.getElementById('transferNumber');
+
+                // 1. تعطيل حقل رقم المستخدم (لأنه هو الحقل القابل للكتابة والبحث)
+                userIdInput.setAttribute('readonly', true);
+                userIdInput.style.cursor = 'not-allowed';
+
+                // 2. تعطيل حقول العرض فقط (للتأكيد، وهي غالباً تكون للقراءة فقط بالفعل)
+                receiverNameInput.setAttribute('readonly', true);
+                emailInput.setAttribute('readonly', true);
+                transferInput.setAttribute('readonly', true);
+
+                //  إظهار رسالة توضيحية أسفل قسم المستلم
+                const recipientHeader = document.getElementById('recipientHeader');
+
+                if (recipientHeader) {
+                    let note = recipientHeader.querySelector('.status-note');
+                    if (!note) {
+                        note = document.createElement('div');
+                        note.className = 'status-note';
+                        note.style.cssText = 'color: #f1c40f; margin-top: 10px; font-weight: 500; font-size: 0.9em;';
+                        note.textContent = '⚠️ المستلم غير قابل للتعديل لأن الطلب قيد الانتظار.';
+                        recipientHeader.appendChild(note);
+                    }
+                }
+
+                console.log('حقول المستلم تم تعطيلها لأن حالة الطلب قيد الانتظار (1).');
+            } else {
+                // إذا كانت حالة الطلب مرفوضة (3)، يجب أن تكون الحقول قابلة للتعديل
+                const userIdInput = document.getElementById('userId');
+                userIdInput.removeAttribute('readonly');
+                userIdInput.style.cursor = 'auto';
+            }
+        }
+        // ==========================================================
+
+
         // ملء النموذج بالبيانات
         function populateForm(orderData) {
             // تعبئة معرف الطلب - استخدم order_id
             document.getElementById('orderId').value = orderData.order.order_id;
             document.getElementById('orderIdDisplay').textContent = orderData.order.order_id;
-
-            // تعبئة بيانات المرسل
-            // if (orderData.from_user) {
-            //     //  التعديل هنا ليتوافق مع أسماء الحقول في جدول employee
-            //     document.getElementById('fromUserId').value = orderData.from_user.emp_id || '';
-            //     document.getElementById('fromSenderName').value = orderData.from_user.name || '';
-            //     document.getElementById('fromUserEmail').value = orderData.from_user.email || '';
-            //     document.getElementById('fromTransferNumber').value = orderData.from_user.emp_ext || ''; // استخدام emp_ext
-
-            //     document.getElementById('fromUserSuccessMsg').style.display = 'block';
-            // }
 
             // تعبئة بيانات المستلم
             if (orderData.to_user) {
@@ -790,67 +835,6 @@
             // تم تمرير مصفوفة items (البيانات القديمة) كمدخل ثانٍ للدالة.
             updateAssetSerialFields(itemCounter, itemGroup.items);
         }
-        // // إنشاء حقول الأصول والأرقام التسلسلية من البيانات
-        // function createAssetSerialFieldsFromData(itemId, items) {
-        //     const container = document.getElementById(`assetSerialContainer_${itemId}`);
-        //     const dynamicSection = document.getElementById(`dynamicFields_${itemId}`);
-
-        //     if (!container || !dynamicSection || !items || items.length === 0) return;
-
-        //     container.innerHTML = '';
-
-        //     items.forEach((item, index) => {
-        //         const i = index + 1;
-        //         const fieldDiv = document.createElement('div');
-        //         fieldDiv.className = 'asset-serial-grid';
-
-        //         fieldDiv.innerHTML = `
-        //             <div class="asset-serial-header">العنصر رقم ${i}</div>
-        //             <input type="hidden" name="existing_item_id_${itemId}_${i}" value="${item.id}">
-        //             <div class="form-group">
-        //                 <label>رقم الأصول <span class="required">*</span></label>
-        //                 <input type="text" 
-        //                     name="asset_num_${itemId}_${i}" 
-        //                     placeholder="أدخل 12 رقم فقط" 
-        //                     pattern="[0-9]{12}" 
-        //                     maxlength="12" 
-        //                     inputmode="numeric"
-        //                     title="يجب إدخال 12 رقم بالضبط"
-        //                     value="${item.asset_num}"
-        //                     required>
-        //                 <div class="validation-message asset-validation-${itemId}-${i}" style="display: none;"></div>
-        //             </div>
-        //             <div class="form-group">
-        //                 <label>الرقم التسلسلي <span class="required">*</span></label>
-        //                 <input type="text" name="serial_num_${itemId}_${i}" placeholder="أدخل الرقم التسلسلي" value="${item.serial_num}" required>
-        //                 <div class="validation-message serial-validation-${itemId}-${i}" style="display: none;"></div>
-        //             </div>
-        //             <div class="form-group">
-        //                 <label>رقم المودل</label>
-        //                 <input type="text" name="model_num_${itemId}_${i}" placeholder="أدخل رقم المودل" value="${item.model_num || ''}">
-        //             </div>
-        //             <div class="form-group">
-        //                 <label>رقم الأصول القديمة</label>
-        //                 <input type="text" name="old_asset_num_${itemId}_${i}" placeholder="أدخل رقم الأصول القديمة" value="${item.old_asset_num || ''}">
-        //             </div>
-        //             <div class="form-group">
-        //                 <label>البراند</label>
-        //                 <input type="text" name="brand_${itemId}_${i}" placeholder="أدخل اسم البراند" value="${item.brand || ''}">
-        //             </div>
-        //         `;
-
-        //         container.appendChild(fieldDiv);
-
-        //         // إضافة معالجات التحقق للحقول
-        //         const assetInput = fieldDiv.querySelector(`input[name="asset_num_${itemId}_${i}"]`);
-        //         const serialInput = fieldDiv.querySelector(`input[name="serial_num_${itemId}_${i}"]`);
-
-        //         assetInput.addEventListener('blur', () => validateAssetSerial(assetInput, itemId, i, 'asset', item.id));
-        //         serialInput.addEventListener('blur', () => validateAssetSerial(serialInput, itemId, i, 'serial', item.id));
-        //     });
-
-        //     dynamicSection.style.display = 'block';
-        // }
 
         // تعيين الموقع من البيانات
         function setLocationFromData(buildingId, floorId, sectionId, roomId) {
@@ -865,21 +849,21 @@
                         const floorSelect = document.getElementById('floorSelect');
                         floorSelect.value = floorId;
 
-                        // تحميل الأقسام والغرف
+                        // تحميل الأقسام
                         loadSections(floorId).then(() => {
 
                             if (sectionId) {
                                 const sectionSelect = document.getElementById('sectionSelect');
                                 sectionSelect.value = sectionId;
-                            }
-                        });
 
-                        // تحميل الأقسام والغرف
-                        loadRooms(sectionId).then(() => {
+                                // تحميل الغرف
+                                loadRooms(sectionId).then(() => {
 
-                            if (roomId) {
-                                const roomSelect = document.getElementById('roomSelect');
-                                roomSelect.value = roomId;
+                                    if (roomId) {
+                                        const roomSelect = document.getElementById('roomSelect');
+                                        roomSelect.value = roomId;
+                                    }
+                                });
                             }
                         });
                     }
@@ -924,7 +908,7 @@
                     </div>
                     <div class="form-group">
                         <label>الكمية <span class="required">*</span></label>
-                        <input type="number" name="quantity_${itemCounter}" min="1" max="100" placeholder="أدخل الكمية" required onchange="createAssetSerialFields(${itemCounter}, this.value)">
+                        <input type="number" name="quantity_${itemCounter}" min="1" max="100" placeholder="أدخل الكمية" required onchange="updateAssetSerialFields(${itemCounter}, this.value)">
                     </div>
                     <div class="form-group">
                         <label>نوع العهدة <span class="required">*</span></label>
@@ -1220,6 +1204,9 @@
             const successMsg = document.getElementById('userSuccessMsg');
 
             userIdInput.addEventListener('input', function() {
+                // منع البحث إذا كان الحقل معطلاً
+                if (this.readOnly) return;
+
                 const userId = this.value.trim();
 
                 loadingMsg.style.display = 'none';
@@ -1345,6 +1332,8 @@
 
         function loadSections(floorId) {
             const roomSelect = document.getElementById('roomSelect');
+            const sectionSelect = document.getElementById('sectionSelect');
+
 
             sectionSelect.innerHTML = '<option value="">اختر القسم</option>';
             roomSelect.innerHTML = '<option value="">اختر الغرفة</option>';
@@ -1371,26 +1360,11 @@
                     } else {
                         sectionSelect.disabled = true;
                     }
+                    return data;
                 })
                 .catch(error => {
                     console.error('خطأ في تحميل الأقسام:', error);
                     sectionSelect.disabled = true;
-                });
-
-            return fetch(buildUrl(`OrderController/getsectionsbyfloor/${floorId}`))
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.data && Array.isArray(data.data) && data.data.length > 0) {
-                        return loadRooms(data.data[0].id);
-                    } else {
-                        roomSelect.disabled = true;
-                        return null;
-                    }
-                })
-                .catch(error => {
-                    console.error('خطأ في تحميل الأقسام:', error);
-                    roomSelect.disabled = true;
-                    return null;
                 });
         }
 
@@ -1439,6 +1413,7 @@
                 // إعادة تحميل البيانات الأصلية
                 if (originalOrderData && Object.keys(originalOrderData).length > 0) {
                     populateForm(originalOrderData);
+                    disableRecipientFieldsIfPending(); //  إعادة تطبيق التعطيل
                 } else {
                     // إعادة تحميل من الخادم
                     loadOrderData();
@@ -1464,7 +1439,19 @@
                 return;
             }
 
+            //  تمكين حقل رقم المستخدم مؤقتًا إذا كان معطلاً للقراءة فقط
+            const userIdInput = document.getElementById('userId');
+            const wasReadOnly = userIdInput.readOnly;
+            if (wasReadOnly) {
+                userIdInput.removeAttribute('readonly');
+            }
+
+
             if (!confirm('هل أنت متأكد من حفظ التعديلات على هذا الطلب؟')) {
+                //  إعادة التعطيل إذا لم يتم التأكيد
+                if (wasReadOnly) {
+                    userIdInput.setAttribute('readonly', true);
+                }
                 return;
             }
 
@@ -1485,6 +1472,11 @@
                 .then(data => {
                     document.getElementById('loadingOverlay').style.display = 'none';
 
+                    //  إعادة التعطيل إذا كان هناك خطأ في الحفظ لمنع التحرير بعد الفشل
+                    if (wasReadOnly) {
+                        userIdInput.setAttribute('readonly', true);
+                    }
+
                     if (data.success) {
                         alert('تم حفظ التعديلات بنجاح!');
                         window.location.href = buildUrl('inventoryController/index');
@@ -1496,6 +1488,11 @@
                     document.getElementById('loadingOverlay').style.display = 'none';
                     console.error('خطأ في حفظ التعديلات:', error);
                     alert('حدث خطأ في حفظ التعديلات: ' + error.message);
+
+                    //  إعادة التعطيل في حالة الخطأ
+                    if (wasReadOnly) {
+                        userIdInput.setAttribute('readonly', true);
+                    }
                 });
         });
 
@@ -1503,6 +1500,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('تحميل صفحة التعديل');
             console.log('رقم الطلب:', currentOrderId);
+            console.log('حالة الطلب (1=قيد الانتظار):', orderStatusId);
+
 
             if (!currentOrderId) {
                 alert('رقم الطلب غير محدد');
@@ -1516,9 +1515,6 @@
             // تحميل بيانات الطلب
             loadOrderData();
         });
-        // edit_order.php -> قسم <script>
-
-        // edit_order.php
 
         /**
          * وظيفة تحديث/إعادة بناء حقول الأصول والأرقام التسلسلية ديناميكياً.
@@ -1631,7 +1627,7 @@
                     serialInput.addEventListener('blur', () => validateAssetSerial(serialInput, itemId, i, 'serial', excludeId));
                 }
 
-                dynamicSection.style.display = 'block'; // ✅ هذا هو السطر الحاسم لإظهار القسم
+                dynamicSection.style.display = 'block'; //  هذا هو السطر الحاسم لإظهار القسم
             } else {
                 dynamicSection.style.display = 'none';
             }

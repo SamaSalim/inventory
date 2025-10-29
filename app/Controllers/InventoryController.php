@@ -50,109 +50,143 @@ class InventoryController extends BaseController
         $this->minorCategoryModel = new \App\Models\MinorCategoryModel();
     }
 
-    public function index()
+        public function index()
     {
-        if (! session()->get('isLoggedIn')) {
-            throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
-        }
+        //  البيانات model
+        $itemOrderModel = $this->itemOrderModel;
+        $minorCategoryModel = $this->minorCategoryModel;
+        $orderStatusModel = $this->orderStatusModel;
+        $usageStatusModel = $this->usageStatusModel;
 
-        $itemOrderModel = new \App\Models\ItemOrderModel();
-        $roomModel      = new \App\Models\RoomModel();
-
+        // التقاط متغيرات البحث والفلاتر
         $search        = $this->request->getVar('search');
-        $category      = $this->request->getVar('category');
         $itemType      = $this->request->getVar('item_type');
+        $category      = $this->request->getVar('category');
         $serialNumber  = $this->request->getVar('serial_number');
         $employeeId    = $this->request->getVar('employee_id');
+        $assetNumber   = $this->request->getVar('asset_number');
         $location      = $this->request->getVar('location');
+        $status        = $this->request->getVar('status');
+        $usageStatus   = $this->request->getVar('usage_status');
 
+        // بناء الاستعلام
         $builder = $itemOrderModel
             ->distinct()
             ->select('
-        item_order.order_id, 
-        MAX(item_order.created_at) as created_at,
-        MAX(item_order.created_by) as created_by,
-        MAX(item_order.room_id) as room_id,
-        MAX(employee.name) AS created_by_name, 
-        MAX(employee.emp_id) AS employee_id, 
-        MAX(employee.emp_ext) AS extension,
-        MAX(items.name) AS item_name,
-        MAX(minor_category.name) AS category_name,
-        MAX(usage_status.usage_status) AS usage_status_name,
-        COUNT(DISTINCT item_order.item_order_id) as items_count,
-        MAX(users.name) as receiver_name,
-        MAX(order_status.status) as order_status_name
-    ')
-            ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
+                item_order.order_id,
+                MAX(item_order.created_at) as created_at,
+                MAX(item_order.created_by) as created_by,
+                MAX(item_order.room_id) as room_id,
+                MAX(item_order.asset_num) as asset_num,
+                MAX(employee.name) AS created_by_name,
+                MAX(employee.emp_id) AS created_by_emp_id, 
+                MAX(employee.emp_ext) AS extension,
+                MAX(items.name) AS item_name,
+                MAX(minor_category.name) AS category_name,
+                MAX(usage_status.usage_status) AS usage_status_name,
+                COUNT(DISTINCT item_order.item_order_id) as items_count,
+                MAX(users.name) as receiver_name,
+                MAX(users.user_id) as receiver_employee_id,
+                MAX(order_status.status) as order_status_name,
+                
+                MAX(CONCAT(building.code, "-", floor.code, "-", section.code, "-", room.code)) as full_location_code
+            ')
+            // الروابط
             ->join('items', 'items.id = item_order.item_id', 'left')
             ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+            ->join('order', 'order.order_id = item_order.order_id', 'left') 
+            ->join('order_status', 'order_status.id = order.order_status_id', 'left') 
+            ->join('employee', 'employee.emp_id = order.from_user_id', 'left') 
+            ->join('users', 'users.user_id = order.to_user_id', 'left') 
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-            ->join('order', 'order.order_id = item_order.order_id', 'left')
-            ->join('users', 'users.user_id = order.to_user_id', 'left')
-            ->join('order_status', 'order_status.id = order.order_status_id', 'left')
-            ->groupBy('item_order.order_id')
-            ->orderBy('MAX(item_order.created_at)', 'DESC')
+            
+            ->join('room', 'room.id = item_order.room_id', 'left')
+            ->join('section', 'section.id = room.section_id', 'left')
+            ->join('floor', 'floor.id = section.floor_id', 'left')
+            ->join('building', 'building.id = floor.building_id', 'left')
+            
             ->groupBy('item_order.order_id')
             ->orderBy('MAX(item_order.created_at)', 'DESC');
-        // فلترة البحث
+
+        // -------------------------
+        // شروط الفلترة المتقدمة 
+        // -------------------------
+        
+        // 1. فلترة البحث العام
         if (!empty($search)) {
             $builder->groupStart()
-                ->like('item_order.order_id', $search)
+                // إضافة البحث في عمود الموقع الكامل في البحث العام
+                ->orLike('CONCAT(building.code, "-", floor.code, "-", section.code, "-", room.code)', $search)
+                
+                ->orLike('item_order.order_id', $search)
                 ->orLike('employee.name', $search)
                 ->orLike('employee.emp_id', $search)
+                ->orLike('users.name', $search)
+                ->orLike('users.user_id', $search)
                 ->orLike('employee.emp_ext', $search)
                 ->orLike('items.name', $search)
                 ->orLike('minor_category.name', $search)
                 ->orLike('item_order.serial_num', $search)
+                ->orLike('item_order.asset_num', $search)
                 ->groupEnd();
         }
 
+        // 2. فلترة بنوع الصنف
         if (!empty($itemType)) {
             $builder->like('items.name', $itemType);
         }
 
+        // 3. فلترة بالفئة الفرعية
         if (!empty($category)) {
             $builder->where('minor_category.id', $category);
         }
+        
+        // 4. فلترة برقم الأصول
+        if (!empty($assetNumber)) {
+            $builder->like('item_order.asset_num', $assetNumber);
+        }
 
+        // 5. فلترة بالرقم التسلسلي
         if (!empty($serialNumber)) {
             $builder->like('item_order.serial_num', $serialNumber);
         }
 
+        // 6. فلترة بالرقم الوظيفي (شامل: المرسل أو المستلم)
         if (!empty($employeeId)) {
-            $builder->where('employee.emp_id', $employeeId);
+            $builder->groupStart()
+                    ->like('employee.emp_id', $employeeId)
+                    ->orLike('users.user_id', $employeeId)
+                    ->groupEnd();
         }
 
+        // 7. فلترة بالموقع (الغرفة) - استخدام العمود المحسوب
         if (!empty($location)) {
-            $builder
-                ->join('room', 'room.id = item_order.room_id', 'left')
-                ->join('section', 'section.id = room.section_id', 'left')
-                ->join('floor', 'floor.id = section.floor_id', 'left')
-                ->join('building', 'building.id = floor.building_id', 'left')
-                ->groupStart()
-                ->like('room.code', $location)
-                ->orLike('section.code', $location)
-                ->orLike('floor.code', $location)
-                ->orLike('building.code', $location)
-                ->groupEnd();
+            //  البحث المباشر في العمود المحسوب
+            $builder->like('CONCAT(building.code, "-", floor.code, "-", section.code, "-", room.code)', $location);
         }
 
+        // 8. فلترة بحالة الطلب (قبول/رفض)
+        if (!empty($status)) {
+            $builder->where('order_status.id', $status);
+        }
 
+        // 9. فلترة بحالة الاستخدام
+        if (!empty($usageStatus)) {
+            $builder->where('usage_status.id', $usageStatus);
+        }
+
+        // جلب البيانات وتقسيمها
         $itemOrders = $builder->paginate(10, 'orders');
         $pager = $itemOrderModel->pager;
 
-        foreach ($itemOrders as $order) {
-            $order->location_code = $roomModel->getFullLocationCode($order->room_id);
-        }
 
-        $minorCategoryModel = new \App\Models\MinorCategoryModel();
+        // جلب البيانات المساعدة للعرض
         $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
             ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
             ->findAll();
-
         $stats = $this->getWarehouseStats();
-        $statuses = (new \App\Models\OrderStatusModel())->findAll();
-        $usageStatuses = (new \App\Models\UsageStatusModel())->findAll();
+        $statuses = $orderStatusModel->findAll();
+        $usageStatuses = $usageStatusModel->findAll();
 
         return view('warehouse/warehouse_view', [
             'categories'     => $categories,
@@ -168,10 +202,12 @@ class InventoryController extends BaseController
                 'serial_number' => $serialNumber,
                 'employee_id'   => $employeeId,
                 'location'      => $location,
+                'asset_number'  => $assetNumber,
+                'status'        => $status,
+                'usage_status'  => $usageStatus,
             ]
         ]);
     }
-
 
     public function bulkDeleteOrders()
     {
@@ -234,7 +270,7 @@ class InventoryController extends BaseController
             ]);
         }
     }
-    
+
     private function getWarehouseStats(): array
     {
         $totalQuantityResult = $this->itemOrderModel->selectSum('quantity')->first();
