@@ -8,207 +8,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= base_url('public/assets/css/warehouse-style.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('public/assets/css/super_warehouse_style.css') ?>">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            font-family: 'Cairo', sans-serif;
-        }
 
-        body {
-            background-color: #EFF8FA;
-            margin: 0;
-            padding: 0;
-        }
-
-        .main-content {
-            margin-right: 80px;
-            padding: 0;
-        }
-
-        .header {
-            background-color: white;
-            padding: 15px 25px;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            min-height: 70px;
-        }
-
-        .page-title {
-            color: #057590;
-            font-size: 22px;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #3AC0C3;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .user-avatar {
-            width: 35px;
-            height: 35px;
-            background-color: #3AC0C3;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .content-area {
-            padding: 25px;
-            background-color: #EFF8FA;
-            min-height: calc(100vh - 70px);
-        }
-
-        .section-title {
-            color: #057590;
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-title i {
-            color: #3AC0C3;
-        }
-
-        /* Status Badges */
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .status-return {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .order-status-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .order-status-accepted {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .order-status-rejected {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .action-btn {
-            padding: 6px 14px;
-            border-radius: 16px;
-            border: 2px solid;
-            font-size: 11px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: white;
-        }
-
-        .view-btn {
-            border-color: #3AC0C3;
-            color: #3AC0C3;
-        }
-
-        .view-btn:not(:disabled):hover {
-            background: linear-gradient(135deg, #3AC0C3, #2aa8ab);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 6px rgba(58, 192, 195, 0.25);
-        }
-
-        .accept-btn {
-            border-color: #28a745;
-            color: #28a745;
-        }
-
-        .accept-btn:not(:disabled):hover {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 6px rgba(40, 167, 69, 0.25);
-        }
-
-        .reject-btn {
-            border-color: #dc3545;
-            color: #dc3545;
-        }
-
-        .reject-btn:not(:disabled):hover {
-            background: linear-gradient(135deg, #dc3545, #fd7e14);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 6px rgba(220, 53, 69, 0.25);
-        }
-
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            border-color: #ccc;
-            color: #999;
-        }
-
-        .btn-icon {
-            width: 12px;
-            height: 12px;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #999;
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            opacity: 0.3;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .empty-state p {
-            font-size: 14px;
-            margin: 0;
-        }
-
-        /* Action Form Inline */
-        .action-form {
-            display: inline;
-            margin: 0;
-        }
-    </style>
 </head>
 
 <body>
@@ -237,7 +39,6 @@
         </div>
 
         <div class="content-area">
-            <!-- Alert Messages -->
             <?php if (session()->getFlashdata('success')): ?>
                 <div class="alert alert-success show" role="alert">
                     <i class="fas fa-check-circle"></i>
@@ -259,11 +60,8 @@
                 </div>
             <?php endif; ?>
 
-
-            <!-- Filters Form -->
             <form method="get" action="<?= base_url('return/superWarehouse/returnrequests') ?>">
                 <div class="filters-section">
-                    <!-- General Search Section -->
                     <div class="main-search-container">
                         <h3 class="search-section-title">
                             <i class="fas fa-search"></i>
@@ -271,20 +69,18 @@
                         </h3>
                         <div class="search-bar-wrapper">
                             <input type="text" 
-                                   class="main-search-input" 
-                                   name="general_search"
-                                   value="<?= esc($filters['general_search'] ?? '') ?>"
-                                   placeholder="ابحث في جميع الحقول...">
+                                class="main-search-input" 
+                                name="general_search"
+                                value="<?= esc($filters['general_search'] ?? '') ?>"
+                                placeholder="ابحث في جميع الحقول...">
                             <i class="fas fa-search search-icon"></i>
                         </div>
                     </div>
 
-                    <!-- Divider -->
                     <div class="filters-divider">
                         <span>أو استخدم الفلاتر التفصيلية</span>
                     </div>
 
-                    <!-- Detailed Filters -->
                     <div class="detailed-filters">
                         <div class="filter-group">
                             <label class="filter-label">
@@ -292,10 +88,10 @@
                                 رقم الطلب
                             </label>
                             <input type="text" 
-                                   class="filter-input" 
-                                   name="order_id"
-                                   value="<?= esc($filters['order_id'] ?? '') ?>" 
-                                   placeholder="أدخل رقم الطلب">
+                                class="filter-input" 
+                                name="order_id"
+                                value="<?= esc($filters['order_id'] ?? '') ?>" 
+                                placeholder="أدخل رقم الطلب">
                         </div>
 
                         <div class="filter-group">
@@ -304,13 +100,11 @@
                                 الرقم الوظيفي
                             </label>
                             <input type="text" 
-                                   class="filter-input" 
-                                   name="emp_id"
-                                   value="<?= esc($filters['emp_id'] ?? '') ?>" 
-                                   placeholder="أدخل الرقم الوظيفي">
+                                class="filter-input" 
+                                name="emp_id"
+                                value="<?= esc($filters['emp_id'] ?? '') ?>" 
+                                placeholder="أدخل الرقم الوظيفي">
                         </div>
-
-
 
                         <div class="filter-group">
                             <label class="filter-label">
@@ -318,10 +112,10 @@
                                 اسم الصنف
                             </label>
                             <input type="text" 
-                                   class="filter-input" 
-                                   name="item_name"
-                                   value="<?= esc($filters['item_name'] ?? '') ?>" 
-                                   placeholder="أدخل اسم الصنف">
+                                class="filter-input" 
+                                name="item_name"
+                                value="<?= esc($filters['item_name'] ?? '') ?>" 
+                                placeholder="أدخل اسم الصنف">
                         </div>
 
                         <div class="filter-group">
@@ -330,10 +124,10 @@
                                 رقم الأصل
                             </label>
                             <input type="text" 
-                                   class="filter-input" 
-                                   name="asset_num"
-                                   value="<?= esc($filters['asset_num'] ?? '') ?>" 
-                                   placeholder="أدخل رقم الأصل">
+                                class="filter-input" 
+                                name="asset_num"
+                                value="<?= esc($filters['asset_num'] ?? '') ?>" 
+                                placeholder="أدخل رقم الأصل">
                         </div>
 
                         <div class="filter-group">
@@ -342,10 +136,10 @@
                                 الرقم التسلسلي
                             </label>
                             <input type="text" 
-                                   class="filter-input" 
-                                   name="serial_num"
-                                   value="<?= esc($filters['serial_num'] ?? '') ?>" 
-                                   placeholder="أدخل الرقم التسلسلي">
+                                class="filter-input" 
+                                name="serial_num"
+                                value="<?= esc($filters['serial_num'] ?? '') ?>" 
+                                placeholder="أدخل الرقم التسلسلي">
                         </div>
 
                         <div class="filter-group">
@@ -354,9 +148,9 @@
                                 من تاريخ
                             </label>
                             <input type="date" 
-                                   class="filter-input" 
-                                   name="date_from"
-                                   value="<?= esc($filters['date_from'] ?? '') ?>">
+                                class="filter-input" 
+                                name="date_from"
+                                value="<?= esc($filters['date_from'] ?? '') ?>">
                         </div>
 
                         <div class="filter-group">
@@ -365,13 +159,12 @@
                                 إلى تاريخ
                             </label>
                             <input type="date" 
-                                   class="filter-input" 
-                                   name="date_to"
-                                   value="<?= esc($filters['date_to'] ?? '') ?>">
+                                class="filter-input" 
+                                name="date_to"
+                                value="<?= esc($filters['date_to'] ?? '') ?>">
                         </div>
                     </div>
 
-                    <!-- Filter Actions -->
                     <div class="filter-actions">
                         <div style="display: flex; gap: 15px;">
                             <button type="submit" class="filter-btn search-btn">
@@ -387,7 +180,6 @@
                 </div>
             </form>
 
-            <!-- Return Requests Table -->
             <div class="table-container">
                 <table class="custom-table">
                     <thead>
@@ -419,77 +211,60 @@
                                             <?= esc($order['usage_status'] ?? 'رجيع') ?>
                                         </span>
                                     </td>
-                                <td>
-                                    <?php 
-                                    if ($order['usage_status_id'] == 2): 
-                                    ?>
-                                        <span class="status-badge order-status-pending">قيد الانتظار</span>
-                                    <?php else: ?>
-                                        <?php if (isset($order['order_status_id'])): ?>
-                                            <?php if ($order['order_status_id'] == 1): ?>
-                                                <span class="status-badge order-status-pending">قيد الانتظار</span>
-                                            <?php elseif ($order['order_status_id'] == 2): ?>
-                                                <span class="status-badge order-status-accepted">مقبول</span>
-                                            <?php elseif ($order['order_status_id'] == 3): ?>
-                                                <span class="status-badge order-status-rejected">مرفوض</span>
+                                    <td>
+                                        <?php 
+                                        if ($order['usage_status_id'] == 2): 
+                                        ?>
+                                            <span class="status-badge order-status-pending">قيد الانتظار</span>
+                                        <?php else: ?>
+                                            <?php if (isset($order['order_status_id'])): ?>
+                                                <?php if ($order['order_status_id'] == 1): ?>
+                                                    <span class="status-badge order-status-pending">قيد الانتظار</span>
+                                                <?php elseif ($order['order_status_id'] == 2): ?>
+                                                    <span class="status-badge order-status-accepted">مقبول</span>
+                                                <?php elseif ($order['order_status_id'] == 3): ?>
+                                                    <span class="status-badge order-status-rejected">مرفوض</span>
+                                                <?php else: ?>
+                                                    <span class="status-badge">غير محدد</span>
+                                                <?php endif; ?>
                                             <?php else: ?>
                                                 <span class="status-badge">غير محدد</span>
                                             <?php endif; ?>
-                                        <?php else: ?>
-                                            <span class="status-badge">غير محدد</span>
                                         <?php endif; ?>
-                                    <?php endif; ?>
-                                </td>
-                                    <td><?= date('Y-m-d', strtotime($order['created_at'])) ?></td>
+                                    </td>
+                                    <td><?= date('d-m-Y', strtotime($order['created_at'])) ?></td>
                                     <td>
                                         <div class="action-buttons">
-                                            <!-- View Button -->
-                                            <a href="<?= base_url('superWarehouseReturn/view/' . $order['item_order_id']) ?>" 
-                                               class="action-btn view-btn">
-                                                <i class="fas fa-eye btn-icon"></i>
-                                                عرض
-                                            </a>
-                                            
-                                            <?php 
-                                            // Enable accept/reject buttons only for pending orders (status_id = 1)
-                                            $isPending = isset($order['order_status_id']) && $order['order_status_id'] == 1;
-                                            ?>
-                                            
-                                            <!-- Accept Button -->
-                                            <?php if ($isPending): ?>
-                                                <form method="post" 
-                                                      action="<?= base_url('superWarehouseReturn/accept/' . $order['item_order_id']) ?>" 
-                                                      class="action-form"
-                                                      onsubmit="return confirm('هل أنت متأكد من قبول هذا الإرجاع؟');">
-                                                    <?= csrf_field() ?>
-                                                    <button type="submit" class="action-btn accept-btn">
-                                                        <i class="fas fa-check btn-icon"></i>
-                                                        قبول
-                                                    </button>
-                                                </form>
+                                            <?php if (!empty($order['attachment']) && $order['attachment'] !== 'NULL'): ?>
+                                                <button onclick='handleAttachmentView(<?= json_encode($order, JSON_HEX_APOS | JSON_HEX_QUOT) ?>)' 
+                                                class="action-btn view-btn">
+                                                    <i class="fas fa-eye btn-icon"></i> عرض المرفق
+                                                </button>
                                             <?php else: ?>
-                                                <button class="action-btn accept-btn" disabled>
-                                                    <i class="fas fa-check btn-icon"></i>
-                                                    قبول
+                                                <button class="action-btn view-btn" disabled>
+                                                    <i class="fas fa-eye btn-icon"></i> لا يوجد مرفق
                                                 </button>
                                             <?php endif; ?>
                                             
-                                            <!-- Reject Button -->
+                                            <?php 
+                                            $isPending = ($order['usage_status_id'] == 2) || (isset($order['order_status_id']) && $order['order_status_id'] == 1);
+                                            ?>
+                                            
                                             <?php if ($isPending): ?>
-                                                <form method="post" 
-                                                      action="<?= base_url('superWarehouseReturn/reject/' . $order['item_order_id']) ?>" 
-                                                      class="action-form"
-                                                      onsubmit="return confirm('هل أنت متأكد من رفض هذا الإرجاع؟');">
-                                                    <?= csrf_field() ?>
-                                                    <button type="submit" class="action-btn reject-btn">
-                                                        <i class="fas fa-times btn-icon"></i>
-                                                        رفض
-                                                    </button>
-                                                </form>
+                                                <button onclick="showAcceptConfirmation('<?= esc($order['item_order_id']) ?>')" 
+                                                class="action-btn accept-btn">
+                                                    <i class="fas fa-check btn-icon"></i> قبول
+                                                </button>
+                                                <button onclick="showRejectConfirmation('<?= esc($order['item_order_id']) ?>')" 
+                                                class="action-btn reject-btn">
+                                                    <i class="fas fa-times btn-icon"></i> رفض
+                                                </button>
                                             <?php else: ?>
+                                                <button class="action-btn accept-btn" disabled>
+                                                    <i class="fas fa-check btn-icon"></i> قبول
+                                                </button>
                                                 <button class="action-btn reject-btn" disabled>
-                                                    <i class="fas fa-times btn-icon"></i>
-                                                    رفض
+                                                    <i class="fas fa-times btn-icon"></i> رفض
                                                 </button>
                                             <?php endif; ?>
                                         </div>
@@ -498,7 +273,7 @@
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="10">
+                                <td colspan="11">
                                     <div class="empty-state">
                                         <i class="fas fa-inbox"></i>
                                         <p>لا توجد طلبات إرجاع</p>
@@ -512,9 +287,73 @@
         </div>
     </div>
 
+    <!-- Accept Confirmation Modal -->
+    <div id="acceptConfirmationModal" class="confirmation-modal">
+        <div class="confirmation-modal-content">
+            <div class="confirmation-modal-header accept-header">
+                <i class="fas fa-check-circle"></i>
+                <h3>تأكيد القبول</h3>
+            </div>
+            <div class="confirmation-modal-body">
+                <p>هل أنت متأكد من قبول طلب الإرجاع؟</p>
+            </div>
+            <div class="confirmation-modal-footer">
+                  <button class="confirm-btn accept-confirm-btn" onclick="confirmAccept()">
+                    نعم
+                </button>
+                <button class="cancel-btn" onclick="closeAcceptConfirmation()">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Confirmation Modal -->
+    <div id="rejectConfirmationModal" class="confirmation-modal">
+        <div class="confirmation-modal-content">
+            <div class="confirmation-modal-header reject-header">
+                <i class="fas fa-times-circle"></i>
+                <h3>تأكيد الرفض  </h3>
+            </div>
+            <div class="confirmation-modal-body">
+                <p>هل أنت متأكد من رفض طلب الإرجاع؟</p></div>
+            <div class="confirmation-modal-footer">
+                  <button class="confirm-btn reject-confirm-btn" onclick="confirmReject()">
+                    نعم
+                </button>
+                <button class="cancel-btn" onclick="closeRejectConfirmation()">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attachment Modal -->
+    <div id="attachmentModal" class="attachment-modal">
+        <div class="attachment-modal-content">
+            <div class="modal-header-custom">
+                <h3>
+                    <i class="fas fa-file-alt"></i>
+                    تفاصيل الطلب والمرفق
+                </h3>
+                <button class="modal-close" onclick="closeAttachmentModal()">✕</button>
+            </div>
+
+            <div class="modal-body-custom">
+                <div class="item-info-section">
+                    <div class="info-grid" id="itemInfoGrid"></div>
+                </div>
+
+                <div id="attachmentDisplayContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden iframe for printing -->
+    <iframe id="hiddenPrintFrame"></iframe>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Auto-hide alerts after 5 seconds
         document.addEventListener('DOMContentLoaded', function() {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(alert => {
@@ -524,6 +363,206 @@
                     setTimeout(() => alert.remove(), 500);
                 }, 5000);
             });
+        });
+
+        let currentOrderData = null;
+        let orderToAccept = null;
+        let orderToReject = null;
+
+        function showAcceptConfirmation(orderId) {
+            orderToAccept = orderId;
+            const modal = document.getElementById('acceptConfirmationModal');
+            modal.style.display = 'block';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function closeAcceptConfirmation() {
+            const modal = document.getElementById('acceptConfirmationModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                orderToAccept = null;
+            }, 300);
+        }
+
+        function confirmAccept() {
+            if (orderToAccept) {
+                window.location.href = '<?= base_url('return/superwarehouse/returnrequests/acceptReturn/') ?>' + orderToAccept;
+            }
+        }
+
+        function showRejectConfirmation(orderId) {
+            orderToReject = orderId;
+            const modal = document.getElementById('rejectConfirmationModal');
+            modal.style.display = 'block';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function closeRejectConfirmation() {
+            const modal = document.getElementById('rejectConfirmationModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                orderToReject = null;
+            }, 300);
+        }
+
+        function confirmReject() {
+            if (orderToReject) {
+                window.location.href = '<?= base_url('return/superwarehouse/returnrequests/rejectReturn/') ?>' + orderToReject;
+            }
+        }
+
+        function handleAttachmentView(orderData) {
+            const attachmentExt = orderData.attachment ? orderData.attachment.split('.').pop().toLowerCase() : '';
+            const isHTML = ['html', 'htm', 'php'].includes(attachmentExt);
+            
+            if (isHTML) {
+                printHTMLDirectly(orderData.asset_num);
+            } else {
+                openAttachmentModal(orderData);
+            }
+        }
+
+        function printHTMLDirectly(assetNum) {
+            const attachmentUrl = '<?= base_url('return/superwarehouse/returnrequests/serveAttachment/') ?>' + assetNum;
+            const printFrame = document.getElementById('hiddenPrintFrame');
+            
+            printFrame.onload = null;
+            
+            printFrame.onload = function() {
+                try {
+                    setTimeout(() => {
+                        printFrame.contentWindow.focus();
+                        printFrame.contentWindow.print();
+                    }, 800);
+                } catch (e) {
+                    console.error('Print error:', e);
+                    alert('حدث خطأ أثناء محاولة الطباعة');
+                }
+            };
+            
+            printFrame.src = attachmentUrl;
+        }
+
+        function openAttachmentModal(orderData) {
+            currentOrderData = orderData;
+            
+            const modal = document.getElementById('attachmentModal');
+            const modalBody = modal.querySelector('.modal-body-custom');
+            const infoGrid = document.getElementById('itemInfoGrid');
+            const displayContainer = document.getElementById('attachmentDisplayContainer');
+            
+            infoGrid.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">رقم الطلب</span>
+                    <span class="info-value">${orderData.item_order_id || '-'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">الرقم الوظيفي</span>
+                    <span class="info-value">${orderData.created_by || '-'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">اسم الصنف</span>
+                    <span class="info-value">${orderData.item_name || 'غير محدد'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">رقم الأصل</span>
+                    <span class="info-value">${orderData.asset_num || '-'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">الرقم التسلسلي</span>
+                    <span class="info-value">${orderData.serial_num || '-'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">تاريخ الطلب</span>
+                    <span class="info-value">${new Date(orderData.created_at).toLocaleDateString('en-GB')}</span>
+                </div>
+            `;
+            
+            const attachmentExt = orderData.attachment ? orderData.attachment.split('.').pop().toLowerCase() : '';
+            const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+            const attachmentUrl = '<?= base_url('return/superwarehouse/returnrequests/serveAttachment/') ?>' + orderData.asset_num;
+            
+            if (imageExtensions.includes(attachmentExt)) {
+                modalBody.classList.remove('file-view');
+                displayContainer.innerHTML = `
+                    <div class="attachment-display-image">
+                        <div class="attachment-container-image">
+                            <img src="${attachmentUrl}" alt="Attachment" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❌</text></svg>'">
+                        </div>
+                    </div>
+                `;
+            } else {
+                modalBody.classList.add('file-view');
+                displayContainer.innerHTML = `
+                    <div class="attachment-display-file">
+                        <div class="attachment-container-file">
+                            <div class="loading-spinner">
+                                <i class="fas fa-circle-notch"></i>
+                                <span>جاري تحميل الملف...</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    displayContainer.querySelector('.attachment-container-file').innerHTML = `
+                        <iframe src="${attachmentUrl}" 
+                                frameborder="0" 
+                                onload="this.style.display='block';"
+                                onerror="this.parentElement.innerHTML='<div style=\'padding:40px;text-align:center;color:#999;\'>خطأ في تحميل الملف</div>'">
+                        </iframe>
+                    `;
+                }, 300);
+            }
+            
+            modal.style.display = 'block';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function closeAttachmentModal() {
+            const modal = document.getElementById('attachmentModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.getElementById('attachmentDisplayContainer').innerHTML = '';
+                currentOrderData = null;
+            }, 300);
+        }
+
+        window.onclick = function(event) {
+            const attachmentModal = document.getElementById('attachmentModal');
+            const acceptModal = document.getElementById('acceptConfirmationModal');
+            const rejectModal = document.getElementById('rejectConfirmationModal');
+            
+            if (event.target === attachmentModal) {
+                closeAttachmentModal();
+            }
+            if (event.target === acceptModal) {
+                closeAcceptConfirmation();
+            }
+            if (event.target === rejectModal) {
+                closeRejectConfirmation();
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const attachmentModal = document.getElementById('attachmentModal');
+                const acceptModal = document.getElementById('acceptConfirmationModal');
+                const rejectModal = document.getElementById('rejectConfirmationModal');
+                
+                if (attachmentModal.style.display === 'block') {
+                    closeAttachmentModal();
+                }
+                if (acceptModal.style.display === 'block') {
+                    closeAcceptConfirmation();
+                }
+                if (rejectModal.style.display === 'block') {
+                    closeRejectConfirmation();
+                }
+            }
         });
     </script>
 </body>
