@@ -1,5 +1,4 @@
 <?php
-// اضافة طلبات من نفس النوع 
 
 namespace App\Controllers;
 
@@ -50,7 +49,6 @@ class OrderController extends BaseController
         $this->transferItemsModel = new TransferItemsModel();
         $this->usageStatusModel = new UsageStatusModel(); // تهيئة نموذج حالة الاستخدام
     }
-
 
 
     /**
@@ -429,12 +427,10 @@ class OrderController extends BaseController
     {
         try {
             // التحقق من تسجيل الدخول
-            if (!session()->get('isLoggedIn')) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'يجب تسجيل الدخول أولاً'
-                ]);
-            }
+                if (!session()->get('isLoggedIn')) {
+                    return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
+                }
+            
 
             $loggedEmployeeId = session()->get('employee_id');
 
@@ -637,22 +633,22 @@ class OrderController extends BaseController
                     ]);
                 }
             }
-                $transferItemData = [
-                    'item_order_id' => $itemOrderId,
-                    'from_user_id' => $loggedEmployeeId,
-                    'to_user_id' => $toUserId,
-                    'order_status_id' => 1, // قيد الانتظار (في جدول transfer_items)
-                    'is_opened' => 0 
-                ];
-                
-                if (!$this->transferItemsModel->insert($transferItemData)) {
-                    $this->orderModel->transRollback();
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => 'فشل في إنشاء سجل التحويل للعنصر.'
-                    ]);
-                }
-            
+            $transferItemData = [
+                'item_order_id' => $itemOrderId,
+                'from_user_id' => $loggedEmployeeId,
+                'to_user_id' => $toUserId,
+                'order_status_id' => 1, // قيد الانتظار (في جدول transfer_items)
+                'is_opened' => 0
+            ];
+
+            if (!$this->transferItemsModel->insert($transferItemData)) {
+                $this->orderModel->transRollback();
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'فشل في إنشاء سجل التحويل للعنصر.'
+                ]);
+            }
+
             // إنهاء المعاملة
             $this->orderModel->transComplete();
 
@@ -676,7 +672,9 @@ class OrderController extends BaseController
             ]);
         }
     }
-
+    /**
+     * عرض صفحة إضافة طلب متعدد الأصناف
+     */
     public function index()
     {
 
@@ -704,9 +702,10 @@ class OrderController extends BaseController
         if (!$orderId) {
             return redirect()->to(base_url('inventoryController/index'))->with('error', 'رقم الطلب مطلوب');
         }
-
-        // التحقق من وجود الطلب
+        
         $order = $this->orderModel->find($orderId);
+        $orderStatusId = $order->order_status_id;
+
         if (!$order) {
             return redirect()->to(base_url('inventoryController/index'))->with('error', 'الطلب غير موجود');
         }
@@ -721,14 +720,13 @@ class OrderController extends BaseController
         return view('warehouse/edit_order', [
             'orderId' => $orderId,
             'loggedInUser' => $loggedInUser, //  تمرير بيانات الموظف المسجل دخوله
+            'orderStatusId' => $orderStatusId, // ✅ تمرير حالة الطلب
 
         ]);
     }
 
 
-    /**
-     * جلب بيانات الطلب للتعديل
-     */
+
     /**
      * جلب بيانات الطلب للتعديل
      */
@@ -807,7 +805,7 @@ class OrderController extends BaseController
 
                 $groupedItems[$itemKey]['quantity']++;
                 $groupedItems[$itemKey]['items'][] = [
-                    'id' => $item['item_order_id'], 
+                    'id' => $item['item_order_id'],
                     'asset_num' => $item['asset_num'],
                     'serial_num' => $item['serial_num'],
                     'model_num' => $item['model_num'],
@@ -837,8 +835,6 @@ class OrderController extends BaseController
             ]);
         }
     }
-
-  
     /**
      * تحديث الطلب متعدد الأصناف
      */
@@ -869,6 +865,24 @@ class OrderController extends BaseController
                 ]);
             }
 
+            // منع التعديل إذا كانت حالة الطلب مقبولة (2)
+            if ($existingOrder->order_status_id == 2) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'لا يمكن تعديل الطلب بعد قبوله من قبل المستلم.'
+                ]);
+            }
+
+            // ✅ السماح بالتعديل في حالة قيد الانتظار (1) والمرفوض (3)
+            $canEdit = ($existingOrder->order_status_id == 1 || $existingOrder->order_status_id == 3);
+
+            if (!$canEdit) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'لا يمكن تعديل الطلب إلا إذا كان قيد الانتظار أو مرفوضاً.'
+                ]);
+            }
+
             $loggedEmployeeId = session()->get('employee_id');
 
             // الحصول على حالة الاستخدام الافتراضية
@@ -893,7 +907,19 @@ class OrderController extends BaseController
                 ]);
             }
 
-            //  1. جمع بيانات الأصناف المُرسلة وتخزينها
+            // التحقق من تغيير المستلم
+            $receiverChanged = ($existingOrder->to_user_id != $toUserId);
+
+            // ✅ منطق منع تغيير المستلم في حالة قيد الانتظار (1)
+            if ($existingOrder->order_status_id == 1 && $receiverChanged) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'لا يمكن تغيير المستلم أثناء حالة "قيد الانتظار". يمكنك فقط تغيير الأصناف والموقع.'
+                ]);
+            }
+            // ❌ ملاحظة: إذا كان مرفوضاً (3) فسيتم السماح بتغييره.
+
+            // جمع بيانات الأصناف المُرسلة وتخزينها
             $items = [];
             $allPostData = $this->request->getPost();
 
@@ -932,7 +958,7 @@ class OrderController extends BaseController
                     $oldAssetNum = trim($this->request->getPost("old_asset_num_{$itemNum}_{$i}") ?? '');
                     $brand = trim($this->request->getPost("brand_{$itemNum}_{$i}") ?? 'غير محدد');
 
-                    //  يتم جمع ID العنصر الموجود
+                    // يتم جمع ID العنصر الموجود
                     $existingItemId = $this->request->getPost("existing_item_id_{$itemNum}_{$i}") ?? null;
 
                     if (empty($assetNum) || empty($serialNum)) {
@@ -964,14 +990,14 @@ class OrderController extends BaseController
                 ]);
             }
 
-            //  2. التحقق من التكرار (داخل الطلب الحالي وفي قاعدة البيانات مع استثناء العناصر القديمة)
+            // التحقق من التكرار (داخل الطلب الحالي وفي قاعدة البيانات مع استثناء العناصر القديمة)
             $assetNumbers = [];
             $serialNumbers = [];
 
             foreach ($items as $index => $item) {
                 $assetNum = $item['asset_number'];
                 $serialNum = $item['serial_number'];
-                $existingItemId = $item['existing_item_id']; // ID العنصر الحالي (item_order_id)
+                $existingItemId = $item['existing_item_id'];
 
                 // التحقق من صحة تنسيق الأرقام
                 $assetValidation = $this->validateAssetNumber($assetNum);
@@ -990,7 +1016,7 @@ class OrderController extends BaseController
                     ]);
                 }
 
-                // التحقق من التكرار في الطلب الحالي (لمنع إرسال رقم مكرر في نفس الدفعة)
+                // التحقق من التكرار في الطلب الحالي
                 if (in_array($assetNum, $assetNumbers)) {
                     return $this->response->setJSON([
                         'success' => false,
@@ -1005,10 +1031,10 @@ class OrderController extends BaseController
                     ]);
                 }
 
-                // التحقق من التكرار في قاعدة البيانات (مع استثناء العنصر الحالي)
+                // التحقق من التكرار في قاعدة البيانات
                 $assetQuery = $this->itemOrderModel->where('asset_num', $assetNum);
                 if ($existingItemId) {
-                    $assetQuery->where('item_order_id !=', $existingItemId); //  استثناء ID العنصر نفسه
+                    $assetQuery->where('item_order_id !=', $existingItemId);
                 }
                 $existingAsset = $assetQuery->first();
 
@@ -1021,7 +1047,7 @@ class OrderController extends BaseController
 
                 $serialQuery = $this->itemOrderModel->where('serial_num', $serialNum);
                 if ($existingItemId) {
-                    $serialQuery->where('item_order_id !=', $existingItemId); //  استثناء ID العنصر نفسه
+                    $serialQuery->where('item_order_id !=', $existingItemId);
                 }
                 $existingSerial = $serialQuery->first();
 
@@ -1036,7 +1062,7 @@ class OrderController extends BaseController
                 $serialNumbers[] = $serialNum;
             }
 
-            //  3. منطق التحديث الانتقائي 
+            // بدء المعاملة
             $this->orderModel->transStart();
 
             // تحديث الطلب الرئيسي
@@ -1045,6 +1071,12 @@ class OrderController extends BaseController
                 'to_user_id' => $toUserId,
                 'note' => $notes
             ];
+
+            // إذا تغير المستلم (وهو مسموح به فقط في حالة الرفض)، نعيد الحالة إلى قيد الانتظار
+            if ($receiverChanged && $existingOrder->order_status_id == 3) {
+                $orderData['order_status_id'] = 1; // قيد الانتظار
+            }
+
             unset($orderData['created_at']);
             $this->orderModel->update($orderId, $orderData);
 
@@ -1076,7 +1108,7 @@ class OrderController extends BaseController
                 $existingItemId = $item['existing_item_id'] ?? null;
 
                 if (!empty($existingItemId) && in_array((string)$existingItemId, $oldItemOrderIds)) {
-                    // العنصر موجود: تحديث (يحافظ على created_at)
+                    // العنصر موجود: تحديث
                     $updateResult = $this->itemOrderModel->updateWithUniqueCheck($existingItemId, $itemOrderData);
 
                     if (!$updateResult['success']) {
@@ -1087,8 +1119,18 @@ class OrderController extends BaseController
                         ]);
                     }
                     $submittedItemOrderIds[] = (string)$existingItemId;
+
+                    // تحديث transfer_items للعنصر الموجود
+                    if ($receiverChanged && $existingOrder->order_status_id == 3) { // فقط إذا تغير المستلم (مسموح فقط في المرفوض)
+                        $this->transferItemsModel->where('item_order_id', $existingItemId)->set([
+                            'to_user_id' => $toUserId,
+                            'order_status_id' => 1, // قيد الانتظار
+                            'is_opened' => 0, // إعادة تعيين حالة الفتح
+                            'updated_at' => date('Y-m-d H:i:s')
+                        ])->update();
+                    }
                 } else {
-                    // العنصر جديد: إدراج (يُعين created_at جديد)
+                    // العنصر جديد: إدراج
                     $insertResult = $this->itemOrderModel->insertWithUniqueCheck($itemOrderData);
 
                     if (!$insertResult['success']) {
@@ -1098,6 +1140,25 @@ class OrderController extends BaseController
                             'message' => 'فشل في إضافة العنصر الجديد: ' . $insertResult['message']
                         ]);
                     }
+
+                    $newItemOrderId = $insertResult['id'];
+
+                    // إنشاء سجل transfer_items للعنصر الجديد
+                    $transferData = [
+                        'item_order_id' => $newItemOrderId,
+                        'from_user_id' => $loggedEmployeeId,
+                        'to_user_id' => $toUserId,
+                        'order_status_id' => 1, // قيد الانتظار
+                        'is_opened' => 0
+                    ];
+
+                    if (!$this->transferItemsModel->insert($transferData)) {
+                        $this->orderModel->transRollback();
+                        return $this->response->setJSON([
+                            'success' => false,
+                            'message' => 'فشل في إنشاء سجل التحويل للعنصر الجديد'
+                        ]);
+                    }
                 }
             }
 
@@ -1105,6 +1166,11 @@ class OrderController extends BaseController
             $itemsToDelete = array_diff($oldItemOrderIds, $submittedItemOrderIds);
 
             if (!empty($itemsToDelete)) {
+                // حذف سجلات transfer_items المرتبطة أولاً
+                foreach ($itemsToDelete as $itemOrderId) {
+                    $this->transferItemsModel->where('item_order_id', $itemOrderId)->delete();
+                }
+                // ثم حذف item_order
                 $this->itemOrderModel->delete($itemsToDelete);
             }
 
@@ -1118,9 +1184,14 @@ class OrderController extends BaseController
                 ]);
             }
 
+            $successMessage = 'تم تحديث الطلب بنجاح';
+            if ($receiverChanged && $existingOrder->order_status_id == 3) {
+                $successMessage .= ' وتم إرساله للمستلم الجديد';
+            }
+
             return $this->response->setJSON([
                 'success' => true,
-                'message' => 'تم تحديث الطلب بنجاح',
+                'message' => $successMessage,
                 'order_id' => $orderId
             ]);
         } catch (\Exception $e) {

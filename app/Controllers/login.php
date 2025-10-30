@@ -5,7 +5,7 @@ namespace App\Controllers;
 use App\Models\EmployeeModel;
 use App\Models\PermissionModel;
 use App\Models\RoleModel;
-use App\Models\UserModel; 
+use App\Models\UserModel;
 
 class login extends BaseController
 {
@@ -20,7 +20,7 @@ class login extends BaseController
         $password = $this->request->getPost('password');
 
         $employeeModel = new EmployeeModel();
-        $userModel = new UserModel(); 
+        $userModel = new UserModel();
         $permissionModel = new PermissionModel();
         $roleModel = new RoleModel();
 
@@ -51,11 +51,11 @@ class login extends BaseController
             // ويُعطى الدور الافتراضي 'user' مباشرة.
             $roleName = 'user';
         }
-        
+
         // جزء التحقق من الصلاحية وجلب الدور: يتم تنفيذه فقط للموظفين
         if ($isEmployee) {
             if (!$permission || empty($permission->role_id)) {
-                 return redirect()->back()->with('error', 'لا يوجد دور مخصص أو بيانات صلاحيات غير صالحة للموظف.');
+                return redirect()->back()->with('error', 'لا يوجد دور مخصص أو بيانات صلاحيات غير صالحة للموظف.');
             }
 
             $role = $roleModel->find($permission->role_id);
@@ -63,20 +63,20 @@ class login extends BaseController
             if (!$role) {
                 return redirect()->back()->with('error', 'الدور غير صالح.');
             }
-            
+
             $roleName = $role->name; // تحديث الدور من قاعدة البيانات
         }
-        
-        // **ملاحظة:** إذا كان $isEmployee خاطئ، فإن $roleName هو 'user' بالفعل من خطوة التعديل أعلاه.
+
 
         // تعيين بيانات الجلسة
         session()->set([
             // استخدام المفتاح الصحيح: user_id للمستخدم العادي، emp_id للموظف
-            'employee_id' => $isEmployee ? $account->emp_id : $account->user_id,
+            'employee_id' => $isEmployee ? $account->emp_id : null,
             'name'        => $account->name,
-            'role'        => $roleName, 
+            'role'        => $roleName,
             'isLoggedIn'  => true,
-            'isEmployee'  => $isEmployee, 
+            'isEmployee'  => $isEmployee,
+            'user_id'     => $isEmployee ? null : $account->user_id
         ]);
 
         // التوجيه بناءً على الدور
@@ -89,9 +89,9 @@ class login extends BaseController
         } elseif ($roleName === 'user') {
             // التوجيه لصفحة العهد
             return redirect()->to('/UserController/dashboard');
-        }elseif ($roleName === 'super_assets') {
+        } elseif ($roleName === 'super_assets') {
             return redirect()->to('/AssetsController/index');
-               }elseif ($roleName === 'super_warehouse') {
+        } elseif ($roleName === 'super_warehouse') {
             return redirect()->to('/AssetsHistory');
         } else {
             return redirect()->back()->with('error', 'دور غير معروف.');

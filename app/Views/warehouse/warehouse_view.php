@@ -86,10 +86,6 @@
             <div class="section-header">
                 <h2 class="section-title">قائمة المخزون</h2>
                 <div class="buttons-group">
-                    <!-- هنا زر لإنشاء طلب لتصنيفات مختلفة -->
-                    <!-- <a href="<ظ?= site_url('OrderController/index') ?>" class="add-btn ">
-                        <i class="fas fa-layer-group"></i> إنشاء طلب  
-                    </a> -->
                     <div class="buttons-group">
                         <?php if (canCreateOrder()): ?>
                             <a href="<?= site_url('OrderController/index') ?>" class="add-btn">
@@ -133,7 +129,7 @@
             </div>
 
             <!-- قسم البحث والفلاتر المحدث -->
-            <form method="get" action="<?= base_url('InventoryController/index') ?>">
+            <form method="get" action="<?= base_url('InventoryController/index') ?>" id="searchForm">
                 <div class="filters-section">
                     <!-- شريط البحث الرئيسي -->
                     <div class="main-search-container">
@@ -142,10 +138,15 @@
                             البحث العام
                         </h3>
                         <div class="search-bar-wrapper">
-                            <input type="text" class="main-search-input" name="search" id="mainSearchInput"
+                            <input type="text"
+                                class="main-search-input"
+                                name="search"
+                                id="mainSearchInput"
                                 value="<?= esc($filters['search'] ?? '') ?>"
                                 placeholder="ابحث في جميع الحقول...">
-                            <i class="fas fa-search search-icon" onclick="document.querySelector('form').submit();" title="بحث"></i>
+                            <i class="fas fa-search search-icon"
+                                onclick="document.getElementById('searchForm').submit();"
+                                title="بحث"></i>
                         </div>
                     </div>
 
@@ -156,13 +157,54 @@
 
                     <!-- الفلاتر التفصيلية -->
                     <div class="detailed-filters">
+                        <!-- رقم الأصول - جديد -->
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-hashtag"></i>
+                                رقم الأصول
+                            </label>
+                            <input type="text"
+                                class="filter-input"
+                                name="asset_number"
+                                id="assetNumberInput"
+                                value="<?= esc($filters['asset_number'] ?? '') ?>"
+                                placeholder="ابحث برقم الأصول">
+                        </div>
+                        <!-- الرقم التسلسلي -->
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-barcode"></i>
+                                الرقم التسلسلي
+                            </label>
+                            <input type="text"
+                                class="filter-input"
+                                name="serial_number"
+                                value="<?= esc($filters['serial_number'] ?? '') ?>"
+                                placeholder="رقم تسلسلي محدد">
+                        </div>
+                        <!-- الرقم الوظيفي - محدث -->
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-id-badge"></i>
+                                الرقم الوظيفي
+                            </label>
+                            <input type="text"
+                                class="filter-input"
+                                name="employee_id"
+                                id="employeeIdInput"
+                                value="<?= esc($filters['employee_id'] ?? '') ?>"
+                                placeholder="رقم الموظف (المرسل أو المستلم)">
+                        </div>
+
                         <!-- الصنف -->
                         <div class="filter-group">
                             <label class="filter-label">
                                 <i class="fas fa-tag"></i>
                                 الصنف
                             </label>
-                            <input type="text" class="filter-input" name="item_type"
+                            <input type="text"
+                                class="filter-input"
+                                name="item_type"
                                 value="<?= esc($filters['item_type'] ?? '') ?>"
                                 placeholder="اكتب نوع الصنف">
                         </div>
@@ -186,27 +228,6 @@
                             </select>
                         </div>
 
-                        <!-- الرقم التسلسلي -->
-                        <div class="filter-group">
-                            <label class="filter-label">
-                                <i class="fas fa-barcode"></i>
-                                الرقم التسلسلي
-                            </label>
-                            <input type="text" class="filter-input" name="serial_number"
-                                value="<?= esc($filters['serial_number'] ?? '') ?>"
-                                placeholder="رقم تسلسلي محدد">
-                        </div>
-
-                        <!-- الرقم الوظيفي -->
-                        <div class="filter-group">
-                            <label class="filter-label">
-                                <i class="fas fa-id-badge"></i>
-                                الرقم الوظيفي
-                            </label>
-                            <input type="text" class="filter-input" name="employee_id"
-                                value="<?= esc($filters['employee_id'] ?? '') ?>"
-                                placeholder="رقم الموظف">
-                        </div>
 
                         <!-- الموقع -->
                         <div class="filter-group">
@@ -214,7 +235,9 @@
                                 <i class="fas fa-map-marker-alt"></i>
                                 الموقع
                             </label>
-                            <input type="text" class="filter-input" name="location"
+                            <input type="text"
+                                class="filter-input"
+                                name="location"
                                 value="<?= esc($filters['location'] ?? '') ?>"
                                 placeholder="اكتب اسم الموقع">
                         </div>
@@ -226,14 +249,14 @@
                             <i class="fas fa-search"></i>
                             بحث
                         </button>
-                        <a href="<?= base_url('InventoryController/index') ?>" class="filter-btn reset-btn">
+                        <a href="<?= base_url('InventoryController/index') ?>"
+                            class="filter-btn reset-btn">
                             <i class="fas fa-undo"></i>
                             إعادة تعيين
                         </a>
                     </div>
                 </div>
             </form>
-
             <div class="table-container">
                 <table class="custom-table" id="datatable-orders">
                     <thead>
@@ -257,23 +280,56 @@
                     <tbody>
                         <?php if (isset($orders) && !empty($orders)): ?>
                             <?php foreach ($orders as $order): ?>
-                                <tr class="text-center align-middle" data-order-id="<?= $order->order_id ?>">
+                                <?php
+                                // تحديد ما إذا كان الطلب مُعطلاً (مقبول أو قيد الانتظار)
+                                $isAccepted = false;
+                                $isPending = false;
+                                $isRejected = false;
+
+                                if (isset($order->order_status_name)) {
+                                    $statusName = strtolower(trim($order->order_status_name));
+                                    // الحالة 2: ممنوع التعديل والحذف
+                                    $isAccepted = ($statusName === 'مقبول' || ($order->order_status_id ?? 0) == 2);
+                                    // الحالة 1: مسموح التعديل فقط
+                                    $isPending = ($statusName === 'قيد الانتظار' || ($order->order_status_id ?? 0) == 1);
+                                    // الحالة 3: مسموح التعديل والحذف وتغيير المستلم
+                                    $isRejected = ($statusName === 'مرفوض' || ($order->order_status_id ?? 0) == 3);
+                                }
+
+                                //  منطق تعطيل التعديل (زر التعديل): فقط إذا كان مقبولاً (2)
+                                $isEditDisabledByStatus = $isAccepted || $isPending;
+
+                                //  منطق تعطيل الحذف (زر الحذف): إذا كان مقبولاً (2) أو قيد الانتظار (1)
+                                $isDeleteDisabledByStatus = $isAccepted || $isPending;
+
+                                // منطق التعطيل للاختيار الجماعي
+                                $isDisabledForBulk = $isAccepted || $isPending;
+                                $isDisabledAttr = $isDisabledForBulk ? 'data-is-disabled="true"' : '';
+                                ?>
+                                <tr class="text-center align-middle" data-order-id="<?= $order->order_id ?>" <?= $isDisabledAttr ?>>
                                     <td class="checkbox-cell">
-                                        <input type="checkbox" class="custom-checkbox row-checkbox" onchange="updateSelection()">
+                                        <!-- تعطيل الاختيار الجماعي فقط للطلبات المقبولة أو قيد الانتظار -->
+                                        <input type="checkbox" class="custom-checkbox row-checkbox" onchange="updateSelection()" <?= $isDisabledForBulk ? 'disabled' : '' ?>>
                                     </td>
                                     <td><?= esc($order->order_id ?? '-') ?></td>
 
-                                    <!-- ✅ عمود مستلم الطلب -->
-                                    <td><?= esc($order->receiver_name ?? 'غير محدد') ?></td>
+                                    <!--  عمود مستلم الطلب -->
+                                    <td>
+                                        <?= esc($order->receiver_name ?? 'غير محدد') ?>
+                                        <?php if (!empty($order->receiver_employee_id)): ?>
+                                            <br>
+                                            <small class="text-muted"><?= esc($order->receiver_employee_id) ?></small>
+                                        <?php endif; ?>
+                                    </td>
 
-                                    <!-- ✅ عمود عدد الأصناف -->
+                                    <!-- عمود عدد الأصناف -->
                                     <td>
                                         <span class="badge bg-primary">
                                             <?= esc($order->items_count ?? 0) ?>
                                         </span>
                                     </td>
 
-                                    <!-- ✅ عمود حالة الطلب -->
+                                    <!--  عمود حالة الطلب -->
                                     <td>
                                         <?php
                                         $statusClass = 'bg-secondary';
@@ -295,40 +351,79 @@
                                     <td><?= esc($order->usage_status_name ?? '-') ?></td>
                                     <td><?= isset($order->created_at) ? esc(date('Y-m-d', strtotime($order->created_at))) : '-' ?></td>
                                     <td><?= esc($order->created_by_name ?? '-') ?></td>
+
+
                                     <td>
-                                        <!-- أزرار العمليات كما هي -->
                                         <div class="action-buttons">
-                                            <a href="<?= site_url('InventoryController/showOrder/' . $order->order_id) ?>" class="action-btn view-btn">
-                                                <svg class="btn-icon" viewBox="0 0 24 24">
-                                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-                                                </svg>
+                                            <a href="<?= site_url('InventoryController/showOrder/' . $order->order_id) ?>"
+                                                class="action-btn view-btn">
                                                 عرض
                                             </a>
 
-                                            <?php if (canEditOrder()): ?>
-                                                <a href="<?= site_url('OrderController/editOrder/' . $order->order_id) ?>" class="action-btn edit-btn">
+                                            <!-- زر التعديل: مفعّل في حالة قيد الانتظار والمرفوض -->
+                                            <?php if (canEditOrder() && !$isEditDisabledByStatus): ?>
+                                                <a href="<?= site_url('OrderController/editOrder/' . $order->order_id) ?>"
+                                                    class="action-btn edit-btn"
+                                                    title="<?php if ($isPending) echo 'يمكنك تعديل الأصناف والموقع، ولكن ليس المستلم.'; ?>">
                                                     <svg class="btn-icon" viewBox="0 0 24 24">
                                                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
                                                     </svg>
                                                     تعديل
                                                 </a>
+                                            <?php else: ?>
+                                                <button class="action-btn edit-btn" disabled
+                                                    style="opacity: 0.5; cursor: not-allowed;"
+                                                    title="<?php
+                                                            //  منطق التلميح لزر التعديل
+                                                            if (!canEditOrder()) {
+                                                                echo 'ليس لديك صلاحية التعديل';
+                                                            } elseif ($isAccepted) {
+                                                                echo ' لا يمكن تعديل الطلب بعد قبوله من المستلم';
+                                                            } else {
+                                                                echo 'الطلب غير قابل للتعديل حالياً';
+                                                            }
+                                                            ?>">
+                                                    <svg class="btn-icon" viewBox="0 0 24 24">
+                                                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                                                    </svg>
+                                                    تعديل
+                                                </button>
                                             <?php endif; ?>
 
-                                            <?php if (canDeleteOrder()): ?>
-                                                <button class="action-btn delete-btn" onclick="deleteOrderConfirm(<?= $order->order_id ?>)">
+                                            <!-- زر الحذف: معطل في حالة المقبول (2) أو قيد الانتظار (1) -->
+                                            <?php if (canDeleteOrder() && !$isDeleteDisabledByStatus): ?>
+                                                <button class="action-btn delete-btn"
+                                                    onclick="deleteOrderConfirm(<?= $order->order_id ?>)">
+                                                    <i class="fas fa-trash"></i>
+                                                    حذف
+                                                </button>
+                                            <?php else: ?>
+                                                <button class="action-btn delete-btn" disabled
+                                                    style="opacity: 0.5; cursor: not-allowed;"
+                                                    title="<?php
+                                                            //  منطق التلميح لزر الحذف
+                                                            if (!canDeleteOrder()) {
+                                                                echo 'ليس لديك صلاحية الحذف';
+                                                            } elseif ($isAccepted) {
+                                                                echo ' لا يمكن حذف الطلب بعد قبوله من المستلم';
+                                                            } elseif ($isPending) {
+                                                                echo ' لا يمكن حذف الطلب وهو قيد الانتظار';
+                                                            } else {
+                                                                echo 'الطلب غير قابل للحذف حالياً';
+                                                            }
+                                                            ?>">
                                                     <i class="fas fa-trash"></i>
                                                     حذف
                                                 </button>
                                             <?php endif; ?>
                                         </div>
                                     </td>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="9" class="text-center">لا توجد بيانات متاحة</td>
                                 </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="9" class="text-center">لا توجد بيانات متاحة</td>
-                            </tr>
-                        <?php endif; ?>
+                            <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -400,8 +495,7 @@
         // وظائف الاختيار
         function toggleAllSelection() {
             const masterCheckbox = document.getElementById('masterCheckbox');
-            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-
+            const rowCheckboxes = document.querySelectorAll('.row-checkbox:not([disabled])');
             rowCheckboxes.forEach(checkbox => {
                 checkbox.checked = masterCheckbox.checked;
                 const row = checkbox.closest('tr');
@@ -418,29 +512,41 @@
         }
 
         function updateSelection() {
-            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+            // نحتاج فقط لصناديق الاختيار غير المعطلة لحساب الاختيار وتحديث الـ set
+            const rowCheckboxes = document.querySelectorAll('.row-checkbox:not([disabled])');
+            const allRowCheckboxes = document.querySelectorAll('.row-checkbox'); // كل صناديق الاختيار لحساب حالة الـ master
             const masterCheckbox = document.getElementById('masterCheckbox');
 
             selectedOrders.clear();
 
             let checkedCount = 0;
+            let totalSelectable = 0; // لحساب نسبة المختارة من غير المعطلة
+
             rowCheckboxes.forEach(checkbox => {
                 const row = checkbox.closest('tr');
-                if (checkbox.checked) {
-                    checkedCount++;
-                    row.classList.add('selected');
-                    selectedOrders.add(row.dataset.orderId);
+                if (!checkbox.disabled) { // نعد فقط الصناديق التي يمكن اختيارها
+                    totalSelectable++;
+                    if (checkbox.checked) {
+                        checkedCount++;
+                        row.classList.add('selected');
+                        selectedOrders.add(row.dataset.orderId);
+                    } else {
+                        row.classList.remove('selected');
+                        selectedOrders.delete(row.dataset.orderId);
+                    }
                 } else {
+                    // للتأكد من عدم إضافة الـ disabled في حال أي خطأ وتفادي ظهور حالة 'selected'
+                    checkbox.checked = false;
                     row.classList.remove('selected');
                     selectedOrders.delete(row.dataset.orderId);
                 }
             });
 
-            // تحديث الـ master checkbox
+            // تحديث الـ master checkbox بناءً على الصناديق *الممكن* اختيارها
             if (checkedCount === 0) {
                 masterCheckbox.indeterminate = false;
                 masterCheckbox.checked = false;
-            } else if (checkedCount === rowCheckboxes.length) {
+            } else if (checkedCount === totalSelectable) {
                 masterCheckbox.indeterminate = false;
                 masterCheckbox.checked = true;
             } else {
@@ -481,10 +587,9 @@
         // وظائف العمليات الجماعية
         function bulkDelete() {
             if (selectedOrders.size === 0) {
-                showAlert('يرجى اختيار طلب واحد على الأقل للحذف', 'warning');
+                showAlert('يرجى اختيار طلب واحد على الأقل للحذف (الطلبات المقبولة أو قيد الانتظار معطلة)', 'warning');
                 return;
             }
-
             const modal = document.getElementById('bulkDeleteModal');
             const message = document.getElementById('bulkDeleteMessage');
             const orderIds = Array.from(selectedOrders);
@@ -605,7 +710,7 @@
             }, 4000);
         }
 
-        // =================== وظائف النموذج المنبثق الأصلية ===================
+        // =================== وظائف النموذج المنبثق الأصلية (غير ذات صلة بالتعطيل) ===================
 
         function openOrderForm(type = 'single') {
             currentOrderType = type;
@@ -1372,85 +1477,21 @@
                     });
             }
         });
-
-        // تهيئة جميع الوظائف عند تحميل الصفحة
+        // منع الضغط على الأزرار المعطلة
         document.addEventListener('DOMContentLoaded', function() {
-            initItemSearch();
-            initQuantityHandler();
-            initEmployeeSearch();
-            initLocationDropdowns();
+            // منع التفاعل مع الأزرار المعطلة
+            document.querySelectorAll('.btn-disabled-order').forEach(function(btn) {
+                btn.style.pointerEvents = 'none';
+                btn.style.cursor = 'not-allowed';
+                btn.disabled = true;
 
-            // تهيئة مستمعات البحث
-            document.getElementById('generalSearch')?.addEventListener('input', performSearch);
-            document.getElementById('searchId')?.addEventListener('input', performSearch);
-            document.getElementById('searchCategory')?.addEventListener('change', performSearch);
-            document.getElementById('searchSerial')?.addEventListener('input', performSearch);
-            document.getElementById('searchEmployeeId')?.addEventListener('input', performSearch);
-            document.getElementById('searchLocation')?.addEventListener('input', performSearch);
-
-            // تهيئة اختيار الصفوف العادي (بدون checkbox)
-            const rows = document.querySelectorAll('.custom-table tbody tr');
-            rows.forEach(row => {
-                row.addEventListener('click', function(e) {
-                    // تجاهل النقر إذا كان على checkbox أو أزرار
-                    if (e.target.closest('.checkbox-cell') || e.target.closest('.action-buttons')) {
-                        return;
-                    }
-
-                    rows.forEach(r => r.classList.remove('selected'));
-                    this.classList.add('selected');
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showAlert('لا يمكن تعديل أو حذف الطلب بعد قبوله', 'warning');
+                    return false;
                 });
             });
-
-            // إغلاق المودالات عند الضغط خارجها
-            document.getElementById('orderModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeOrderForm();
-                }
-            });
-
-            document.getElementById('deleteConfirmModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    cancelDeleteOrder();
-                }
-            });
-
-            document.getElementById('bulkDeleteModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeBulkDeleteModal();
-                }
-            });
-
-            // إغلاق المودالات بمفتاح Escape
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    const orderModal = document.getElementById('orderModal');
-                    const deleteModal = document.getElementById('deleteConfirmModal');
-                    const bulkDeleteModal = document.getElementById('bulkDeleteModal');
-
-                    if (orderModal.style.display === 'flex') {
-                        closeOrderForm();
-                    }
-                    if (deleteModal.style.display === 'flex') {
-                        cancelDeleteOrder();
-                    }
-                    if (bulkDeleteModal.style.display === 'flex') {
-                        closeBulkDeleteModal();
-                    }
-                }
-            });
-
-            // إغلاق قوائم البحث المنسدلة
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.search-dropdown')) {
-
-                    document.querySelectorAll('.search-dropdown .dropdown-list').forEach(dropdown => {
-                        dropdown.style.display = 'none';
-                    });
-                }
-            });
-
-
         });
     </script>
 

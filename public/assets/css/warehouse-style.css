@@ -294,6 +294,7 @@ body {
     font-size: 13px;
   }
 }
+
 main-content {
   margin-right: 80px;
 }
@@ -432,6 +433,8 @@ main-content {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(58, 192, 195, 0.3);
+  position: relative;
+  /* مهم لرمز القفل */
 }
 
 .add-btn:hover {
@@ -473,6 +476,7 @@ main-content {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -619,7 +623,7 @@ main-content {
   transform: translateY(-50%) scale(1.1);
 }
 
-.main-search-input:focus + .search-icon {
+.main-search-input:focus+.search-icon {
   color: #3ac0c3;
 }
 
@@ -793,6 +797,7 @@ main-content {
   max-width: 100%;
   overflow: hidden;
 }
+
 .custom-table {
   width: 100%;
   min-width: 1000px;
@@ -882,6 +887,8 @@ main-content {
   min-width: 70px;
   justify-content: center;
   white-space: nowrap;
+  position: relative;
+  /* مهم لرمز القفل/الممنوع */
 }
 
 .view-btn {
@@ -1256,3 +1263,5 @@ main-content {
   transform: scale(1);
   opacity: 1;
 }
+
+/*  */

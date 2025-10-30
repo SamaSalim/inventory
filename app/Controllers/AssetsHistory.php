@@ -17,9 +17,10 @@ class AssetsHistory extends BaseController
     private function checkAuth()
     {
         if (!session()->get('isLoggedIn')) {
-            throw new AuthenticationException();
+            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
         }
     }
+
 
     /**
      * دالة لتبديل المستخدمين تلقائياً: ليالي ↔ حميدة
@@ -400,16 +401,23 @@ public function superAssets(): string
     $pager = \Config\Services::pager();
     $pager->store('operations', $page, $perPage, count($operations));
 
-    return view('assets/super_assets_view', [
-        'operations' => $paginatedOperations,
-        'stats' => $stats,
-        'filters' => $filters,
-        'pager' => $pager,
-    ]);
-}
-public function assetCycle($assetNum = null): string
-{
-    $this->checkAuth();
+        return view('assets/super_assets_view', [
+            'operations' => $paginatedOperations,
+            'stats' => [
+                'total_transfers' => count($transfers),
+                'total_returns' => count($returns),
+                'total_operations' => count($operations),
+                'total_assets' => count($uniqueAssets),
+            ],
+            'filters' => $filters,
+            'pager' => $pager,
+        ]);
+        
+    }
+
+    public function assetCycle($assetNum = null): string
+    {
+        $this->checkAuth();
 
     if (!$assetNum) {
         $assetNum = $this->request->getGet('asset_num');
