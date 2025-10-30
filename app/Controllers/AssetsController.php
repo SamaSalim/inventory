@@ -300,19 +300,19 @@ public function transferView($orderId)
         throw new \Exception('العهدة غير موجودة');
     }
 
-    // ✅ جلب بيانات المستخدم الحالي (صاحب العهدة) من to_user_id
+    //  جلب بيانات المستخدم الحالي (صاحب العهدة) من to_user_id
     $currentUser = $userModel->where('user_id', $order->to_user_id)->first();
     
     if (!$currentUser) {
         throw new \Exception('المستخدم الحالي (صاحب العهدة) غير موجود');
     }
 
-    // ✅ جلب الأصناف المتاحة للتحويل:
+    //  جلب الأصناف المتاحة للتحويل:
     // - usage_status_id = 1 (جديد) أو 4 (معاد صرفة)
     // - استبعاد: 2 (رجيع), 3 (تحويل - قيد التحويل بالفعل)
     $items = $itemOrderModel
         ->where('order_id', $orderId)
-        ->whereNotIn('usage_status_id', [2, 3]) // ✅ استبعاد الرجيع والتحويل
+        ->whereNotIn('usage_status_id', [2, 3]) //  استبعاد الرجيع والتحويل
         ->findAll();
 
     foreach ($items as $item) {
@@ -334,7 +334,7 @@ public function transferView($orderId)
         'users' => $users,
         'order_id' => $orderId,
         'order' => $order,
-        'current_user' => $currentUser // ✅ إضافة بيانات المستخدم الحالي
+        'current_user' => $currentUser //  إضافة بيانات المستخدم الحالي
     ]);
 }
 
@@ -395,62 +395,93 @@ public function processTransfer()
             ]);
         }
 
-        // Get items details for email
-        $itemsDetails = [];
-        $firstItemOrderId = null;
-        
-        // ✅ معالجة كل صنف بشكل منفصل حسب item_order_id
-        foreach ($itemOrderIds as $itemOrderId) {
-            if ($firstItemOrderId === null) {
-                $firstItemOrderId = $itemOrderId;
-            }
-            
-            // ✅ جلب الصنف المحدد بناءً على item_order_id
-            $currentItem = $itemOrderModel
-                ->select('item_order.*, items.name as item_name')
-                ->join('items', 'items.id = item_order.item_id')
-                ->find($itemOrderId); // ✅ البحث بـ item_order_id وليس order_id
-            
-            if (!$currentItem) {
-                log_message('warning', "Item order {$itemOrderId} not found");
-                continue;
-            }
+        //  الخطوة 1: جلب الأصناف المحددة من المستخدم
+        $selectedItems = $itemOrderModel
+            ->select('item_order.item_order_id, item_order.usage_status_id, item_order.order_id, items.name as item_name')
+            ->join('items', 'items.id = item_order.item_id')
+            ->whereIn('item_order.item_order_id', $itemOrderIds)
+            ->findAll();
 
-            // ✅ التحقق من حالة هذا الصنف بالتحديد (item_order_id)
+        if (empty($selectedItems)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'لم يتم العثور على الأصناف المحددة'
+            ]);
+        }
+
+        //  الخطوة 2: الحصول على order_id من أول صنف
+        $orderId = $selectedItems[0]->order_id;
+
+        //  الخطوة 3: جلب جميع أصناف الطلب (للتحقق من طلبات التحويل القائمة)
+        $allOrderItems = $itemOrderModel
+            ->select('item_order.item_order_id, item_order.usage_status_id, items.name as item_name')
+            ->join('items', 'items.id = item_order.item_id')
+            ->where('item_order.order_id', $orderId)
+            ->findAll();
+
+        //  الخطوة 4: فحص الأصناف المحددة - الحالة والتحويلات القائمة
+        $itemsWithPendingTransfer = [];
+        $itemsWithInvalidStatus = [];
+
+        // أولاً: فحص الأصناف المحددة من حيث الحالة
+        foreach ($selectedItems as $item) {
+            // التحقق من حالة الصنف
             // 1 = جديد, 4 = معاد صرفة (يمكن تحويلهم)
             // 2 = رجيع, 3 = تحويل (لا يمكن تحويلهم)
-            if (in_array($currentItem->usage_status_id, [2, 3])) {
-                $statusName = $currentItem->usage_status_id == 2 ? 'رجيع' : 'قيد التحويل';
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => "الصنف '{$currentItem->item_name}' في حالة '{$statusName}' ولا يمكن تحويله"
-                ]);
+            if (in_array($item->usage_status_id, [2, 3])) {
+                $statusName = $item->usage_status_id == 2 ? 'رجيع' : 'قيد التحويل';
+                $itemsWithInvalidStatus[] = "'{$item->item_name}' ({$statusName})";
             }
+        }
 
-            // ✅ التحقق من عدم وجود طلب تحويل قيد الانتظار لهذا الصنف بالتحديد
+        // ثانياً: فحص جميع أصناف الطلب من حيث طلبات التحويل القائمة
+        foreach ($allOrderItems as $item) {
             $existingTransfer = $transferItemsModel
-                ->where('item_order_id', $itemOrderId) // ✅ التحقق من item_order_id المحدد
+                ->where('item_order_id', $item->item_order_id)
                 ->where('order_status_id', 1) // قيد الانتظار
                 ->first();
             
             if ($existingTransfer) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => "الصنف '{$currentItem->item_name}' لديه طلب تحويل قيد الانتظار بالفعل"
-                ]);
+                $itemsWithPendingTransfer[] = "'{$item->item_name}'";
+            }
+        }
+
+        //  إرجاع الأخطاء
+        if (!empty($itemsWithInvalidStatus)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => "الأصناف التالية لا يمكن تحويلها: " . implode(', ', $itemsWithInvalidStatus)
+            ]);
+        }
+
+        if (!empty($itemsWithPendingTransfer)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => "يوجد طلب تحويل قيد الانتظار للأصناف التالية من نفس الطلب يجب إتمام أو إلغاء الطلب السابق أولاً"
+                // . implode(', ', $itemsWithPendingTransfer) . 
+            ]);
+        }
+
+        // ✅ الخطوة 5: بعد التأكد من صحة كل شيء، نبدأ بمعالجة الأصناف المحددة
+        $itemsDetails = [];
+        $firstItemOrderId = null;
+        
+        foreach ($selectedItems as $item) {
+            if ($firstItemOrderId === null) {
+                $firstItemOrderId = $item->item_order_id;
             }
 
-            $itemsDetails[] = $currentItem;
+            $itemsDetails[] = $item;
 
-            // ✅ تحديث حالة هذا الصنف بالتحديد إلى "تحويل" (3)
-            $itemOrderModel->update($itemOrderId, [ // ✅ تحديث item_order_id المحدد
+            // تحديث حالة هذا الصنف بالتحديد إلى "تحويل" (3)
+            $itemOrderModel->update($item->item_order_id, [
                 'usage_status_id' => 3, // تحويل
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            // ✅ إضافة سجل في جدول transfer_items لهذا الصنف
+            // إضافة سجل في جدول transfer_items لهذا الصنف
             $transferData = [
-                'item_order_id' => $itemOrderId, // ✅ ربط بـ item_order_id المحدد
+                'item_order_id' => $item->item_order_id,
                 'from_user_id' => $fromUserId,
                 'to_user_id' => $toUserId,
                 'order_status_id' => 1, // قيد الانتظار
