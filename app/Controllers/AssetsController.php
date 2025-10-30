@@ -53,8 +53,8 @@ class AssetsController extends BaseController
 
     public function index()
     {
-        if (! session()->get('isLoggedIn')) {
-            throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
         }
 
         $itemOrderModel = new \App\Models\ItemOrderModel();
@@ -281,9 +281,9 @@ class AssetsController extends BaseController
 //  transferView - عرض صفحة تحويل العهدة
 public function transferView($orderId)
 {
-    if (!session()->get('isLoggedIn')) {
-        throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
-    }
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
+        }
 
     $itemOrderModel = new \App\Models\ItemOrderModel();
     $itemModel = new \App\Models\ItemModel();
@@ -343,12 +343,9 @@ public function transferView($orderId)
 
 public function processTransfer()
 {
-    if (!session()->get('isLoggedIn')) {
-        return $this->response->setJSON([
-            'success' => false,
-            'message' => 'يجب تسجيل الدخول أولاً'
-        ]);
-    }
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
+        }
 
     $json = $this->request->getJSON();
     

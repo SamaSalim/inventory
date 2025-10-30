@@ -427,12 +427,10 @@ class OrderController extends BaseController
     {
         try {
             // التحقق من تسجيل الدخول
-            if (!session()->get('isLoggedIn')) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'يجب تسجيل الدخول أولاً'
-                ]);
-            }
+                if (!session()->get('isLoggedIn')) {
+                    return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
+                }
+            
 
             $loggedEmployeeId = session()->get('employee_id');
 

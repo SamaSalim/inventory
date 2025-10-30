@@ -17,9 +17,10 @@ class AssetsHistory extends BaseController
     private function checkAuth()
     {
         if (!session()->get('isLoggedIn')) {
-            throw new AuthenticationException();
+            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
         }
     }
+
 
     /**
      * دالة لتبديل المستخدمين تلقائياً: ليالي ↔ حميدة
@@ -406,7 +407,7 @@ class AssetsHistory extends BaseController
         
     }
 
-    public function assetCycle($assetNum = null): string
+    public function assetCycle($assetNum = null)
     {
         $this->checkAuth();
 

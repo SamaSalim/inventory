@@ -296,10 +296,10 @@
                                     $isRejected = ($statusName === 'مرفوض' || ($order->order_status_id ?? 0) == 3);
                                 }
 
-                                // ✅ منطق تعطيل التعديل (زر التعديل): فقط إذا كان مقبولاً (2)
-                                $isEditDisabledByStatus = $isAccepted;
+                                //  منطق تعطيل التعديل (زر التعديل): فقط إذا كان مقبولاً (2)
+                                $isEditDisabledByStatus = $isAccepted || $isPending;
 
-                                // ✅ منطق تعطيل الحذف (زر الحذف): إذا كان مقبولاً (2) أو قيد الانتظار (1)
+                                //  منطق تعطيل الحذف (زر الحذف): إذا كان مقبولاً (2) أو قيد الانتظار (1)
                                 $isDeleteDisabledByStatus = $isAccepted || $isPending;
 
                                 // منطق التعطيل للاختيار الجماعي
@@ -374,7 +374,7 @@
                                                 <button class="action-btn edit-btn" disabled
                                                     style="opacity: 0.5; cursor: not-allowed;"
                                                     title="<?php
-                                                            // ✅ منطق التلميح لزر التعديل
+                                                            //  منطق التلميح لزر التعديل
                                                             if (!canEditOrder()) {
                                                                 echo 'ليس لديك صلاحية التعديل';
                                                             } elseif ($isAccepted) {
@@ -401,7 +401,7 @@
                                                 <button class="action-btn delete-btn" disabled
                                                     style="opacity: 0.5; cursor: not-allowed;"
                                                     title="<?php
-                                                            // ✅ منطق التلميح لزر الحذف
+                                                            //  منطق التلميح لزر الحذف
                                                             if (!canDeleteOrder()) {
                                                                 echo 'ليس لديك صلاحية الحذف';
                                                             } elseif ($isAccepted) {

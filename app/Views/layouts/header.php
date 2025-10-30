@@ -61,7 +61,7 @@
     /* ====================================
        CSS الإشعارات - مُصحح وكامل
        ==================================== */
-    
+
     /* جرس الإشعارات */
     .notification-bell {
         position: relative;
@@ -113,11 +113,14 @@
     }
 
     @keyframes pulse {
-        0%, 100% { 
+
+        0%,
+        100% {
             transform: scale(1);
             box-shadow: 0 2px 8px rgba(255, 68, 68, 0.4);
         }
-        50% { 
+
+        50% {
             transform: scale(1.15);
             box-shadow: 0 2px 12px rgba(255, 68, 68, 0.6);
         }
@@ -534,13 +537,13 @@
     <?php $role = service('session')->get('role'); ?>
 
     <?php if (session()->has('user_id') || $role == 'super_assets'): ?>
-    <!-- جرس الإشعارات - فقط لمستخدمي العهد ومدير العهد -->
-    <div class="notification-bell" id="notificationBell">
-        <svg viewBox="0 0 24 24">
-            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-        </svg>
-        <span class="notification-count" id="notificationCount" style="display: none;">0</span>
-    </div>
+        <!-- جرس الإشعارات - فقط لمستخدمي العهد ومدير العهد -->
+        <div class="notification-bell" id="notificationBell">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+            </svg>
+            <span class="notification-count" id="notificationCount" style="display: none;">0</span>
+        </div>
     <?php endif; ?>
 
 
@@ -558,7 +561,7 @@
         </a>
     <?php endif; ?>
 
-   <?php if ($role === 'super_assets'): ?>
+    <?php if ($role === 'super_assets'): ?>
         <a href="<?= base_url('AssetsHistory/superAssets') ?>"
             class="<?= (service('uri')->getSegment(1) == 'AssetsHistory' && service('uri')->getSegment(2) == 'superAssets') ? 'active' : '' ?>">
             <i class="fa-solid fa-diagram-project"></i> <span>تتبع العهد</span>
@@ -570,7 +573,7 @@
             class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'userView2') ? 'active' : '' ?>">
             <i class="fa-solid fa-file-circle-plus"></i> <span> العهد الخاصة بي</span>
         </a>
-   
+
         <a href="<?= base_url('UserController/dashboard') ?>"
             class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'dashboard') ? 'active' : '' ?>">
             <i class="fa-solid fa-id-card"></i> <span> طلبات العهد</span>
@@ -589,7 +592,7 @@
             <i class="fa-solid fa-user-shield"></i> <span>الصلاحيات</span>
         </a>
     <?php endif; ?>
-    
+
     <?php if ($role === 'super_warehouse'): ?>
         <a href="<?= base_url('AssetsHistory') ?>"
             class="<?= (service('uri')->getSegment(1) == 'AssetsHistory') ? 'active' : '' ?>">
@@ -597,7 +600,7 @@
         </a>
     <?php endif; ?>
 
-    <a href="<?= base_url('login') ?>">
+    <a href="<?= base_url('login/logout') ?>">
         <i class="fa-solid fa-right-from-bracket"></i> <span>تسجيل الخروج</span>
     </a>
 </div>
@@ -612,25 +615,25 @@
             </div>
             <button class="close-panel" id="closeNotificationPanel">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
                 </svg>
             </button>
         </div>
-        
+
         <div class="notification-tabs">
             <button class="tab-btn active" data-tab="all">الكل</button>
             <button class="tab-btn" data-tab="unread">غير المقروءة</button>
         </div>
-        
+
         <div class="notification-list" id="notificationList">
             <div class="no-notifications">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="#ccc">
-                    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
                 </svg>
                 <p>لا توجد إشعارات</p>
             </div>
         </div>
-        
+
         <div class="notification-footer">
             <button class="mark-all-read-btn" id="markAllRead">تعليم الكل كمقروء</button>
             <button class="clear-all-btn" id="clearAll">مسح الكل</button>
@@ -642,89 +645,89 @@
 <?php endif; ?>
 
 <script>
-// نظام الإشعارات - فقط لمستخدمي العهد ومدير العهد
-<?php if (session()->has('user_id') || $role == 'super_assets'): ?>
+    // نظام الإشعارات - فقط لمستخدمي العهد ومدير العهد
+    <?php if (session()->has('user_id') || $role == 'super_assets'): ?>
 
-// العناصر
-const notificationBell = document.querySelector('.notification-bell');
-const notificationPanel = document.getElementById('notificationPanel');
-const notificationOverlay = document.getElementById('notificationOverlay');
-const closePanel = document.getElementById('closeNotificationPanel');
-const notificationList = document.getElementById('notificationList');
-const notificationCount = document.getElementById('notificationCount');
-const unreadCountText = document.getElementById('unreadCountText');
-const markAllReadBtn = document.getElementById('markAllRead');
-const clearAllBtn = document.getElementById('clearAll');
-const tabBtns = document.querySelectorAll('.tab-btn');
+        // العناصر
+        const notificationBell = document.querySelector('.notification-bell');
+        const notificationPanel = document.getElementById('notificationPanel');
+        const notificationOverlay = document.getElementById('notificationOverlay');
+        const closePanel = document.getElementById('closeNotificationPanel');
+        const notificationList = document.getElementById('notificationList');
+        const notificationCount = document.getElementById('notificationCount');
+        const unreadCountText = document.getElementById('unreadCountText');
+        const markAllReadBtn = document.getElementById('markAllRead');
+        const clearAllBtn = document.getElementById('clearAll');
+        const tabBtns = document.querySelectorAll('.tab-btn');
 
-// دالة فتح/إغلاق لوحة الإشعارات
-function toggleNotifications() {
-    if (notificationPanel) {
-        const isShowing = notificationPanel.classList.contains('show');
-        
-        if (isShowing) {
-            notificationPanel.classList.remove('show');
-            if (notificationOverlay) notificationOverlay.classList.remove('show');
-        } else {
-            notificationPanel.classList.add('show');
-            if (notificationOverlay) notificationOverlay.classList.add('show');
-            loadNotifications();
-        }
-    }
-}
+        // دالة فتح/إغلاق لوحة الإشعارات
+        function toggleNotifications() {
+            if (notificationPanel) {
+                const isShowing = notificationPanel.classList.contains('show');
 
-// فتح/إغلاق لوحة الإشعارات عند الضغط على الجرس
-if (notificationBell) {
-    notificationBell.addEventListener('click', toggleNotifications);
-}
-
-// إغلاق اللوحة عند الضغط على زر الإغلاق
-if (closePanel) {
-    closePanel.addEventListener('click', function() {
-        notificationPanel.classList.remove('show');
-        if (notificationOverlay) notificationOverlay.classList.remove('show');
-    });
-}
-
-// إغلاق اللوحة عند الضغط على الخلفية
-if (notificationOverlay) {
-    notificationOverlay.addEventListener('click', function() {
-        notificationPanel.classList.remove('show');
-        notificationOverlay.classList.remove('show');
-    });
-}
-
-// التبويبات
-tabBtns.forEach(btn => {
-    btn.addEventListener('click', function() {
-        tabBtns.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        
-        const tab = this.getAttribute('data-tab');
-        loadNotifications(tab === 'unread');
-    });
-});
-
-// تحميل الإشعارات
-function loadNotifications(unreadOnly = false) {
-    const url = '<?= base_url('notifications/get') ?>' + (unreadOnly ? '?unread=true' : '');
-    
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                displayNotifications(data.notifications);
+                if (isShowing) {
+                    notificationPanel.classList.remove('show');
+                    if (notificationOverlay) notificationOverlay.classList.remove('show');
+                } else {
+                    notificationPanel.classList.add('show');
+                    if (notificationOverlay) notificationOverlay.classList.add('show');
+                    loadNotifications();
+                }
             }
-        })
-        .catch(error => console.error('خطأ في تحميل الإشعارات:', error));
-}
+        }
 
-// عرض الإشعارات
-function displayNotifications(notifications) {
-    if (!notificationList) return;
-    
-    if (!notifications || notifications.length === 0) {
-        notificationList.innerHTML = `
+        // فتح/إغلاق لوحة الإشعارات عند الضغط على الجرس
+        if (notificationBell) {
+            notificationBell.addEventListener('click', toggleNotifications);
+        }
+
+        // إغلاق اللوحة عند الضغط على زر الإغلاق
+        if (closePanel) {
+            closePanel.addEventListener('click', function() {
+                notificationPanel.classList.remove('show');
+                if (notificationOverlay) notificationOverlay.classList.remove('show');
+            });
+        }
+
+        // إغلاق اللوحة عند الضغط على الخلفية
+        if (notificationOverlay) {
+            notificationOverlay.addEventListener('click', function() {
+                notificationPanel.classList.remove('show');
+                notificationOverlay.classList.remove('show');
+            });
+        }
+
+        // التبويبات
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                const tab = this.getAttribute('data-tab');
+                loadNotifications(tab === 'unread');
+            });
+        });
+
+        // تحميل الإشعارات
+        function loadNotifications(unreadOnly = false) {
+            const url = '<?= base_url('notifications/get') ?>' + (unreadOnly ? '?unread=true' : '');
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayNotifications(data.notifications);
+                    }
+                })
+                .catch(error => console.error('خطأ في تحميل الإشعارات:', error));
+        }
+
+        // عرض الإشعارات
+        function displayNotifications(notifications) {
+            if (!notificationList) return;
+
+            if (!notifications || notifications.length === 0) {
+                notificationList.innerHTML = `
             <div class="notification-empty">
                 <svg viewBox="0 0 24 24">
                     <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
@@ -732,16 +735,16 @@ function displayNotifications(notifications) {
                 <p>لا توجد إشعارات</p>
             </div>
         `;
-        return;
-    }
-    
-    let html = '';
-    notifications.forEach(notification => {
-        const unreadClass = notification.is_read ? '' : 'unread';
-        const iconClass = getIconClass(notification.type);
-        const icon = getIcon(notification.type);
-        
-        html += `
+                return;
+            }
+
+            let html = '';
+            notifications.forEach(notification => {
+                const unreadClass = notification.is_read ? '' : 'unread';
+                const iconClass = getIconClass(notification.type);
+                const icon = getIcon(notification.type);
+
+                html += `
             <div class="notification-item ${unreadClass} ${notification.type}" data-id="${notification.id}" onclick="markAsRead('${notification.id}')">
                 <div class="notification-icon ${iconClass}">
                     <i class="${icon}"></i>
@@ -753,110 +756,110 @@ function displayNotifications(notifications) {
                 </div>
             </div>
         `;
-    });
-    
-    notificationList.innerHTML = html;
-}
+            });
 
-// الحصول على أيقونة حسب النوع
-function getIcon(type) {
-    const icons = {
-        'transfer': 'fa-solid fa-exchange-alt',
-        'return': 'fa-solid fa-undo',
-        'order': 'fa-solid fa-shopping-cart',
-        'order_status': 'fa-solid fa-info-circle',
-        'new_order': 'fa-solid fa-bell',
-        'admin_transfer': 'fa-solid fa-people-arrows',
-        'admin_return': 'fa-solid fa-box-open'
-    };
-    return icons[type] || 'fa-solid fa-bell';
-}
-
-// الحصول على class الأيقونة
-function getIconClass(type) {
-    return type || 'order';
-}
-
-// تحديث عداد الإشعارات
-function updateNotificationCount() {
-    fetch('<?= base_url('notifications/get') ?>')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const unreadCount = data.notifications.filter(n => !n.is_read).length;
-                
-                // تحديث العداد في الجرس
-                if (notificationCount) {
-                    if (unreadCount > 0) {
-                        notificationCount.textContent = unreadCount > 99 ? '99+' : unreadCount;
-                        notificationCount.style.display = 'flex';
-                    } else {
-                        notificationCount.style.display = 'none';
-                    }
-                }
-                
-                // تحديث النص في الهيدر
-                if (unreadCountText) {
-                    unreadCountText.textContent = unreadCount + ' غير مقروء';
-                }
-            }
-        })
-        .catch(error => console.error('خطأ في تحديث العداد:', error));
-}
-
-// تعليم إشعار كمقروء
-function markAsRead(notificationId) {
-    // هنا يمكن إضافة request للسيرفر لتحديث حالة القراءة
-    updateNotificationCount();
-    
-    // تحديث الإشعار الحالي
-    const activeTab = document.querySelector('.tab-btn.active');
-    const isUnreadTab = activeTab && activeTab.getAttribute('data-tab') === 'unread';
-    loadNotifications(isUnreadTab);
-}
-
-// تعليم الكل كمقروء
-if (markAllReadBtn) {
-    markAllReadBtn.addEventListener('click', function() {
-        fetch('<?= base_url('notifications/mark-all-read') ?>', {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                updateNotificationCount();
-                loadNotifications();
-            }
-        })
-        .catch(error => console.error('خطأ:', error));
-    });
-}
-
-// مسح الكل
-if (clearAllBtn) {
-    clearAllBtn.addEventListener('click', function() {
-        if (confirm('هل أنت متأكد من مسح جميع الإشعارات؟')) {
-            fetch('<?= base_url('notifications/clear') ?>', {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    updateNotificationCount();
-                    loadNotifications();
-                }
-            })
-            .catch(error => console.error('خطأ:', error));
+            notificationList.innerHTML = html;
         }
-    });
-}
 
-// تحديث العداد عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', function() {
-    updateNotificationCount();
-    // فحص الإشعارات كل دقيقة
-    setInterval(updateNotificationCount, 60000);
-});
+        // الحصول على أيقونة حسب النوع
+        function getIcon(type) {
+            const icons = {
+                'transfer': 'fa-solid fa-exchange-alt',
+                'return': 'fa-solid fa-undo',
+                'order': 'fa-solid fa-shopping-cart',
+                'order_status': 'fa-solid fa-info-circle',
+                'new_order': 'fa-solid fa-bell',
+                'admin_transfer': 'fa-solid fa-people-arrows',
+                'admin_return': 'fa-solid fa-box-open'
+            };
+            return icons[type] || 'fa-solid fa-bell';
+        }
 
-<?php endif; ?>
+        // الحصول على class الأيقونة
+        function getIconClass(type) {
+            return type || 'order';
+        }
+
+        // تحديث عداد الإشعارات
+        function updateNotificationCount() {
+            fetch('<?= base_url('notifications/get') ?>')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const unreadCount = data.notifications.filter(n => !n.is_read).length;
+
+                        // تحديث العداد في الجرس
+                        if (notificationCount) {
+                            if (unreadCount > 0) {
+                                notificationCount.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                                notificationCount.style.display = 'flex';
+                            } else {
+                                notificationCount.style.display = 'none';
+                            }
+                        }
+
+                        // تحديث النص في الهيدر
+                        if (unreadCountText) {
+                            unreadCountText.textContent = unreadCount + ' غير مقروء';
+                        }
+                    }
+                })
+                .catch(error => console.error('خطأ في تحديث العداد:', error));
+        }
+
+        // تعليم إشعار كمقروء
+        function markAsRead(notificationId) {
+            // هنا يمكن إضافة request للسيرفر لتحديث حالة القراءة
+            updateNotificationCount();
+
+            // تحديث الإشعار الحالي
+            const activeTab = document.querySelector('.tab-btn.active');
+            const isUnreadTab = activeTab && activeTab.getAttribute('data-tab') === 'unread';
+            loadNotifications(isUnreadTab);
+        }
+
+        // تعليم الكل كمقروء
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', function() {
+                fetch('<?= base_url('notifications/mark-all-read') ?>', {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            updateNotificationCount();
+                            loadNotifications();
+                        }
+                    })
+                    .catch(error => console.error('خطأ:', error));
+            });
+        }
+
+        // مسح الكل
+        if (clearAllBtn) {
+            clearAllBtn.addEventListener('click', function() {
+                if (confirm('هل أنت متأكد من مسح جميع الإشعارات؟')) {
+                    fetch('<?= base_url('notifications/clear') ?>', {
+                            method: 'POST'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                updateNotificationCount();
+                                loadNotifications();
+                            }
+                        })
+                        .catch(error => console.error('خطأ:', error));
+                }
+            });
+        }
+
+        // تحديث العداد عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNotificationCount();
+            // فحص الإشعارات كل دقيقة
+            setInterval(updateNotificationCount, 60000);
+        });
+
+    <?php endif; ?>
 </script>

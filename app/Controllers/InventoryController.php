@@ -216,7 +216,7 @@ class InventoryController extends BaseController
         }
 
         if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON(['success' => false, 'message' => 'يجب تسجيل الدخول أولاً']);
+            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
         }
 
         try {
