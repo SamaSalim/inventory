@@ -50,7 +50,7 @@ class InventoryController extends BaseController
         $this->minorCategoryModel = new \App\Models\MinorCategoryModel();
     }
 
-        public function index()
+    public function index()
     {
         //  البيانات model
         $itemOrderModel = $this->itemOrderModel;
@@ -94,30 +94,30 @@ class InventoryController extends BaseController
             // الروابط
             ->join('items', 'items.id = item_order.item_id', 'left')
             ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-            ->join('order', 'order.order_id = item_order.order_id', 'left') 
-            ->join('order_status', 'order_status.id = order.order_status_id', 'left') 
-            ->join('employee', 'employee.emp_id = order.from_user_id', 'left') 
-            ->join('users', 'users.user_id = order.to_user_id', 'left') 
+            ->join('order', 'order.order_id = item_order.order_id', 'left')
+            ->join('order_status', 'order_status.id = order.order_status_id', 'left')
+            ->join('employee', 'employee.emp_id = order.from_user_id', 'left')
+            ->join('users', 'users.user_id = order.to_user_id', 'left')
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-            
+
             ->join('room', 'room.id = item_order.room_id', 'left')
             ->join('section', 'section.id = room.section_id', 'left')
             ->join('floor', 'floor.id = section.floor_id', 'left')
             ->join('building', 'building.id = floor.building_id', 'left')
-            
+
             ->groupBy('item_order.order_id')
             ->orderBy('MAX(item_order.created_at)', 'DESC');
 
         // -------------------------
         // شروط الفلترة المتقدمة 
         // -------------------------
-        
+
         // 1. فلترة البحث العام
         if (!empty($search)) {
             $builder->groupStart()
                 // إضافة البحث في عمود الموقع الكامل في البحث العام
                 ->orLike('CONCAT(building.code, "-", floor.code, "-", section.code, "-", room.code)', $search)
-                
+
                 ->orLike('item_order.order_id', $search)
                 ->orLike('employee.name', $search)
                 ->orLike('employee.emp_id', $search)
@@ -140,7 +140,7 @@ class InventoryController extends BaseController
         if (!empty($category)) {
             $builder->where('minor_category.id', $category);
         }
-        
+
         // 4. فلترة برقم الأصول
         if (!empty($assetNumber)) {
             $builder->like('item_order.asset_num', $assetNumber);
@@ -154,9 +154,9 @@ class InventoryController extends BaseController
         // 6. فلترة بالرقم الوظيفي (شامل: المرسل أو المستلم)
         if (!empty($employeeId)) {
             $builder->groupStart()
-                    ->like('employee.emp_id', $employeeId)
-                    ->orLike('users.user_id', $employeeId)
-                    ->groupEnd();
+                ->like('employee.emp_id', $employeeId)
+                ->orLike('users.user_id', $employeeId)
+                ->groupEnd();
         }
 
         // 7. فلترة بالموقع (الغرفة) - استخدام العمود المحسوب

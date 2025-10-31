@@ -235,7 +235,10 @@ class UserController extends BaseController
                 ]);
             }
 
-            $currentUserId = session()->get('employee_id');
+            $isEmployee = session()->get('isEmployee');
+            $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id'); // يحتوي على user_id أو emp_id
+            $currentUserId = $account_id;
+            
             if ($transfer->to_user_id !== $currentUserId) {
                 return $this->response->setJSON([
                     'success' => false,
