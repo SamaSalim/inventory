@@ -554,7 +554,7 @@ public function superAssets(): string
         $this->checkAuth();
     }
 
-  public function assetsHistory(): string
+public function assetsHistory(): string
 {
     $this->checkAuth();
 
@@ -566,15 +566,22 @@ public function superAssets(): string
 
     $toUserIdFilter = $this->request->getGet('to_user_id');
 
-    if (!in_array($userRole, ['assets', 'super_assets'])) {
+    // Allow super_assets and super_warehouse to view all users' data
+    if (!in_array($userRole, ['assets', 'super_assets', 'super_warehouse'])) {
         $toUserIdFilter = $userId;
+    }
+
+    // CRITICAL: Force operation_type to 'return' for super_warehouse
+    $operationTypeFilter = $this->request->getGet('operation_type');
+    if ($userRole === 'super_warehouse') {
+        $operationTypeFilter = 'return'; // Force return operations only
     }
 
     $filters = [
         'search' => $this->request->getGet('search'),
         'asset_number' => $this->request->getGet('asset_number'),
         'item_name' => $this->request->getGet('item_name'),
-        'operation_type' => $this->request->getGet('operation_type'),
+        'operation_type' => $operationTypeFilter,
         'date_from' => $this->request->getGet('date_from'),
         'date_to' => $this->request->getGet('date_to'),
         'to_user_id' => $toUserIdFilter,
@@ -582,60 +589,69 @@ public function superAssets(): string
     ];
 
     // ==================== NEW ITEMS ====================
-    $newItemsQuery = $itemOrderModel
-        ->select('item_order.asset_num as asset_number, items.name as item_name,
-                  item_order.created_at as last_operation_date, item_order.item_order_id as id,
-                  item_order.order_id, order_status.status as order_status_name,
-                  order.to_user_id')
-        ->join('items', 'items.id = item_order.item_id', 'left')
-        ->join('order', 'order.order_id = item_order.order_id', 'left')
-        ->join('order_status', 'order_status.id = order.order_status_id', 'left')
-        ->where('item_order.usage_status_id', 1);
+    // Super warehouse cannot see new items
+    $newItems = [];
+    if ($userRole !== 'super_warehouse') {
+        $newItemsQuery = $itemOrderModel
+            ->select('item_order.asset_num as asset_number, items.name as item_name,
+                      item_order.created_at as last_operation_date, item_order.item_order_id as id,
+                      item_order.order_id, order_status.status as order_status_name,
+                      order.to_user_id')
+            ->join('items', 'items.id = item_order.item_id', 'left')
+            ->join('order', 'order.order_id = item_order.order_id', 'left')
+            ->join('order_status', 'order_status.id = order.order_status_id', 'left')
+            ->where('item_order.usage_status_id', 1);
 
-    if (!empty($filters['asset_number'])) $newItemsQuery->like('item_order.asset_num', $filters['asset_number']);
-    if (!empty($filters['item_name'])) $newItemsQuery->like('items.name', $filters['item_name']);
-    if (!empty($filters['date_from'])) $newItemsQuery->where('item_order.created_at >=', $filters['date_from'] . ' 00:00:00');
-    if (!empty($filters['date_to'])) $newItemsQuery->where('item_order.created_at <=', $filters['date_to'] . ' 23:59:59');
-    if (!empty($filters['search'])) {
-        $newItemsQuery->groupStart()
-            ->like('item_order.asset_num', $filters['search'])
-            ->orLike('items.name', $filters['search'])
-            ->groupEnd();
-    }
-    if (!empty($filters['to_user_id'])) {
-        $newItemsQuery->where('order.to_user_id', $filters['to_user_id']);
-    }
+        if (!empty($filters['asset_number'])) $newItemsQuery->like('item_order.asset_num', $filters['asset_number']);
+        if (!empty($filters['item_name'])) $newItemsQuery->like('items.name', $filters['item_name']);
+        if (!empty($filters['date_from'])) $newItemsQuery->where('item_order.created_at >=', $filters['date_from'] . ' 00:00:00');
+        if (!empty($filters['date_to'])) $newItemsQuery->where('item_order.created_at <=', $filters['date_to'] . ' 23:59:59');
+        if (!empty($filters['search'])) {
+            $newItemsQuery->groupStart()
+                ->like('item_order.asset_num', $filters['search'])
+                ->orLike('items.name', $filters['search'])
+                ->groupEnd();
+        }
+        if (!empty($filters['to_user_id'])) {
+            $newItemsQuery->where('order.to_user_id', $filters['to_user_id']);
+        }
 
-    $newItems = $newItemsQuery->orderBy('item_order.created_at', 'DESC')->findAll();
+        $newItems = $newItemsQuery->orderBy('item_order.created_at', 'DESC')->findAll();
+    }
 
     // ==================== TRANSFERS ====================
-    $transfersQuery = $transferItemsModel
-        ->select('item_order.asset_num as asset_number, items.name as item_name,
-                  transfer_items.created_at as last_operation_date, item_order.item_order_id as id,
-                  item_order.order_id, order_status.status as order_status_name,
-                  transfer_items.to_user_id')
-        ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
-        ->join('items', 'items.id = item_order.item_id', 'left')
-        ->join('order', 'order.order_id = item_order.order_id', 'left')
-        ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left');
+    // Super warehouse cannot see transfers
+    $transfers = [];
+    if ($userRole !== 'super_warehouse') {
+        $transfersQuery = $transferItemsModel
+            ->select('item_order.asset_num as asset_number, items.name as item_name,
+                      transfer_items.created_at as last_operation_date, item_order.item_order_id as id,
+                      item_order.order_id, order_status.status as order_status_name,
+                      transfer_items.to_user_id')
+            ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+            ->join('items', 'items.id = item_order.item_id', 'left')
+            ->join('order', 'order.order_id = item_order.order_id', 'left')
+            ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left');
 
-    if (!empty($filters['asset_number'])) $transfersQuery->like('item_order.asset_num', $filters['asset_number']);
-    if (!empty($filters['item_name'])) $transfersQuery->like('items.name', $filters['item_name']);
-    if (!empty($filters['date_from'])) $transfersQuery->where('transfer_items.created_at >=', $filters['date_from'] . ' 00:00:00');
-    if (!empty($filters['date_to'])) $transfersQuery->where('transfer_items.created_at <=', $filters['date_to'] . ' 23:59:59');
-    if (!empty($filters['search'])) {
-        $transfersQuery->groupStart()
-            ->like('item_order.asset_num', $filters['search'])
-            ->orLike('items.name', $filters['search'])
-            ->groupEnd();
-    }
-    if (!empty($filters['to_user_id'])) {
-        $transfersQuery->where('transfer_items.to_user_id', $filters['to_user_id']);
-    }
+        if (!empty($filters['asset_number'])) $transfersQuery->like('item_order.asset_num', $filters['asset_number']);
+        if (!empty($filters['item_name'])) $transfersQuery->like('items.name', $filters['item_name']);
+        if (!empty($filters['date_from'])) $transfersQuery->where('transfer_items.created_at >=', $filters['date_from'] . ' 00:00:00');
+        if (!empty($filters['date_to'])) $transfersQuery->where('transfer_items.created_at <=', $filters['date_to'] . ' 23:59:59');
+        if (!empty($filters['search'])) {
+            $transfersQuery->groupStart()
+                ->like('item_order.asset_num', $filters['search'])
+                ->orLike('items.name', $filters['search'])
+                ->groupEnd();
+        }
+        if (!empty($filters['to_user_id'])) {
+            $transfersQuery->where('transfer_items.to_user_id', $filters['to_user_id']);
+        }
 
-    $transfers = $transfersQuery->orderBy('transfer_items.created_at', 'DESC')->findAll();
+        $transfers = $transfersQuery->orderBy('transfer_items.created_at', 'DESC')->findAll();
+    }
 
     // ==================== RETURNS ====================
+    // All roles can see returns
     $returnsQuery = $itemOrderModel
         ->select('item_order.asset_num as asset_number, items.name as item_name,
                   item_order.updated_at as last_operation_date, item_order.item_order_id as id,
@@ -646,7 +662,7 @@ public function superAssets(): string
         ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
         ->join('users', 'users.user_id = item_order.created_by', 'left')
         ->join('order', 'order.order_id = item_order.order_id', 'left')
-        ->whereIn('item_order.usage_status_id', [2, 4, 5]); // Only return-related statuses
+        ->whereIn('item_order.usage_status_id', [2, 4, 5]);
 
     if (!empty($filters['asset_number'])) $returnsQuery->like('item_order.asset_num', $filters['asset_number']);
     if (!empty($filters['item_name'])) $returnsQuery->like('items.name', $filters['item_name']);
@@ -672,8 +688,8 @@ public function superAssets(): string
     $operations = [];
     $uniqueAssets = [];
 
-    // NEW ITEMS
-    if (empty($filters['operation_type']) || $filters['operation_type'] == 'new') {
+    // NEW ITEMS - Only for non-super_warehouse
+    if ($userRole !== 'super_warehouse' && (empty($filters['operation_type']) || $filters['operation_type'] == 'new')) {
         foreach ($newItems as $n) {
             if (!isset($uniqueAssets[$n->asset_number])) {
                 $operations[] = (object)[
@@ -690,8 +706,8 @@ public function superAssets(): string
         }
     }
 
-    // TRANSFERS
-    if (empty($filters['operation_type']) || $filters['operation_type'] == 'transfer') {
+    // TRANSFERS - Only for non-super_warehouse
+    if ($userRole !== 'super_warehouse' && (empty($filters['operation_type']) || $filters['operation_type'] == 'transfer')) {
         foreach ($transfers as $t) {
             if (!isset($uniqueAssets[$t->asset_number])) {
                 $operations[] = (object)[
@@ -708,15 +724,14 @@ public function superAssets(): string
         }
     }
 
-    // RETURNS - Map usage_status_id to display labels
+    // RETURNS - For all roles
     if (empty($filters['operation_type']) || $filters['operation_type'] == 'return') {
         foreach ($returns as $r) {
             if (!isset($uniqueAssets[$r->asset_number])) {
-                // Map usage_status_id to display status
                 $displayStatus = match ((int)$r->usage_status_id) {
-                    2 => 'قيد الانتظار',    // رجيع → قيد الانتظار
-                    4 => 'مقبول',           // معاد صرفه → مقبول
-                    5 => 'مرفوض',           // معادة للمرسل → مرفوض
+                    2 => 'قيد الانتظار',
+                    4 => 'مقبول',
+                    5 => 'مرفوض',
                     default => 'غير محدد',
                 };
 
@@ -727,7 +742,7 @@ public function superAssets(): string
                     'operation_type' => 'return',
                     'last_operation_date' => $r->last_operation_date,
                     'order_status_name' => $displayStatus,
-                    'usage_status_id' => $r->usage_status_id // Keep original for validation
+                    'usage_status_id' => $r->usage_status_id
                 ];
                 $uniqueAssets[$r->asset_number] = true;
             }
@@ -757,5 +772,5 @@ public function superAssets(): string
         'filters' => $filters,
         'pager' => $pager,
     ]);
-} 
+}
 }

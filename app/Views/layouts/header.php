@@ -547,12 +547,32 @@
     <?php endif; ?>
 
 
-    <?php if ($role === 'admin' || $role === 'warehouse' || $role === 'super_warehouse'): ?>
+    <?php if ($role === 'admin' || $role === 'warehouse' ): ?>
         <a href="<?= base_url('inventoryController/index') ?>"
             class="<?= (service('uri')->getSegment(1) == 'inventoryController') ? 'active' : '' ?>">
             <i class="fa-solid fa-warehouse"></i> <span>إدارة المستودعات</span>
         </a>
     <?php endif; ?>
+
+    <?php if ($role === 'super_warehouse'): ?>
+    <a href="<?= base_url('Return/SuperWarehouse/ReturnRequests') ?>"
+        class="<?= (service('uri')->getSegment(1) == 'Return/SuperWarehouse/ReturnRequests') ? 'active' : '' ?>">
+        <i class="fa-solid fa-rotate-left"></i> <span>عمليات الإرجاع </span>
+    </a>
+<?php endif; ?>
+
+<?php if ($role === 'super_warehouse'): ?>
+    <?php 
+    $currentUri = service('uri');
+    $isReissueActive = ($currentUri->getSegment(1) == 'Return' && 
+                        $currentUri->getSegment(2) == 'SuperWarehouse' && 
+                        $currentUri->getSegment(3) == 'ReissueItems' );
+    ?>
+    <a href="<?= base_url('Return/SuperWarehouse/ReissueItems') ?>"
+        class="<?= $isReissueActive ? 'active' : '' ?>">
+        <i class="fa-solid fa-box-archive"></i> <span>اعادة صرف العهد</span>
+    </a>
+<?php endif; ?>
 
     <?php if ($role === 'admin' || $role === 'assets' || $role === 'super_assets'): ?>
         <a href="<?= base_url('AssetsController/index') ?>"
@@ -579,7 +599,7 @@
             <i class="fa-solid fa-id-card"></i> <span> طلبات العهد</span>
         </a>
     <?php endif; ?>
-    <?php if ($role === 'assets' || $role === 'user' || $role === 'super_assets'): ?>
+    <?php if ($role === 'assets' || $role === 'user' || $role === 'super_assets' || $role === 'super_warehouse'): ?>
         <a href="<?= base_url('AssetsHistory/assetsHistory') ?>"
             class="<?= (service('uri')->getSegment(1) == 'AssetsHistory' && service('uri')->getSegment(2) == 'assetsHistory') ? 'active' : '' ?>">
             <i class="fa-solid fa-file-lines"></i> <span>سجلات العهد</span>
@@ -593,12 +613,7 @@
         </a>
     <?php endif; ?>
 
-    <?php if ($role === 'super_warehouse'): ?>
-        <a href="<?= base_url('AssetsHistory') ?>"
-            class="<?= (service('uri')->getSegment(1) == 'AssetsHistory') ? 'active' : '' ?>">
-            <i class="fa-solid fa-archive"></i> <span>عمليات الإرجاع </span>
-        </a>
-    <?php endif; ?>
+
 
     <a href="<?= base_url('login/logout') ?>">
         <i class="fa-solid fa-right-from-bracket"></i> <span>تسجيل الخروج</span>
