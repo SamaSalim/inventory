@@ -230,6 +230,17 @@ class UserController extends BaseController
                 ]);
             }
 
+            $isEmployee = session()->get('isEmployee');
+            $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id'); // يحتوي على user_id أو emp_id
+            $currentUserId = $account_id;
+            
+            if ($transfer->to_user_id !== $currentUserId) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'ليس لديك صلاحية لهذا الإجراء'
+                ]);
+            }
+
             if ($transfer->order_status_id != 1) {
                 $statusText = $transfer->order_status_id == 2 ? 'مقبول' : 'مرفوض';
                 return $this->response->setJSON([

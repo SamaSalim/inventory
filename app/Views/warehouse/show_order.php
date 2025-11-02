@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -116,7 +117,7 @@
                                 <div class="item-card-header">
                                     <h4 class="item-name"><?= esc($item->item_name) ?></h4>
                                 </div>
-                                
+
                                 <div class="item-details">
                                     <div class="detail-item">
                                         <div class="detail-label">التصنيف</div>
@@ -124,49 +125,49 @@
                                             <span class="category-badge"><?= esc($item->major_category_name . ' / ' . $item->minor_category_name) ?></span>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="detail-item">
                                         <div class="detail-label">الموديل</div>
                                         <div class="detail-value"><?= esc($item->model_num) ?: '<span class="empty">غير محدد</span>' ?></div>
                                     </div>
-                                    
+
                                     <div class="detail-item">
                                         <div class="detail-label">الرقم التسلسلي</div>
                                         <div class="detail-value"><?= esc($item->serial_num) ?: '<span class="empty">غير محدد</span>' ?></div>
                                     </div>
-                                    
+
                                     <div class="detail-item">
                                         <div class="detail-label">رقم الأصل</div>
                                         <div class="detail-value"><?= esc($item->asset_num) ?: '<span class="empty">غير محدد</span>' ?></div>
                                     </div>
-                                    
+
                                     <div class="detail-item">
                                         <div class="detail-label">الرقم القديم</div>
                                         <div class="detail-value"><?= esc($item->old_asset_num) ?: '<span class="empty">غير محدد</span>' ?></div>
                                     </div>
-                                    
+
                                     <div class="detail-item">
                                         <div class="detail-label">العلامة التجارية</div>
                                         <div class="detail-value"><?= esc($item->brand) ?: '<span class="empty">غير محدد</span>' ?></div>
                                     </div>
-                                    
+
                                     <div class="detail-item">
                                         <div class="detail-label">نوع الأصل</div>
                                         <div class="detail-value"><?= esc($item->assets_type) ?: '<span class="empty">غير محدد</span>' ?></div>
                                     </div>
-                                    
+
                                     <div class="detail-item">
                                         <div class="detail-label">الغرفة</div>
                                         <div class="detail-value"><?= esc($item->location_code) ?: '<span class="empty">غير محدد</span>' ?></div>
                                     </div>
-                                    
+
                                     <div class="detail-item">
                                         <div class="detail-label">الحالة</div>
                                         <div class="detail-value">
                                             <span class="status-badge status-active"><?= esc($item->usage_status_name) ?></span>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="detail-item">
                                         <div class="detail-label">أنشئ بواسطة</div>
                                         <div class="detail-value"><?= esc($item->created_by_name) ?: '<span class="empty">غير محدد</span>' ?></div>
@@ -184,11 +185,11 @@
                                 <div class="item-timestamps">
                                     <div class="detail-item">
                                         <div class="detail-label">تاريخ الإنشاء</div>
-                                         <div class="detail-value"><?= date('Y-m-d', strtotime($item->updated_at)) ?></div>
+                                        <div class="detail-value"><?= date('Y-m-d', strtotime($item->created_at)) ?></div>
                                     </div>
                                     <div class="detail-item">
                                         <div class="detail-label">آخر تحديث</div>
-                                         <div class="detail-value"><?= date('Y-m-d', strtotime($item->updated_at)) ?></div>
+                                        <div class="detail-value"><?= date('Y-m-d', strtotime($item->updated_at)) ?></div>
                                     </div>
                                 </div>
                             </div>
@@ -203,7 +204,7 @@
                     <?php if (isset($order->order_status_id) && $order->order_status_id == 2): ?>
                         <button onclick="window.print()" class="action-btn print-btn">
                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M6 9V4H18V9M6 14H18V20H6V14Z" stroke="currentColor" stroke-width="2"/>
+                                <path d="M6 9V4H18V9M6 14H18V20H6V14Z" stroke="currentColor" stroke-width="2" />
                             </svg>
                             <span>طباعة نموذج الاستلام</span>
                         </button>
@@ -213,13 +214,13 @@
                             <span>طباعة نموذج الاستلام</span>
                         </button>
                     <?php endif; ?>
-                    
-                    <?php $backUrl= previous_url() ?>
-                    <!-- 🚨 التعديل هنا: استخدام المسار السابق مباشرة بدلاً من site_url() -->
-                    <a href="<?= $backUrl ?>" class="action-btn back-btn">
+
+                    <?php $back_url = previous_url();  ?>
+                    <!--   استخدام المسار السابق مباشرة    -->
+                    <a href="<?= esc($back_url)  ?>" class="action-btn back-btn">
                         <span>العودة</span>
                         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2"/>
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" />
                         </svg>
                     </a>
                 </div>
@@ -236,7 +237,7 @@
                     <div class="ministry-details">
                         <div class="logo-section">
                             <div class="kamc-emblem">
-                                <img src="<?= base_url('public/assets/images/Kamc Logo Guideline-04.png') ?>" 
+                                <img src="<?= base_url('public/assets/images/Kamc Logo Guideline-04.png') ?>"
                                     alt="KAMC Logo">
                             </div>
                             <div class="form-title">نموذج استلام عهدة (طلب صرف مواد)</div>
@@ -290,8 +291,17 @@
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <?php for ($i=1; $i<=6; $i++): ?>
-                                <tr class="empty-row"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                            <?php for ($i = 1; $i <= 6; $i++): ?>
+                                <tr class="empty-row">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
                             <?php endfor; ?>
                         <?php endif; ?>
                     </tbody>
@@ -311,8 +321,8 @@
                             <td>
                                 <div class="signature-title-cell">المستلم</div>
                                 <div class="signature-fields">
-                                    الاسم: <span class="signature-line"></span><br>
-                                    التاريخ: <span class="signature-line"></span>
+                                    الاسم: <span class="signature-line"><?= esc($order->to_name) ?></span><br>
+                                    التاريخ: <span class="signature-line"><?= date('Y-m-d', strtotime($order->created_at)) ?></span>
                                 </div>
                             </td>
                         </tr>
@@ -333,4 +343,5 @@
     <?php endif; ?>
     <!-- END: Print Only Content (Form) -->
 </body>
+
 </html>
