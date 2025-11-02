@@ -13,7 +13,6 @@
 
 
 
-
     <!-- BASE URL CONFIGURATION -->
     <script>
         window.appConfig = {
@@ -55,6 +54,12 @@
             $totalCount = count($orders ?? []);
             $directCount = count(array_filter($orders ?? [], fn($o) => ($o->source_table ?? '') === 'orders'));
             $transferCount = count(array_filter($orders ?? [], fn($o) => ($o->source_table ?? '') === 'transfer_items'));
+            
+            // Count reissued items (usage_status_id = 1 AND history_count > 0)
+            $reissuedCount = count(array_filter($orders ?? [], function($o) {
+                return isset($o->usage_status_id) && $o->usage_status_id == 1 
+                    && isset($o->history_count) && $o->history_count > 0;
+            }));
             ?>
 
             <div class="stats-cards">
@@ -85,6 +90,7 @@
                         <p>العهد المحولة</p>
                     </div>
                 </div>
+
             </div>
 
             <div class="filter-buttons">
@@ -137,8 +143,13 @@
                                     $classification[] = $order->minor_category_name;
                                 }
                                 $classificationText = implode(' / ', $classification) ?: '-';
+                                
+                                // Determine if item is reissued (usage_status_id = 1 AND has history)
+                                $isReissued = isset($order->usage_status_id) && $order->usage_status_id == 1 
+                                           && isset($order->history_count) && $order->history_count > 0;
                                 ?>
                                 <tr data-source="<?= esc($order->source_table ?? '') ?>" 
+                                    data-reissued="<?= $isReissued ? 'true' : 'false' ?>"
                                     data-item-order-id="<?= esc($order->item_order_id ?? $order->id) ?>"
                                     data-asset-num="<?= esc($order->asset_num ?? '-') ?>"
                                     data-item-name="<?= esc($order->item_name ?? '-') ?>"
@@ -153,14 +164,35 @@
                                     <td><?= esc($order->item_name ?? '-') ?></td>
                                     <td><?= esc($classificationText) ?></td>
                                     <td>
-                                        <span class="source-badge source-<?= ($order->source_table ?? '') === 'orders' ? 'direct' : 'transfer' ?>">
-                                            <?= ($order->source_table ?? '') === 'orders' ? 'مباشر' : 'محول' ?>
+                                        <?php 
+                                        // If item is reissued, show "مباشرة" regardless of actual source
+                                        if ($isReissued) {
+                                            $sourceDisplay = 'مباشرة';
+                                            $sourceClass = 'source-direct';
+                                        } else {
+                                            $sourceDisplay = ($order->source_table ?? '') === 'orders' ? 'مباشر' : 'محول';
+                                            $sourceClass = ($order->source_table ?? '') === 'orders' ? 'source-direct' : 'source-transfer';
+                                        }
+                                        ?>
+                                        <span class="source-badge <?= $sourceClass ?>">
+                                            <?= $sourceDisplay ?>
                                         </span>
                                     </td>
                                     <td>
                                         <?php 
                                         $usageClass = 'status-new';
                                         $usageStatus = $order->usage_status_name ?? '';
+                                        
+                                        // If item is reissued (has history), show "معاد صرفه"
+                                        // If item is truly new (no history), show "جديد"
+                                        if (isset($order->usage_status_id) && $order->usage_status_id == 1) {
+                                            if ($isReissued) {
+                                                $usageStatus = 'معاد صرفه';
+                                            } else {
+                                                $usageStatus = 'جديد';
+                                            }
+                                        }
+                                        
                                         if ($usageStatus == 'تحويل') $usageClass = 'status-transfer';
                                         ?>
                                         <span class="status-badge <?= $usageClass ?>">
@@ -191,7 +223,6 @@
                                                 <i class="fas fa-exchange-alt"></i>
                                                 تحويل
                                             </button>
-
                                         </div>
                                     </td>
                                 </tr>
@@ -272,6 +303,27 @@
     <!-- Load External Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Enhanced JavaScript with reissued filter -->
+    <script>
+        // Update existing filterBySource to work with all filters
+        function filterBySource(source) {
+            const rows = document.querySelectorAll('#covenantsTable tbody tr');
+            const buttons = document.querySelectorAll('.filter-buttons .custom-btn');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            rows.forEach(row => {
+                const rowSource = row.getAttribute('data-source');
+                if (source === 'all') {
+                    row.style.display = '';
+                } else {
+                    row.style.display = rowSource === source ? '' : 'none';
+                }
+            });
+        }
+    </script>
     
     <!-- Load the separated JavaScript file -->
     <script src="<?= base_url('public/assets/JS/user_return.js') ?>"></script>

@@ -8,6 +8,7 @@ use App\Models\MinorCategoryModel;
 use App\Models\ItemModel;
 use App\Models\OrderStatusModel;
 use App\Models\UsageStatusModel;
+use App\Models\HistoryModel;
 use App\Exceptions\AuthenticationException;
 use App\Entities\Item;
 use App\Entities\ItemOrder;
@@ -20,11 +21,14 @@ class UserController extends BaseController
     protected $orderModel;
     protected $transferItemsModel;
     protected $itemOrderModel;
+    protected $historyModel;
+    
     public function __construct()
     {
         $this->orderModel = new OrderModel();
         $this->transferItemsModel = new TransferItemsModel();
         $this->itemOrderModel = new ItemOrderModel();
+        $this->historyModel = new HistoryModel();
     }
 
     /**
@@ -44,24 +48,13 @@ class UserController extends BaseController
     {
         $this->checkAuth();
 
-        // التحقق من تسجيل الدخول
-       
-
-        // جلب معلومات الحساب من السيشن (نفس طريقة UserInfo)
         $isEmployee = session()->get('isEmployee');
-        $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id'); // يحتوي على user_id أو emp_id
-
-        // تحديد user_id بناءً على نوع الحساب
-        //  $currentUserId = null;
-
-        // if (!$isEmployee) {
-        // إذا كان مستخدم عادي، account_id هو user_id مباشرة
+        $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id');
         $currentUserId = $account_id;
-        // }
-        //  echo $account_id;
+        
         $transferItemsModel = new TransferItemsModel();
 
-        // استعلام الطلبات المحولة للمستخدم الحالي
+        // استعلام الطلبات المحولة للمستخدم الحالي مع فحص السجل التاريخي
         $myOrders = $transferItemsModel
             ->distinct()
             ->select(
@@ -72,18 +65,20 @@ class UserController extends BaseController
                  item_order.created_by AS employee_id,
                  item_order.asset_num,
                  item_order.serial_num,
+                 item_order.usage_status_id,
                  from_user.name AS from_user_name,
                  from_user.user_dept AS from_user_dept,
                  usage_status.usage_status AS usage_status_name,
-                 order_status.status AS order_status_name'
+                 order_status.status AS order_status_name,
+                 (SELECT COUNT(*) FROM history WHERE history.item_order_id = item_order.item_order_id) as history_count'
             )
             ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
             ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
             ->where('transfer_items.to_user_id', $currentUserId)
-            ->where('item_order.usage_status_id !=', 2) // استبعاد العناصر المرجعة
-            ->where('transfer_items.order_status_id', 1) // إظهار الطلبات قيد الانتظار فقط
+            ->where('item_order.usage_status_id !=', 2)
+            ->where('transfer_items.order_status_id', 1)
             ->orderBy('transfer_items.created_at', 'DESC')
             ->findAll();
 
@@ -147,7 +142,6 @@ class UserController extends BaseController
         $transferModel = new TransferItemsModel();
         $itemOrderModel = new ItemOrderModel();
 
-        // جلب معلومات الطلب الأساسية
         $transfer = $transferModel
             ->select('transfer_items.*, from_user.name AS from_user_name, from_user.user_dept AS from_user_dept, 
                   from_user.user_ext AS from_user_ext, from_user.email AS from_user_email, 
@@ -163,10 +157,11 @@ class UserController extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'الطلب غير موجود']);
         }
 
-        // جلب الأصناف من transfer_items
+        // جلب الأصناف من transfer_items مع عدد السجلات في history
         $transferItems = $itemOrderModel
             ->select('item_order.item_order_id, item_order.asset_num, item_order.serial_num, item_order.assets_type,
-                  items.name as item_name, usage_status.usage_status AS usage_status_name')
+                  items.name as item_name, usage_status.usage_status AS usage_status_name,
+                  (SELECT COUNT(*) FROM history WHERE history.item_order_id = item_order.item_order_id) as history_count')
             ->join('items', 'items.id = item_order.item_id', 'left')
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('transfer_items', 'transfer_items.item_order_id = item_order.item_order_id', 'left')
@@ -174,10 +169,11 @@ class UserController extends BaseController
             ->where('item_order.order_id', $transfer->order_id)
             ->findAll();
 
-        // جلب الأصناف من order
+        // جلب الأصناف من order مع عدد السجلات في history
         $orderItems = $itemOrderModel
             ->select('item_order.item_order_id, item_order.asset_num, item_order.serial_num, item_order.assets_type,
-                  items.name as item_name, usage_status.usage_status AS usage_status_name')
+                  items.name as item_name, usage_status.usage_status AS usage_status_name,
+                  (SELECT COUNT(*) FROM history WHERE history.item_order_id = item_order.item_order_id) as history_count')
             ->join('items', 'items.id = item_order.item_id', 'left')
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('order', 'order.order_id = item_order.order_id', 'left')
@@ -185,7 +181,6 @@ class UserController extends BaseController
             ->where('item_order.order_id', $transfer->order_id)
             ->findAll();
 
-        // دمج وإزالة التكرار
         $items = array_values(array_unique(array_merge($transferItems, $orderItems), SORT_REGULAR));
 
         return $this->response->setJSON(['success' => true, 'data' => $transfer, 'items' => $items]);
@@ -234,7 +229,6 @@ class UserController extends BaseController
                     'message' => 'الطلب غير موجود'
                 ]);
             }
-
 
             if ($transfer->order_status_id != 1) {
                 $statusText = $transfer->order_status_id == 2 ? 'مقبول' : 'مرفوض';
@@ -371,19 +365,11 @@ class UserController extends BaseController
     {
         $this->checkAuth();
 
-       
-
-        // $isEmployee = session()->get('isEmployee');
-        // $account_id = session()->get('employee_id');
-        // $currentUserId = null;
         $currentUserId = session()->get('isEmployee') ? session()->get('employee_id') : session()->get('user_id');
-
-        // if (!$isEmployee) {
-        //     $currentUserId = $account_id;
-        // }
 
         $transferItemsModel = $this->transferItemsModel;
 
+        // Get transfer items with history check
         $transferItems = $transferItemsModel
             ->select(
                 'transfer_items.transfer_item_id AS id,
@@ -404,6 +390,7 @@ class UserController extends BaseController
              from_user.user_dept AS from_user_dept,
              usage_status.usage_status AS usage_status_name,
              order_status.status AS order_status_name,
+             (SELECT COUNT(*) FROM history WHERE history.item_order_id = item_order.item_order_id) as history_count,
              "transfer_items" AS source_table'
             )
             ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
@@ -421,6 +408,7 @@ class UserController extends BaseController
 
         $orderModel = $this->orderModel;
 
+        // Get orders with history check
         $orders = $orderModel
             ->select(
                 'order.order_id AS id,
@@ -442,6 +430,7 @@ class UserController extends BaseController
              items.name AS item_name,
              minor_category.name AS minor_category_name,
              major_category.name AS major_category_name,
+             (SELECT COUNT(*) FROM history WHERE history.item_order_id = item_order.item_order_id) as history_count,
              "orders" AS source_table'
             )
             ->join('item_order', 'item_order.order_id = order.order_id', 'left')

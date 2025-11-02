@@ -320,4 +320,5 @@ class ReturnRequests extends BaseController
         
         return redirect()->back()->with('warning', ' تم رفض الإرجاع');
     }
+
 }

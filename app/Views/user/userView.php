@@ -342,8 +342,13 @@
                     <tbody>
                         <?php if (isset($orders) && !empty($orders)): ?>
                             <?php foreach ($orders as $order): ?>
+                                <?php
+                                // Check if item is reissued (has history)
+                                $isReissued = isset($order->history_count) && $order->history_count > 0;
+                                ?>
                                 <tr data-transfer-id="<?= $order->transfer_item_id ?>"
                                     data-usage="<?= esc($order->usage_status_name ?? '') ?>"
+                                    data-reissued="<?= $isReissued ? 'true' : 'false' ?>"
                                     class="<?= ($order->is_opened == 1) ? 'opened-row' : '' ?>">
 
                                     <td><?= esc($order->transfer_item_id ?? '-') ?></td>
@@ -352,11 +357,22 @@
                                     <td>
                                         <?php
                                         $usageClass = 'status-new';
-                                        if ($order->usage_status_name == 'تحويل') $usageClass = 'status-transfer';
-                                        if ($order->usage_status_name == 'رجيع') $usageClass = 'status-return';
+                                        $usageStatus = $order->usage_status_name ?? '';
+                                        
+                                        // Determine status based on history
+                                        if ($usageStatus == 'جديد') {
+                                            if ($isReissued) {
+                                                $usageStatus = 'معاد صرفه';
+                                            } else {
+                                                $usageStatus = 'جديد';
+                                            }
+                                        }
+                                        
+                                        if ($usageStatus == 'تحويل') $usageClass = 'status-transfer';
+                                        if ($usageStatus == 'رجيع') $usageClass = 'status-return';
                                         ?>
                                         <span class="status-badge <?= $usageClass ?>">
-                                            <?= esc($order->usage_status_name ?? '-') ?>
+                                            <?= esc($usageStatus) ?>
                                         </span>
                                     </td>
                                     <td>
@@ -479,14 +495,22 @@
                                         <tbody>`;
 
                             items.forEach(item => {
+                                // Determine display status based on history
+                                let displayStatus = item.usage_status_name || '-';
+                                if (displayStatus === 'جديد') {
+                                    // Check if item has history (is reissued)
+                                    const isReissued = item.history_count && item.history_count > 0;
+                                    displayStatus = isReissued ? 'معاد صرفه' : 'جديد';
+                                }
+                                
                                 itemsTableHtml += `
                                     <tr>
                                         <td><strong>${item.item_name || '-'}</strong></td>
                                         <td>${item.asset_num || '-'}</td>
                                         <td>${item.serial_num || '-'}</td>
                                         <td>
-                                            <span class="status-badge ${getUsageStatusClass(item.usage_status_name)}">
-                                                ${item.usage_status_name || '-'}
+                                            <span class="status-badge ${getUsageStatusClass(displayStatus)}">
+                                                ${displayStatus}
                                             </span>
                                         </td>
                                         <td>${item.assets_type || '-'}</td>
@@ -623,10 +647,8 @@
         }
 
         function getUsageStatusClass(name) {
-            return name == 'جديد' ? 'status-new' : name == 'تحويل' ? 'status-transfer' : 'status-return';
+            return name == 'جديد' || name == 'معاد صرفه' ? 'status-new' : name == 'تحويل' ? 'status-transfer' : 'status-return';
         }
-
-        // استبدل دالة formatDate في userView.php بهذا الكود:
 
         function formatDate(d) {
             if (!d) return '-';
