@@ -11,8 +11,6 @@
     <link rel="stylesheet" href="<?= base_url('public/assets/css/transfer-style.css') ?>">
     <link rel="stylesheet" href="<?= base_url('public/assets/css/my_assets_style.css') ?>">
 
-
-
     <!-- BASE URL CONFIGURATION -->
     <script>
         window.appConfig = {
@@ -54,12 +52,6 @@
             $totalCount = count($orders ?? []);
             $directCount = count(array_filter($orders ?? [], fn($o) => ($o->source_table ?? '') === 'orders'));
             $transferCount = count(array_filter($orders ?? [], fn($o) => ($o->source_table ?? '') === 'transfer_items'));
-            
-            // Count reissued items (usage_status_id = 1 AND history_count > 0)
-            $reissuedCount = count(array_filter($orders ?? [], function($o) {
-                return isset($o->usage_status_id) && $o->usage_status_id == 1 
-                    && isset($o->history_count) && $o->history_count > 0;
-            }));
             ?>
 
             <div class="stats-cards">
@@ -90,7 +82,6 @@
                         <p>العهد المحولة</p>
                     </div>
                 </div>
-
             </div>
 
             <div class="filter-buttons">
@@ -144,12 +135,15 @@
                                 }
                                 $classificationText = implode(' / ', $classification) ?: '-';
                                 
-                                // Determine if item is reissued (usage_status_id = 1 AND has history)
-                                $isReissued = isset($order->usage_status_id) && $order->usage_status_id == 1 
-                                           && isset($order->history_count) && $order->history_count > 0;
+                                // Check if item is reissued from controller flag
+                                $isReissued = isset($order->is_reissued) && $order->is_reissued === true;
+                                
+                                // Get order status for styling
+                                $orderStatusName = $order->order_status_name ?? '';
                                 ?>
                                 <tr data-source="<?= esc($order->source_table ?? '') ?>" 
                                     data-reissued="<?= $isReissued ? 'true' : 'false' ?>"
+                                    data-order-status="<?= esc($orderStatusName) ?>"
                                     data-item-order-id="<?= esc($order->item_order_id ?? $order->id) ?>"
                                     data-asset-num="<?= esc($order->asset_num ?? '-') ?>"
                                     data-item-name="<?= esc($order->item_name ?? '-') ?>"
@@ -165,14 +159,8 @@
                                     <td><?= esc($classificationText) ?></td>
                                     <td>
                                         <?php 
-                                        // If item is reissued, show "مباشرة" regardless of actual source
-                                        if ($isReissued) {
-                                            $sourceDisplay = 'مباشرة';
-                                            $sourceClass = 'source-direct';
-                                        } else {
-                                            $sourceDisplay = ($order->source_table ?? '') === 'orders' ? 'مباشر' : 'محول';
-                                            $sourceClass = ($order->source_table ?? '') === 'orders' ? 'source-direct' : 'source-transfer';
-                                        }
+                                        $sourceDisplay = ($order->source_table ?? '') === 'orders' ? 'مباشر' : 'محول';
+                                        $sourceClass = ($order->source_table ?? '') === 'orders' ? 'source-direct' : 'source-transfer';
                                         ?>
                                         <span class="source-badge <?= $sourceClass ?>">
                                             <?= $sourceDisplay ?>
@@ -181,35 +169,44 @@
                                     <td>
                                         <?php 
                                         $usageClass = 'status-new';
-                                        $usageStatus = $order->usage_status_name ?? '';
+                                        $usageStatus = '';
                                         
-                                        // If item is reissued (has history), show "معاد صرفه"
-                                        // If item is truly new (no history), show "جديد"
-                                        if (isset($order->usage_status_id) && $order->usage_status_id == 1) {
-                                            if ($isReissued) {
-                                                $usageStatus = 'معاد صرفه';
-                                            } else {
-                                                $usageStatus = 'جديد';
-                                            }
+                                        // If item is reissued, show "معاد صرفه" with green badge
+                                        if ($isReissued) {
+                                            $usageStatus = 'معاد صرفه';
+                                            $usageClass = 'status-new'; // Green badge
+                                        } else {
+                                            // Normal status display
+                                            $usageStatus = $order->usage_status_name ?? '';
+                                            if ($usageStatus == 'جديد') $usageClass = 'status-new';
+                                            if ($usageStatus == 'تحويل') $usageClass = 'status-transfer';
                                         }
-                                        
-                                        if ($usageStatus == 'تحويل') $usageClass = 'status-transfer';
                                         ?>
                                         <span class="status-badge <?= $usageClass ?>">
                                             <?= esc($usageStatus ?: '-') ?>
                                         </span>
                                     </td>
-                                    <td>
-                                        <?php 
-                                        $orderClass = 'order-status-pending';
-                                        $orderStatus = $order->order_status_name ?? '';
-                                        if ($orderStatus == 'مقبول') $orderClass = 'order-status-accepted';
-                                        if ($orderStatus == 'مرفوض') $orderClass = 'order-status-rejected';
-                                        ?>
-                                        <span class="status-badge <?= $orderClass ?>">
-                                            <?= esc($orderStatus ?: '-') ?>
-                                        </span>
-                                    </td>
+                            <td>
+                                <?php 
+
+                                $displayOrderStatus = $order->order_status_name ?? '';
+                                
+                                $orderClass = 'order-status-pending';
+                                $inlineStyle = '';
+                                
+                                if ($displayOrderStatus == 'مقبول') {
+                                    $orderClass = 'order-status-accepted';
+                                }
+                                if ($displayOrderStatus == 'مرفوض') {
+                                    $orderClass = 'order-status-rejected';
+                                    // Add inline style for rejected status
+                                    $inlineStyle = 'background: rgba(220, 53, 69, 0.15); color: #3c3939ff; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: bold; text-transform: uppercase; display: inline-block;';
+                                }
+                                ?>
+                                <span class="status-badge <?= $orderClass ?>" <?= !empty($inlineStyle) ? 'style="' . $inlineStyle . '"' : '' ?>>
+                                    <?= esc($displayOrderStatus ?: '-') ?>
+                                </span>
+                            </td>
                                     <td><?= isset($order->created_at) ? date('d/m/Y', strtotime($order->created_at)) : '-' ?></td>
                                     <td>
                                         <div class="action-buttons">

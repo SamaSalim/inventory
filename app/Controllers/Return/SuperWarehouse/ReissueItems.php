@@ -9,6 +9,7 @@ use App\Models\EmployeeModel;
 use App\Models\UserModel;
 use App\Models\OrderModel;
 use App\Models\TransferItemsModel;
+use App\Models\HistoryModel;
 
 class ReissueItems extends BaseController
 {
@@ -18,6 +19,7 @@ class ReissueItems extends BaseController
     protected $userModel;
     protected $orderModel;
     protected $transferItemsModel;
+    protected $historyModel; 
 
     public function __construct()
     {
@@ -27,11 +29,10 @@ class ReissueItems extends BaseController
         $this->userModel = new UserModel();
         $this->orderModel = new OrderModel();
         $this->transferItemsModel = new TransferItemsModel();
+        $this->historyModel = new HistoryModel(); 
     }
 
-    /**
-     * عرض صفحة إعادة الصرف
-     */
+
     public function index(): string
     {
         // جلب بيانات المرسل من الجلسة
@@ -58,7 +59,7 @@ class ReissueItems extends BaseController
             'date_to'        => $this->request->getGet('date_to')
         ];
 
-        // بناء الاستعلام - جلب العناصر في حالة "معاد صرفه" (4)
+        // بناء الاستعلام - جلب العناصر الفردية في حالة "معاد صرفه" (4)
         $builder = $this->itemOrderModel
             ->select('
                 item_order.item_order_id,
@@ -126,8 +127,8 @@ class ReissueItems extends BaseController
             $builder->where('DATE(item_order.created_at) <=', $filters['date_to']);
         }
 
-        // جلب النتائج
-        $reissuedOrders = $builder
+        // جلب النتائج - عناصر فردية
+        $reissuedItems = $builder
             ->orderBy('item_order.created_at', 'DESC')
             ->asArray()
             ->findAll();
@@ -137,7 +138,7 @@ class ReissueItems extends BaseController
 
         // عرض الصفحة مع البيانات
         return view('warehouse/super_warehouse/reissue_items', [
-            'returnOrders'  => $reissuedOrders,
+            'returnOrders'  => $reissuedItems,
             'usageStatuses' => $usageStatuses,
             'filters'       => $filters,
             'sender_data'   => $senderData
@@ -204,12 +205,13 @@ class ReissueItems extends BaseController
     }
 
     /**
-     * إرسال طلب إعادة صرف للعناصر المحددة
+     * إرسال طلب إعادة صرف واحد لجميع العناصر المحددة
      */
     public function sendReissueOrder()
     {
         try {
-            // التحقق من تسجيل الدخول
+            log_message('info', 'Reissue order request received from IP: ' . $this->request->getIPAddress());
+
             if (!session()->get('isLoggedIn')) {
                 return $this->response->setJSON([
                     'success' => false,
@@ -217,7 +219,6 @@ class ReissueItems extends BaseController
                 ]);
             }
 
-            // الحصول على معرف الموظف المرسل من الجلسة
             $fromUserId = session()->get('employee_id');
             
             if (!$fromUserId) {
@@ -227,7 +228,6 @@ class ReissueItems extends BaseController
                 ]);
             }
 
-            // الحصول على البيانات المُرسلة
             $receiverUserId = $this->request->getPost('receiver_user_id');
             $itemOrderIdsJson = $this->request->getPost('item_order_ids');
             
@@ -238,7 +238,6 @@ class ReissueItems extends BaseController
                 ]);
             }
 
-            // فك تشفير معرفات العناصر
             $itemOrderIds = json_decode($itemOrderIdsJson, true);
             
             if (empty($itemOrderIds) || !is_array($itemOrderIds)) {
@@ -248,10 +247,10 @@ class ReissueItems extends BaseController
                 ]);
             }
 
-            // التحقق من وجود المستلم
+            log_message('info', 'Attempting to reissue items: ' . implode(',', $itemOrderIds) . ' | From: ' . $fromUserId . ' | To: ' . $receiverUserId);
+
             $receiver = $this->userModel->where('user_id', $receiverUserId)->first();
             if (!$receiver) {
-                // محاولة البحث في جدول الموظفين
                 $receiver = $this->employeeModel->where('emp_id', $receiverUserId)->first();
                 if (!$receiver) {
                     return $this->response->setJSON([
@@ -261,47 +260,59 @@ class ReissueItems extends BaseController
                 }
             }
 
-            // التحقق من وجود جميع العناصر وأنها في حالة "معاد صرفه" (4)
             $items = $this->itemOrderModel
                 ->whereIn('item_order_id', $itemOrderIds)
                 ->where('usage_status_id', 4)
                 ->findAll();
 
             if (count($items) !== count($itemOrderIds)) {
+                log_message('warning', 'Some items are not eligible for reissue. Expected: ' . count($itemOrderIds) . ', Found: ' . count($items));
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'بعض العناصر المحددة غير صالحة لإعادة الصرف'
                 ]);
             }
 
-            // بدء المعاملة
-            $this->orderModel->transStart();
+            // ✅ استخدام db من itemOrderModel بدلاً من property منفصل
+            $this->itemOrderModel->db->transStart();
+
+            // حذف السجلات القديمة في transfer_items
+            foreach ($itemOrderIds as $itemOrderId) {
+                $this->itemOrderModel->db->table('transfer_items')
+                    ->where('item_order_id', $itemOrderId)
+                    ->delete();
+                
+                log_message('info', "Deleted old transfer_items records for item_order_id: {$itemOrderId}");
+            }
 
             // إنشاء طلب جديد
             $orderData = [
                 'from_user_id' => $fromUserId,
                 'to_user_id' => $receiverUserId,
-                'order_status_id' => 1, // قيد الانتظار
+                'order_status_id' => 1,
                 'note' => 'إعادة صرف - تم الإنشاء من قبل المخزون الرئيسي'
             ];
 
-            $orderId = $this->orderModel->insert($orderData);
+            $newOrderId = $this->orderModel->insert($orderData);
 
-            if (!$orderId) {
-                $this->orderModel->transRollback();
+            if (!$newOrderId) {
+                $this->itemOrderModel->db->transRollback();
+                log_message('error', 'Failed to create order in database');
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'فشل في إنشاء الطلب'
                 ]);
             }
 
+            log_message('info', 'Order created successfully with ID: ' . $newOrderId);
+
             // تحديث العناصر
             $successCount = 0;
+            
             foreach ($items as $item) {
-                // تحديث بيانات العنصر
                 $updateData = [
-                    'order_id' => $orderId,
-                    'usage_status_id' => 1, // جديد
+                    'order_id' => $newOrderId,
+                    'usage_status_id' => 1,
                     'created_by' => $fromUserId,
                     'updated_at' => date('Y-m-d H:i:s')
                 ];
@@ -309,57 +320,79 @@ class ReissueItems extends BaseController
                 $updated = $this->itemOrderModel->update($item->item_order_id, $updateData);
 
                 if (!$updated) {
-                    $this->orderModel->transRollback();
+                    $this->itemOrderModel->db->transRollback();
+                    log_message('error', 'Failed to update item_order_id: ' . $item->item_order_id);
                     return $this->response->setJSON([
                         'success' => false,
                         'message' => 'فشل في تحديث العنصر رقم ' . $item->item_order_id
                     ]);
                 }
 
-                // إنشاء سجل في transfer_items
-                $transferData = [
+                // ✅ إضافة سجل في جدول history لكل عنصر
+                $historyData = [
                     'item_order_id' => $item->item_order_id,
-                    'from_user_id' => $fromUserId,
-                    'to_user_id' => $receiverUserId,
-                    'order_status_id' => 1, // قيد الانتظار
-                    'is_opened' => 0
+                    'usage_status_id' => 1, // الحالة الجديدة
+                    'handled_by' => $fromUserId
                 ];
 
-                $transferId = $this->transferItemsModel->insert($transferData);
+                $historyInserted = $this->historyModel->insert($historyData);
 
-                if (!$transferId) {
-                    $this->orderModel->transRollback();
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => 'فشل في إنشاء سجل التحويل للعنصر رقم ' . $item->item_order_id
-                    ]);
+                if (!$historyInserted) {
+                    log_message('warning', 'Failed to insert history for item_order_id: ' . $item->item_order_id);
+                    // ⚠️ لا نفشل العملية بأكملها إذا فشل تسجيل التاريخ
                 }
 
                 $successCount++;
             }
 
-            // إنهاء المعاملة
-            $this->orderModel->transComplete();
+            // إنشاء سجل transfer_items
+            $firstItem = $items[0];
+            
+            $transferData = [
+                'item_order_id' => $firstItem->item_order_id,
+                'from_user_id' => $fromUserId,
+                'to_user_id' => $receiverUserId,
+                'order_status_id' => 1,
+                'is_opened' => 0
+            ];
 
-            if ($this->orderModel->transStatus() === FALSE) {
+            $transferId = $this->transferItemsModel->insert($transferData);
+
+            if (!$transferId) {
+                $this->itemOrderModel->db->transRollback();
+                log_message('error', 'Failed to create transfer_items for order: ' . $newOrderId);
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'فشل في إنشاء سجل التحويل للطلب'
+                ]);
+            }
+
+            $this->itemOrderModel->db->transComplete();
+
+            if ($this->itemOrderModel->db->transStatus() === false) {
+                log_message('error', 'Transaction failed for order_id: ' . $newOrderId);
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'فشل في حفظ البيانات'
                 ]);
             }
 
-            // تسجيل النشاط
-            log_message('info', "Reissue order created successfully. Order ID: {$orderId}, Items count: {$successCount}, From: {$fromUserId}, To: {$receiverUserId}");
+            log_message('info', "✅ Reissue order completed successfully. Order ID: {$newOrderId}, Items count: {$successCount}, From: {$fromUserId}, To: {$receiverUserId}");
 
             return $this->response->setJSON([
                 'success' => true,
-                'message' => 'تم إرسال الطلب بنجاح',
-                'order_id' => $orderId,
+                'message' => "تم إرسال الطلب بنجاح (رقم الطلب: {$newOrderId})",
+                'order_id' => $newOrderId,
                 'items_count' => $successCount
             ]);
 
         } catch (\Exception $e) {
-            log_message('error', 'Error in sendReissueOrder: ' . $e->getMessage() . ' | Line: ' . $e->getLine());
+            if (isset($this->itemOrderModel->db)) {
+                $this->itemOrderModel->db->transRollback();
+            }
+            
+            log_message('error', '❌ Error in sendReissueOrder: ' . $e->getMessage() . ' | Line: ' . $e->getLine() . ' | File: ' . $e->getFile());
+            
             return $this->response->setJSON([
                 'success' => false,
                 'message' => 'خطأ في إرسال الطلب: ' . $e->getMessage()

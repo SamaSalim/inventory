@@ -8,7 +8,6 @@ use App\Models\MinorCategoryModel;
 use App\Models\ItemModel;
 use App\Models\OrderStatusModel;
 use App\Models\UsageStatusModel;
-use App\Models\HistoryModel;
 use App\Exceptions\AuthenticationException;
 use App\Entities\Item;
 use App\Entities\ItemOrder;
@@ -21,14 +20,11 @@ class UserController extends BaseController
     protected $orderModel;
     protected $transferItemsModel;
     protected $itemOrderModel;
-    protected $historyModel;
-    
     public function __construct()
     {
         $this->orderModel = new OrderModel();
         $this->transferItemsModel = new TransferItemsModel();
         $this->itemOrderModel = new ItemOrderModel();
-        $this->historyModel = new HistoryModel();
     }
 
     /**
@@ -44,48 +40,61 @@ class UserController extends BaseController
     /**
      * عرض الطلبات المحولة للمستخدم الحالي
      */
-    public function dashboard(): string
-    {
-        $this->checkAuth();
+public function dashboard(): string
+{
+    $this->checkAuth();
 
-        $isEmployee = session()->get('isEmployee');
-        $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id');
-        $currentUserId = $account_id;
-        
-        $transferItemsModel = new TransferItemsModel();
+    $isEmployee = session()->get('isEmployee');
+    $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id');
+    $currentUserId = $account_id;
 
-        // استعلام الطلبات المحولة للمستخدم الحالي مع فحص السجل التاريخي
-        $myOrders = $transferItemsModel
-            ->distinct()
-            ->select(
-                'transfer_items.transfer_item_id,
-                 transfer_items.created_at,
-                 transfer_items.item_order_id,
-                 transfer_items.is_opened, 
-                 item_order.created_by AS employee_id,
-                 item_order.asset_num,
-                 item_order.serial_num,
-                 item_order.usage_status_id,
-                 from_user.name AS from_user_name,
-                 from_user.user_dept AS from_user_dept,
-                 usage_status.usage_status AS usage_status_name,
-                 order_status.status AS order_status_name,
-                 (SELECT COUNT(*) FROM history WHERE history.item_order_id = item_order.item_order_id) as history_count'
-            )
-            ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
-            ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
-            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-            ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
-            ->where('transfer_items.to_user_id', $currentUserId)
-            ->where('item_order.usage_status_id !=', 2)
-            ->where('transfer_items.order_status_id', 1)
-            ->orderBy('transfer_items.created_at', 'DESC')
-            ->findAll();
+    $transferItemsModel = new TransferItemsModel();
+    $historyModel = new \App\Models\HistoryModel(); 
 
-        return view('user/userView', [
-            'orders' => $myOrders
-        ]);
+    $myOrders = $transferItemsModel
+        ->distinct()
+        ->select(
+            'transfer_items.transfer_item_id,
+             transfer_items.created_at,
+             transfer_items.item_order_id,
+             transfer_items.is_opened, 
+             item_order.created_by AS employee_id,
+             item_order.asset_num,
+             item_order.serial_num,
+             item_order.usage_status_id,
+             from_user.name AS from_user_name,
+             from_user.user_dept AS from_user_dept,
+             usage_status.usage_status AS usage_status_name,
+             order_status.status AS order_status_name'
+        )
+        ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+        ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+        ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
+        ->where('transfer_items.to_user_id', $currentUserId)
+        ->where('item_order.usage_status_id !=', 2) // exclude returned items
+        ->where('transfer_items.order_status_id', 1) // pending only
+        ->orderBy('transfer_items.created_at', 'DESC')
+        ->findAll();
+
+    foreach ($myOrders as &$order) {
+        if ($order->usage_status_id == 1) {
+            $hasReturn = $historyModel
+                ->where('item_order_id', $order->item_order_id)
+                ->where('usage_status_id', 2)
+                ->first();
+
+            if ($hasReturn) {
+                $order->usage_status_name = 'معاد صرفه';
+            }
+        }
     }
+    unset($order); 
+    return view('user/userView', [
+        'orders' => $myOrders
+    ]);
+}
+
 
     private function getWarehouseStats(): array
     {
@@ -115,6 +124,8 @@ class UserController extends BaseController
             ->orderBy('item_order.created_at', 'DESC')
             ->first();
 
+            
+
         return [
             'total_receipts' => $totalReceipts,
             'available_items' => $availableItems,
@@ -142,6 +153,7 @@ class UserController extends BaseController
         $transferModel = new TransferItemsModel();
         $itemOrderModel = new ItemOrderModel();
 
+        // جلب معلومات الطلب الأساسية
         $transfer = $transferModel
             ->select('transfer_items.*, from_user.name AS from_user_name, from_user.user_dept AS from_user_dept, 
                   from_user.user_ext AS from_user_ext, from_user.email AS from_user_email, 
@@ -157,11 +169,10 @@ class UserController extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'الطلب غير موجود']);
         }
 
-        // جلب الأصناف من transfer_items مع عدد السجلات في history
+        // جلب الأصناف من transfer_items
         $transferItems = $itemOrderModel
             ->select('item_order.item_order_id, item_order.asset_num, item_order.serial_num, item_order.assets_type,
-                  items.name as item_name, usage_status.usage_status AS usage_status_name,
-                  (SELECT COUNT(*) FROM history WHERE history.item_order_id = item_order.item_order_id) as history_count')
+                  items.name as item_name, usage_status.usage_status AS usage_status_name')
             ->join('items', 'items.id = item_order.item_id', 'left')
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('transfer_items', 'transfer_items.item_order_id = item_order.item_order_id', 'left')
@@ -169,11 +180,10 @@ class UserController extends BaseController
             ->where('item_order.order_id', $transfer->order_id)
             ->findAll();
 
-        // جلب الأصناف من order مع عدد السجلات في history
+        // جلب الأصناف من order
         $orderItems = $itemOrderModel
             ->select('item_order.item_order_id, item_order.asset_num, item_order.serial_num, item_order.assets_type,
-                  items.name as item_name, usage_status.usage_status AS usage_status_name,
-                  (SELECT COUNT(*) FROM history WHERE history.item_order_id = item_order.item_order_id) as history_count')
+                  items.name as item_name, usage_status.usage_status AS usage_status_name')
             ->join('items', 'items.id = item_order.item_id', 'left')
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('order', 'order.order_id = item_order.order_id', 'left')
@@ -181,7 +191,24 @@ class UserController extends BaseController
             ->where('item_order.order_id', $transfer->order_id)
             ->findAll();
 
+        // دمج وإزالة التكرار
         $items = array_values(array_unique(array_merge($transferItems, $orderItems), SORT_REGULAR));
+
+        $historyModel = new \App\Models\HistoryModel();
+
+        foreach ($items as &$item) {
+    if ($item->usage_status_name === 'جديد') {
+        $hasReturnHistory = $historyModel
+            ->where('item_order_id', $item->item_order_id)
+            ->where('usage_status_id', 2)
+            ->first();
+
+        if ($hasReturnHistory) {
+            $item->usage_status_name = 'معاد صرفه';
+        }
+    }
+}
+
 
         return $this->response->setJSON(['success' => true, 'data' => $transfer, 'items' => $items]);
     }
@@ -234,12 +261,6 @@ class UserController extends BaseController
             $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id'); // يحتوي على user_id أو emp_id
             $currentUserId = $account_id;
             
-            if ($transfer->to_user_id !== $currentUserId) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'ليس لديك صلاحية لهذا الإجراء'
-                ]);
-            }
 
             if ($transfer->order_status_id != 1) {
                 $statusText = $transfer->order_status_id == 2 ? 'مقبول' : 'مرفوض';
@@ -291,6 +312,30 @@ class UserController extends BaseController
                 }
             } else {
                 $orderModel->update($orderId, ['order_status_id' => 3]);
+
+
+                // جلب جميع الأصناف المرتبطة بهذا الطلب
+                $relatedItems = $itemOrderModel
+                    ->where('order_id', $orderId)
+                    ->findAll();
+
+                $historyModel = new \App\Models\HistoryModel();
+
+                foreach ($relatedItems as $item) {
+                    if ($item->usage_status_id == 1) {
+                        $hasReturn = $historyModel
+                            ->where('item_order_id', $item->item_order_id)
+                            ->where('usage_status_id', 2)
+                            ->first();
+
+                        if ($hasReturn) {
+                            $itemOrderModel->update($item->item_order_id, [
+                                'usage_status_id' => 4,
+                                'updated_at' => date('Y-m-d H:i:s')
+                            ]);
+                        }
+                    }
+                }
             }
 
             $orderModel->transComplete();
@@ -372,122 +417,164 @@ class UserController extends BaseController
         }
     }
 
-    public function userView2(): string
-    {
-        $this->checkAuth();
+public function userView2(): string
+{
+    $this->checkAuth();
 
-        $currentUserId = session()->get('isEmployee') ? session()->get('employee_id') : session()->get('user_id');
+    $currentUserId = session()->get('isEmployee') ? session()->get('employee_id') : session()->get('user_id');
 
-        $transferItemsModel = $this->transferItemsModel;
+    $transferItemsModel = $this->transferItemsModel;
+    $historyModel = new \App\Models\HistoryModel();
 
-        // Get transfer items with history check
-        $transferItems = $transferItemsModel
-            ->select(
-                'transfer_items.transfer_item_id AS id,
-             transfer_items.created_at,
-             transfer_items.item_order_id,
-             transfer_items.is_opened, 
-             item_order.asset_num,
-             item_order.serial_num,
-             item_order.model_num AS model,
-             item_order.brand,
-             item_order.old_asset_num,
-             item_order.assets_type,
-             item_order.usage_status_id,
-             items.name AS item_name,
-             minor_category.name AS minor_category_name,
-             major_category.name AS major_category_name,
-             from_user.name AS from_user_name,
-             from_user.user_dept AS from_user_dept,
-             usage_status.usage_status AS usage_status_name,
-             order_status.status AS order_status_name,
-             (SELECT COUNT(*) FROM history WHERE history.item_order_id = item_order.item_order_id) as history_count,
-             "transfer_items" AS source_table'
-            )
-            ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
-            ->join('items', 'items.id = item_order.item_id', 'left')
-            ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-            ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
-            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-            ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
-            ->where('transfer_items.to_user_id', $currentUserId)
-            ->where('transfer_items.order_status_id',  2)
-            ->groupBy('transfer_items.transfer_item_id')
-            ->orderBy('transfer_items.created_at', 'ASC')
-            ->findAll();
+    $transferItems = $transferItemsModel
+        ->select(
+            'transfer_items.transfer_item_id AS id,
+         transfer_items.created_at,
+         transfer_items.item_order_id,
+         transfer_items.is_opened,
+         transfer_items.order_status_id AS transfer_order_status_id,
+         item_order.asset_num,
+         item_order.serial_num,
+         item_order.model_num AS model,
+         item_order.brand,
+         item_order.old_asset_num,
+         item_order.assets_type,
+         item_order.usage_status_id,
+         items.name AS item_name,
+         minor_category.name AS minor_category_name,
+         major_category.name AS major_category_name,
+         from_user.name AS from_user_name,
+         from_user.user_dept AS from_user_dept,
+         usage_status.usage_status AS usage_status_name,
+         order_status.status AS order_status_name,
+         "transfer_items" AS source_table'
+        )
+        ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+        ->join('items', 'items.id = item_order.item_id', 'left')
+        ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+        ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+        ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
+        ->where('transfer_items.to_user_id', $currentUserId)
+        ->where('transfer_items.order_status_id', 2) // Only accepted transfers
+        ->whereNotIn('item_order.usage_status_id', [2, 4]) // Exclude returned (2) and reissued (4)
+        ->groupBy('transfer_items.transfer_item_id')
+        ->orderBy('transfer_items.created_at', 'ASC')
+        ->findAll();
 
-        $orderModel = $this->orderModel;
+    $orderModel = $this->orderModel;
 
-        // Get orders with history check
-        $orders = $orderModel
-            ->select(
-                'order.order_id AS id,
-             order.created_at,
-             order.to_user_id,
-             order.order_status_id,
-             order_status.status AS order_status_name,
-             usage_status.usage_status AS usage_status_name,
-             from_user.name AS from_user_name,
-             from_user.user_dept AS from_user_dept,
-             item_order.asset_num,
-             item_order.serial_num,
-             item_order.model_num AS model,
-             item_order.brand,
-             item_order.old_asset_num,
-             item_order.assets_type,
-             item_order.item_order_id,
-             item_order.usage_status_id,
-             items.name AS item_name,
-             minor_category.name AS minor_category_name,
-             major_category.name AS major_category_name,
-             (SELECT COUNT(*) FROM history WHERE history.item_order_id = item_order.item_order_id) as history_count,
-             "orders" AS source_table'
-            )
-            ->join('item_order', 'item_order.order_id = order.order_id', 'left')
-            ->join('items', 'items.id = item_order.item_id', 'left')
-            ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-            ->join('users AS from_user', 'from_user.user_id = order.from_user_id', 'left')
-            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-            ->join('order_status', 'order_status.id = order.order_status_id', 'left')
-            ->where('order.to_user_id', $currentUserId)
-            ->where('order.order_status_id', 2)
-            ->groupBy('item_order.item_order_id')
-            ->orderBy('order.created_at', 'ASC')
-            ->findAll();
+    $orders = $orderModel
+        ->select(
+            'order.order_id AS id,
+         order.created_at,
+         order.to_user_id,
+         order.order_status_id,
+         order_status.status AS order_status_name,
+         usage_status.usage_status AS usage_status_name,
+         from_user.name AS from_user_name,
+         from_user.user_dept AS from_user_dept,
+         item_order.asset_num,
+         item_order.serial_num,
+         item_order.model_num AS model,
+         item_order.brand,
+         item_order.old_asset_num,
+         item_order.assets_type,
+         item_order.item_order_id,
+         item_order.usage_status_id,
+         items.name AS item_name,
+         minor_category.name AS minor_category_name,
+         major_category.name AS major_category_name,
+         "orders" AS source_table'
+        )
+        ->join('item_order', 'item_order.order_id = order.order_id', 'left')
+        ->join('items', 'items.id = item_order.item_id', 'left')
+        ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+        ->join('users AS from_user', 'from_user.user_id = order.from_user_id', 'left')
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+        ->join('order_status', 'order_status.id = order.order_status_id', 'left')
+        ->where('order.to_user_id', $currentUserId)
+        ->where('order.order_status_id', 2) // Only accepted orders
+        ->whereNotIn('item_order.usage_status_id', [2, 4]) // Exclude returned (2) and reissued (4)
+        ->groupBy('item_order.item_order_id')
+        ->orderBy('order.created_at', 'ASC')
+        ->findAll();
 
-        $combinedItems = [];
-        $assetNums = [];
+    $combinedItems = [];
+    $assetNums = [];
 
-        foreach ($orders as $order) {
-            $assetNum = $order->asset_num;
-            $key = $order->item_order_id ?? $assetNum;
+    // Process orders first
+    foreach ($orders as $order) {
+        $assetNum = $order->asset_num;
+        $key = $order->item_order_id ?? $assetNum;
 
-            if (!isset($assetNums[$key])) {
-                $combinedItems[] = $order;
-                $assetNums[$key] = true;
+        if (!isset($assetNums[$key])) {
+            // Initialize reissued flag
+            $order->is_reissued = false;
+            
+            // Check if item has usage_status_id = 1 (new) and has a history of being returned (usage_status_id = 2)
+            // This means the item was returned before and now reissued
+            if ($order->usage_status_id == 1) {
+                $returnHistoryExists = $historyModel
+                    ->where('item_order_id', $order->item_order_id)
+                    ->where('usage_status_id', 2) // Check for returned status in history
+                    ->first();
+
+                if ($returnHistoryExists) {
+                    $order->is_reissued = true;
+                    $order->usage_status_name = 'معاد صرفه';
+                }
             }
-        }
-
-        foreach ($transferItems as $transfer) {
-            $assetNum = $transfer->asset_num;
-            $key = $transfer->item_order_id ?? $assetNum;
-
-            if (!isset($assetNums[$key])) {
-                $combinedItems[] = $transfer;
-                $assetNums[$key] = true;
+            
+            // Check if usage_status_id = 5, then override order status to "مرفوض"
+            if ($order->usage_status_id == 5) {
+                $order->order_status_name = 'مرفوض';
             }
+            
+            $combinedItems[] = $order;
+            $assetNums[$key] = true;
         }
-
-        $filteredOrders = array_filter($combinedItems, function ($item) {
-            return isset($item->usage_status_id) && $item->usage_status_id != 2;
-        });
-
-        $filteredOrders = array_values($filteredOrders);
-
-        return view('user/userView2', [
-            'orders' => $filteredOrders
-        ]);
     }
+
+    // Process transfer items
+    foreach ($transferItems as $transfer) {
+        $assetNum = $transfer->asset_num;
+        $key = $transfer->item_order_id ?? $assetNum;
+
+        if (!isset($assetNums[$key])) {
+            // Initialize reissued flag
+            $transfer->is_reissued = false;
+            
+            // Check if item has usage_status_id = 1 (new) and has a history of being returned (usage_status_id = 2)
+            // This means the item was returned before and now reissued
+            if ($transfer->usage_status_id == 1) {
+                $returnHistoryExists = $historyModel
+                    ->where('item_order_id', $transfer->item_order_id)
+                    ->where('usage_status_id', 2) // Check for returned status in history
+                    ->first();
+                
+                if ($returnHistoryExists) {
+                    $transfer->is_reissued = true;
+                    $transfer->usage_status_name = 'معاد صرفه';
+                }
+            }
+            
+            // Check if usage_status_id = 5, then override order status to "مرفوض"
+            if ($transfer->usage_status_id == 5) {
+                $transfer->order_status_name = 'مرفوض';
+            }
+            
+            $combinedItems[] = $transfer;
+            $assetNums[$key] = true;
+        }
+    }
+
+    $filteredOrders = array_values($combinedItems);
+
+    return view('user/userView2', [
+        'orders' => $filteredOrders
+    ]);
+}
 }
