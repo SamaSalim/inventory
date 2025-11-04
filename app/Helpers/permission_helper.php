@@ -28,9 +28,10 @@ if (!function_exists('isUser')) {
 
 if (!function_exists('isWarehouse')) {
     function isWarehouse() {
-        return getRoleName() === 'warehouse';
+        return getRoleName() === 'warehouse' || getRoleName() === 'admin';
     }
 }
+
 
 if (!function_exists('isSuperWarehouse')) {
     function isSuperWarehouse() {
