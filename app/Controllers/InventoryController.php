@@ -179,6 +179,23 @@ class InventoryController extends BaseController
         $itemOrders = $builder->paginate(10, 'orders');
         $pager = $itemOrderModel->pager;
 
+         foreach ($itemOrders as $order) {
+        if (
+            isset($order->usage_status_id) &&
+            $order->usage_status_id == 1 &&
+            !empty($order->asset_num)
+        ) {
+            $inHistory = $historyModel
+                ->where('asset_num', $order->asset_num)
+                ->where('usage_status_id', 1)
+                ->first();
+
+            if ($inHistory) {
+                $order->usage_status_name = 'معاد صرفه';
+            }
+        }
+    }   
+
 
         // جلب البيانات المساعدة للعرض
         $categories = $minorCategoryModel->select('minor_category.*, major_category.name AS major_category_name')
@@ -329,58 +346,79 @@ class InventoryController extends BaseController
     }
 
 
-    public function showOrder($id)
-    {
-        $orderModel         = new \App\Models\OrderModel();
-        $itemOrderModel     = new \App\Models\ItemOrderModel();
-        $userModel          = new \App\Models\UserModel();
-        $itemModel          = new \App\Models\ItemModel();
-        $minorCatModel      = new \App\Models\MinorCategoryModel();
-        $majorCatModel      = new \App\Models\MajorCategoryModel();
-        $roomModel          = new \App\Models\RoomModel();
-        $usageStatusModel   = new \App\Models\UsageStatusModel();
-        $employeeModel      = new \App\Models\EmployeeModel();
-        $statusModel        = new \App\Models\OrderStatusModel();
+public function showOrder($id)
+{
+    $orderModel         = new \App\Models\OrderModel();
+    $itemOrderModel     = new \App\Models\ItemOrderModel();
+    $userModel          = new \App\Models\UserModel();
+    $itemModel          = new \App\Models\ItemModel();
+    $minorCatModel      = new \App\Models\MinorCategoryModel();
+    $majorCatModel      = new \App\Models\MajorCategoryModel();
+    $roomModel          = new \App\Models\RoomModel();
+    $usageStatusModel   = new \App\Models\UsageStatusModel();
+    $employeeModel      = new \App\Models\EmployeeModel();
+    $statusModel        = new \App\Models\OrderStatusModel();
+    $historyModel       = new \App\Models\HistoryModel();
 
+    $order = $orderModel->find($id);
 
-        $order = $orderModel->find($id);
-
-        if (!$order) {
-            return redirect()->back()->with('error', 'الطلب غير موجود');
-        }
-
-
-        $fromUser = $userModel->where('user_id', $order->from_user_id)->first();
-        $toUser   = $userModel->where('user_id', $order->to_user_id)->first();
-        $status   = $statusModel->find($order->order_status_id);
-
-        $order->from_name    = $fromUser->name ?? 'غير معروف';
-        $order->to_name      = $toUser->name ?? 'غير معروف';
-        $order->status_name  = $status->status ?? 'غير معروف';
-
-
-        $items = $itemOrderModel->where('order_id', $id)->findAll();
-
-        foreach ($items as $item) {
-            $itemData = $itemModel->find($item->item_id);
-            $minor    = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
-            $major    = $minor ? $majorCatModel->find($minor->major_category_id) : null;
-
-            $item->item_name             = $itemData->name ?? 'غير معروف';
-            $item->minor_category_name  = $minor->name ?? 'غير معروف';
-            $item->major_category_name  = $major->name ?? 'غير معروف';
-            $item->location_code        = $roomModel->getFullLocationCode($item->room_id);
-            $item->usage_status_name    = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
-            $item->created_by_name      = $employeeModel->where('emp_id', $item->created_by)->first()->name ?? 'غير معروف';
-        }
-
-
-        return view('warehouse/show_order', [
-            'order'       => $order,
-            'items'       => $items,
-            'item_count'  => count($items),
-        ]);
+    if (!$order) {
+        return redirect()->back()->with('error', 'الطلب غير موجود');
     }
+
+    $fromUser = $userModel->where('user_id', $order->from_user_id)->first();
+    $toUser   = $userModel->where('user_id', $order->to_user_id)->first();
+    $status   = $statusModel->find($order->order_status_id);
+
+    $order->from_name    = $fromUser->name ?? 'غير معروف';
+    $order->to_name      = $toUser->name ?? 'غير معروف';
+    $order->status_name  = $status->status ?? 'غير معروف';
+
+    $items = $itemOrderModel
+        ->where('order_id', $id)
+        ->findAll();
+
+    foreach ($items as $item) {
+        $itemData = $itemModel->find($item->item_id);
+        $minor    = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
+        $major    = $minor ? $majorCatModel->find($minor->major_category_id) : null;
+
+        // ✅ Detect "معاد صرفه": usage_status_id = 1 + has return history
+        if ($item->usage_status_id == 1) {
+            $hasReturnHistory = $historyModel
+                ->where('item_order_id', $item->item_order_id)
+                ->where('usage_status_id', 2)
+                ->first();
+
+            if ($hasReturnHistory) {
+                $item->usage_status_name = 'معاد صرفه';
+            } else {
+                $item->usage_status_name = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
+            }
+        } else {
+            $item->usage_status_name = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
+        }
+
+        // ✅ Support both employee and user creators
+        $creator = $employeeModel->where('emp_id', $item->created_by)->first();
+        if (!$creator) {
+            $creator = $userModel->where('user_id', $item->created_by)->first();
+        }
+        $item->created_by_name = $creator->name ?? 'غير معروف';
+
+        $item->item_name            = $itemData->name ?? 'غير معروف';
+        $item->minor_category_name = $minor->name ?? 'غير معروف';
+        $item->major_category_name = $major->name ?? 'غير معروف';
+        $item->location_code       = $roomModel->getFullLocationCode($item->room_id);
+    }
+
+    return view('warehouse/show_order', [
+        'order'      => $order,
+        'items'      => $items,
+        'item_count' => count($items),
+    ]);
+}
+
 
     public function deleteOrder($orderId)
     {

@@ -101,8 +101,8 @@ class AssetsController extends BaseController
     $builder->whereIn('item_order.order_id', function($sub) {
     return $sub->select('order_id')
                ->from('item_order')
-               ->where('usage_status_id !=', 2);
-        });
+               ->whereNotIn('usage_status_id', [2, 4]); 
+});
         
         if (!empty($itemType)) {
             $builder->like('items.name', $itemType);
@@ -225,95 +225,173 @@ class AssetsController extends BaseController
         ];
     }
 
-    public function orderDetails($id)
-    {
-        $orderModel         = new \App\Models\OrderModel();
-        $itemOrderModel     = new \App\Models\ItemOrderModel();
-        $userModel          = new \App\Models\UserModel();
-        $itemModel          = new \App\Models\ItemModel();
-        $minorCatModel      = new \App\Models\MinorCategoryModel();
-        $majorCatModel      = new \App\Models\MajorCategoryModel();
-        $roomModel          = new \App\Models\RoomModel();
-        $usageStatusModel   = new \App\Models\UsageStatusModel();
-        $employeeModel      = new \App\Models\EmployeeModel();
-        $statusModel        = new \App\Models\OrderStatusModel();
+public function orderDetails($id)
+{
+    $orderModel         = new \App\Models\OrderModel();
+    $itemOrderModel     = new \App\Models\ItemOrderModel();
+    $userModel          = new \App\Models\UserModel();
+    $itemModel          = new \App\Models\ItemModel();
+    $minorCatModel      = new \App\Models\MinorCategoryModel();
+    $majorCatModel      = new \App\Models\MajorCategoryModel();
+    $roomModel          = new \App\Models\RoomModel();
+    $usageStatusModel   = new \App\Models\UsageStatusModel();
+    $employeeModel      = new \App\Models\EmployeeModel();
+    $statusModel        = new \App\Models\OrderStatusModel();
+    $historyModel       = new \App\Models\HistoryModel(); // ✅ add this
 
-        $order = $orderModel->find($id);
+    $order = $orderModel->find($id);
 
-        if (!$order) {
-            return redirect()->back()->with('error', 'الطلب غير موجود');
-        }
-
-        $fromUser = $userModel->where('user_id', $order->from_user_id)->first();
-        $toUser   = $userModel->where('user_id', $order->to_user_id)->first();
-        $status   = $statusModel->find($order->order_status_id);
-
-        $order->from_name    = $fromUser->name ?? 'غير معروف';
-        $order->to_name      = $toUser->name ?? 'غير معروف';
-        $order->status_name  = $status->status ?? 'غير معروف';
-
-        $items = $itemOrderModel
-                    ->where('order_id', $id)
-                    ->where('usage_status_id !=', 2)
-                    ->findAll();
-
-        foreach ($items as $item) {
-            $itemData = $itemModel->find($item->item_id);
-            $minor    = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
-            $major    = $minor ? $majorCatModel->find($minor->major_category_id) : null;
-
-            $item->item_name             = $itemData->name ?? 'غير معروف';
-            $item->minor_category_name  = $minor->name ?? 'غير معروف';
-            $item->major_category_name  = $major->name ?? 'غير معروف';
-            $item->location_code        = $roomModel->getFullLocationCode($item->room_id);
-            $item->usage_status_name    = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
-            $item->created_by_name      = $employeeModel->where('emp_id', $item->created_by)->first()->name ?? 'غير معروف';
-        }
-
-        return view('assets/return_order', [
-            'order'       => $order,
-            'items'       => $items,
-            'item_count'  => count($items),
-        ]);
+    if (!$order) {
+        return redirect()->back()->with('error', 'الطلب غير موجود');
     }
 
+    $fromUser = $userModel->where('user_id', $order->from_user_id)->first();
+    $toUser   = $userModel->where('user_id', $order->to_user_id)->first();
+    $status   = $statusModel->find($order->order_status_id);
 
-//  transferView - عرض صفحة تحويل العهدة
-public function transferView($orderId)
-{
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
+    $order->from_name    = $fromUser->name ?? 'غير معروف';
+    $order->to_name      = $toUser->name ?? 'غير معروف';
+    $order->status_name  = $status->status ?? 'غير معروف';
+
+    $items = $itemOrderModel
+    ->where('order_id', $id)
+    ->whereNotIn('usage_status_id', [2, 4])
+    ->findAll();
+
+    foreach ($items as $item) {
+        $itemData = $itemModel->find($item->item_id);
+        $minor    = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
+        $major    = $minor ? $majorCatModel->find($minor->major_category_id) : null;
+
+     
+        if ($item->usage_status_id == 1) {
+            $hasReturnHistory = $historyModel
+                ->where('item_order_id', $item->item_order_id)
+                ->where('usage_status_id', 2)
+                ->first();
+
+            if ($hasReturnHistory) {
+                $item->usage_status_name = 'معاد صرفه';
+            } else {
+                $item->usage_status_name = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
+            }
+        } else {
+            $item->usage_status_name = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
         }
 
+        $item->item_name            = $itemData->name ?? 'غير معروف';
+        $item->minor_category_name  = $minor->name ?? 'غير معروف';
+        $item->major_category_name  = $major->name ?? 'غير معروف';
+        $item->location_code        = $roomModel->getFullLocationCode($item->room_id);
+        $item->created_by_name      = $employeeModel->where('emp_id', $item->created_by)->first()->name ?? 'غير معروف';
+    }
+
+    return view('assets/return_order', [
+        'order'       => $order,
+        'items'       => $items,
+        'item_count'  => count($items),
+    ]);
+}
+
+
+public function transferView($orderId = null)
+{
+    if (!session()->get('isLoggedIn')) {
+        throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
+    }
+
     $itemOrderModel = new \App\Models\ItemOrderModel();
+    
+    $itemOrderId = null;
+    
+    // ✅ دعم 3 طرق لاستقبال البيانات
+    if ($orderId !== null) {
+        $itemOrder = $itemOrderModel->where('order_id', $orderId)->first();
+        if ($itemOrder) {
+            $itemOrderId = $itemOrder->item_order_id;
+        } else {
+            $itemOrderId = $orderId;
+        }
+    } elseif ($this->request->getGet('item_order_id')) {
+        $itemOrderId = $this->request->getGet('item_order_id');
+    } elseif ($this->request->getGet('order_id')) {
+        $orderId = $this->request->getGet('order_id');
+        $itemOrder = $itemOrderModel->where('order_id', $orderId)->first();
+        if ($itemOrder) {
+            $itemOrderId = $itemOrder->item_order_id;
+        }
+    }
+    
+    if (!$itemOrderId) {
+        return redirect()->back()->with('error', 'معرف العنصر مطلوب');
+    }
+
     $itemModel = new \App\Models\ItemModel();
     $minorCatModel = new \App\Models\MinorCategoryModel();
     $majorCatModel = new \App\Models\MajorCategoryModel();
     $usageStatusModel = new \App\Models\UsageStatusModel();
     $userModel = new \App\Models\UserModel();
     $orderModel = new \App\Models\OrderModel();
+    $transferItemsModel = new \App\Models\TransferItemsModel();
     
-    // جلب بيانات العهدة
-    $order = $orderModel->find($orderId);
+    $currentUserId = session()->get('employee_id');
     
-    if (!$order) {
+    // ✅ جلب الـ item_order
+    $itemOrder = $itemOrderModel->find($itemOrderId);
+    
+    if (!$itemOrder) {
         throw new \Exception('العهدة غير موجودة');
     }
+    
+    $orderId = $itemOrder->order_id;
+    $order = null;
+    $currentUser = null;
+    $actualOwnerId = null;
 
-    //  جلب بيانات المستخدم الحالي (صاحب العهدة) من to_user_id
-    $currentUser = $userModel->where('user_id', $order->to_user_id)->first();
+    // ✅ البحث عن صاحب العهدة الحالي
+    // 1. البحث في transfer_items أولاً (أحدث مالك)
+    $transferItem = $transferItemsModel
+        ->where('item_order_id', $itemOrderId)
+        ->where('order_status_id', 2)
+        ->orderBy('created_at', 'DESC')
+        ->first();
+    
+    if ($transferItem) {
+        $actualOwnerId = $transferItem->to_user_id;
+        $currentUser = $userModel->where('user_id', $actualOwnerId)->first(); // ✅ التعديل هنا
+    }
+    
+    // 2. إذا ما لقينا في transfer_items، نبحث في orders
+    if (!$currentUser && $orderId) {
+        $order = $orderModel->find($orderId);
+        
+        if ($order && $order->to_user_id) {
+            $actualOwnerId = $order->to_user_id;
+            $currentUser = $userModel->where('user_id', $actualOwnerId)->first(); // ✅ التعديل هنا
+        }
+    }
     
     if (!$currentUser) {
-        throw new \Exception('المستخدم الحالي (صاحب العهدة) غير موجود');
+        throw new \Exception('لا يمكن تحديد صاحب العهدة الحالي');
     }
 
-    //  جلب الأصناف المتاحة للتحويل:
-    // - usage_status_id = 1 (جديد) أو 4 (معاد صرفة)
-    // - استبعاد: 2 (رجيع), 3 (تحويل - قيد التحويل بالفعل)
+    // ✅ التحقق من الصلاحية
+    $isOwner = ($actualOwnerId == $currentUserId);
+    $canTransferOthers = canTransfer();
+    
+    if (!$isOwner && !$canTransferOthers) {
+        return redirect()->back()->with('error', 'ليس لديك صلاحية تحويل هذه العهدة');
+    }
+
+    // ✅ جلب الأصناف المتاحة للتحويل
     $items = $itemOrderModel
-        ->where('order_id', $orderId)
-        ->whereNotIn('usage_status_id', [2, 3]) //  استبعاد الرجيع والتحويل
+        ->where('item_order_id', $itemOrderId)
+        ->where('usage_status_id !=', 2)
         ->findAll();
+
+    if (empty($items)) {
+        return redirect()->back()->with('error', 'لا توجد أصناف متاحة للتحويل');
+    }
 
     foreach ($items as $item) {
         $itemData = $itemModel->find($item->item_id);
@@ -326,26 +404,28 @@ public function transferView($orderId)
         $item->usage_status_name = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
     }
 
-    // جلب جميع المستخدمين (ماعدا المستخدم الحالي)
-    $users = $userModel->where('user_id !=', $order->to_user_id)->findAll();
+    // ✅ جلب جميع المستخدمين ماعدا صاحب العهدة الحالي
+    $users = $userModel->where('user_id !=', $actualOwnerId)->findAll();
 
     return view('assets/transfer_order', [
         'items' => $items,
         'users' => $users,
         'order_id' => $orderId,
         'order' => $order,
-        'current_user' => $currentUser //  إضافة بيانات المستخدم الحالي
+        'current_user' => $currentUser
     ]);
 }
-
 
 //  processTransfer - معالجة طلب التحويل
 
 public function processTransfer()
 {
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
-        }
+    if (!session()->get('isLoggedIn')) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'يجب تسجيل الدخول أولاً'
+        ]);
+    }
 
     $json = $this->request->getJSON();
     
@@ -392,93 +472,69 @@ public function processTransfer()
             ]);
         }
 
-        //  الخطوة 1: جلب الأصناف المحددة من المستخدم
-        $selectedItems = $itemOrderModel
-            ->select('item_order.item_order_id, item_order.usage_status_id, item_order.order_id, items.name as item_name')
-            ->join('items', 'items.id = item_order.item_id')
-            ->whereIn('item_order.item_order_id', $itemOrderIds)
-            ->findAll();
+        // Get items details for email
+        $itemsDetails = [];
+        $firstItemOrderId = null;
+        
+        // ✅ معالجة كل صنف بشكل منفصل حسب item_order_id
+        foreach ($itemOrderIds as $itemOrderId) {
+            if ($firstItemOrderId === null) {
+                $firstItemOrderId = $itemOrderId;
+            }
+            
+            // ✅ جلب الصنف المحدد بناءً على item_order_id
+            $currentItem = $itemOrderModel
+                ->select('item_order.*, items.name as item_name')
+                ->join('items', 'items.id = item_order.item_id')
+                ->find($itemOrderId); // ✅ البحث بـ item_order_id وليس order_id
+            
+            if (!$currentItem) {
+                log_message('warning', "Item order {$itemOrderId} not found");
+                continue;
+            }
 
-        if (empty($selectedItems)) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'لم يتم العثور على الأصناف المحددة'
-            ]);
-        }
-
-        //  الخطوة 2: الحصول على order_id من أول صنف
-        $orderId = $selectedItems[0]->order_id;
-
-        //  الخطوة 3: جلب جميع أصناف الطلب (للتحقق من طلبات التحويل القائمة)
-        $allOrderItems = $itemOrderModel
-            ->select('item_order.item_order_id, item_order.usage_status_id, items.name as item_name')
-            ->join('items', 'items.id = item_order.item_id')
-            ->where('item_order.order_id', $orderId)
-            ->findAll();
-
-        //  الخطوة 4: فحص الأصناف المحددة - الحالة والتحويلات القائمة
-        $itemsWithPendingTransfer = [];
-        $itemsWithInvalidStatus = [];
-
-        // أولاً: فحص الأصناف المحددة من حيث الحالة
-        foreach ($selectedItems as $item) {
-            // التحقق من حالة الصنف
+            // ✅ التحقق من حالة هذا الصنف بالتحديد (item_order_id)
             // 1 = جديد, 4 = معاد صرفة (يمكن تحويلهم)
             // 2 = رجيع, 3 = تحويل (لا يمكن تحويلهم)
-            if (in_array($item->usage_status_id, [2, 3])) {
-                $statusName = $item->usage_status_id == 2 ? 'رجيع' : 'قيد التحويل';
-                $itemsWithInvalidStatus[] = "'{$item->item_name}' ({$statusName})";
+            if (in_array($currentItem->usage_status_id, [2, 3])) {
+                $statusName = $currentItem->usage_status_id == 2 ? 'رجيع' : 'قيد التحويل';
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "الصنف '{$currentItem->item_name}' في حالة '{$statusName}' ولا يمكن تحويله"
+                ]);
             }
-        }
 
-        // ثانياً: فحص جميع أصناف الطلب من حيث طلبات التحويل القائمة
-        foreach ($allOrderItems as $item) {
+
+            // ✅ التحقق من عدم وجود طلب تحويل قيد الانتظار لهذا الصنف بالتحديد
             $existingTransfer = $transferItemsModel
-                ->where('item_order_id', $item->item_order_id)
+                ->where('item_order_id', $itemOrderId) // ✅ التحقق من item_order_id المحدد
                 ->where('order_status_id', 1) // قيد الانتظار
                 ->first();
             
             if ($existingTransfer) {
-                $itemsWithPendingTransfer[] = "'{$item->item_name}'";
-            }
-        }
-
-        //  إرجاع الأخطاء
-        if (!empty($itemsWithInvalidStatus)) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => "الأصناف التالية لا يمكن تحويلها: " . implode(', ', $itemsWithInvalidStatus)
-            ]);
-        }
-
-        if (!empty($itemsWithPendingTransfer)) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => "يوجد طلب تحويل قيد الانتظار للأصناف التالية من نفس الطلب يجب إتمام أو إلغاء الطلب السابق أولاً"
-                // . implode(', ', $itemsWithPendingTransfer) . 
-            ]);
-        }
-
-        // ✅ الخطوة 5: بعد التأكد من صحة كل شيء، نبدأ بمعالجة الأصناف المحددة
-        $itemsDetails = [];
-        $firstItemOrderId = null;
-        
-        foreach ($selectedItems as $item) {
-            if ($firstItemOrderId === null) {
-                $firstItemOrderId = $item->item_order_id;
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "الصنف '{$currentItem->item_name}' لديه طلب تحويل قيد الانتظار بالفعل"
+                ]);
             }
 
-            $itemsDetails[] = $item;
+            $itemsDetails[] = $currentItem;
 
-            // تحديث حالة هذا الصنف بالتحديد إلى "تحويل" (3)
-            $itemOrderModel->update($item->item_order_id, [
+            // ✅ تحديث حالة هذا الصنف بالتحديد إلى "تحويل" (3)
+            $itemOrderModel->update($itemOrderId, [ // ✅ تحديث item_order_id المحدد
                 'usage_status_id' => 3, // تحويل
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            // إضافة سجل في جدول transfer_items لهذا الصنف
+            // عند قبول التحويل (order_status_id = 2)
+            // $itemOrderModel->update($itemOrderId, [
+            //     'usage_status_id' => 5, // ✅تتغير الحالة إلى " مستعمل" عند قبول التحويل
+            //     'updated_at' => date('Y-m-d H:i:s')
+            // ]);
+
+            // ✅ إضافة سجل في جدول transfer_items لهذا الصنف
             $transferData = [
-                'item_order_id' => $item->item_order_id,
+                'item_order_id' => $itemOrderId, // ✅ ربط بـ item_order_id المحدد
                 'from_user_id' => $fromUserId,
                 'to_user_id' => $toUserId,
                 'order_status_id' => 1, // قيد الانتظار
@@ -509,6 +565,7 @@ public function processTransfer()
         ]);
     }
 }
+
 
 private function sendTransferEmail($toUser, $fromUser, $itemsDetails, $note, $orderId)
 {

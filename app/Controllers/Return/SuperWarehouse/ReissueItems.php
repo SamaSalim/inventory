@@ -328,20 +328,6 @@ class ReissueItems extends BaseController
                     ]);
                 }
 
-                // ✅ إضافة سجل في جدول history لكل عنصر
-                $historyData = [
-                    'item_order_id' => $item->item_order_id,
-                    'usage_status_id' => 1, // الحالة الجديدة
-                    'handled_by' => $fromUserId
-                ];
-
-                $historyInserted = $this->historyModel->insert($historyData);
-
-                if (!$historyInserted) {
-                    log_message('warning', 'Failed to insert history for item_order_id: ' . $item->item_order_id);
-                    // ⚠️ لا نفشل العملية بأكملها إذا فشل تسجيل التاريخ
-                }
-
                 $successCount++;
             }
 

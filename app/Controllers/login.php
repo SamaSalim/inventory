@@ -92,7 +92,7 @@ class login extends BaseController
         } elseif ($roleName === 'super_assets') {
             return redirect()->to('/AssetsController/index');
         } elseif ($roleName === 'super_warehouse') {
-            return redirect()->to('/AssetsHistory');
+            return redirect()->to('Return/SuperWarehouse/ReturnRequests');
         } else {
             return redirect()->back()->with('error', 'دور غير معروف.');
         }

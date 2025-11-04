@@ -324,5 +324,18 @@
     
     <!-- Load the separated JavaScript file -->
     <script src="<?= base_url('public/assets/JS/user_return.js') ?>"></script>
+
+    <script>
+function openTransferPopup(itemOrderId) {
+    if (!itemOrderId) {
+        showAlert('warning', 'معرف العنصر غير صحيح');
+        return;
+    }
+    
+    // ✅ تمرير القيمة كـ segment في الـ URL
+    window.location.href = `${window.appConfig.baseUrl}AssetsController/transferView/${itemOrderId}`;
+}
+</script>
+    
 </body>
 </html>

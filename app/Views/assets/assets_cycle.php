@@ -63,11 +63,11 @@
                         <div class="stat-value">
                             <?= count(array_filter($timeline, fn($t) => $t['type'] === 'transfer')) ?>
                         </div>
-                        <div class="stat-label">عمليات تحويل</div>
+                        <div class="stat-label">عمليات تحويل عادية</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value">
-                            <?= count(array_filter($timeline, fn($t) => $t['type'] === 'returned')) ?>
+                            <?= count(array_filter($timeline, fn($t) => $t['type'] === 'return_phase_1')) ?>
                         </div>
                         <div class="stat-label">عمليات إرجاع</div>
                     </div>
@@ -84,7 +84,9 @@
                 <?php if (!empty($timeline)): ?>
                     <div class="operations-list">
                         <?php foreach ($timeline as $index => $operation): ?>
+                            
                             <?php if ($operation['type'] === 'transfer'): ?>
+                                <!-- Regular Transfer -->
                                 <div class="operation-item">
                                     <div class="operation-header">
                                         <div class="operation-date">
@@ -111,8 +113,8 @@
                                                 <i class="fas fa-user-minus"></i>
                                                 من
                                             </div>
-                                            <div class="user-name"><?= esc($operation['from_user_name'] ?? 'غير محدد') ?></div>
-                                            <div class="user-detail"><i class="fas fa-building"></i> <?= esc($operation['from_user_dept'] ?? '-') ?></div>
+                                            <div class="user-name"><?= esc($operation['from_user_name']) ?></div>
+                                            <div class="user-detail"><i class="fas fa-building"></i> <?= esc($operation['from_user_dept']) ?></div>
                                         </div>
 
                                         <div class="arrow-section">
@@ -125,8 +127,8 @@
                                                 <i class="fas fa-user-plus"></i>
                                                 إلى
                                             </div>
-                                            <div class="user-name"><?= esc($operation['to_user_name'] ?? 'غير محدد') ?></div>
-                                            <div class="user-detail"><i class="fas fa-building"></i> <?= esc($operation['to_user_dept'] ?? '-') ?></div>
+                                            <div class="user-name"><?= esc($operation['to_user_name']) ?></div>
+                                            <div class="user-detail"><i class="fas fa-building"></i> <?= esc($operation['to_user_dept']) ?></div>
                                         </div>
                                     </div>
 
@@ -141,7 +143,8 @@
                                     <?php endif; ?>
                                 </div>
 
-                            <?php elseif ($operation['type'] === 'returned'): ?>
+                            <?php elseif ($operation['type'] === 'return_phase_1'): ?>
+                                <!-- User Returns to Warehouse -->
                                 <div class="operation-item returned">
                                     <div class="operation-header">
                                         <div class="operation-date">
@@ -151,26 +154,29 @@
                                         <div class="operation-status">
                                             <span class="status-badge 
                                                 <?php 
-                                                    if ($operation['status'] === 'قيد الانتظار') echo 'status-pending';
-                                                    elseif ($operation['status'] === 'مقبول') echo 'status-approved';
-                                                    elseif ($operation['status'] === 'مرفوض') echo 'status-rejected';
-                                                    else echo 'status-received';
+                                                    if (isset($operation['warehouse_response'])) {
+                                                        if ($operation['warehouse_response'] === 'pending') echo 'status-pending';
+                                                        elseif ($operation['warehouse_response'] === 'accepted') echo 'status-approved';
+                                                        else echo 'status-rejected';
+                                                    } else {
+                                                        echo 'status-pending';
+                                                    }
                                                 ?>
                                             ">
-                                                <i class="fas fa-<?= $operation['status'] === 'قيد الانتظار' ? 'clock' : ($operation['status'] === 'مقبول' ? 'check-circle' : ($operation['status'] === 'مرفوض' ? 'times-circle' : 'info-circle')) ?>"></i>
-                                                <?= esc($operation['status']) ?>
+                                                <i class="fas fa-info-circle"></i>
+                                                <?= esc($operation['warehouse_response_status'] ?? 'قيد الانتظار') ?>
                                             </span>
                                         </div>
                                     </div>
 
                                     <div class="return-flow">
-                                        <div class="user-card from">
+                                        <div class="user-card from" style="border: 2px solid #dc3545;">
                                             <div class="user-label from">
                                                 <i class="fas fa-user-minus"></i>
                                                 من
                                             </div>
-                                            <div class="user-name"><?= esc($operation['returned_by_name']) ?></div>
-                                            <div class="user-detail"><i class="fas fa-building"></i> <?= esc($operation['returned_by_dept']) ?></div>
+                                            <div class="user-name"><?= esc($operation['from_user_name']) ?></div>
+                                            <div class="user-detail"><i class="fas fa-building"></i> <?= esc($operation['from_user_dept']) ?></div>
                                         </div>
 
                                         <div class="arrow-section">
@@ -178,38 +184,26 @@
                                             <span class="arrow-label">إرجاع</span>
                                         </div>
 
-                                        <div class="warehouse-card">
+                                        <div class="warehouse-card" style="border: 2px solid #198754;">
                                             <i class="fas fa-warehouse"></i>
-                                            <h4>المستودع</h4>
-                                            <p style="font-size: 12px; margin: 0; color: #6c757d;">
-                                                <?php 
-                                                    if ($operation['status'] === 'قيد الانتظار') echo 'بانتظار المراجعة';
-                                                    elseif ($operation['status'] === 'مقبول') echo 'تم قبول الإرجاع';
-                                                    elseif ($operation['status'] === 'مرفوض') echo 'تم رفض الإرجاع';
-                                                    else echo 'تم استلام الأصل';
-                                                ?>
-                                            </p>
+                                            <h4>المستودع العام</h4>
+                                            <?php if (!empty($operation['warehouse_handler'])): ?>
+                                                <div style="font-size: 11px; color: #6c757d; margin-top: 5px;">
+                                                    المسؤول: <?= esc($operation['warehouse_handler']) ?>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
-
-                                    <?php if (!empty($operation['note'])): ?>
-                                        <div class="note-section">
-                                            <div class="note-label">
-                                                <i class="fas fa-sticky-note"></i>
-                                                ملاحظة الإرجاع
-                                            </div>
-                                            <div class="note-text"><?= esc($operation['note']) ?></div>
-                                        </div>
-                                    <?php endif; ?>
                                 </div>
                             <?php endif; ?>
+                            
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
                     <div class="empty-state">
                         <i class="fas fa-inbox"></i>
                         <h3>لا توجد عمليات</h3>
-                        <p>لم يتم إجراء أي عمليات تحويل على هذا الأصل</p>
+                        <p>لم يتم إجراء أي عمليات على هذا الأصل</p>
                     </div>
                 <?php endif; ?>
 
@@ -248,156 +242,122 @@
                 </div>
                 
                 <!-- Asset Info -->
-        <div class="header-fields">
-            <div class="header-field">
-                <span class="field-label">رقم الأصل:</span>
-                <div class="field-value-on-line"><?= esc($asset_info->asset_num) ?></div>
-            </div>
-            <div class="header-field">
-                <span class="field-label">اسم الصنف:</span>
-                <div class="field-value-on-line"><?= esc($asset_info->item_name) ?></div>
-            </div>
-        </div>
+                <div class="header-fields">
+                    <div class="header-field">
+                        <span class="field-label">رقم الأصل:</span>
+                        <div class="field-value-on-line"><?= esc($asset_info->asset_num) ?></div>
+                    </div>
+                    <div class="header-field">
+                        <span class="field-label">اسم الصنف:</span>
+                        <div class="field-value-on-line"><?= esc($asset_info->item_name) ?></div>
+                    </div>
+                </div>
 
-        <div class="header-fields">
-            <div class="header-field">
-                <span class="field-label">إجمالي العمليات:</span>
-                <div class="field-value-on-line"><?= $total_operations ?></div>
-            </div>
-            <div class="header-field">
-                <span class="field-label">التاريخ:</span>
-                <div class="field-value-on-line"><?= date('Y-m-d') ?></div>
-            </div>
-        </div>
+                <div class="header-fields">
+                    <div class="header-field">
+                        <span class="field-label">إجمالي العمليات:</span>
+                        <div class="field-value-on-line"><?= $total_operations ?></div>
+                    </div>
+                    <div class="header-field">
+                        <span class="field-label">التاريخ:</span>
+                        <div class="field-value-on-line"><?= date('Y-m-d') ?></div>
+                    </div>
+                </div>
 
-            <!-- Operations Table -->
-            <table class="main-table">
-                <thead>
-                    <tr>
-                        <th style="width: 5%;">رقم العملية</th>
-                        <th style="width: 10%;">نوع العملية</th>
-                        <th style="width: 15%;">من</th>
-                        <th style="width: 15%;">إلى</th>
-                        <th style="width: 12%;">تاريخ العملية</th>
-                        <th style="width: 10%;">الحالة</th>
-                        <th style="width: 12%;">تاريخ الحالة</th>
-                        <th style="width: 21%;">ملاحظات</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($timeline)): ?>
-                        <?php foreach ($timeline as $index => $operation): ?>
-                            <tr>
-                                <!-- Operation Number -->
-                                <td><?= $index + 1 ?></td>
-
-                                <!-- Operation Type -->
-                                <td>
-                                    <?php if ($operation['type'] === 'transfer'): ?>
-                                        تحويل
-                                    <?php else: ?>
-                                        إرجاع
-                                    <?php endif; ?>
-                                </td>
-
-                                <!-- From -->
-                                <td>
-                                    <?php if ($operation['type'] === 'transfer'): ?>
-                                        <?= esc($operation['from_user_name']) ?>
-                                        <br><small><?= esc($operation['from_user_dept']) ?></small>
-                                    <?php else: ?>
-                                        <?= esc($operation['returned_by_name']) ?>
-                                        <br><small><?= esc($operation['returned_by_dept']) ?></small>
-                                    <?php endif; ?>
-                                </td>
-
-                                <!-- To -->
-                                <td>
-                                    <?php if ($operation['type'] === 'transfer'): ?>
-                                        <?= esc($operation['to_user_name']) ?>
-                                        <br><small><?= esc($operation['to_user_dept']) ?></small>
-                                    <?php else: ?>
-                                        المستودع
-                                    <?php endif; ?>
-                                </td>
-
-                                <!-- Operation Date -->
-                                <td><?= date('Y-m-d', strtotime($operation['date'])) ?></td>
-
-                                <!-- Status -->
-                                <td><?= esc($operation['status']) ?></td>
-
-                                <!-- Status Date -->
-                                <td>
-                                    <?php if (isset($operation['status_date'])): ?>
-                                        <?= date('Y-m-d', strtotime($operation['status_date'])) ?>
-                                    <?php else: ?>
-                                        -
-                                    <?php endif; ?>
-                                </td>
-
-                                <!-- Notes -->
-                                <td>
-                                    <?php if (!empty($operation['note'])): ?>
-                                        <?= esc($operation['note']) ?>
-                                    <?php else: ?>
-                                        -
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
+                <!-- Operations Table -->
+                <table class="main-table">
+                    <thead>
                         <tr>
-                            <td colspan="8" style="text-align: center;">لا توجد عمليات</td>
+                            <th style="width: 4%;">#</th>
+                            <th style="width: 12%;">نوع العملية</th>
+                            <th style="width: 16%;">من</th>
+                            <th style="width: 16%;">إلى</th>
+                            <th style="width: 10%;">تاريخ العملية</th>
+                            <th style="width: 10%;">الحالة</th>
+                            <th style="width: 22%;">ملاحظات</th>
                         </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($timeline)): ?>
+                            <?php foreach ($timeline as $index => $operation): ?>
+                                <tr>
+                                    <!-- Operation Number -->
+                                    <td><?= $index + 1 ?></td>
 
-            <!-- Signature Section -->
-            <div class="signature-section">
-                <table class="signature-table">
-                    <tr>
+                                    <!-- Operation Type -->
+                                    <td>
+                                        <?php 
+                                            if ($operation['type'] === 'transfer') echo 'تحويل';
+                                            elseif ($operation['type'] === 'return_phase_1') echo 'إرجاع';
+                                        ?>
+                                    </td>
 
-                        <td>
-                            <div class="signature-title-cell">مدير الأصول</div>
-                            <div class="signature-fields">
-                                الاسم: <span class="signature-line"></span><br>
-                                التاريخ: <span class="signature-line"></span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="signature-title-cell">المراجع</div>
-                            <div class="signature-fields">
-                                الاسم: <span class="signature-line"></span><br>
-                                التاريخ: <span class="signature-line"></span>
-                            </div>
-                        </td>
-                    </tr>
+                                    <!-- From -->
+                                    <td>
+                                        <?php if ($operation['type'] === 'transfer'): ?>
+                                            <?= esc($operation['from_user_name']) ?>
+                                            <br><small><?= esc($operation['from_user_dept']) ?></small>
+                                        <?php elseif ($operation['type'] === 'return_phase_1'): ?>
+                                            <?= esc($operation['from_user_name']) ?>
+                                            <br><small><?= esc($operation['from_user_dept']) ?></small>
+                                        <?php endif; ?>
+                                    </td>
+
+                                    <!-- To -->
+                                    <td>
+                                        <?php if ($operation['type'] === 'transfer'): ?>
+                                            <?= esc($operation['to_user_name']) ?>
+                                            <br><small><?= esc($operation['to_user_dept']) ?></small>
+                                        <?php elseif ($operation['type'] === 'return_phase_1'): ?>
+                                            المستودع العام
+                                            <?php if (!empty($operation['warehouse_handler'])): ?>
+                                                <br><small>(<?= esc($operation['warehouse_handler']) ?>)</small>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </td>
+
+                                    <!-- Operation Date -->
+                                    <td><?= date('Y-m-d', strtotime($operation['date'])) ?></td>
+
+                                    <!-- Status -->
+                                    <td>
+                                        <?php 
+                                            if ($operation['type'] === 'transfer') {
+                                                echo esc($operation['status'] ?? 'غير محدد');
+                                            } elseif ($operation['type'] === 'return_phase_1') {
+                                                echo esc($operation['warehouse_response_status'] ?? 'قيد الانتظار');
+                                            }
+                                        ?>
+                                    </td>
+
+                          
+
+                                    <!-- Notes -->
+                                    <td>
+                                        <?php 
+                                            if (!empty($operation['note'])) echo esc($operation['note']);
+                                            else echo '-';
+                                        ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="8" style="text-align: center;">لا توجد عمليات</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
                 </table>
-            </div>
 
-            <div class="header-fields">
-                <div class="header-field" style="border-left:none;">
-                    <span class="field-label">صاحب الصلاحية:</span>
-                    <div class="field-line"></div>
-                </div>
-            </div>
-            
-            <div class="header-fields">
-                <div class="header-field" style="border-left:none;">
-                    <span class="field-label">التوقيع:</span>
-                    <div class="field-line"></div>
-                </div>
-            </div>
 
-            <!-- Footer -->
-            <div class="form-footer">
-                <div class="footer-warning">
-                    تنبيه مهم: يرجى مراجعة جميع العمليات بدقة والتأكد من صحة البيانات
-                </div>
-                <div class="footer-note">
-                    هذا المستند رسمي ويجب الاحتفاظ به للمراجعة والتدقيق
+                <!-- Footer -->
+                <div class="form-footer">
+                    <div class="footer-warning">
+                        تنبيه مهم: يرجى مراجعة جميع العمليات بدقة والتأكد من صحة البيانات
+                    </div>
+                    <div class="footer-note">
+                        هذا المستند رسمي ويجب الاحتفاظ به للمراجعة والتدقيق
+                    </div>
                 </div>
             </div>
         </div>
