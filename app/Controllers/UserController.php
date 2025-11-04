@@ -331,7 +331,7 @@ public function respondToTransfer()
             if (count($previousTransfers) > 1) {
                 // هناك مستخدم سابق قبل هذا التحويل → نغير الحالة إلى مستعمل
                 $itemOrderModel->update($itemOrderId, [
-                    'usage_status_id' => 5, // مستعمل
+                    'usage_status_id' => 6, // مستعمل
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
             }
@@ -467,7 +467,6 @@ public function userView2(): string
     $transferItemsModel = $this->transferItemsModel;
     $historyModel = new \App\Models\HistoryModel();
 
-    // ✅ Fetch transfer items
     $transferItems = $transferItemsModel
         ->select(
             'transfer_items.transfer_item_id AS id,
@@ -507,7 +506,6 @@ public function userView2(): string
 
     $orderModel = $this->orderModel;
 
-    // ✅ Fetch orders
     $orders = $orderModel
         ->select(
             'order.order_id AS id,
@@ -548,7 +546,7 @@ public function userView2(): string
     $combinedItems = [];
     $assetNums = [];
 
-    // ✅ Process orders first
+    // Process orders first
     foreach ($orders as $order) {
         $assetNum = $order->asset_num;
         $key = $order->item_order_id ?? $assetNum;
@@ -557,7 +555,7 @@ public function userView2(): string
             // Initialize reissued flag
             $order->is_reissued = false;
             
-            // ✅ Check if item has usage_status_id = 1 (new) and has a history of being returned (usage_status_id = 2)
+            // Check if item has usage_status_id = 1 (new) and has a history of being returned (usage_status_id = 2)
             // This means the item was returned before and now reissued
             if ($order->usage_status_id == 1) {
                 $returnHistoryExists = $historyModel
@@ -571,7 +569,7 @@ public function userView2(): string
                 }
             }
             
-            // ✅ Check if usage_status_id = 5, then override order status to "مرفوض"
+            // Check if usage_status_id = 5, then override order status to "مرفوض"
             if ($order->usage_status_id == 5) {
                 $order->order_status_name = 'مرفوض';
             }
@@ -581,7 +579,7 @@ public function userView2(): string
         }
     }
 
-    // ✅ Process transfer items
+    // Process transfer items
     foreach ($transferItems as $transfer) {
         $assetNum = $transfer->asset_num;
         $key = $transfer->item_order_id ?? $assetNum;
@@ -590,7 +588,7 @@ public function userView2(): string
             // Initialize reissued flag
             $transfer->is_reissued = false;
             
-            // ✅ Check if item has usage_status_id = 1 (new) and has a history of being returned (usage_status_id = 2)
+
             if ($transfer->usage_status_id == 1) {
                 $returnHistoryExists = $historyModel
                     ->where('item_order_id', $transfer->item_order_id)
@@ -603,7 +601,7 @@ public function userView2(): string
                 }
             }
             
-            // ✅ Check if usage_status_id = 5, then override order status to "مرفوض"
+
             if ($transfer->usage_status_id == 5) {
                 $transfer->order_status_name = 'مرفوض';
             }
@@ -613,13 +611,7 @@ public function userView2(): string
         }
     }
 
-    // ✅ Additional filter to remove items with usage_status_id = 2 (returned)
-    // This is a safety check in addition to the whereNotIn clause in the queries
-    $filteredOrders = array_filter($combinedItems, function ($item) {
-        return isset($item->usage_status_id) && $item->usage_status_id != 2;
-    });
-    
-    $filteredOrders = array_values($filteredOrders);
+    $filteredOrders = array_values($combinedItems);
 
     return view('user/userView2', [
         'orders' => $filteredOrders

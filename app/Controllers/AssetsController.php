@@ -334,7 +334,7 @@ public function transferView($orderId = null)
     $orderModel = new \App\Models\OrderModel();
     $transferItemsModel = new \App\Models\TransferItemsModel();
     
-    $currentUserId = session()->get('employee_id');
+        $currentUserId = session()->get('isEmployee') ? session()->get('employee_id') : session()->get('user_id');
     
     // ✅ جلب الـ item_order
     $itemOrder = $itemOrderModel->find($itemOrderId);

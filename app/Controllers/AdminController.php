@@ -19,6 +19,7 @@ class AdminController extends BaseController
 {
     public function dashboard(): string // Admin view
     {
+        
         // Exception
         if (! session()->get('isLoggedIn')) {
             throw new AuthenticationException();
