@@ -17,7 +17,7 @@ use App\Models\{
     UsageStatusModel,
     TransferItemsModel,
 };
-
+use App\Exceptions\AuthenticationException;
 class AssetsController extends BaseController
 {
     protected $orderModel;
@@ -54,7 +54,7 @@ class AssetsController extends BaseController
     public function index()
     {
         if (!session()->get('isLoggedIn')) {
-            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
+            throw new AuthenticationException();
         }
 
         $itemOrderModel = new \App\Models\ItemOrderModel();
@@ -296,9 +296,9 @@ public function orderDetails($id)
 
 public function transferView($orderId = null)
 {
-    if (!session()->get('isLoggedIn')) {
-        throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
-    }
+        if (!session()->get('isLoggedIn')) {
+            throw new AuthenticationException();
+        }
 
     $itemOrderModel = new \App\Models\ItemOrderModel();
     

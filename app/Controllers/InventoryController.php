@@ -52,6 +52,11 @@ class InventoryController extends BaseController
 
     public function index()
     {
+        //http://localhost/inventory88/UserController/dashboard
+        // التحقق من تسجيل الدخول
+        if (!session()->get('isLoggedIn')) {
+            throw new AuthenticationException();
+        }
         //  البيانات model
         $itemOrderModel = $this->itemOrderModel;
         $minorCategoryModel = $this->minorCategoryModel;
@@ -176,10 +181,13 @@ class InventoryController extends BaseController
         }
 
         // جلب البيانات وتقسيمها
-        $itemOrders = $builder->paginate(10, 'orders');
-        $pager = $itemOrderModel->pager;
+    $itemOrders = $builder->paginate(10, 'orders');
+    $pager = $itemOrderModel->pager;
 
-         foreach ($itemOrders as $order) {
+    // Initialize history model to avoid undefined variable error
+    $historyModel = new \App\Models\HistoryModel();
+
+    foreach ($itemOrders as $order) {
         if (
             isset($order->usage_status_id) &&
             $order->usage_status_id == 1 &&
@@ -194,7 +202,7 @@ class InventoryController extends BaseController
                 $order->usage_status_name = 'معاد صرفه';
             }
         }
-    }   
+    }
 
 
         // جلب البيانات المساعدة للعرض

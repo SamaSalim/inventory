@@ -7,7 +7,7 @@ use App\Models\PermissionModel;
 use App\Models\RoleModel;
 use App\Models\UserModel;
 use App\Entities\Employee;
-
+use App\Exceptions\AuthenticationException;
 class UserInfo extends BaseController
 {
     public function getUserInfo()
@@ -18,7 +18,7 @@ class UserInfo extends BaseController
         session()->setFlashdata('previous_url', previous_url());
 
         if (!session()->get('isLoggedIn')) {
-            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
+            throw new AuthenticationException();
         }
 
         $isEmployee = session()->get('isEmployee');
