@@ -771,6 +771,7 @@ public function showTransfer($orderId)
         'created_at' => $firstTransfer->created_at,
     ];
 
+    
     // جلب تفاصيل كل الأصناف المحولة
     $items = [];
     foreach ($transfers as $transfer) {
