@@ -8,7 +8,7 @@
     <style>
         @media screen {
             body { 
-                font-family: 'Arial', sans-serif; 
+                font-family: 'Cairo', 'Arial', sans-serif; 
                 direction: rtl; 
                 padding: 20px;
                 background: #f5f5f5;
@@ -34,22 +34,6 @@
                 padding: 10mm;
             }
         }
-        
-        .field-value {
-            display: inline-block;
-            min-width: 200px;
-            border-bottom: 1px solid #333;
-            padding: 0 10px;
-            font-weight: bold;
-        }
-        
-        .signature-value {
-            display: inline-block;
-            min-width: 150px;
-            font-weight: bold;
-            border-bottom: 1px solid #333;
-            padding: 2px 5px;
-        }
 
         .empty-state {
             text-align: center;
@@ -67,35 +51,6 @@
             font-size: 24px;
             margin-bottom: 10px;
             color: #333;
-        }
-
-        .header-field {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            justify-content: flex-end;
-        }
-
-        .field-label {
-            white-space: nowrap;
-        }
-
-        .field-value-text {
-            border-bottom: 1px solid #000;
-            padding: 2px 5px;
-            min-width: 200px;
-            text-align: center;
-        }
-
-        .signature-fields {
-            text-align: right;
-        }
-
-        .signature-line {
-            display: inline-block;
-            min-width: 150px;
-            border-bottom: 1px solid #333;
-            padding: 2px 5px;
         }
     </style>
 </head>
@@ -115,36 +70,29 @@
                         <div class="logo-section">
                             <div class="kamc-emblem">
                                 <img src="<?= base_url('public/assets/images/Kamc Logo Guideline-04.png') ?>" 
-                                    alt="KAMC Logo"
-                                    style="max-width: 350px; height: auto;">
+                                    alt="KAMC Logo">
                             </div>
-                            <div class="form-title">
-                                <h1 style="font-size: 25px; margin-top:-5px">نموذج نقل عهدة</h1>
-                            </div>
+                            <div class="form-title">نموذج نقل عهدة</div>
                         </div>
                         <div style="width:60px;"></div>
                     </div>
-
+                    
                     <!-- Header fields -->
                     <div class="header-fields">
                         <div class="header-field">
                             <span class="field-label">المحول من:</span>
-                            <span class="field-value"><?= esc($from_user_name) ?></span>
+                            <div class="field-line" style="border-top: none; border-bottom: 1px solid #000;"><?= esc($from_user_name) ?></div>
                         </div>
-                        <div class="header-field">
-                            <span class="field-label">المحول إلى:</span>
-                            <span class="field-value"><?= esc($to_user_name) ?></span>
-                        </div>
-                    </div>
-
-                    <div class="header-fields">
                         <div class="header-field">
                             <span class="field-label">التاريخ:</span>
-                            <span class="field-value"><?= esc($current_date) ?></span>
+                            <div class="field-line" style="border-top: none; border-bottom: 1px solid #000;"><?= esc($current_date) ?></div>
                         </div>
-                        <div class="header-field">
-                            <span class="field-label">عدد العناصر:</span>
-                            <span class="field-value"><?= esc($total_count) ?></span>
+                    </div>
+                    
+                    <div class="header-fields">
+                        <div class="header-field" style="border-left:none;">
+                            <span class="field-label">المحول إلى:</span>
+                            <div class="field-line" style="border-top: none; border-bottom: 1px solid #000;"><?= esc($to_user_name) ?></div>
                         </div>
                     </div>
                 </div>
@@ -153,83 +101,85 @@
                 <table class="main-table">
                     <thead>
                         <tr>
-                            <th class="col-serial">#</th>
-                            <th class="col-description">رقم الأصل KAMC</th>
-                            <th class="col-description">رقم الأصل MOH</th>
-                            <th class="col-description">الرقم التسلسلي</th>
-                            <th class="col-description">اسم الصنف وتصنيفه</th>
-                            <th class="col-model">الموديل</th>
-                            <th class="col-model">الماركة</th>
-                            <th class="col-unit-price">نوع الصنف</th>
-                            <th class="col-unit-price">الموقع</th>
-                            <th class="col-unit-price">الحالة</th>
-                            <th class="col-notes">ملاحظات</th>
+                            <th>م</th>
+                            <th colspan="2">رقم الصنف</th>
+                            <th rowspan="2">اسم الصنف</th>
+                            <th rowspan="2">الوحدة</th>
+                            <th rowspan="2">الكمية</th>
+                            <th colspan="2">حالة الصنف</th>
+                            <th rowspan="2">ملاحظات</th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th>KAMC</th>
+                            <th>MOH</th>
+                            <th>جديد</th>
+                            <th>مستعمل</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($items as $index => $item): ?>
-                        <tr>
-                            <td class="col-serial"><?= $index + 1 ?></td>
-                            <td><?= esc($item['asset_num']) ?></td>
-                            <td><?= esc($item['old_asset_num']) ?></td>
-                            <td><?= esc($item['serial_num']) ?></td>
-                            <td class="item-description-cell">
-                                <div class="item-main-name"><?= esc($item['item_name']) ?></div>
-                                <div class="item-sub-details"><?= esc($item['minor_category']) ?> / <?= esc($item['major_category']) ?></div>
-                            </td>
-                            <td><?= esc($item['model']) ?></td>
-                            <td><?= esc($item['brand']) ?></td>
-                            <td><?= esc($item['asset_type']) ?></td>
-                            <td><?= esc($item['location_code']) ?></td>
-                            <td><?= esc($item['usage_status']) ?></td>
-                            <td class="notes-cell"><?= esc($item['notes']) ?></td>
-                        </tr>
-                        <?php endforeach; ?>
+                        <?php if (!empty($items)): ?>
+                            <?php $counter = 1; ?>
+                            <?php foreach ($items as $item): ?>
+                                <tr>
+                                    <td><?= $counter++ ?></td>
+                                    <td><?= esc($item['asset_num']) ?: '' ?></td>
+                                    <td><?= esc($item['old_asset_num']) ?: '' ?></td>
+                                    <td>
+                                        <?= esc($item['item_name']) ?>
+                                        <?php if (!empty($item['model'])): ?>
+                                            <br><small>موديل: <?= esc($item['model']) ?></small>
+                                        <?php endif; ?>
+                                        <?php if (!empty($item['brand'])): ?>
+                                            <br><small>ماركة: <?= esc($item['brand']) ?></small>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align: center;">
+                                        <?php if (strtolower($item['usage_status']) == 'جديد'): ?>
+                                            ✓
+                                        <?php endif; ?>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <?php if (strtolower($item['usage_status']) == 'مستعمل' || strtolower($item['usage_status']) == 'معاد الصرف'): ?>
+                                            ✓
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?= esc($item['notes']) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <?php for ($i=1; $i<=10; $i++): ?>
+                                <tr class="empty-row">
+                                    <td><?= $i ?></td>
+                                    <td></td><td></td><td></td>
+                                    <td></td><td></td><td></td>
+                                    <td></td><td></td>
+                                </tr>
+                            <?php endfor; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
 
                 <!-- Signature Section -->
-                <div class="signature-section no-page-break">
+                <div class="signature-section">
                     <table class="signature-table" style="table-layout: fixed; width: 100%;">
                         <tr>
-                            <td style="width: 20%; vertical-align: top; padding: 10px;">
+                            <td style="width: 50%; vertical-align: top; padding: 10px;">
                                 <div style="font-weight: bold; text-align: center; margin-bottom: 15px; border-bottom: 2px solid #333; padding-bottom: 8px;">المسلم</div>
                                 <div style="line-height: 2;">
-                                    الاسم: <span class="signature-line"><?= esc($from_user_name) ?></span><br>
-                                    التوقيع: <span class="signature-line"></span><br>
-                                    الرقم الوظيفي: <span class="signature-line"><?= esc($from_user_id) ?></span>
+                                    الاسم: <?= esc($from_user_name) ?><br>
+                                    التوقيع: ..................................<br>
+                                    الرقم الوظيفي: ..................................
                                 </div>
                             </td>
-                            <td style="width: 20%; vertical-align: top; padding: 10px;">
+                            <td style="width: 50%; vertical-align: top; padding: 10px;">
                                 <div style="font-weight: bold; text-align: center; margin-bottom: 15px; border-bottom: 2px solid #333; padding-bottom: 8px;">المستلم</div>
                                 <div style="line-height: 2;">
-                                    الاسم: <span class="signature-line"><?= esc($to_user_name) ?></span><br>
-                                    التوقيع: <span class="signature-line"></span><br>
-                                    الرقم الوظيفي: <span class="signature-line"><?= esc($to_user_id) ?></span>
-                                </div>
-                            </td>
-                            <td style="width: 20%; vertical-align: top; padding: 10px;">
-                                <div style="font-weight: bold; text-align: center; margin-bottom: 15px; border-bottom: 2px solid #333; padding-bottom: 8px;">رئيس الجهة المسلمة</div>
-                                <div style="line-height: 2;">
-                                    الاسم: <span class="signature-line"></span><br>
-                                    التوقيع: <span class="signature-line"></span><br>
-                                    الرقم الوظيفي: <span class="signature-line"></span>
-                                </div>
-                            </td>
-                            <td style="width: 20%; vertical-align: top; padding: 10px;">
-                                <div style="font-weight: bold; text-align: center; margin-bottom: 15px; border-bottom: 2px solid #333; padding-bottom: 8px;">رئيس الجهة المستلمة</div>
-                                <div style="line-height: 2;">
-                                    الاسم: <span class="signature-line"></span><br>
-                                    التوقيع: <span class="signature-line"></span><br>
-                                    الرقم الوظيفي: <span class="signature-line"></span>
-                                </div>
-                            </td>
-                            <td style="width: 20%; vertical-align: top; padding: 10px;">
-                                <div style="font-weight: bold; text-align: center; margin-bottom: 15px; border-bottom: 2px solid #333; padding-bottom: 8px;">إدارة مراقبة المخزون</div>
-                                <div style="line-height: 2;">
-                                    الاسم: <span class="signature-line"></span><br>
-                                    التوقيع: <span class="signature-line"></span><br>
-                                    الرقم الوظيفي: <span class="signature-line"></span>
+                                    الاسم: <?= esc($to_user_name) ?><br>
+                                    التوقيع: ..................................<br>
+                                    الرقم الوظيفي: ..................................
                                 </div>
                             </td>
                         </tr>
@@ -239,7 +189,7 @@
                 <!-- Footer -->
                 <div class="form-footer">
                     <div class="footer-note">
-                        تمت معاينة (الصنف/الأصناف) الموضحة أعلاه من قبل المسلم والمستلم وبالتوقيع على هذا المحضر أخلى الطرف الأول مسؤوليته من تلك الصنف/الأصناف، وأصبح الطرف الثاني مسئولاً عنها وعلى هذا جرى التوقيع والمصادقة
+                       تمت معاينة (الصنف/الأصناف ) الموضحة أعلاه من قبل المسلم و المستلم و بالتوقيع على هذا المحضر أخلى الطرف الأول مسؤوليته من تلك الصنف / الأصناف ، و أصبح الطرف الثاني مسئولا عنها و على هذا جرى التوقيع و المصادقة
                     </div>
                 </div>
             </div>
