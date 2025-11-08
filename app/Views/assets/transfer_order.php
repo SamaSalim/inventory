@@ -398,9 +398,10 @@
                 <?php else: ?>
                     <div class="no-items-msg">لا توجد عناصر متاحة للتحويل.</div>
                 <?php endif; ?>
-
+  <?php $back_url = previous_url();  ?>
                 <div class="action-buttons-container">
-                    <a href="<?= site_url('AssetsController') ?>" class="action-btn back-btn">
+
+                    <a href="<?= esc($back_url)?>" class="action-btn back-btn">
                         <span>العودة</span>
                     </a>
                 </div>
