@@ -150,6 +150,11 @@
                                         <div class="detail-label">العلامة التجارية</div>
                                         <div class="detail-value"><?= esc($item->brand) ?: '<span class="empty">غير محدد</span>' ?></div>
                                     </div>
+                                    
+                                    <div class="detail-item">
+                                        <div class="detail-label">السعر</div>
+                                        <div class="detail-value"><?= !empty($item->price) ? esc($item->price) . ' ريال' : '<span class="empty">غير محدد</span>' ?></div>
+                                    </div>
 
                                     <div class="detail-item">
                                         <div class="detail-label">نوع الأصل</div>

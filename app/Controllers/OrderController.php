@@ -495,6 +495,7 @@ class OrderController extends BaseController
                     $modelNum = trim($this->request->getPost("model_num_{$itemNum}_{$i}") ?? '');
                     $oldAssetNum = trim($this->request->getPost("old_asset_num_{$itemNum}_{$i}") ?? '');
                     $brand = trim($this->request->getPost("brand_{$itemNum}_{$i}") ?? 'غير محدد');
+                    $price = $this->request->getPost("price_{$itemNum}_{$i}"); //  جلب السعر
 
                     if (empty($assetNum) || empty($serialNum)) {
                         return $this->response->setJSON([
@@ -512,7 +513,8 @@ class OrderController extends BaseController
                         'old_asset_number' => $oldAssetNum,
                         'brand' => $brand,
                         'custody_type' => $custodyType,
-                        'quantity' => 1
+                        'quantity' => 1,
+                        'price' => is_numeric($price) ? (float)$price : null // إضافة السعر
                     ];
                 }
             }
@@ -621,7 +623,8 @@ class OrderController extends BaseController
                     'assets_type' => $item['custody_type'],
                     'created_by' => $loggedEmployeeId,
                     'usage_status_id' => $defaultUsageStatus->id,
-                    'note' => $notes
+                    'note' => $notes,
+                    'price' => $item['price'] // حفظ السعر 
                 ];
 
                 $itemOrderId = $this->itemOrderModel->insert($itemOrderData);
@@ -777,7 +780,7 @@ class OrderController extends BaseController
             $builder = $this->itemOrderModel->builder();
             $orderItems = $builder
                 ->select('item_order.*, item_order.item_order_id, items.name as item_name, room.id as room_id, room.code as room_code, 
-                     section.id as section_id, floor.id as floor_id, building.id as building_id')
+                     section.id as section_id, floor.id as floor_id, building.id as building_id, item_order.price')
                 ->join('items', 'item_order.item_id = items.id', 'left')
                 ->join('room', 'item_order.room_id = room.id', 'left')
                 ->join('section', 'room.section_id = section.id', 'left')
@@ -814,7 +817,8 @@ class OrderController extends BaseController
                     'serial_num' => $item['serial_num'],
                     'model_num' => $item['model_num'],
                     'old_asset_num' => $item['old_asset_num'],
-                    'brand' => $item['brand']
+                    'brand' => $item['brand'],
+                    'price' => $item['price'] // إضافة السعر هنا إذا كان موجودًا
                 ];
             }
 
@@ -874,7 +878,7 @@ class OrderController extends BaseController
                 ]);
             }
 
-            // ✅ السماح بالتعديل في حالة قيد الانتظار (1) والمرفوض (3)
+            //  السماح بالتعديل في حالة قيد الانتظار (1) والمرفوض (3)
             $canEdit = ($existingOrder->order_status_id == 1 || $existingOrder->order_status_id == 3);
 
             if (!$canEdit) {
@@ -911,14 +915,13 @@ class OrderController extends BaseController
             // التحقق من تغيير المستلم
             $receiverChanged = ($existingOrder->to_user_id != $toUserId);
 
-            // ✅ منطق منع تغيير المستلم في حالة قيد الانتظار (1)
+            //  منطق منع تغيير المستلم في حالة قيد الانتظار (1)
             if ($existingOrder->order_status_id == 1 && $receiverChanged) {
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'لا يمكن تغيير المستلم أثناء حالة "قيد الانتظار". يمكنك فقط تغيير الأصناف والموقع.'
                 ]);
             }
-            // ❌ ملاحظة: إذا كان مرفوضاً (3) فسيتم السماح بتغييره.
 
             // جمع بيانات الأصناف المُرسلة وتخزينها
             $items = [];
@@ -958,6 +961,7 @@ class OrderController extends BaseController
                     $modelNum = trim($this->request->getPost("model_num_{$itemNum}_{$i}") ?? '');
                     $oldAssetNum = trim($this->request->getPost("old_asset_num_{$itemNum}_{$i}") ?? '');
                     $brand = trim($this->request->getPost("brand_{$itemNum}_{$i}") ?? 'غير محدد');
+                    $price = $this->request->getPost("price_{$itemNum}_{$i}"); // جلب السعر
 
                     // يتم جمع ID العنصر الموجود
                     $existingItemId = $this->request->getPost("existing_item_id_{$itemNum}_{$i}") ?? null;
@@ -979,7 +983,8 @@ class OrderController extends BaseController
                         'old_asset_number' => $oldAssetNum,
                         'brand' => $brand,
                         'custody_type' => $custodyType,
-                        'quantity' => 1
+                        'quantity' => 1,
+                        'price' => is_numeric($price) ? (float)$price : null // إضافة السعر
                     ];
                 }
             }
@@ -1103,7 +1108,8 @@ class OrderController extends BaseController
                     'assets_type' => $item['custody_type'],
                     'created_by' => $loggedEmployeeId,
                     'usage_status_id' => $defaultUsageStatus->id,
-                    'note' => $notes
+                    'note' => $notes,
+                    'price' => $item['price'] // حفظ السعر
                 ];
 
                 $existingItemId = $item['existing_item_id'] ?? null;

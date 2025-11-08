@@ -17,6 +17,7 @@ use App\Models\{
     UsageStatusModel,
     TransferItemsModel,
 };
+use App\Exceptions\AuthenticationException;
 
 class AssetsController extends BaseController
 {
@@ -296,9 +297,9 @@ public function orderDetails($id)
 // transferView - عرض صفحة تحويل العهدة
 public function transferView($orderId = null)
 {
-    if (!session()->get('isLoggedIn')) {
-        throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
-    }
+        if (!session()->get('isLoggedIn')) {
+            throw new AuthenticationException();
+        }
 
     $itemOrderModel = new \App\Models\ItemOrderModel();
     
