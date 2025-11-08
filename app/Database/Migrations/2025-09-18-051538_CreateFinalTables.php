@@ -346,7 +346,6 @@ class CreateFinalTables extends Migration
             'serial_num' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '100',
-                'unique'     => true,
             ],
             'old_asset_num' => [
                 'type'       => 'VARCHAR',

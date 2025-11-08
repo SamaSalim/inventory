@@ -336,23 +336,24 @@ class OrderController extends BaseController
                         'type' => 'serial',
                         'message' => $serialValidation['message']
                     ];
-                } else {
-                    // التحقق من التكرار في قاعدة البيانات
-                    $serialQuery = $this->itemOrderModel->where('serial_num', $serialNum);
+                } 
+                // else {
+                     // التحقق من التكرار في قاعدة البيانات
+                //     $serialQuery = $this->itemOrderModel->where('serial_num', $serialNum);
 
-                    // استثناء العنصر الحالي عند التعديل
-                    if (!empty($excludeItemId)) {
-                        $serialQuery->where('order_id !=', $excludeItemId);
-                    }
+                     // استثناء العنصر الحالي عند التعديل
+                //     if (!empty($excludeItemId)) {
+                //         $serialQuery->where('order_id !=', $excludeItemId);
+                //     }
 
-                    $existingSerial = $serialQuery->first();
-                    if ($existingSerial) {
-                        $errors[] = [
-                            'type' => 'serial',
-                            'message' => "الرقم التسلسلي {$serialNum} موجود مسبقاً في النظام"
-                        ];
-                    }
-                }
+                //     $existingSerial = $serialQuery->first();
+                //     if ($existingSerial) {
+                //         $errors[] = [
+                //             'type' => 'serial',
+                //             'message' => "الرقم التسلسلي {$serialNum} موجود مسبقاً في النظام"
+                //         ];
+                //     }
+                // }
             }
 
             if (!empty($errors)) {
@@ -559,12 +560,12 @@ class OrderController extends BaseController
                     ]);
                 }
 
-                if (in_array($serialNum, $serialNumbers)) {
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "الرقم التسلسلي {$serialNum} مكرر في الطلب"
-                    ]);
-                }
+                // if (in_array($serialNum, $serialNumbers)) {
+                //     return $this->response->setJSON([
+                //         'success' => false,
+                //         'message' => "الرقم التسلسلي {$serialNum} مكرر في الطلب"
+                //     ]);
+                // }
 
                 // التحقق من التكرار في قاعدة البيانات
                 $existingAsset = $this->itemOrderModel->where('asset_num', $assetNum)->first();
@@ -575,13 +576,13 @@ class OrderController extends BaseController
                     ]);
                 }
 
-                $existingSerial = $this->itemOrderModel->where('serial_num', $serialNum)->first();
-                if ($existingSerial) {
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "الرقم التسلسلي {$serialNum} موجود مسبقاً في النظام"
-                    ]);
-                }
+                // $existingSerial = $this->itemOrderModel->where('serial_num', $serialNum)->first();
+                // if ($existingSerial) {
+                //     return $this->response->setJSON([
+                //         'success' => false,
+                //         'message' => "الرقم التسلسلي {$serialNum} موجود مسبقاً في النظام"
+                //     ]);
+                // }
 
                 $assetNumbers[] = $assetNum;
                 $serialNumbers[] = $serialNum;
@@ -1030,12 +1031,12 @@ class OrderController extends BaseController
                     ]);
                 }
 
-                if (in_array($serialNum, $serialNumbers)) {
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "الرقم التسلسلي {$serialNum} مكرر في الطلب"
-                    ]);
-                }
+                // if (in_array($serialNum, $serialNumbers)) {
+                //     return $this->response->setJSON([
+                //         'success' => false,
+                //         'message' => "الرقم التسلسلي {$serialNum} مكرر في الطلب"
+                //     ]);
+                // }
 
                 // التحقق من التكرار في قاعدة البيانات
                 $assetQuery = $this->itemOrderModel->where('asset_num', $assetNum);
@@ -1051,18 +1052,18 @@ class OrderController extends BaseController
                     ]);
                 }
 
-                $serialQuery = $this->itemOrderModel->where('serial_num', $serialNum);
-                if ($existingItemId) {
-                    $serialQuery->where('item_order_id !=', $existingItemId);
-                }
-                $existingSerial = $serialQuery->first();
+                // $serialQuery = $this->itemOrderModel->where('serial_num', $serialNum);
+                // if ($existingItemId) {
+                //     $serialQuery->where('item_order_id !=', $existingItemId);
+                // }
+                // $existingSerial = $serialQuery->first();
 
-                if ($existingSerial) {
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => "الرقم التسلسلي {$serialNum} موجود مسبقاً في النظام"
-                    ]);
-                }
+                // if ($existingSerial) {
+                //     return $this->response->setJSON([
+                //         'success' => false,
+                //         'message' => "الرقم التسلسلي {$serialNum} موجود مسبقاً في النظام"
+                //     ]);
+                // }
 
                 $assetNumbers[] = $assetNum;
                 $serialNumbers[] = $serialNum;
