@@ -19,6 +19,7 @@ class AdminController extends BaseController
 {
     public function dashboard(): string // Admin view
     {
+
         // Exception
         if (! session()->get('isLoggedIn')) {
             throw new AuthenticationException();
@@ -149,10 +150,16 @@ class AdminController extends BaseController
      * @param int|null $permissionId معرف الصلاحية في جدول 'permission'.
      * @return \CodeIgniter\HTTP\RedirectResponse
      */
+    /**
+     * تحذف صلاحية معينة (ربط موظف بدور).
+     *
+     * @param int|null $permissionId معرف الصلاحية في جدول 'permission'.
+     * @return \CodeIgniter\HTTP\RedirectResponse
+     */
     public function deletePermission($permissionId = null)
     {
         if (empty($permissionId)) {
-            return redirect()->to(base_url('admin/addPermission')) // أو إلى صفحة قائمة الصلاحيات
+            return redirect()->to(base_url('admin/listPermissions'))
                 ->with('status', 'error')
                 ->with('message', 'لم يتم تحديد معرف الصلاحية للحذف.');
         }
@@ -160,22 +167,18 @@ class AdminController extends BaseController
         $permission = $this->permissionModel->find($permissionId);
 
         if (!$permission) {
-            return redirect()->to(base_url('admin/addPermission'))
+            return redirect()->to(base_url('admin/listPermissions'))
                 ->with('status', 'error')
                 ->with('message', 'الصلاحية المطلوبة للحذف غير موجودة.');
         }
 
-        // حفظ emp_id قبل حذف الصلاحية لإعادة التوجيه لاحقاً
-        $empId = $permission->emp_id;
-
         if ($this->permissionModel->delete($permissionId)) {
-            // إعادة التوجيه إلى صفحة معلومات الموظف بعد الحذف
-            return redirect()->to(base_url('admin/listPermissions/' . $empId))
+            return redirect()->to(base_url('admin/listPermissions'))
                 ->with('status', 'success')
                 ->with('message', 'تم حذف الصلاحية بنجاح');
         } else {
-            return redirect()->to(base_url('admin/listPermissions/' . $empId)) // أو إلى نفس صفحة التحديث إذا كنت تريد
-                ->with('status', 'success')
+            return redirect()->to(base_url('admin/listPermissions'))
+                ->with('status', 'error') // يجب أن تكون error
                 ->with('message', 'فشل في حذف الصلاحية.');
         }
     }

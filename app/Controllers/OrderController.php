@@ -16,6 +16,7 @@ use App\Models\{
     TransferItemsModel,
     UsageStatusModel
 };
+use App\Exceptions\AuthenticationException;
 
 use CodeIgniter\HTTP\ResponseInterface;
 
@@ -427,10 +428,10 @@ class OrderController extends BaseController
     {
         try {
             // التحقق من تسجيل الدخول
-                if (!session()->get('isLoggedIn')) {
-                    return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
-                }
-            
+            if (!session()->get('isLoggedIn')) {
+                throw new AuthenticationException();
+            }
+
 
             $loggedEmployeeId = session()->get('employee_id');
 
@@ -699,10 +700,13 @@ class OrderController extends BaseController
      */
     public function editOrder($orderId = null)
     {
+        if (!session()->get('isLoggedIn')) {
+            throw new AuthenticationException();
+        }
         if (!$orderId) {
             return redirect()->to(base_url('inventoryController/index'))->with('error', 'رقم الطلب مطلوب');
         }
-        
+
         $order = $this->orderModel->find($orderId);
         $orderStatusId = $order->order_status_id;
 
@@ -843,10 +847,7 @@ class OrderController extends BaseController
         try {
             // التحقق من تسجيل الدخول
             if (!session()->get('isLoggedIn')) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'يجب تسجيل الدخول أولاً'
-                ]);
+                throw new AuthenticationException();
             }
 
             if (!$orderId) {

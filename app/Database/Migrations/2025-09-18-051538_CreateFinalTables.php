@@ -382,6 +382,11 @@ class CreateFinalTables extends Migration
                 "constraint" => 128,
                 'null'       => true,
             ],
+            'price' => [
+                'type'       => 'DECIMAL',
+                'constraint' => '15,2',
+                'null'       => true,
+            ],
             'created_at datetime default current_timestamp',
             'updated_at datetime default current_timestamp on update current_timestamp',
         ]);
@@ -536,6 +541,35 @@ class CreateFinalTables extends Migration
         $this->forge->addForeignKey('emp_id', 'employee', 'emp_id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('role_id', 'role', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('permission');
+
+        // attachment table
+        $this->forge->addField([
+            'id' => [
+                'type'           => 'INT',
+                'constraint'     => 11,
+                'unsigned'       => true,
+                'auto_increment' => true,
+            ],
+            'item_order_id' => [
+                'type'           => 'INT',
+                'constraint'     => 11,
+                'unsigned'       => true,
+            ],
+            'handled_by' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 50,
+            ],
+            'notes' => [
+                'type' => 'TEXT',
+            ],
+            'created_at datetime default current_timestamp',
+            'updated_at datetime default current_timestamp on update current_timestamp',        ]);
+        $this->forge->addPrimaryKey('id');
+        $this->forge->addKey('item_order_id'); // index
+        $this->forge->addKey('handled_by'); // index
+        $this->forge->addForeignKey('item_order_id', 'item_order', 'item_order_id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('handled_by', 'employee', 'emp_id', 'CASCADE', 'CASCADE');
+        $this->forge->createTable('attachment');
     }
 
     public function down()
@@ -544,6 +578,7 @@ class CreateFinalTables extends Migration
         $this->forge->dropTable('permission');
         $this->forge->dropTable('returned_items');
         $this->forge->dropTable('history');
+        $this->forge->dropTable('attachment');
         $this->forge->dropTable('transfer_items');
         $this->forge->dropTable('item_order');
         $this->forge->dropTable('items');

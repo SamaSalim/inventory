@@ -5,9 +5,9 @@ namespace App\Controllers;
 use App\Models\EmployeeModel;
 use App\Models\PermissionModel;
 use App\Models\RoleModel;
-use App\Models\UserModel; 
+use App\Models\UserModel;
 use App\Entities\Employee;
-
+use App\Exceptions\AuthenticationException;
 class UserInfo extends BaseController
 {
     public function getUserInfo()
@@ -16,14 +16,13 @@ class UserInfo extends BaseController
 
         // حفظ عنوان URL للصفحة السابقة في الجلسة
         session()->setFlashdata('previous_url', previous_url());
-        
+
         if (!session()->get('isLoggedIn')) {
-            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
+            throw new AuthenticationException();
         }
 
-
-        $isEmployee = session()->get('isEmployee'); // جلب متغير التمييز من الجلسة
-        $account_id = session()->get('employee_id'); // هذا المتغير يحتوي على user_id أو emp_id
+        $isEmployee = session()->get('isEmployee');
+        $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id');
         $currentRole = session()->get('role'); // جلب الدور من الجلسة (للمستخدم العادي هو 'user')
 
         $account = null;
@@ -46,14 +45,14 @@ class UserInfo extends BaseController
         // جلب الأدوار بناءً على نوع الحساب
         $permissions = null;
         $roles = [];
-        
+
         if ($isEmployee) {
             // للموظف: لا يزال يتم جلب الصلاحيات من جدول permission بناءً على emp_id
             $permissions = $permissionModel->select('role.*')
                 ->join('role', 'role.id = permission.role_id')
                 ->where('permission.emp_id', $account_id)
                 ->findAll();
-            
+
             // تحويل نتائج قاعدة البيانات إلى مصفوفة الأدوار
             foreach ($permissions as $permission) {
                 $roles[] = [
