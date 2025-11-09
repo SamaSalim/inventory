@@ -499,8 +499,7 @@ class UserController extends BaseController
             ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
             ->where('transfer_items.to_user_id', $currentUserId)
             ->where('transfer_items.order_status_id', 2) // Only accepted transfers
-            ->whereNotIn('item_order.usage_status_id', [2, 4,7]) // Exclude returned (2) and reissued (4)
-            ->groupBy('transfer_items.item_order_id')
+            ->whereNotIn('item_order.usage_status_id', [2, 4,7])
             ->orderBy('transfer_items.created_at', 'ASC')
             ->findAll();
 

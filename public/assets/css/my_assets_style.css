@@ -537,26 +537,3 @@ body {
   align-items: center;
   gap: 8px;
 }
-/* Updated rejected status badge style */
-.order-status-rejected {
-  background: rgba(220, 53, 69, 0.12); /* Faint red background */
-  color: #dc3545; /* Red text */
-  border: 1px solid rgba(220, 53, 69, 0.2); /* Faint red border */
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-/* Alternative lighter version if you want even fainter */
-.order-status-rejected-alt {
-  background: #fde8e8; /* Very light red/pink background */
-  color: #d63447; /* Darker red text */
-  border: 1px solid #f5c6cb; /* Light red border */
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: bold;
-  text-transform: uppercase;
-}
