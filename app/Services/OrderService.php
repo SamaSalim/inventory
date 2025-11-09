@@ -51,6 +51,7 @@ class OrderService
      * ============================================================ */
     public function showOrderPage()
     {
+        if (!session()->get('isLoggedIn')) throw new AuthenticationException();
         $employeeId = session()->get('employee_id');
         $senderData = $employeeId ? $this->employeeModel->where('emp_id', $employeeId)->first() : null;
 
@@ -317,7 +318,7 @@ class OrderService
     }
 
     /* ============================================================
-     * STORE & UPDATE (مختصرة)
+     * STORE & UPDATE 
      * ============================================================ */
     public function storeMultiItem($request)
     {
