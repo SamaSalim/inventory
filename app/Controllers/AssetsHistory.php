@@ -466,17 +466,23 @@ class AssetsHistory extends BaseController
         }
 
         // ==================== RETURNS ====================
-        // All roles can see returns
+        // All roles can see returns - NOW WITH BIDIRECTIONAL SEARCH
         $returnsQuery = $itemOrderModel
             ->select('item_order.asset_num as asset_number, items.name as item_name,
                   item_order.updated_at as last_operation_date, item_order.item_order_id as id,
-                  item_order.created_by, item_order.order_id, item_order.usage_status_id,
-                  employee.name as employee_name, employee.emp_id,
-                  users.name as user_name, users.user_id')
+                  item_order.created_by, order.to_user_id, item_order.order_id, item_order.usage_status_id,
+                  created_employee.name as created_employee_name, created_employee.emp_id as created_emp_id,
+                  created_user.name as created_user_name, created_user.user_id as created_user_id,
+                  returner_employee.name as returner_employee_name, returner_employee.emp_id as returner_emp_id,
+                  returner_user.name as returner_user_name, returner_user.user_id as returner_user_id')
             ->join('items', 'items.id = item_order.item_id', 'left')
-            ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
-            ->join('users', 'users.user_id = item_order.created_by', 'left')
             ->join('order', 'order.order_id = item_order.order_id', 'left')
+            // Join for person who CREATED the return (created_by from item_order)
+            ->join('employee as created_employee', 'created_employee.emp_id = item_order.created_by', 'left')
+            ->join('users as created_user', 'created_user.user_id = item_order.created_by', 'left')
+            // Join for person who is RETURNING the asset (to_user_id from order table)
+            ->join('employee as returner_employee', 'returner_employee.emp_id = order.to_user_id', 'left')
+            ->join('users as returner_user', 'returner_user.user_id = order.to_user_id', 'left')
             ->whereIn('item_order.usage_status_id', [2, 4, 5]);
 
         if (!empty($filters['asset_number'])) $returnsQuery->like('item_order.asset_num', $filters['asset_number']);
@@ -489,11 +495,18 @@ class AssetsHistory extends BaseController
                 ->orLike('items.name', $filters['search'])
                 ->groupEnd();
         }
+        
+        // BIDIRECTIONAL SEARCH: Search in BOTH directions
         if (!empty($filters['to_user_id'])) {
             $returnsQuery->groupStart()
-                ->where('employee.emp_id', $filters['to_user_id'])
-                ->orWhere('users.user_id', $filters['to_user_id'])
-                ->orWhere('item_order.created_by', $filters['to_user_id'])
+                // Person RETURNING the asset (to_user_id from order table)
+                ->like('returner_employee.emp_id', $filters['to_user_id'])
+                ->orLike('returner_user.user_id', $filters['to_user_id'])
+                ->orLike('order.to_user_id', $filters['to_user_id'])
+                // Person who CREATED/RECEIVED the return (created_by from item_order)
+                ->orLike('created_employee.emp_id', $filters['to_user_id'])
+                ->orLike('created_user.user_id', $filters['to_user_id'])
+                ->orLike('item_order.created_by', $filters['to_user_id'])
                 ->groupEnd();
         }
 

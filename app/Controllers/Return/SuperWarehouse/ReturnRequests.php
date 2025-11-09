@@ -49,6 +49,17 @@ class ReturnRequests extends BaseController
             'date_to' => $this->request->getGet('date_to')
         ];
 
+        // First, get the latest evaluation for each item_order_id using a subquery
+        $db = \Config\Database::connect();
+        $subquery = $db->table('evaluation e1')
+            ->select('e1.item_order_id, e1.attachment, e1.created_at')
+            ->join('(SELECT item_order_id, MAX(created_at) as max_created 
+                     FROM evaluation 
+                     GROUP BY item_order_id) e2', 
+                    'e1.item_order_id = e2.item_order_id AND e1.created_at = e2.max_created', 
+                    'inner')
+            ->getCompiledSelect();
+
         $builder = $this->itemOrderModel
             ->select('item_order.item_order_id,
                       item_order.order_id,
@@ -60,7 +71,9 @@ class ReturnRequests extends BaseController
                       item_order.brand,
                       item_order.model_num,
                       item_order.note,
-                      item_order.attachment,
+                      item_order.attachment as item_attachment,
+                      latest_eval.attachment as eval_attachment,
+                      COALESCE(latest_eval.attachment, item_order.attachment) as attachment,
                       COALESCE(employee.name, users.name) AS employee_name,
                       COALESCE(employee.emp_id, users.user_id) AS emp_id_display,
                       COALESCE(employee.emp_dept, users.user_dept) AS department,
@@ -72,6 +85,7 @@ class ReturnRequests extends BaseController
             ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
             ->join('items', 'items.id = item_order.item_id', 'left')
             ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+            ->join("({$subquery}) as latest_eval", 'latest_eval.item_order_id = item_order.item_order_id', 'left')
             ->where('item_order.usage_status_id', 2);
 
         if (!empty($filters['general_search'])) {
@@ -138,26 +152,85 @@ class ReturnRequests extends BaseController
 
     public function serveAttachment($assetNum)
     {
-        $item = $this->itemOrderModel
-            ->select('attachment')
-            ->where('asset_num', $assetNum)
-            ->first();
+        log_message('info', "=== Serving Attachment for Asset: {$assetNum} ===");
+        
+        // First, try to get the latest attachment from evaluation table
+        $db = \Config\Database::connect();
+        $builder = $db->table('evaluation');
+        $builder->select('evaluation.attachment, evaluation.created_at')
+                ->join('item_order', 'item_order.item_order_id = evaluation.item_order_id')
+                ->where('item_order.asset_num', $assetNum)
+                ->where('evaluation.attachment IS NOT NULL')
+                ->where('evaluation.attachment !=', '')
+                ->orderBy('evaluation.created_at', 'DESC')
+                ->limit(1);
+        
+        $evaluationResult = $builder->get()->getRow();
+        
+        $attachment = null;
+        $source = null;
+        
+        if ($evaluationResult && !empty($evaluationResult->attachment)) {
+            $attachment = $evaluationResult->attachment;
+            $source = 'evaluation';
+            log_message('info', "Attachment found in evaluation table: {$attachment}");
+            log_message('info', "Evaluation created at: {$evaluationResult->created_at}");
+        } else {
+            // If not found in evaluation, get from item_order
+            $item = $this->itemOrderModel
+                ->select('attachment')
+                ->where('asset_num', $assetNum)
+                ->asArray()
+                ->first();
+            
+            if ($item && !empty($item['attachment'])) {
+                $attachment = $item['attachment'];
+                $source = 'item_order';
+                log_message('info', "Attachment found in item_order table: {$attachment}");
+            }
+        }
 
-        if (!$item || empty($item->attachment)) {
+        if (!$attachment || $attachment === 'NULL' || trim($attachment) === '') {
+            log_message('error', "No valid attachment found for asset: {$assetNum}");
             return $this->response->setStatusCode(404)->setBody('❌ لا يوجد مرفق لهذا الأصل');
         }
 
-        $filenames = explode(',', $item->attachment);
-        $latestFile = trim(end($filenames));
-        $filePath = WRITEPATH . 'uploads/return_attachments/' . $latestFile;
+        // Handle comma-separated filenames and get the latest one
+        $filenames = array_map('trim', explode(',', $attachment));
+        $latestFile = end($filenames);
+        
+        log_message('info', "All filenames: " . implode(', ', $filenames));
+        log_message('info', "Latest file to serve: {$latestFile}");
+        
+        // Check possible paths
+        $possiblePaths = [
+            WRITEPATH . 'uploads/evaluation_attachments/' . $latestFile,
+            WRITEPATH . 'uploads/return_attachments/' . $latestFile,
+            WRITEPATH . 'uploads/attachments/' . $latestFile,
+            WRITEPATH . 'uploads/' . $latestFile
+        ];
+        
+        $filePath = null;
+        foreach ($possiblePaths as $path) {
+            log_message('debug', "Checking path: {$path}");
+            if (is_file($path)) {
+                $filePath = $path;
+                log_message('info', "✓ File found at: {$path}");
+                break;
+            }
+        }
 
-        if (!is_file($filePath)) {
-            return $this->response->setStatusCode(404)->setBody('❌ الملف غير موجود');
+        if (!$filePath) {
+            log_message('error', "File not found in any path. Searched for: {$latestFile}");
+            log_message('error', "Searched paths: " . implode(', ', $possiblePaths));
+            return $this->response->setStatusCode(404)->setBody('❌ الملف غير موجود على السيرفر');
         }
 
         $extension = strtolower(pathinfo($latestFile, PATHINFO_EXTENSION));
+        log_message('info', "File extension: {$extension}");
 
-        if ($extension === 'html') {
+        if ($extension === 'html' || $extension === 'htm') {
+            log_message('info', "Serving HTML file");
             return $this->response
                 ->setHeader('Content-Type', 'text/html; charset=UTF-8')
                 ->setBody(file_get_contents($filePath));
@@ -166,10 +239,13 @@ class ReturnRequests extends BaseController
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $filePath);
         finfo_close($finfo);
+        
+        log_message('info', "File MIME type: {$mimeType}");
+        log_message('info', "=== End Serving Attachment ===");
 
         return $this->response
             ->setHeader('Content-Type', $mimeType)
-            ->setHeader('Content-Disposition', 'inline; filename="' . $latestFile . '"')
+            ->setHeader('Content-Disposition', 'inline; filename="' . basename($latestFile) . '"')
             ->setBody(file_get_contents($filePath));
     }
 
@@ -258,7 +334,7 @@ class ReturnRequests extends BaseController
         log_message('info', "Return accepted successfully. Item Order ID: {$itemOrderId}, User: {$currentUserId}");
         log_message('debug', '=== ACCEPT RETURN END ===');
         
-        return redirect()->back()->with('success', '');
+        return redirect()->back()->with('success', 'تم قبول الإرجاع بنجاح');
     }
 
     public function rejectReturn($itemOrderId)
@@ -318,7 +394,6 @@ class ReturnRequests extends BaseController
         log_message('info', "Return rejected successfully. Item Order ID: {$itemOrderId}, User: {$currentUserId}");
         log_message('debug', '=== REJECT RETURN END ===');
         
-        return redirect()->back()->with('warning', ' تم رفض الإرجاع');
+        return redirect()->back()->with('warning', 'تم رفض الإرجاع');
     }
-
 }

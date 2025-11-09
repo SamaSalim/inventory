@@ -4,7 +4,7 @@ namespace App\Entities;
 
 use CodeIgniter\Entity\Entity;
 
-class Attachment extends Entity
+class Evaluation  extends Entity
 {
     protected $attributes = [
         'id'       => null,

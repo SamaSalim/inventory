@@ -38,6 +38,8 @@ class FinalTablesSeeder extends Seeder
             ['usage_status' => 'معاد صرفة'],
             ['usage_status' => 'معادة للمرسل'],
             ['usage_status' => ' مستعمل'],
+            ['usage_status' => ' قيد التقييم'],
+
 
 
         ];
@@ -324,7 +326,7 @@ class FinalTablesSeeder extends Seeder
             [
                 'emp_id'   => '1005',
                 'name'     => 'ليان السيد',
-                'emp_dept' => 'المستودعات',
+                'emp_dept' => 'دعم فني',
                 'emp_ext'  => 5000,
                 'email'    => 'layan@example.com',
                 'password' => password_hash('123455', PASSWORD_DEFAULT),

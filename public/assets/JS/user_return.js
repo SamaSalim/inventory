@@ -5,6 +5,14 @@ let itemReasons = {};
 let selectedToUser = null;
 let currentTransferItemId = null;
 
+// ==================== HELPER FUNCTIONS ====================
+
+// Helper function to check if category requires special handling
+function isSpecialCategory(minorCategory) {
+  const specialCategories = ["IT", "Telecom", "Equipment"];
+  return specialCategories.includes(minorCategory);
+}
+
 // ==================== RETURN POPUP FUNCTIONS ====================
 
 function openReturnPopup(itemOrderId) {
@@ -70,8 +78,9 @@ function showSelectedItemsPopup() {
 
   let itemsHTML = "";
   selectedItems.forEach((item, index) => {
-    const categoryBadgeColor =
-      item.minorCategory === "IT" ? "#3a61c3ff" : "#ff6b6b";
+    const categoryBadgeColor = isSpecialCategory(item.minorCategory)
+      ? "#3a61c3ff"
+      : "#ff6b6b";
     const categoryBadgeText = item.minorCategory || "غير محدد";
 
     itemsHTML += `
@@ -120,48 +129,25 @@ function showSelectedItemsPopup() {
         `;
   });
 
-  const hasITItems = selectedItems.some((item) => item.minorCategory === "IT");
-
-  const printButtonSection = hasITItems
-    ? `
-        <div style="padding: 15px 20px; background: #fffbf0; border-top: 2px solid #f4d03f; border-bottom: 1px solid #e0e6ed;">
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
-                <div style="flex: 1;">
-                    <div style="font-size: 13px; color: #7d6608; line-height: 1.5;">
-                        <i class="fas fa-info-circle" style="margin-left: 5px; color: #f39c12;"></i>
-                        <strong>معاينة التقرير المُنشأ تلقائياً قبل إرساله لموظفي مستودع الإرجاع</strong>
-                    </div>
-                </div>
-                <button onclick="printAllForms()" style="padding: 10px 20px; background: linear-gradient(135deg, #5f97d6, #3a7bc8); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.3s; box-shadow: 0 3px 8px rgba(58, 123, 200, 0.3); white-space: nowrap; flex-shrink: 0;">
-                    <i class="fas fa-eye" style="margin-left: 5px;"></i>
-                    عرض التقرير
-                </button>
-            </div>
-        </div>
-    `
-    : "";
-
   popup.innerHTML = `
         <div style="padding: 20px; background: linear-gradient(135deg, #057590, #3ac0c3); color: white; display: flex; justify-content: space-between; align-items: center;">
             <h3 style="margin: 0; font-size: 20px;">
                 <i class="fas fa-undo-alt" style="margin-left: 8px;"></i>
                 العناصر المحددة للترجيع (${selectedItems.length})
             </h3>
-            <button onclick="closeSelectedItemsPopup()" style="background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">✕</button>
+            <button onclick="closeSelectedItemsPopup()" style="background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">✕</button>
         </div>
         
         <div style="flex: 1; overflow-y: auto; min-height: 0;">
             ${itemsHTML}
         </div>
         
-        ${printButtonSection}
-        
         <div style="padding: 15px 20px; background: #f8f9fa; border-top: 2px solid #e0e6ed; display: flex; justify-content: space-between; gap: 10px; flex-shrink: 0;">
-            <button onclick="handleCancelSelection()" style="flex: 1; padding: 12px 20px; background: #95a5a6; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.2s;">
+            <button onclick="handleCancelSelection()" style="flex: 1; padding: 12px 20px; background: #95a5a6; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.2s;" onmouseover="this.style.background='#7f8c8d'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#95a5a6'; this.style.transform='translateY(0)'">
                 <i class="fas fa-times" style="margin-left: 5px;"></i>
                 إلغاء التحديد
             </button>
-            <button onclick="submitReturn()" style="flex: 1; padding: 12px 20px; background: linear-gradient(135deg, #3ac0c3, #2aa8ab); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(58, 192, 195, 0.3);">
+            <button onclick="confirmBulkReturnDirectly()" style="flex: 1; padding: 12px 20px; background: linear-gradient(135deg, #3ac0c3, #2aa8ab); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(58, 192, 195, 0.3);" onmouseover="this.style.background='linear-gradient(135deg, #2aa8ab, #259a9d)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(58, 192, 195, 0.4)'" onmouseout="this.style.background='linear-gradient(135deg, #3ac0c3, #2aa8ab)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(58, 192, 195, 0.3)'">
                 <i class="fas fa-undo" style="margin-left: 5px;"></i>
                 تأكيد الترجيع
             </button>
@@ -171,99 +157,159 @@ function showSelectedItemsPopup() {
   const backdrop = document.createElement("div");
   backdrop.id = "popupBackdrop";
   backdrop.style.cssText =
-    "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;";
+    "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; animation: fadeIn 0.3s ease;";
   backdrop.onclick = closeSelectedItemsPopup;
+
+  if (!document.getElementById("popupAnimationStyles")) {
+    const style = document.createElement("style");
+    style.id = "popupAnimationStyles";
+    style.textContent = `
+            @keyframes popupSlideIn { from { transform: translate(-50%, -60%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            .popup-item:hover { background: #f8f9fa !important; }
+        `;
+    document.head.appendChild(style);
+  }
 
   document.body.appendChild(backdrop);
   document.body.appendChild(popup);
 }
 
 function getFileUploadSection(item) {
-  const isIT = item.minorCategory === "IT";
+  const isSpecial = isSpecialCategory(item.minorCategory);
 
-  if (isIT) {
-    return `
-            <div style="margin-top: 15px; margin-bottom: 15px;">
-                <label style="display: block; font-size: 13px; font-weight: 600; color: #057590; margin-bottom: 8px;">
-                    <i class="fas fa-file-alt" style="margin-left: 5px;"></i>
-                    نموذج الترجيع (سيتم إنشاؤه تلقائياً):
-                </label>
-                <div style="border: 2px dashed #e0e6ed; border-radius: 8px; padding: 15px; background: #f8fdff;">
-                    <div style="margin-bottom: 15px;">
-                        <strong style="color: #057590; font-size: 14px; display: block; margin-bottom: 10px;">
-                            <i class="fas fa-clipboard-list" style="margin-left: 5px;"></i>
-                            حدد سبب الإرجاع:
-                        </strong>
-                        <div class="action-checkbox-group">
-                            <label class="action-checkbox-item" onclick="toggleReason('${item.assetNum}', 'purpose_end', event)">
-                                <input type="radio" name="reason_${item.assetNum}" id="reason_purpose_end_${item.assetNum}">
-                                <div class="label">انتهاء الغرض</div>
-                            </label>
-                            <label class="action-checkbox-item" onclick="toggleReason('${item.assetNum}', 'excess', event)">
-                                <input type="radio" name="reason_${item.assetNum}" id="reason_excess_${item.assetNum}">
-                                <div class="label">فائض</div>
-                            </label>
-                            <label class="action-checkbox-item" onclick="toggleReason('${item.assetNum}', 'unfit', event)">
-                                <input type="radio" name="reason_${item.assetNum}" id="reason_unfit_${item.assetNum}">
-                                <div class="label">عدم الصلاحية</div>
-                            </label>
-                            <label class="action-checkbox-item" onclick="toggleReason('${item.assetNum}', 'damaged', event)">
-                                <input type="radio" name="reason_${item.assetNum}" id="reason_damaged_${item.assetNum}">
-                                <div class="label">تالف</div>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-preview-container">
-                        <div class="form-preview-title">
-                            <i class="fas fa-check-circle"></i>
-                            السبب المحدد:
-                        </div>
-                        <div class="form-preview-content" id="formPreview_${item.assetNum}">
-                            <div style="color: #999; font-style: italic;">لم يتم تحديد سبب الإرجاع</div>
-                        </div>
-                    </div>
-                    <div style="font-size: 11px; color: #3ac0c3; text-align: center; margin-top: 12px;">
-                        <i class="fas fa-magic"></i>
-                        سيتم إنشاء النموذج تلقائياً بجميع بيانات الصنف عند الترجيع
-                    </div>
+  // Return reason section (now for ALL items)
+  const reasonSection = `
+    <div style="margin-top: 15px; margin-bottom: 15px;">
+        <label style="display: block; font-size: 13px; font-weight: 600; color: #057590; margin-bottom: 8px;">
+            <i class="fas fa-clipboard-list" style="margin-left: 5px;"></i>
+            ${
+              isSpecial
+                ? "نموذج الترجيع (سيتم إنشاؤه تلقائياً):"
+                : "سبب الإرجاع:"
+            }
+        </label>
+        <div style="border: 2px dashed #e0e6ed; border-radius: 8px; padding: 15px; background: #f8fdff; transition: border-color 0.2s;">
+            <div style="margin-bottom: 15px;">
+                <strong style="color: #057590; font-size: 14px; display: block; margin-bottom: 10px;">
+                    <i class="fas fa-clipboard-list" style="margin-left: 5px;"></i>
+                    حدد سبب الإرجاع:
+                </strong>
+                <div class="action-checkbox-group">
+                    <label class="action-checkbox-item" onclick="toggleReason('${
+                      item.assetNum
+                    }', 'purpose_end', event)">
+                        <input type="radio" name="reason_${
+                          item.assetNum
+                        }" id="reason_purpose_end_${
+    item.assetNum
+  }" style="display: none;">
+                        <div class="label">انتهاء الغرض</div>
+                    </label>
+                    <label class="action-checkbox-item" onclick="toggleReason('${
+                      item.assetNum
+                    }', 'excess', event)">
+                        <input type="radio" name="reason_${
+                          item.assetNum
+                        }" id="reason_excess_${
+    item.assetNum
+  }" style="display: none;">
+                        <div class="label">فائض</div>
+                    </label>
+                    <label class="action-checkbox-item" onclick="toggleReason('${
+                      item.assetNum
+                    }', 'unfit', event)">
+                        <input type="radio" name="reason_${
+                          item.assetNum
+                        }" id="reason_unfit_${
+    item.assetNum
+  }" style="display: none;">
+                        <div class="label">عدم الصلاحية</div>
+                    </label>
+                    <label class="action-checkbox-item" onclick="toggleReason('${
+                      item.assetNum
+                    }', 'damaged', event)">
+                        <input type="radio" name="reason_${
+                          item.assetNum
+                        }" id="reason_damaged_${
+    item.assetNum
+  }" style="display: none;">
+                        <div class="label">تالف</div>
+                    </label>
                 </div>
             </div>
-        `;
-  } else {
-    return `
-            <div style="margin-top: 15px; margin-bottom: 15px;">
-                <label style="display: block; font-size: 13px; font-weight: 600; color: #057590; margin-bottom: 8px;">
-                    <i class="fas fa-image" style="margin-left: 5px;"></i>
-                    الصور المرفقة:
-                </label>
-                <div style="border: 2px dashed #e0e6ed; border-radius: 8px; padding: 15px; background: #f8fdff;">
-                    <input 
-                        type="file" 
-                        id="fileInput_${item.assetNum}"
-                        data-asset-num="${item.assetNum}"
-                        data-minor-category="${item.minorCategory}"
-                        multiple
-                        accept="image/*"
-                        onchange="handleFileUpload(this.dataset.assetNum, this.files, this.dataset.minorCategory)"
-                        style="display: none;"
-                    />
-                    <button 
-                        onclick="document.getElementById('fileInput_${item.assetNum}').click()"
-                        style="background: linear-gradient(135deg, #3ac0c3, #2aa8ab); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; width: 100%; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;"
-                    >
-                        <i class="fas fa-camera"></i>
-                        اختر الصور
-                    </button>
-                    <div style="font-size: 11px; color: #999; text-align: center; margin-top: 8px;">
-                        الحد الأقصى: 5 ميجابايت لكل صورة | صور فقط (JPG, PNG)
-                    </div>
-                    <div id="fileList_${item.assetNum}" style="margin-top: 10px;">
-                        <div style="color: #999; font-size: 13px; padding: 10px; text-align: center;">لم يتم رفع أي صور</div>
-                    </div>
+            <div class="form-preview-container">
+                <div class="form-preview-title">
+                    <i class="fas fa-check-circle"></i>
+                    السبب المحدد:
+                </div>
+                <div class="form-preview-content" id="formPreview_${
+                  item.assetNum
+                }">
+                    <div style="color: #999; font-style: italic;">لم يتم تحديد سبب الإرجاع</div>
                 </div>
             </div>
-        `;
-  }
+            
+            <div style="font-size: 11px; color: #3ac0c3; text-align: center; margin-top: 12px;">
+                <i class="fas fa-magic"></i>
+                ${
+                  isSpecial
+                    ? "سيتم إنشاء النموذج تلقائياً بجميع بيانات الصنف عند الترجيع"
+                    : "سيتم حفظ السبب مع عملية الإرجاع"
+                }
+            </div>
+        </div>
+    </div>
+  `;
+
+  // File upload section - MANDATORY for non-special categories
+  const fileUploadSection = `
+    <div style="margin-top: 15px; margin-bottom: 15px;">
+        <label style="display: block; font-size: 13px; font-weight: 600; color: #057590; margin-bottom: 8px;">
+            <i class="fas fa-file-upload" style="margin-left: 5px;"></i>
+            الملفات والصور المرفقة${
+              !isSpecial ? ' <span style="color: #e74c3c;">*</span>' : ""
+            }
+        </label>
+        <div style="border: 2px dashed #e0e6ed; border-radius: 8px; padding: 15px; background: #f8fdff; transition: border-color 0.2s;">
+            <input 
+                type="file" 
+                id="fileInput_${item.assetNum}"
+                data-asset-num="${item.assetNum}"
+                data-minor-category="${item.minorCategory}"
+                multiple
+                accept="${isSpecial ? "*" : "image/*"}"
+                onchange="handleFileUpload(this.dataset.assetNum, this.files, this.dataset.minorCategory)"
+                style="display: none;"
+            />
+            <button 
+                onclick="document.getElementById('fileInput_${
+                  item.assetNum
+                }').click()"
+                style="background: linear-gradient(135deg, #3ac0c3, #2aa8ab); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; width: 100%; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;"
+                onmouseover="this.style.background='linear-gradient(135deg, #2aa8ab, #259a9d)'"
+                onmouseout="this.style.background='linear-gradient(135deg, #3ac0c3, #2aa8ab)'"
+            >
+                <i class="fas fa-file-upload"></i>
+                اختر الملفات أو الصور
+            </button>
+            <div style="font-size: 11px; color: #999; text-align: center; margin-top: 8px;">
+                ${
+                  !isSpecial
+                    ? "⚠️ إلزامي: يجب رفع صور للعنصر | الحد الأقصى: 5 ميجابايت لكل ملف | صور فقط (JPG, PNG, GIF)"
+                    : "الحد الأقصى: 5 ميجابايت لكل ملف | جميع أنواع الملفات (صور، PDF، مستندات)"
+                }
+            </div>
+            <div id="fileList_${item.assetNum}" style="margin-top: 10px;">
+                <div style="color: #999; font-size: 13px; padding: 10px; text-align: center;">${
+                  !isSpecial ? "لم يتم رفع أي صور" : "لم يتم رفع أي ملفات"
+                }</div>
+            </div>
+        </div>
+    </div>
+  `;
+
+  return reasonSection + fileUploadSection;
 }
 
 function handleCancelSelection() {
@@ -288,7 +334,7 @@ function handleFileUpload(assetNum, files, minorCategory) {
     uploadedFiles[assetNum] = [];
   }
 
-  const isIT = minorCategory === "IT";
+  const isSpecial = isSpecialCategory(minorCategory);
 
   Array.from(files).forEach((file) => {
     if (file.size > 5 * 1024 * 1024) {
@@ -296,7 +342,8 @@ function handleFileUpload(assetNum, files, minorCategory) {
       return;
     }
 
-    if (!isIT) {
+    // For non-special categories, only allow images
+    if (!isSpecial) {
       const allowedImageTypes = [
         "image/jpeg",
         "image/jpg",
@@ -308,6 +355,7 @@ function handleFileUpload(assetNum, files, minorCategory) {
         return;
       }
     }
+    // For special categories (IT/Telecom/Equipment), accept all file types
 
     uploadedFiles[assetNum].push(file);
   });
@@ -320,10 +368,12 @@ function updateFileList(assetNum, minorCategory) {
   if (!fileList) return;
 
   const files = uploadedFiles[assetNum] || [];
-  const isIT = minorCategory === "IT";
+  const isSpecial = isSpecialCategory(minorCategory);
 
   if (files.length === 0) {
-    const emptyMessage = isIT ? "لم يتم رفع أي ملفات" : "لم يتم رفع أي صور";
+    const emptyMessage = isSpecial
+      ? "لم يتم رفع أي ملفات"
+      : "لم يتم رفع أي صور";
     fileList.innerHTML = `<div style="color: #999; font-size: 13px; padding: 10px; text-align: center;">${emptyMessage}</div>`;
     return;
   }
@@ -331,7 +381,7 @@ function updateFileList(assetNum, minorCategory) {
   fileList.innerHTML = files
     .map((file, index) => {
       const icon = file.type.startsWith("image/") ? "fa-image" : "fa-file";
-      const iconColor = isIT ? "#3ac0c3" : "#ff6b6b";
+      const iconColor = isSpecial ? "#3ac0c3" : "#ff6b6b";
       return `
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; margin-bottom: 6px; border: 1px solid #e0e6ed;">
                 <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
@@ -370,6 +420,7 @@ function toggleReason(assetNum, reason, event) {
     itemReasons[assetNum] = {};
   }
 
+  // Clear all other reasons for this item (radio button behavior)
   ["purpose_end", "excess", "unfit", "damaged"].forEach((r) => {
     itemReasons[assetNum][r] = false;
     const otherCheckbox = document.getElementById(`reason_${r}_${assetNum}`);
@@ -378,6 +429,7 @@ function toggleReason(assetNum, reason, event) {
     if (otherLabel) otherLabel.classList.remove("selected");
   });
 
+  // Set the selected reason
   itemReasons[assetNum][reason] = true;
 
   const checkbox = document.getElementById(`reason_${reason}_${assetNum}`);
@@ -412,6 +464,11 @@ function updateFormPreview(assetNum) {
     damaged: "تالف",
   };
 
+  const isSpecial = isSpecialCategory(item.minorCategory);
+  const infoText = isSpecial
+    ? "سيتم إنشاء النموذج تلقائياً مع بيانات الصنف"
+    : "سيتم حفظ السبب مع بيانات الإرجاع";
+
   preview.innerHTML = `
         <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #3ac0c3;">
             <strong style="color: #057590;">سبب الإرجاع المحدد:</strong>
@@ -428,7 +485,7 @@ function updateFormPreview(assetNum) {
             </div>
             <div style="margin-top: 12px; font-size: 12px; color: #666;">
                 <i class="fas fa-info-circle" style="color: #3ac0c3;"></i>
-                سيتم إنشاء النموذج تلقائياً مع بيانات الصنف
+                ${infoText}
             </div>
         </div>
     `;
@@ -436,7 +493,7 @@ function updateFormPreview(assetNum) {
 
 // ==================== SUBMIT RETURN FUNCTION ====================
 
-function submitReturn() {
+function confirmBulkReturnDirectly() {
   if (selectedItems.length === 0) {
     showAlert("warning", "لم يتم تحديد أي عناصر للترجيع");
     return;
@@ -444,7 +501,7 @@ function submitReturn() {
 
   const returnData = selectedItems.map((item) => {
     const commentElement = document.getElementById(`comment_${item.assetNum}`);
-    const isIT = item.minorCategory === "IT";
+    const isSpecial = isSpecialCategory(item.minorCategory);
 
     return {
       id: item.id,
@@ -459,115 +516,74 @@ function submitReturn() {
       minorCategory: item.minorCategory,
       comment: commentElement ? commentElement.value.trim() : "",
       files: uploadedFiles[item.assetNum] || [],
-      reasons: isIT ? itemReasons[item.assetNum] || {} : null,
-      generateForm: isIT,
+      reasons: itemReasons[item.assetNum] || {},
+      generateForm: isSpecial,
+      isSpecialCategory: isSpecial,
     };
   });
 
-  const itItemsWithoutReasons = returnData.filter(
-    (item) =>
-      item.generateForm &&
-      (!item.reasons ||
-        Object.keys(item.reasons).filter((k) => item.reasons[k]).length === 0)
-  );
+  // Check for items without reasons (applies to ALL items)
+  const itemsWithoutReasons = returnData.filter((item) => {
+    const reasons = item.reasons || {};
+    return Object.keys(reasons).filter((k) => reasons[k]).length === 0;
+  });
 
-  if (itItemsWithoutReasons.length > 0) {
-    showAlert("warning", "يجب تحديد سبب الإرجاع لعناصر IT قبل الترجيع");
+  if (itemsWithoutReasons.length > 0) {
+    showAlert("warning", "يجب تحديد سبب الإرجاع لجميع العناصر قبل الترجيع");
     return;
   }
 
-  showReturnConfirmation(returnData);
-}
+  // Check for non-special items without files (MANDATORY file upload)
+  const nonSpecialItemsWithoutFiles = returnData.filter((item) => {
+    return !item.isSpecialCategory && (!item.files || item.files.length === 0);
+  });
 
-function showReturnConfirmation(returnData) {
-  const modal = document.getElementById("deleteModal");
-  const message = document.getElementById("deleteMessage");
-
-  if (!modal || !message) {
-    showAlert("error", "عنصر النافذة المنبثقة غير موجود");
+  if (nonSpecialItemsWithoutFiles.length > 0) {
+    const itemNames = nonSpecialItemsWithoutFiles
+      .map((item) => item.name)
+      .join("، ");
+    showAlert("error", `يجب رفع صور للعناصر التالية قبل الترجيع: ${itemNames}`);
     return;
   }
 
-  let itemsList = returnData
-    .map((item, index) => {
-      let attachmentInfo = "";
+  const missingComments = returnData.filter((item) => !item.comment);
 
-      if (item.generateForm) {
-        const reasons = item.reasons || {};
-        const selectedReasons = Object.keys(reasons).filter((k) => reasons[k]);
-        const reasonLabels = {
-          purpose_end: "انتهاء الغرض",
-          excess: "فائض",
-          unfit: "عدم الصلاحية",
-          damaged: "تالف",
-        };
-        const reasonsText = selectedReasons
-          .map((r) => reasonLabels[r])
-          .join(", ");
-        attachmentInfo = `<br><small style="color: #3ac0c3;">📄 نموذج تلقائي: ${reasonsText}</small>`;
-      } else if (item.files.length > 0) {
-        attachmentInfo = `<br><small style="color: #ff6b6b;">📷 ${item.files.length} صورة</small>`;
-      }
-
-      return `<div style="margin: 8px 0; padding: 8px; background: #f8f9fa; border-radius: 6px;">
-            <strong>${index + 1}. ${item.name}</strong>
-            <br><small style="color: #888;">رقم الأصل: ${item.assetNum}</small>
-            ${
-              item.comment
-                ? `<br><small style="color: #666;">📝 ${item.comment}</small>`
-                : '<br><small style="color: #999;">بدون ملاحظات</small>'
-            }
-            ${attachmentInfo}
-        </div>`;
-    })
-    .join("");
-
-  message.innerHTML = `
-        <div style="max-height: 300px; overflow-y: auto; margin: 10px 0;">
-            ${itemsList}
-        </div>
-        <strong style="color: #057590; margin-top: 15px; display: block;">
-            هل أنت متأكد من ترجيع هذه العناصر؟
-        </strong>
-    `;
-
-  modal.style.display = "flex";
-  setTimeout(() => modal.classList.add("show"), 10);
-
-  window.tempReturnData = returnData;
-
-  closeSelectedItemsPopup();
-}
-
-function closeDeleteModal() {
-  const modal = document.getElementById("deleteModal");
-  if (modal) {
-    modal.classList.remove("show");
-    setTimeout(() => (modal.style.display = "none"), 300);
-  }
-}
-
-function confirmBulkReturnWithFiles() {
-  const returnData = window.tempReturnData;
-
-  if (!returnData) {
-    showAlert("warning", "حدث خطأ في البيانات");
-    return;
+  if (missingComments.length > 0) {
+    const confirmProceed = confirm(
+      `يوجد ${missingComments.length} عنصر بدون ملاحظات.\nهل تريد المتابعة؟`
+    );
+    if (!confirmProceed) return;
   }
 
-  const confirmBtn = document.querySelector(".confirm-delete-btn");
-  if (!confirmBtn) return;
+  // Directly process the return without showing confirmation modal
+  processReturnSubmission(returnData);
+}
 
-  const originalText = confirmBtn.innerHTML;
-  confirmBtn.disabled = true;
-  confirmBtn.innerHTML =
-    '<i class="fas fa-spinner fa-spin"></i> جاري الترجيع...';
+function processReturnSubmission(returnData) {
+  const popup = document.getElementById("selectedItemsPopup");
+
+  // Show loading state
+  const confirmBtn = popup
+    ? popup.querySelector('button[onclick="confirmBulkReturnDirectly()"]')
+    : null;
+  let originalBtnContent = "";
+
+  if (confirmBtn) {
+    originalBtnContent = confirmBtn.innerHTML;
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML =
+      '<i class="fas fa-spinner fa-spin"></i> جاري الترجيع...';
+  }
 
   const formData = new FormData();
 
   returnData.forEach((item, index) => {
     formData.append(`asset_nums[${index}]`, item.assetNum);
     formData.append(`comments[${item.assetNum}]`, item.comment || "");
+    formData.append(
+      `is_special_category[${item.assetNum}]`,
+      item.isSpecialCategory ? "1" : "0"
+    );
 
     if (item.generateForm) {
       formData.append(`generate_form[${item.assetNum}]`, "1");
@@ -587,25 +603,26 @@ function confirmBulkReturnWithFiles() {
         item.assetType
       );
       formData.append(`item_data[${item.assetNum}][category]`, item.category);
-
-      const reasons = item.reasons || {};
-      formData.append(
-        `reasons[${item.assetNum}][purpose_end]`,
-        reasons.purpose_end ? "1" : "0"
-      );
-      formData.append(
-        `reasons[${item.assetNum}][excess]`,
-        reasons.excess ? "1" : "0"
-      );
-      formData.append(
-        `reasons[${item.assetNum}][unfit]`,
-        reasons.unfit ? "1" : "0"
-      );
-      formData.append(
-        `reasons[${item.assetNum}][damaged]`,
-        reasons.damaged ? "1" : "0"
-      );
     }
+
+    // Send reasons for ALL items now
+    const reasons = item.reasons || {};
+    formData.append(
+      `reasons[${item.assetNum}][purpose_end]`,
+      reasons.purpose_end ? "1" : "0"
+    );
+    formData.append(
+      `reasons[${item.assetNum}][excess]`,
+      reasons.excess ? "1" : "0"
+    );
+    formData.append(
+      `reasons[${item.assetNum}][unfit]`,
+      reasons.unfit ? "1" : "0"
+    );
+    formData.append(
+      `reasons[${item.assetNum}][damaged]`,
+      reasons.damaged ? "1" : "0"
+    );
 
     if (item.files && item.files.length > 0) {
       item.files.forEach((file) => {
@@ -633,172 +650,24 @@ function confirmBulkReturnWithFiles() {
         selectedItems = [];
         uploadedFiles = {};
         itemReasons = {};
-        closeDeleteModal();
-        delete window.tempReturnData;
+        closeSelectedItemsPopup();
 
         setTimeout(() => window.location.reload(), 1500);
       } else {
         showAlert("error", data.message || "حدث خطأ أثناء الترجيع");
-        confirmBtn.disabled = false;
-        confirmBtn.innerHTML = originalText;
+        if (confirmBtn) {
+          confirmBtn.disabled = false;
+          confirmBtn.innerHTML = originalBtnContent;
+        }
       }
     })
     .catch((error) => {
       console.error("Error:", error);
       showAlert("error", "حدث خطأ في الاتصال بالخادم");
-      confirmBtn.disabled = false;
-      confirmBtn.innerHTML = originalText;
-    });
-}
-
-// ==================== PRINT FORM FUNCTION ====================
-
-function printAllForms() {
-  const itItems = selectedItems.filter((item) => item.minorCategory === "IT");
-
-  if (itItems.length === 0) {
-    showAlert("warning", "لا توجد عناصر IT لمعاينة نماذج");
-    return;
-  }
-
-  const itemsWithoutReasons = itItems.filter((item) => {
-    const reasons = itemReasons[item.assetNum] || {};
-    return Object.keys(reasons).filter((k) => reasons[k]).length === 0;
-  });
-
-  if (itemsWithoutReasons.length > 0) {
-    showAlert("warning", "يجب تحديد سبب الإرجاع قبل عرض التقرير");
-    return;
-  }
-
-  const printBtn = event.target;
-  const originalBtnContent = printBtn.innerHTML;
-  printBtn.disabled = true;
-  printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
-
-  const itItemsData = itItems.map((item) => {
-    const itemReasonsData = itemReasons[item.assetNum] || {};
-    const commentElement = document.getElementById(`comment_${item.assetNum}`);
-    const itemNotes = commentElement ? commentElement.value.trim() : "";
-
-    return {
-      assetNum: item.assetNum,
-      name: item.name,
-      category: item.category,
-      assetType: item.assetType || "غير محدد",
-      notes: itemNotes,
-      reasons: {
-        purpose_end: itemReasonsData.purpose_end ? "1" : "0",
-        excess: itemReasonsData.excess ? "1" : "0",
-        unfit: itemReasonsData.unfit ? "1" : "0",
-        damaged: itemReasonsData.damaged ? "1" : "0",
-      },
-    };
-  });
-
-  const formData = new FormData();
-  formData.append("asset_num", itItems[0].assetNum);
-  formData.append("item_data[name]", itItems[0].name);
-  formData.append("item_data[serial_num]", itItems[0].serialNum || "غير محدد");
-  formData.append("item_data[model]", itItems[0].model || "غير محدد");
-  formData.append("item_data[brand]", itItems[0].brand || "غير محدد");
-  formData.append(
-    "item_data[old_asset_num]",
-    itItems[0].oldAssetNum || "غير محدد"
-  );
-  formData.append("item_data[asset_type]", itItems[0].assetType || "غير محدد");
-  formData.append("item_data[category]", itItems[0].category);
-
-  itItemsData.forEach((item, index) => {
-    formData.append(`all_items[${index}][assetNum]`, item.assetNum);
-    formData.append(`all_items[${index}][name]`, item.name);
-    formData.append(`all_items[${index}][category]`, item.category);
-    formData.append(`all_items[${index}][assetType]`, item.assetType);
-    formData.append(`all_items[${index}][notes]`, item.notes);
-    formData.append(
-      `all_items[${index}][reasons][purpose_end]`,
-      item.reasons.purpose_end
-    );
-    formData.append(
-      `all_items[${index}][reasons][excess]`,
-      item.reasons.excess
-    );
-    formData.append(`all_items[${index}][reasons][unfit]`, item.reasons.unfit);
-    formData.append(
-      `all_items[${index}][reasons][damaged]`,
-      item.reasons.damaged
-    );
-  });
-
-  const printFrame = document.createElement("iframe");
-  printFrame.style.cssText =
-    "position: fixed; right: 0; bottom: 0; width: 0; height: 0; border: none; visibility: hidden;";
-  document.body.appendChild(printFrame);
-
-  const baseUrl =
-    typeof window.appConfig !== "undefined" ? window.appConfig.baseUrl : "";
-
-  fetch(baseUrl + "return/attachment/printForm", {
-    method: "POST",
-    headers: {
-      "X-Requested-With": "XMLHttpRequest",
-      Accept: "application/json",
-    },
-    body: formData,
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = originalBtnContent;
       }
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        return response.json();
-      } else {
-        return response.text().then((html) => ({ success: true, html: html }));
-      }
-    })
-    .then((data) => {
-      if (data.success && data.html) {
-        const iframeDoc = printFrame.contentWindow.document;
-        iframeDoc.open();
-        iframeDoc.write(data.html);
-        iframeDoc.close();
-
-        printFrame.onload = function () {
-          try {
-            printFrame.contentWindow.focus();
-            printFrame.contentWindow.print();
-
-            setTimeout(() => {
-              if (printFrame && printFrame.parentNode) {
-                document.body.removeChild(printFrame);
-              }
-            }, 1000);
-          } catch (e) {
-            console.error("Print error:", e);
-            showAlert("error", "حدث خطأ أثناء الطباعة");
-            if (printFrame && printFrame.parentNode) {
-              document.body.removeChild(printFrame);
-            }
-          }
-        };
-      } else {
-        showAlert("error", data.message || "فشل إنشاء النموذج");
-        if (printFrame && printFrame.parentNode) {
-          document.body.removeChild(printFrame);
-        }
-      }
-    })
-    .catch((error) => {
-      console.error("Error details:", error);
-      showAlert("error", "حدث خطأ في الاتصال بالخادم: " + error.message);
-      if (printFrame && printFrame.parentNode) {
-        document.body.removeChild(printFrame);
-      }
-    })
-    .finally(() => {
-      printBtn.disabled = false;
-      printBtn.innerHTML = originalBtnContent;
     });
 }
 
@@ -896,7 +765,7 @@ function filterBySource(source) {
 }
 
 // ==================== TRANSFER FUNCTIONS (PLACEHOLDERS) ====================
-// These functions are referenced in the HTML but not implemented in the original code
+// These functions are referenced in the HTML but not fully implemented
 // Add them if you have transfer functionality
 
 function openTransferPopup(itemOrderId) {
@@ -925,4 +794,8 @@ function submitTransferSingle() {
 
 // ==================== INITIALIZATION ====================
 
-console.log("Return system initialized - Ready for returns from userView2");
+document.addEventListener("DOMContentLoaded", function () {
+  console.log(
+    "Return system initialized - IT/Telecom/Equipment items go to 'Under Evaluation', others need mandatory file upload"
+  );
+});

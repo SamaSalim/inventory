@@ -487,82 +487,81 @@ public function respondToTransfer()
     $transferItemsModel = $this->transferItemsModel;
     $historyModel = new \App\Models\HistoryModel();
 
-    // ✅ جلب التحويلات المقبولة - مع التأكد أن المستخدم هو آخر مستلم
-    $transferItems = $transferItemsModel
-        ->select(
-            'transfer_items.transfer_item_id AS id,
-             transfer_items.created_at,
-             transfer_items.item_order_id,
-             transfer_items.is_opened,
-             transfer_items.order_status_id AS transfer_order_status_id,
-             item_order.asset_num,
-             item_order.serial_num,
-             item_order.model_num AS model,
-             item_order.brand,
-             item_order.old_asset_num,
-             item_order.assets_type,
-             item_order.usage_status_id,
-             items.name AS item_name,
-             minor_category.name AS minor_category_name,
-             major_category.name AS major_category_name,
-             from_user.name AS from_user_name,
-             from_user.user_dept AS from_user_dept,
-             usage_status.usage_status AS usage_status_name,
-             order_status.status AS order_status_name,
-             "transfer_items" AS source_table'
-        )
-        ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
-        ->join('items', 'items.id = item_order.item_id', 'left')
-        ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-        ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
-        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-        ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
-        ->where('transfer_items.to_user_id', $currentUserId)
-        ->where('transfer_items.order_status_id', 2) // Only accepted transfers
-        ->whereNotIn('item_order.usage_status_id', [2, 3]) // Exclude returned and in-transfer
-        ->groupBy('transfer_items.item_order_id')
-        ->orderBy('transfer_items.created_at', 'ASC')
-        ->findAll();
+        $transferItems = $transferItemsModel
+            ->select(
+                'transfer_items.transfer_item_id AS id,
+         transfer_items.created_at,
+         transfer_items.item_order_id,
+         transfer_items.is_opened,
+         transfer_items.order_status_id AS transfer_order_status_id,
+         item_order.asset_num,
+         item_order.serial_num,
+         item_order.model_num AS model,
+         item_order.brand,
+         item_order.old_asset_num,
+         item_order.assets_type,
+         item_order.usage_status_id,
+         items.name AS item_name,
+         minor_category.name AS minor_category_name,
+         major_category.name AS major_category_name,
+         from_user.name AS from_user_name,
+         from_user.user_dept AS from_user_dept,
+         usage_status.usage_status AS usage_status_name,
+         order_status.status AS order_status_name,
+         "transfer_items" AS source_table'
+            )
+            ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+            ->join('items', 'items.id = item_order.item_id', 'left')
+            ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+            ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
+            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+            ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
+            ->where('transfer_items.to_user_id', $currentUserId)
+            ->where('transfer_items.order_status_id', 2) // Only accepted transfers
+            ->whereNotIn('item_order.usage_status_id', [2, 4,7]) // Exclude returned (2) and reissued (4)
+            ->groupBy('transfer_items.item_order_id')
+            ->orderBy('transfer_items.created_at', 'ASC')
+            ->findAll();
 
     $orderModel = $this->orderModel;
 
-    $orders = $orderModel
-        ->select(
-            'order.order_id AS id,
-             order.created_at,
-             order.to_user_id,
-             order.order_status_id,
-             order_status.status AS order_status_name,
-             usage_status.usage_status AS usage_status_name,
-             from_user.name AS from_user_name,
-             from_user.user_dept AS from_user_dept,
-             item_order.asset_num,
-             item_order.serial_num,
-             item_order.model_num AS model,
-             item_order.brand,
-             item_order.old_asset_num,
-             item_order.assets_type,
-             item_order.item_order_id,
-             item_order.usage_status_id,
-             items.name AS item_name,
-             minor_category.name AS minor_category_name,
-             major_category.name AS major_category_name,
-             "orders" AS source_table'
-        )
-        ->join('item_order', 'item_order.order_id = order.order_id', 'left')
-        ->join('items', 'items.id = item_order.item_id', 'left')
-        ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-        ->join('users AS from_user', 'from_user.user_id = order.from_user_id', 'left')
-        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-        ->join('order_status', 'order_status.id = order.order_status_id', 'left')
-        ->where('order.to_user_id', $currentUserId)
-        ->where('order.order_status_id', 2) // Only accepted orders
-        ->whereNotIn('item_order.usage_status_id', [2, 3]) // Exclude returned and in-transfer
-        ->groupBy('item_order.item_order_id')
-        ->orderBy('order.created_at', 'ASC')
-        ->findAll();
+        $orders = $orderModel
+            ->select(
+                'order.order_id AS id,
+         order.created_at,
+         order.to_user_id,
+         order.order_status_id,
+         order_status.status AS order_status_name,
+         usage_status.usage_status AS usage_status_name,
+         from_user.name AS from_user_name,
+         from_user.user_dept AS from_user_dept,
+         item_order.asset_num,
+         item_order.serial_num,
+         item_order.model_num AS model,
+         item_order.brand,
+         item_order.old_asset_num,
+         item_order.assets_type,
+         item_order.item_order_id,
+         item_order.usage_status_id,
+         items.name AS item_name,
+         minor_category.name AS minor_category_name,
+         major_category.name AS major_category_name,
+         "orders" AS source_table'
+            )
+            ->join('item_order', 'item_order.order_id = order.order_id', 'left')
+            ->join('items', 'items.id = item_order.item_id', 'left')
+            ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+            ->join('users AS from_user', 'from_user.user_id = order.from_user_id', 'left')
+            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+            ->join('order_status', 'order_status.id = order.order_status_id', 'left')
+            ->where('order.to_user_id', $currentUserId)
+            ->where('order.order_status_id', 2) // Only accepted orders
+            ->whereNotIn('item_order.usage_status_id', [2, 4,7]) // Exclude returned (2) and reissued (4)
+            ->groupBy('item_order.item_order_id')
+            ->orderBy('order.created_at', 'ASC')
+            ->findAll();
 
     $combinedItems = [];
     $assetNums = [];
@@ -588,12 +587,12 @@ public function respondToTransfer()
             // Initialize reissued flag
             $order->is_reissued = false;
 
-            // Check if item has usage_status_id = 1 (new) and has a history of being returned (usage_status_id = 2)
-            if ($order->usage_status_id == 1) {
-                $returnHistoryExists = $historyModel
-                    ->where('item_order_id', $order->item_order_id)
-                    ->where('usage_status_id', 2) // Check for returned status in history
-                    ->first();
+ 
+                if ($order->usage_status_id == 1) {
+                    $returnHistoryExists = $historyModel
+                        ->where('item_order_id', $order->item_order_id)
+                        ->where('usage_status_id', 2) 
+                        ->first();
 
                 if ($returnHistoryExists) {
                     $order->is_reissued = true;
@@ -601,10 +600,9 @@ public function respondToTransfer()
                 }
             }
 
-            // Check if usage_status_id = 5, then override order status to "مرفوض"
-            if ($order->usage_status_id == 5) {
-                $order->order_status_name = 'مرفوض';
-            }
+                if ($order->usage_status_id == 5) {
+                    $order->order_status_name = 'مرفوض';
+                }
 
             $combinedItems[] = $order;
             $assetNums[$key] = true;
