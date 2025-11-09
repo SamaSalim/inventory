@@ -25,6 +25,7 @@ class ItemOrderModel extends Model
         'created_by',
         'usage_status_id',
         'attachment',
+        'price',
         'note'
     ];
 
@@ -48,6 +49,7 @@ class ItemOrderModel extends Model
         'created_by' => 'permit_empty|max_length[50]',
         'usage_status_id' => 'required|integer|is_not_unique[usage_status.id]',
         'attachment'       => 'permit_empty|max_length[128]',
+        'price' => 'permit_empty|decimal',
         'note' => 'permit_empty'
     ];
 
@@ -97,6 +99,9 @@ class ItemOrderModel extends Model
             'required' => 'حالة الاستخدام مطلوبة',
             'integer' => 'حالة الاستخدام يجب أن تكون رقم صحيح',
             'is_not_unique' => 'حالة الاستخدام المحددة غير موجودة'
+        ],
+        'price' => [
+            'decimal' => 'السعر يجب أن يكون رقم عشري صالح'
         ],
         'attachment' => [
             'max_length'      => 'اسم المرفق يجب ألا يتجاوز 128 حرف'

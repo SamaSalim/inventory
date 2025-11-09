@@ -17,6 +17,7 @@ use App\Models\{
     UsageStatusModel,
     TransferItemsModel,
 };
+use App\Exceptions\AuthenticationException;
 
 class AssetsController extends BaseController
 {
@@ -296,9 +297,9 @@ public function orderDetails($id)
 // transferView - عرض صفحة تحويل العهدة
 public function transferView($orderId = null)
 {
-    if (!session()->get('isLoggedIn')) {
-        throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
-    }
+        if (!session()->get('isLoggedIn')) {
+            throw new AuthenticationException();
+        }
 
     $itemOrderModel = new \App\Models\ItemOrderModel();
     
@@ -721,91 +722,92 @@ private function sendTransferEmail($toUser, $fromUser, $itemsDetails, $note, $or
     }
 }
 
-public function showTransfer($orderId)
-{
-    $transferItemsModel = new \App\Models\TransferItemsModel();
-    $itemOrderModel     = new \App\Models\ItemOrderModel();
-    $userModel          = new \App\Models\UserModel();
-    $itemModel          = new \App\Models\ItemModel();
-    $minorCatModel      = new \App\Models\MinorCategoryModel();
-    $majorCatModel      = new \App\Models\MajorCategoryModel();
-    $roomModel          = new \App\Models\RoomModel();
-    $usageStatusModel   = new \App\Models\UsageStatusModel();
+// public function showTransfer($orderId)
+// {
+//     $transferItemsModel = new \App\Models\TransferItemsModel();
+//     $itemOrderModel     = new \App\Models\ItemOrderModel();
+//     $userModel          = new \App\Models\UserModel();
+//     $itemModel          = new \App\Models\ItemModel();
+//     $minorCatModel      = new \App\Models\MinorCategoryModel();
+//     $majorCatModel      = new \App\Models\MajorCategoryModel();
+//     $roomModel          = new \App\Models\RoomModel();
+//     $usageStatusModel   = new \App\Models\UsageStatusModel();
 
-    // جلب كل item_order_id للطلب
-    $itemOrders = $itemOrderModel->where('order_id', $orderId)->findAll();
+//     // جلب كل item_order_id للطلب
+//     $itemOrders = $itemOrderModel->where('order_id', $orderId)->findAll();
     
-    if (empty($itemOrders)) {
-        return redirect()->back()->with('error', 'لا توجد عناصر لهذا الطلب');
-    }
+//     if (empty($itemOrders)) {
+//         return redirect()->back()->with('error', 'لا توجد عناصر لهذا الطلب');
+//     }
 
-    // جلب كل item_order_id
-    $itemOrderIds = array_column($itemOrders, 'item_order_id');
+//     // جلب كل item_order_id
+//     $itemOrderIds = array_column($itemOrders, 'item_order_id');
     
-    // 🔥 التعديل الرئيسي: جلب آخر تحويل لكل صنف فقط
-    $transfers = [];
-    foreach ($itemOrderIds as $itemOrderId) {
-        $latestTransfer = $transferItemsModel
-            ->where('item_order_id', $itemOrderId)
-            ->orderBy('created_at', 'DESC')  // الأحدث أولاً
-            ->first();  // فقط أول نتيجة (الأحدث)
+//     // 🔥 التعديل الرئيسي: جلب آخر تحويل لكل صنف فقط
+//     $transfers = [];
+//     foreach ($itemOrderIds as $itemOrderId) {
+//         $latestTransfer = $transferItemsModel
+//             ->where('item_order_id', $itemOrderId)
+//             ->orderBy('created_at', 'DESC')  // الأحدث أولاً
+//             ->first();  // فقط أول نتيجة (الأحدث)
         
-        if ($latestTransfer) {
-            $transfers[] = $latestTransfer;
-        }
-    }
+//         if ($latestTransfer) {
+//             $transfers[] = $latestTransfer;
+//         }
+//     }
 
-    if (empty($transfers)) {
-        return redirect()->back()->with('error', 'لا توجد تحويلات لهذا الطلب');
-    }
+//     if (empty($transfers)) {
+//         return redirect()->back()->with('error', 'لا توجد تحويلات لهذا الطلب');
+//     }
 
-    // جلب معلومات المستخدمين من أول تحويل
-    $firstTransfer = $transfers[0];
-    $fromUser = $userModel->where('user_id', $firstTransfer->from_user_id)->first();
-    $toUser   = $userModel->where('user_id', $firstTransfer->to_user_id)->first();
+//     // جلب معلومات المستخدمين من أول تحويل
+//     $firstTransfer = $transfers[0];
+//     $fromUser = $userModel->where('user_id', $firstTransfer->from_user_id)->first();
+//     $toUser   = $userModel->where('user_id', $firstTransfer->to_user_id)->first();
 
-    $transferInfo = (object)[
-        'order_id'   => $orderId,
-        'from_name'  => $fromUser->name ?? 'غير معروف',
-        'to_name'    => $toUser->name ?? 'غير معروف',
-        'created_at' => $firstTransfer->created_at,
-    ];
+//     $transferInfo = (object)[
+//         'order_id'   => $orderId,
+//         'from_name'  => $fromUser->name ?? 'غير معروف',
+//         'to_name'    => $toUser->name ?? 'غير معروف',
+//         'created_at' => $firstTransfer->created_at,
+//     ];
 
-    // جلب تفاصيل كل الأصناف المحولة
-    $items = [];
-    foreach ($transfers as $transfer) {
-        $itemOrder = $itemOrderModel->find($transfer->item_order_id);
+    
+//     // جلب تفاصيل كل الأصناف المحولة
+//     $items = [];
+//     foreach ($transfers as $transfer) {
+//         $itemOrder = $itemOrderModel->find($transfer->item_order_id);
         
-        if (!$itemOrder) continue;
+//         if (!$itemOrder) continue;
 
-        $itemData = $itemModel->find($itemOrder->item_id);
-        $minor    = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
-        $major    = $minor ? $majorCatModel->find($minor->major_category_id) : null;
-        $usageStatus = $usageStatusModel->find($itemOrder->usage_status_id);
+//         $itemData = $itemModel->find($itemOrder->item_id);
+//         $minor    = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
+//         $major    = $minor ? $majorCatModel->find($minor->major_category_id) : null;
+//         $usageStatus = $usageStatusModel->find($itemOrder->usage_status_id);
 
-        $items[] = (object)[
-            'transfer_item_id'     => $transfer->transfer_item_id,
-            'item_name'            => $itemData->name ?? 'غير معروف',
-            'minor_category_name'  => $minor->name ?? 'غير معروف',
-            'major_category_name'  => $major->name ?? 'غير معروف',
-            'model_num'            => $itemOrder->model_num,
-            'serial_num'           => $itemOrder->serial_num,
-            'asset_num'            => $itemOrder->asset_num,
-            'old_asset_num'        => $itemOrder->old_asset_num,
-            'brand'                => $itemOrder->brand,
-            'assets_type'          => $itemOrder->assets_type,
-            'location_code'        => $roomModel->getFullLocationCode($itemOrder->room_id),
-            'usage_status_name'    => $usageStatus->usage_status ?? 'غير معروف',
-            'note'                 => $transfer->note,
-            'created_at'           => $transfer->created_at,
-            'updated_at'           => $transfer->updated_at,
-        ];
-    }
+//         $items[] = (object)[
+//             'transfer_item_id'     => $transfer->transfer_item_id,
+//             'item_name'            => $itemData->name ?? 'غير معروف',
+//             'minor_category_name'  => $minor->name ?? 'غير معروف',
+//             'major_category_name'  => $major->name ?? 'غير معروف',
+//             'model_num'            => $itemOrder->model_num,
+//             'serial_num'           => $itemOrder->serial_num,
+//             'asset_num'            => $itemOrder->asset_num,
+//             'old_asset_num'        => $itemOrder->old_asset_num,
+//             'brand'                => $itemOrder->brand,
+//             'assets_type'          => $itemOrder->assets_type,
+//             'location_code'        => $roomModel->getFullLocationCode($itemOrder->room_id),
+//             'usage_status_name'    => $usageStatus->usage_status ?? 'غير معروف',
+//             'note'                 => $transfer->note,
+//             'created_at'           => $transfer->created_at,
+//             'updated_at'           => $transfer->updated_at,
+//         ];
+//     }
 
-    return view('assets/show_transfer', [
-        'transfer'   => $transferInfo,
-        'items'      => $items,
-        'item_count' => count($items),
-    ]);
-}
+//     return view('assets/show_transfer', [
+//         'transfer'   => $transferInfo,
+//         'items'      => $items,
+//         'item_count' => count($items),
+//     ]);
+// }
 }

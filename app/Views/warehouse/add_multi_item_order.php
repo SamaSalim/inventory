@@ -858,6 +858,14 @@
                     <label>البراند</label>
                     <input type="text" name="brand_${itemId}_${i}" placeholder="أدخل اسم البراند">
                 </div>
+<div class="form-group">
+    <label>السعر</label>
+    <input type="text" 
+        name="price_${itemId}_${i}" 
+        placeholder="أدخل السعر مثال: 1500.50" 
+        inputmode="decimal" 
+        pattern="^[0-9]+(\.[0-9]+)?$"  title="يجب إدخال رقم عشري موجب صالح (باستخدام النقطة كفاصل عشري: 1000.75).">
+</div>
             `;
 
                     container.appendChild(fieldDiv);

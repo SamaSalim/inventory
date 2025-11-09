@@ -767,7 +767,6 @@
             });
         }
 
-        // edit_order.php
 
         // وظيفة إضافة صنف من البيانات المحملة
         function addItemFromData(itemGroup, itemNumber) {
@@ -832,8 +831,89 @@
             // تحميل قائمة أنواع العهدة وتعيين القيمة الحالية
             loadCustodyTypesForItem(itemCounter, itemGroup.assets_type);
 
-            // تم تمرير مصفوفة items (البيانات القديمة) كمدخل ثانٍ للدالة.
-            updateAssetSerialFields(itemCounter, itemGroup.items);
+            // إضافة الحقول الديناميكية مباشرة
+            const assetSerialContainer = document.getElementById(`assetSerialContainer_${itemCounter}`);
+            const dynamicSection = document.getElementById(`dynamicFields_${itemCounter}`);
+            const qty = itemGroup.quantity || 0;
+
+            if (qty > 0 && assetSerialContainer) {
+                // جمع بيانات العناصر لهذا الصنف
+                for (let i = 1; i <= qty; i++) {
+                    const currentItem = itemGroup.items[i - 1] || {};
+
+                    const fieldDiv = document.createElement('div');
+                    fieldDiv.className = 'asset-serial-grid';
+
+                    fieldDiv.innerHTML = `
+            <div class="asset-serial-header">العنصر رقم ${i}</div>
+            <input type="hidden" name="existing_item_id_${itemCounter}_${i}" value="${currentItem.id || ''}">
+            <div class="form-group">
+                <label>رقم الأصول <span class="required">*</span></label>
+                <input type="text" 
+                    name="asset_num_${itemCounter}_${i}" 
+                    placeholder="أدخل 12 رقم فقط" 
+                    pattern="[0-9]{12}" 
+                    maxlength="12" 
+                    inputmode="numeric"
+                    title="يجب إدخال 12 رقم بالضبط"
+                    value="${currentItem.asset_num || ''}"
+                    required>
+                <div class="validation-message asset-validation-${itemCounter}-${i}" style="display: none;"></div>
+            </div>
+            <div class="form-group">
+                <label>الرقم التسلسلي <span class="required">*</span></label>
+                <input type="text" 
+                    name="serial_num_${itemCounter}_${i}" 
+                    placeholder="أدخل الرقم التسلسلي" 
+                    value="${currentItem.serial_num || ''}"
+                    required>
+                <div class="validation-message serial-validation-${itemCounter}-${i}" style="display: none;"></div>
+            </div>
+            <div class="form-group">
+                <label>رقم الموديل</label>
+                <input type="text" 
+                    name="model_num_${itemCounter}_${i}" 
+                    placeholder="أدخل رقم الموديل"
+                    value="${currentItem.model_num || ''}">
+            </div>
+            <div class="form-group">
+                <label>رقم الأصول القديمة</label>
+                <input type="text" 
+                    name="old_asset_num_${itemCounter}_${i}" 
+                    placeholder="أدخل رقم الأصول القديمة"
+                    value="${currentItem.old_asset_num || ''}">
+            </div>
+            <div class="form-group">
+                <label>البراند</label>
+                <input type="text" 
+                    name="brand_${itemCounter}_${i}" 
+                    placeholder="أدخل اسم البراند"
+                    value="${currentItem.brand || ''}">
+            </div>
+            <div class="form-group">
+                <label>السعر</label>
+                <input type="text" 
+                    name="price_${itemCounter}_${i}" 
+                    placeholder="أدخل السعر" 
+                    inputmode="decimal"
+                    value="${currentItem.price || ''}">
+            </div>
+        `;
+
+                    assetSerialContainer.appendChild(fieldDiv);
+
+                    // إضافة معالجات التحقق للحقول الجديدة
+                    const assetInput = fieldDiv.querySelector(`input[name="asset_num_${itemCounter}_${i}"]`);
+                    const serialInput = fieldDiv.querySelector(`input[name="serial_num_${itemCounter}_${i}"]`);
+
+                    const excludeId = currentItem.id || null;
+
+                    assetInput.addEventListener('blur', () => validateAssetSerial(assetInput, itemCounter, i, 'asset', excludeId));
+                    serialInput.addEventListener('blur', () => validateAssetSerial(serialInput, itemCounter, i, 'serial', excludeId));
+                }
+
+                dynamicSection.style.display = 'block';
+            }
         }
 
         // تعيين الموقع من البيانات
@@ -1548,6 +1628,7 @@
                     const modelNum = grid.querySelector('input[name^="model_num_"]')?.value || '';
                     const oldAssetNum = grid.querySelector('input[name^="old_asset_num_"]')?.value || '';
                     const brand = grid.querySelector('input[name^="brand_"]')?.value || '';
+                    const price = grid.querySelector('input[name^="price_"]')?.value || '';
 
                     initialItemsData.push({
                         id: existingItemId,
@@ -1555,7 +1636,9 @@
                         serial_num: serialNum,
                         model_num: modelNum,
                         old_asset_num: oldAssetNum,
-                        brand: brand
+                        brand: brand,
+                        price: price //  حفظ حقل السعر
+
                     });
                 });
             }
@@ -1571,7 +1654,8 @@
                         serial_num: '',
                         model_num: '',
                         old_asset_num: '',
-                        brand: ''
+                        brand: '',
+                        price: '' //  حقل السعر 
                     };
 
                     const fieldDiv = document.createElement('div');
@@ -1613,6 +1697,14 @@
                     <label>البراند</label>
                     <input type="text" name="brand_${itemId}_${i}" placeholder="أدخل اسم البراند" value="${itemData.brand}">
                 </div>
+   <div class="form-group">
+    <label>السعر</label>
+    <input type="text" 
+        name="price_${itemId}_${i}" 
+        placeholder="أدخل السعر مثال: 1500.50" 
+        inputmode="decimal" 
+        pattern="^[0-9]+(\.[0-9]+)?$"  title="يجب إدخال رقم عشري موجب صالح (باستخدام النقطة كفاصل عشري: 1000.75).">
+</div>
             `;
 
                     container.appendChild(fieldDiv);

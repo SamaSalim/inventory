@@ -598,9 +598,8 @@
                     url = '<?= site_url("reports/directordersreport") ?>?' + params.toString();
                     break;
                 case 'transfer':
-                    showAlert('⚠️ طباعة تقرير التحويل غير متاحة حالياً');
-                    isPrinting = false;
-                    return;
+                    url = '<?= site_url("reports/transferreport") ?>?' + params.toString();
+                    break;
                 default:
                     showAlert('⚠️ نوع العملية غير مدعوم للطباعة');
                     isPrinting = false;
