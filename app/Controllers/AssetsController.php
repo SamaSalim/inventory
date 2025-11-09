@@ -493,8 +493,8 @@ public function processTransfer()
             $currentItem = $itemOrderModel
                 ->select('item_order.*, items.name as item_name')
                 ->join('items', 'items.id = item_order.item_id')
-                ->find($itemOrderId); // ✅ البحث بـ item_order_id وليس order_id
-            
+                ->where('item_order.item_order_id', $itemOrderId)
+                ->first();
             if (!$currentItem) {
                 log_message('warning', "Item order {$itemOrderId} not found");
                 continue;
@@ -533,11 +533,7 @@ public function processTransfer()
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            // عند قبول التحويل (order_status_id = 2)
-            // $itemOrderModel->update($itemOrderId, [
-            //     'usage_status_id' => 5, // ✅تتغير الحالة إلى " مستعمل" عند قبول التحويل
-            //     'updated_at' => date('Y-m-d H:i:s')
-            // ]);
+            
 
             // ✅ إضافة سجل في جدول transfer_items لهذا الصنف
             $transferData = [
