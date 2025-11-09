@@ -19,6 +19,15 @@ class Attachment extends BaseController
         $this->model = new ItemOrderModel();
     }
 
+    /**
+     * Helper function to check if category is special (IT/Telecom/Equipment)
+     */
+    private function isSpecialCategory($minorCategoryName)
+    {
+        $specialCategories = ['IT', 'Telecom', 'Equipment'];
+        return in_array($minorCategoryName, $specialCategories);
+    }
+
     public function upload()
     {
         if (!session()->get('isLoggedIn')) {
@@ -41,9 +50,9 @@ class Attachment extends BaseController
 
         $assetNums = $this->request->getPost('asset_nums');
         $comments  = $this->request->getPost('comments');
-        $generateForm = $this->request->getPost('generate_form');
         $itemData = $this->request->getPost('item_data');
-        $reasons = $this->request->getPost('reasons');
+        $isSpecialCategoryFlags = $this->request->getPost('is_special_category');
+        $reasons = $this->request->getPost('reasons'); // Get reasons from POST
 
         if (empty($assetNums) || !is_array($assetNums)) {
             return $this->response->setJSON([
@@ -53,12 +62,17 @@ class Attachment extends BaseController
         }
 
         $usageStatusModel = new \App\Models\UsageStatusModel();
-        $returnedStatus = $usageStatusModel->where('usage_status', 'رجيع')->first();
+        
+        // Status 7: Under Evaluation (for IT/Telecom/Equipment)
+        $underEvaluationStatus = $usageStatusModel->where('id', 7)->first();
+        
+        // Status 2: Returned (for other items)
+        $returnedStatus = $usageStatusModel->where('id', 2)->first();
 
-        if (!$returnedStatus) {
+        if (!$underEvaluationStatus || !$returnedStatus) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'حالة "رجيع" غير موجودة في النظام'
+                'message' => 'حالات الاستخدام غير موجودة في النظام'
             ]);
         }
 
@@ -73,35 +87,6 @@ class Attachment extends BaseController
         $failedItems  = [];
         $allFiles = $this->request->getFiles();
 
-        // Collect all IT items that need form generation
-        $itItems = [];
-        foreach ($assetNums as $assetNum) {
-            $originalItem = $this->model
-                ->select('item_order.*, minor_category.name as minor_category_name')
-                ->join('items', 'items.id = item_order.item_id')
-                ->join('minor_category', 'minor_category.id = items.minor_category_id')
-                ->where('item_order.asset_num', $assetNum)
-                ->first();
-
-            if (!$originalItem) {
-                continue;
-            }
-
-            $isIT = ($originalItem->minor_category_name === 'IT');
-            if ($isIT && isset($generateForm[$assetNum]) && $generateForm[$assetNum] == '1') {
-                $itemComment = isset($comments[$assetNum]) ? trim($comments[$assetNum]) : '';
-                
-                $itItems[] = [
-                    'assetNum' => $assetNum,
-                    'name' => $itemData[$assetNum]['name'] ?? '',
-                    'category' => $itemData[$assetNum]['category'] ?? '',
-                    'assetType' => $itemData[$assetNum]['asset_type'] ?? '',
-                    'notes' => $itemComment,
-                    'reasons' => $reasons[$assetNum] ?? []
-                ];
-            }
-        }
-
         // Collect all successfully returned item order IDs for ONE email
         $returnedItemOrderIds = [];
         $allItemsNotes = '';
@@ -111,7 +96,7 @@ class Attachment extends BaseController
 
         foreach ($assetNums as $assetNum) {
             $originalItem = $this->model
-                ->select('item_order.*, minor_category.name as minor_category_name')
+                ->select('item_order.*, items.name as item_name, minor_category.name as minor_category_name')
                 ->join('items', 'items.id = item_order.item_id')
                 ->join('minor_category', 'minor_category.id = items.minor_category_id')
                 ->where('item_order.asset_num', $assetNum)
@@ -122,32 +107,24 @@ class Attachment extends BaseController
                 continue;
             }
 
-            $isIT = ($originalItem->minor_category_name === 'IT');
+            $isSpecial = $this->isSpecialCategory($originalItem->minor_category_name);
             $uploadedFileNames = [];
 
-            // Generate form for IT items with all items data
-            if ($isIT && isset($generateForm[$assetNum]) && $generateForm[$assetNum] == '1') {
-                try {
-                    $itemComment = isset($comments[$assetNum]) ? trim($comments[$assetNum]) : '';
-                    
-                    $formPath = $this->generateReturnForm(
-                        $assetNum,
-                        $itemData[$assetNum] ?? [],
-                        $itemComment,
-                        $itItems,
-                        $createdBy
-                    );
-                    
-                    if ($formPath) {
-                        $uploadedFileNames[] = basename($formPath);
-                    }
-                } catch (\Exception $e) {
-                    $failedItems[] = "فشل إنشاء النموذج للأصل: $assetNum - " . $e->getMessage();
+            // Determine which status to use based on category
+            $targetStatus = $isSpecial ? $underEvaluationStatus : $returnedStatus;
+
+            // Validate file upload for non-special categories (MANDATORY)
+            if (!$isSpecial) {
+                $hasFiles = isset($allFiles['attachments'][$assetNum]) && 
+                           count($allFiles['attachments'][$assetNum]) > 0;
+                
+                if (!$hasFiles) {
+                    $failedItems[] = "يجب رفع صور للأصل رقم: $assetNum";
                     continue;
                 }
             }
 
-            // Handle uploaded files
+            // Handle uploaded files (images, PDFs, etc.)
             if (isset($allFiles['attachments'][$assetNum])) {
                 foreach ($allFiles['attachments'][$assetNum] as $file) {
                     if (!$file->isValid()) {
@@ -158,29 +135,24 @@ class Attachment extends BaseController
                         continue;
                     }
 
+                    // Check file size (max 5MB)
                     if ($file->getSizeByUnit("mb") > 5) {
                         $failedItems[] = "الملف كبير جداً للأصل: $assetNum - " . $file->getName();
                         continue;
                     }
 
-                    if ($isIT) {
-                        $allowedMimes = [
-                            "image/png", "image/jpeg", "image/jpg", "image/gif",
-                            "application/pdf", "application/msword",
-                            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                        ];
-                    } else {
-                        $allowedMimes = [
-                            "image/png", "image/jpeg", "image/jpg", "image/gif"
-                        ];
+                    // For non-special categories, only accept images
+                    if (!$isSpecial) {
+                        $allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                        $mimeType = $file->getMimeType();
+                        
+                        if (!in_array($mimeType, $allowedImageTypes)) {
+                            $failedItems[] = "يجب رفع صور فقط للأصل: $assetNum";
+                            continue;
+                        }
                     }
-
-                    if (!in_array($file->getMimeType(), $allowedMimes)) {
-                        $fileType = $isIT ? "غير مسموح" : "يجب أن يكون صورة";
-                        $failedItems[] = "نوع ملف $fileType للأصل: $assetNum - " . $file->getName();
-                        continue;
-                    }
-
+                    // For special categories, accept all file types
+                    
                     $newName = $assetNum . '_' . time() . '_' . $file->getRandomName();
                     if ($file->move($uploadPath, $newName)) {
                         $uploadedFileNames[] = $newName;
@@ -190,14 +162,51 @@ class Attachment extends BaseController
                 }
             }
 
+            $itemComment = isset($comments[$assetNum]) ? trim($comments[$assetNum]) : '';
+            
+            // Get reasons for this item
+            $itemReasons = isset($reasons[$assetNum]) ? $reasons[$assetNum] : [];
+            
+            // Generate HTML form for this item with all data (saved separately, NOT in database)
+            try {
+                $formData = [
+                    'name' => $originalItem->item_name,
+                    'category' => $originalItem->minor_category_name,
+                    'asset_type' => $originalItem->assets_type ?? 'غير محدد'
+                ];
+                
+                $itemForForm = [
+                    'assetNum' => $assetNum,
+                    'name' => $originalItem->item_name,
+                    'category' => $originalItem->minor_category_name,
+                    'assetType' => $originalItem->assets_type ?? 'غير محدد',
+                    'notes' => $itemComment,
+                    'reasons' => $itemReasons
+                ];
+                
+                // Generate the form - saved to disk only, not added to database attachment field
+                $formPath = $this->generateReturnForm(
+                    $assetNum,
+                    $formData,
+                    $itemComment,
+                    [$itemForForm], // Pass as single item in array
+                    $createdBy
+                );
+                
+                // DO NOT add form to uploadedFileNames - it's saved separately
+                // The report will find it by searching for form_{assetNum}_*.html pattern
+                
+            } catch (\Exception $e) {
+                log_message('error', "Failed to generate form for {$assetNum}: " . $e->getMessage());
+            }
+
+            // Only save user-uploaded files to database, NOT the generated HTML form
             $attachmentPath = !empty($uploadedFileNames)
                 ? implode(',', $uploadedFileNames)
                 : ($originalItem->attachment ?? null);
-
-            $itemComment = isset($comments[$assetNum]) ? trim($comments[$assetNum]) : '';
             
             $updateData = [
-                'usage_status_id' => $returnedStatus->id,
+                'usage_status_id' => $targetStatus->id,
                 'note'            => !empty($itemComment) ? $itemComment : 'تم الترجيع',
                 'attachment'      => $attachmentPath,
                 'updated_at'      => date('Y-m-d H:i:s'),
@@ -219,7 +228,7 @@ class Attachment extends BaseController
                 try {
                     $historyModel->insert([
                         'item_order_id'   => $originalItem->item_order_id,
-                        'usage_status_id' => $returnedStatus->id,
+                        'usage_status_id' => $targetStatus->id,
                         'handled_by'      => $createdBy
                     ]);
                 } catch (\Exception $e) {
@@ -253,7 +262,7 @@ class Attachment extends BaseController
             }
         }
 
-        $message = "تم تحديث $successCount عنصر بنجاح وإرسال إشعار بريد إلكتروني واحد";
+        $message = "تم تحديث $successCount عنصر بنجاح وإنشاء نماذج الإرجاع وإرسال إشعار بريد إلكتروني";
         if (!empty($failedItems)) {
             $message .= "\n\nفشل التحديث: " . implode(', ', $failedItems);
         }
@@ -336,10 +345,11 @@ class Attachment extends BaseController
                 $rowNum = $index + 1;
                 $itemReasons = $item['reasons'] ?? [];
                 
-                $purposeEnd = isset($itemReasons['purpose_end']) && $itemReasons['purpose_end'] == '1' ? '✓' : '';
-                $excess = isset($itemReasons['excess']) && $itemReasons['excess'] == '1' ? '✓' : '';
-                $unfit = isset($itemReasons['unfit']) && $itemReasons['unfit'] == '1' ? '✓' : '';
-                $damaged = isset($itemReasons['damaged']) && $itemReasons['damaged'] == '1' ? '✓' : '';
+                // Check for checkmarks - handle both '1' string and boolean true
+                $purposeEnd = (isset($itemReasons['purpose_end']) && ($itemReasons['purpose_end'] === '1' || $itemReasons['purpose_end'] === true)) ? '✓' : '';
+                $excess = (isset($itemReasons['excess']) && ($itemReasons['excess'] === '1' || $itemReasons['excess'] === true)) ? '✓' : '';
+                $unfit = (isset($itemReasons['unfit']) && ($itemReasons['unfit'] === '1' || $itemReasons['unfit'] === true)) ? '✓' : '';
+                $damaged = (isset($itemReasons['damaged']) && ($itemReasons['damaged'] === '1' || $itemReasons['damaged'] === true)) ? '✓' : '';
                 
                 $itemNotes = '';
                 if (isset($item['notes']) && !empty(trim($item['notes']))) {

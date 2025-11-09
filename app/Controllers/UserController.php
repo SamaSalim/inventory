@@ -499,7 +499,7 @@ class UserController extends BaseController
             ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
             ->where('transfer_items.to_user_id', $currentUserId)
             ->where('transfer_items.order_status_id', 2) // Only accepted transfers
-            ->whereNotIn('item_order.usage_status_id', [2, 4]) // Exclude returned (2) and reissued (4)
+            ->whereNotIn('item_order.usage_status_id', [2, 4,7]) // Exclude returned (2) and reissued (4)
             ->groupBy('transfer_items.item_order_id')
             ->orderBy('transfer_items.created_at', 'ASC')
             ->findAll();
@@ -538,7 +538,7 @@ class UserController extends BaseController
             ->join('order_status', 'order_status.id = order.order_status_id', 'left')
             ->where('order.to_user_id', $currentUserId)
             ->where('order.order_status_id', 2) // Only accepted orders
-            ->whereNotIn('item_order.usage_status_id', [2, 4]) // Exclude returned (2) and reissued (4)
+            ->whereNotIn('item_order.usage_status_id', [2, 4,7]) // Exclude returned (2) and reissued (4)
             ->groupBy('item_order.item_order_id')
             ->orderBy('order.created_at', 'ASC')
             ->findAll();
@@ -555,12 +555,11 @@ class UserController extends BaseController
                 // Initialize reissued flag
                 $order->is_reissued = false;
 
-                // Check if item has usage_status_id = 1 (new) and has a history of being returned (usage_status_id = 2)
-                // This means the item was returned before and now reissued
+ 
                 if ($order->usage_status_id == 1) {
                     $returnHistoryExists = $historyModel
                         ->where('item_order_id', $order->item_order_id)
-                        ->where('usage_status_id', 2) // Check for returned status in history
+                        ->where('usage_status_id', 2) 
                         ->first();
 
                     if ($returnHistoryExists) {
@@ -569,7 +568,6 @@ class UserController extends BaseController
                     }
                 }
 
-                // Check if usage_status_id = 5, then override order status to "مرفوض"
                 if ($order->usage_status_id == 5) {
                     $order->order_status_name = 'مرفوض';
                 }

@@ -100,7 +100,6 @@ class ReturnReport extends BaseController
 
         // Check if there are no accepted returned items
         if (empty($returnedItems)) {
-            // Return view with no_accepted_items flag
             return view('assets/reports/return_report_view', [
                 'items' => [],
                 'no_accepted_items' => true,
@@ -120,30 +119,40 @@ class ReturnReport extends BaseController
             ]);
         }
 
-        // Process items to extract reasons from attachments
+        // Process items to extract data from HTML attachments
         $processedItems = [];
         foreach ($returnedItems as $item) {
-            $reasons = $this->extractReasonsFromAttachment($item->attachment, $item->asset_num);
+            $attachmentData = $this->extractDataFromAttachment($item->attachment, $item->asset_num);
             
+            // Use data from attachment if available, otherwise use database values
             $processedItems[] = [
                 'asset_num' => $item->asset_num,
-                'item_name' => $item->item_name,
-                'category' => $item->category,
-                'asset_type' => $item->assets_type,
+                'item_name' => $attachmentData['item_name'] ?? $item->item_name,
+                'category' => $attachmentData['category'] ?? $item->category,
+                'asset_type' => $attachmentData['asset_type'] ?? $item->assets_type,
                 'brand' => $item->brand ?? '-',
                 'model' => $item->model_num ?? '-',
-                'return_date' => $item->return_date,
-                'notes' => $item->note ?? '',
+                'return_date' => $attachmentData['return_date'] ?? $item->return_date,
+                'notes' => $attachmentData['notes'] ?? ($item->note ?? ''),
                 'created_by' => $item->created_by,
                 'order_status' => $item->order_status_name ?? 'غير محدد',
-                'reasons' => $reasons
+                'reasons' => $attachmentData['reasons'] ?? [
+                    'purpose_end' => false,
+                    'excess' => false,
+                    'unfit' => false,
+                    'damaged' => false
+                ],
+                'returning_entity' => $attachmentData['returning_entity'] ?? 'ادارة العهد',
+                'returner_name' => $attachmentData['returner_name'] ?? $this->getCreatorInfo($item->created_by)['name']
             ];
         }
 
-        // Get creator name and ID from first item
-        $creatorInfo = $this->getCreatorInfo($processedItems[0]['created_by']);
+        // Get returner info from first item (person who returned the items)
+        // Use returner_name from HTML form if available, otherwise get from database
+        $returnerName = $processedItems[0]['returner_name'] ?? $this->getCreatorInfo($processedItems[0]['created_by'])['name'];
+        $returnerId = $this->getCreatorInfo($processedItems[0]['created_by'])['id'];
 
-        // Get receiver info (super_warehouse user)
+        // Get receiver info (super_warehouse user - person receiving the items)
         $receiverName = $superWarehouseInfo['name'];
         $receiverId = $superWarehouseInfo['id'];
 
@@ -151,11 +160,11 @@ class ReturnReport extends BaseController
         $data = [
             'items' => $processedItems,
             'no_accepted_items' => false,
-            'creator_name' => $creatorInfo['name'],
-            'creator_id' => $creatorInfo['id'],
+            'creator_name' => $returnerName,  // Person returning items (From)
+            'creator_id' => $returnerId,
             'total_count' => count($processedItems),
             'current_date' => date('Y-m-d'),
-            'receiver_name' => $receiverName,
+            'receiver_name' => $receiverName,  // Warehouse keeper receiving items
             'receiver_id' => $receiverId,
             'filters' => [
                 'asset_number' => $assetNumber,
@@ -169,48 +178,111 @@ class ReturnReport extends BaseController
         return view('assets/reports/return_report_view', $data);
     }
 
-    private function extractReasonsFromAttachment($attachment, $assetNum)
+    /**
+     * Extract all data from HTML form file (stored separately on disk, not in database)
+     */
+    private function extractDataFromAttachment($attachment, $assetNum)
     {
-        $reasons = [
-            'purpose_end' => false,
-            'excess' => false,
-            'unfit' => false,
-            'damaged' => false
+        $result = [
+            'item_name' => null,
+            'category' => null,
+            'asset_type' => null,
+            'notes' => null,
+            'return_date' => null,
+            'returning_entity' => null,
+            'returner_name' => null,
+            'reasons' => [
+                'purpose_end' => false,
+                'excess' => false,
+                'unfit' => false,
+                'damaged' => false
+            ]
         ];
 
-        if (empty($attachment)) {
-            return $reasons;
-        }
-
-        $files = explode(',', $attachment);
+        // Look for HTML form file by asset number pattern (not in database attachment field)
         $uploadPath = WRITEPATH . 'uploads/return_attachments/';
-
-        foreach ($files as $file) {
-            $filename = trim($file);
+        $pattern = $uploadPath . 'form_' . $assetNum . '_*.html';
+        $files = glob($pattern);
+        
+        if (empty($files)) {
+            // No form found for this asset
+            return $result;
+        }
+        
+        // Sort by modification time (newest first)
+        usort($files, function($a, $b) {
+            return filemtime($b) - filemtime($a);
+        });
+        
+        // Get the latest form
+        $fullPath = $files[0];
+        
+        if (!file_exists($fullPath)) {
+            return $result;
+        }
+        
+        $content = file_get_contents($fullPath);
+        
+        // Extract return date
+        if (preg_match('/<span class="field-value">(\d{4}-\d{2}-\d{2})<\/span>/', $content, $dateMatch)) {
+            $result['return_date'] = $dateMatch[1];
+        }
+        
+        // Extract returning entity
+        if (preg_match('/<span class="field-label">الجهة المرجعة:<\/span>\s*<span class="field-value">([^<]+)<\/span>/', $content, $entityMatch)) {
+            $result['returning_entity'] = trim($entityMatch[1]);
+        }
+        
+        // Extract returner name (from signature section)
+        if (preg_match('/الاسم:\s*<span class="signature-value">([^<]+)<\/span>/', $content, $nameMatch)) {
+            $result['returner_name'] = trim($nameMatch[1]);
+        }
+        
+        // Extract item data from table rows
+        // Look for the specific asset number row
+        $assetNumPattern = '/<tr>.*?<td[^>]*>' . preg_quote($assetNum, '/') . '<\/td>.*?<\/tr>/s';
+        if (preg_match($assetNumPattern, $content, $rowMatch)) {
+            $row = $rowMatch[0];
             
-            // Check if it's a generated form file
-            if (strpos($filename, 'form_' . $assetNum) === 0) {
-                $fullPath = $uploadPath . $filename;
-                
-                if (file_exists($fullPath)) {
-                    $content = file_get_contents($fullPath);
-                    
-                    // Parse HTML to extract checkmarks
-                    $pattern = '/<td class="check-mark">([^<]*)<\/td>/';
-                    preg_match_all($pattern, $content, $matches);
-                    
-                    if (isset($matches[1]) && count($matches[1]) >= 4) {
-                        $reasons['purpose_end'] = !empty(trim($matches[1][0]));
-                        $reasons['excess'] = !empty(trim($matches[1][1]));
-                        $reasons['unfit'] = !empty(trim($matches[1][2]));
-                        $reasons['damaged'] = !empty(trim($matches[1][3]));
-                    }
+            // Extract item name and category from item-description-cell
+            if (preg_match('/<div class="item-main-name">([^<]+)<\/div>\s*<div class="item-sub-details">([^<]+)<\/div>/', $row, $itemMatch)) {
+                $result['item_name'] = trim($itemMatch[1]);
+                $result['category'] = trim($itemMatch[2]);
+            }
+            
+            // Extract all td elements
+            preg_match_all('/<td[^>]*>(.*?)<\/td>/s', $row, $tdMatches);
+            
+            if (isset($tdMatches[1])) {
+                // Asset type is typically in position 3 (after serial, asset_num, description)
+                if (isset($tdMatches[1][3])) {
+                    $assetType = strip_tags($tdMatches[1][3]);
+                    $result['asset_type'] = trim($assetType);
                 }
-                break;
+                
+                // Extract checkmarks for reasons (positions 6-9)
+                if (isset($tdMatches[1][6])) {
+                    $result['reasons']['purpose_end'] = !empty(trim(strip_tags($tdMatches[1][6])));
+                }
+                if (isset($tdMatches[1][7])) {
+                    $result['reasons']['excess'] = !empty(trim(strip_tags($tdMatches[1][7])));
+                }
+                if (isset($tdMatches[1][8])) {
+                    $result['reasons']['unfit'] = !empty(trim(strip_tags($tdMatches[1][8])));
+                }
+                if (isset($tdMatches[1][9])) {
+                    $result['reasons']['damaged'] = !empty(trim(strip_tags($tdMatches[1][9])));
+                }
+                
+                // Extract notes (last td with notes-cell class)
+                if (isset($tdMatches[1][10])) {
+                    $notes = strip_tags($tdMatches[1][10]);
+                    $result['notes'] = trim($notes);
+                }
             }
         }
 
-        return $reasons;
+        return $result;
     }
 
     private function getCreatorInfo($createdBy = null)
@@ -248,26 +320,24 @@ class ReturnReport extends BaseController
         return ['name' => 'غير معروف', 'id' => ''];
     }
 
-private function getSuperWarehouseUser()
-{
+    private function getSuperWarehouseUser()
+    {
+        $employeeModel = new EmployeeModel();
 
-    $employeeModel = new EmployeeModel();
+        $result = $employeeModel
+            ->select('employee.emp_id, employee.name')
+            ->join('permission', 'permission.emp_id = employee.emp_id')
+            ->where('permission.role_id', 6) 
+            ->asArray()
+            ->first();
 
-    $result = $employeeModel
-        ->select('employee.emp_id, employee.name')
-        ->join('permission', 'permission.emp_id = employee.emp_id')
-        ->where('permission.role_id', 6) 
-        ->asArray()
-        ->first();
+        if ($result) {
+            return [
+                'name' => $result['name'],
+                'id'   => $result['emp_id']
+            ];
+        }
 
-    if ($result) {
-        return [
-            'name' => $result['name'],
-            'id'   => $result['emp_id']
-        ];
+        return ['name' => 'غير معروف', 'id' => ''];
     }
-
-    return ['name' => 'غير معروف', 'id' => ''];
-}
-
 }

@@ -542,7 +542,7 @@ class CreateFinalTables extends Migration
         $this->forge->addForeignKey('role_id', 'role', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('permission');
 
-        // attachment table
+        // evaluation  table
         $this->forge->addField([
             'id' => [
                 'type'           => 'INT',
@@ -562,6 +562,11 @@ class CreateFinalTables extends Migration
             'notes' => [
                 'type' => 'TEXT',
             ],
+          "attachment" => [
+                "type"       => "VARCHAR",
+                "constraint" => 128,
+                'null'       => true,
+            ],
             'created_at datetime default current_timestamp',
             'updated_at datetime default current_timestamp on update current_timestamp',        ]);
         $this->forge->addPrimaryKey('id');
@@ -569,7 +574,7 @@ class CreateFinalTables extends Migration
         $this->forge->addKey('handled_by'); // index
         $this->forge->addForeignKey('item_order_id', 'item_order', 'item_order_id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('handled_by', 'employee', 'emp_id', 'CASCADE', 'CASCADE');
-        $this->forge->createTable('attachment');
+        $this->forge->createTable('evaluation');
     }
 
     public function down()
@@ -578,7 +583,7 @@ class CreateFinalTables extends Migration
         $this->forge->dropTable('permission');
         $this->forge->dropTable('returned_items');
         $this->forge->dropTable('history');
-        $this->forge->dropTable('attachment');
+        $this->forge->dropTable('evaluation ');
         $this->forge->dropTable('transfer_items');
         $this->forge->dropTable('item_order');
         $this->forge->dropTable('items');

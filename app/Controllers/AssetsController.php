@@ -101,7 +101,7 @@ class AssetsController extends BaseController
         $builder->whereIn('item_order.order_id', function($sub) {
         return $sub->select('order_id')
                ->from('item_order')
-               ->whereNotIn('usage_status_id', [2, 4]); 
+               ->whereNotIn('usage_status_id', [2, 4,7]); 
         });
         
         if (!empty($itemType)) {
@@ -237,7 +237,7 @@ public function orderDetails($id)
     $usageStatusModel   = new \App\Models\UsageStatusModel();
     $employeeModel      = new \App\Models\EmployeeModel();
     $statusModel        = new \App\Models\OrderStatusModel();
-    $historyModel       = new \App\Models\HistoryModel(); // ✅ add this
+    $historyModel       = new \App\Models\HistoryModel(); 
 
     $order = $orderModel->find($id);
 
@@ -255,7 +255,7 @@ public function orderDetails($id)
 
     $items = $itemOrderModel
     ->where('order_id', $id)
-    ->whereNotIn('usage_status_id', [2, 4])
+    ->whereNotIn('usage_status_id', [2, 4,7])
     ->findAll();
 
     foreach ($items as $item) {

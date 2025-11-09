@@ -572,6 +572,13 @@
         class="<?= $isReissueActive ? 'active' : '' ?>">
         <i class="fa-solid fa-box-archive"></i> <span>اعادة صرف العهد</span>
     </a>
+    <?php endif; ?>
+
+    <?php if ($role === 'IT_specialist'): ?>
+    <a href="<?= base_url('Return/IT/ReturnRequests') ?>"
+        class="<?= (service('uri')->getSegment(1) == 'Return/SuperWarehouse/ReturnRequests') ? 'active' : '' ?>">
+        <i class="fa-solid fa-rotate-left"></i> <span>عمليات الإرجاع </span>
+    </a>
 <?php endif; ?>
 
     <?php if ($role === 'admin' || $role === 'assets' || $role === 'super_assets'): ?>
@@ -588,7 +595,7 @@
         </a>
     <?php endif; ?>
 
-    <?php if ($role === 'admin' || $role === 'assets' || $role === 'user' || $role === 'super_warehouse'  || $role === 'super_assets' || $role === 'warehouse'): ?>
+    <?php if ($role === 'admin' || $role === 'assets' || $role === 'user' || $role === 'super_warehouse'  || $role === 'super_assets' || $role === 'warehouse' || $role === 'IT_specialist'): ?>
         <a href="<?= base_url('UserController/userView2') ?>"
             class="<?= (service('uri')->getSegment(1) == 'UserController' && service('uri')->getSegment(2) == 'userView2') ? 'active' : '' ?>">
             <i class="fa-solid fa-file-circle-plus"></i> <span> العهد الخاصة بي</span>
@@ -599,7 +606,7 @@
             <i class="fa-solid fa-id-card"></i> <span> طلبات العهد</span>
         </a>
     <?php endif; ?>
-    <?php if ($role === 'assets' || $role === 'user' || $role === 'super_assets' || $role === 'super_warehouse'): ?>
+    <?php if ($role === 'assets' || $role === 'user' || $role === 'super_assets' || $role === 'super_warehouse'  || $role === 'IT_specialist'): ?>
         <a href="<?= base_url('AssetsHistory/assetsHistory') ?>"
             class="<?= (service('uri')->getSegment(1) == 'AssetsHistory' && service('uri')->getSegment(2) == 'assetsHistory') ? 'active' : '' ?>">
             <i class="fa-solid fa-file-lines"></i> <span>سجلات العهد</span>
