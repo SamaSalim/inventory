@@ -34,7 +34,7 @@ class FinalTablesSeeder extends Seeder
         $usage_statuses = [
             ['usage_status' => 'جديد'],
             ['usage_status' => 'رجيع'],
-            ['usage_status' => 'تحويل'],
+            ['usage_status' => 'قيد التحويل'],
             ['usage_status' => 'معاد صرفة'],
             ['usage_status' => 'معادة للمرسل'],
             ['usage_status' => ' مستعمل'],
