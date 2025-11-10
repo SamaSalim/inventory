@@ -738,16 +738,13 @@
             // تعبئة معرف الطلب - استخدم order_id
             document.getElementById('orderId').value = orderData.order.order_id;
             document.getElementById('orderIdDisplay').textContent = orderData.order.order_id;
-
             // تعبئة بيانات المستلم
-            if (orderData.to_user) {
-                document.getElementById('userId').value = orderData.to_user.user_id || '';
-                document.getElementById('receiverName').value = orderData.to_user.name || '';
-                document.getElementById('userEmail').value = orderData.to_user.email || '';
-                document.getElementById('transferNumber').value = orderData.to_user.user_ext || '';
-
-                document.getElementById('userSuccessMsg').style.display = 'block';
+            if (orderData.order.to_user_id) {
+                document.getElementById('userId').value = orderData.order.to_user_id;
+                // هذا السطر يقوم بتعبئة باقي حقول المستلم:
+                searchUser(orderData.order.to_user_id);
             }
+         
 
             // تعبئة الملاحظات
             document.getElementById('notesTextarea').value = orderData.order.note || '';
@@ -1274,7 +1271,7 @@
         }
 
 
-        function initUserSearch() {
+        function searchUser(userId) {
             const userIdInput = document.getElementById('userId');
             const receiverNameInput = document.getElementById('receiverName');
             const emailInput = document.getElementById('userEmail');
@@ -1283,32 +1280,26 @@
             const errorMsg = document.getElementById('userErrorMsg');
             const successMsg = document.getElementById('userSuccessMsg');
 
-            userIdInput.addEventListener('input', function() {
-                // منع البحث إذا كان الحقل معطلاً
-                if (this.readOnly) return;
+            // مسح الرسائل
+            loadingMsg.style.display = 'none';
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
 
-                const userId = this.value.trim();
-
-                loadingMsg.style.display = 'none';
-                errorMsg.style.display = 'none';
-                successMsg.style.display = 'none';
-
+            // في حالة البحث الآلي عند تحميل النموذج، لا تمسح الحقول (إلا إذا فشل البحث)
+            if (!userId) {
+                userId = userIdInput.value.trim();
                 receiverNameInput.value = '';
                 emailInput.value = '';
                 transferInput.value = '';
+            }
 
-                if (userId.length < 3) return;
+            if (userId.length < 3) return;
 
-                clearTimeout(searchTimeout);
+            clearTimeout(searchTimeout);
 
-                loadingMsg.style.display = 'block';
+            loadingMsg.style.display = 'block';
 
-                searchTimeout = setTimeout(() => {
-                    searchUser(userId);
-                }, 500);
-            });
-
-            function searchUser(userId) {
+            searchTimeout = setTimeout(() => {
                 fetch(buildUrl(`OrderController/searchuser?user_id=${encodeURIComponent(userId)}`))
                     .then(response => response.json())
                     .then(data => {
@@ -1322,6 +1313,11 @@
                         } else {
                             errorMsg.textContent = data.message || 'رقم المستخدم غير موجود';
                             errorMsg.style.display = 'block';
+
+                            // مسح بيانات المستخدم عند فشل البحث
+                            receiverNameInput.value = '';
+                            emailInput.value = '';
+                            transferInput.value = '';
                         }
                     })
                     .catch(error => {
@@ -1330,9 +1326,21 @@
                         errorMsg.textContent = 'خطأ في الاتصال بالخادم';
                         errorMsg.style.display = 'block';
                     });
-            }
+            }, 100); // تقليل التأخير لتسريع التحميل الآلي
         }
 
+        // تهيئة البحث عن المستخدم في حقل الإدخال
+        function initUserSearch() {
+            const userIdInput = document.getElementById('userId');
+
+            userIdInput.addEventListener('input', function() {
+                // منع البحث إذا كان الحقل معطلاً
+                if (this.readOnly) return;
+
+                // استدعاء الدالة العامة searchUser للتحقق من الإدخال
+                searchUser(null);
+            });
+        }
         // إدارة المواقع
         function initLocationDropdowns() {
             const buildingSelect = document.getElementById('buildingSelect');

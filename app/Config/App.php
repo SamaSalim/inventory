@@ -16,7 +16,7 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    public string $baseURL = 'https://localhost:8080/inventory'; //خلوه فاضي
+    public string $baseURL = 'https://gluconeogenic-unscarved-saturnina.ngrok-free.dev';
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
