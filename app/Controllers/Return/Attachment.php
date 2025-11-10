@@ -28,6 +28,36 @@ class Attachment extends BaseController
         return in_array($minorCategoryName, $specialCategories);
     }
 
+    /**
+     * Helper function to delete old attachment files from disk
+     */
+    private function deleteOldAttachmentFiles($attachmentString)
+    {
+        if (empty($attachmentString)) {
+            return;
+        }
+
+        $uploadPath = WRITEPATH . 'uploads/return_attachments';
+        $files = explode(',', $attachmentString);
+
+        foreach ($files as $file) {
+            $file = trim($file);
+            if (empty($file)) {
+                continue;
+            }
+
+            $filePath = $uploadPath . '/' . $file;
+            if (is_file($filePath)) {
+                try {
+                    unlink($filePath);
+                    log_message('info', "Deleted old attachment file: {$file}");
+                } catch (\Exception $e) {
+                    log_message('error', "Failed to delete file {$file}: " . $e->getMessage());
+                }
+            }
+        }
+    }
+
     public function upload()
     {
         if (!session()->get('isLoggedIn')) {
@@ -52,7 +82,7 @@ class Attachment extends BaseController
         $comments  = $this->request->getPost('comments');
         $itemData = $this->request->getPost('item_data');
         $isSpecialCategoryFlags = $this->request->getPost('is_special_category');
-        $reasons = $this->request->getPost('reasons'); // Get reasons from POST
+        $reasons = $this->request->getPost('reasons');
 
         if (empty($assetNums) || !is_array($assetNums)) {
             return $this->response->setJSON([
@@ -113,19 +143,25 @@ class Attachment extends BaseController
             // Determine which status to use based on category
             $targetStatus = $isSpecial ? $underEvaluationStatus : $returnedStatus;
 
+            // Check if new files were uploaded for this item
+            $hasNewFiles = isset($allFiles['attachments'][$assetNum]) && 
+                          count($allFiles['attachments'][$assetNum]) > 0;
+
             // Validate file upload for non-special categories (MANDATORY)
-            if (!$isSpecial) {
-                $hasFiles = isset($allFiles['attachments'][$assetNum]) && 
-                           count($allFiles['attachments'][$assetNum]) > 0;
-                
-                if (!$hasFiles) {
-                    $failedItems[] = "يجب رفع صور للأصل رقم: $assetNum";
-                    continue;
-                }
+            if (!$isSpecial && !$hasNewFiles) {
+                $failedItems[] = "يجب رفع صور للأصل رقم: $assetNum";
+                continue;
+            }
+
+            // For special categories: if no new files uploaded, delete old attachments
+            if ($isSpecial && !$hasNewFiles && !empty($originalItem->attachment)) {
+                // Delete old attachment files from disk
+                $this->deleteOldAttachmentFiles($originalItem->attachment);
+                log_message('info', "Deleted old attachments for special category item: {$assetNum}");
             }
 
             // Handle uploaded files (images, PDFs, etc.)
-            if (isset($allFiles['attachments'][$assetNum])) {
+            if ($hasNewFiles) {
                 foreach ($allFiles['attachments'][$assetNum] as $file) {
                     if (!$file->isValid()) {
                         $error_code = $file->getError();
@@ -160,6 +196,11 @@ class Attachment extends BaseController
                         $failedItems[] = "فشل رفع الملف للأصل: $assetNum - " . $file->getName();
                     }
                 }
+
+                // If new files were uploaded successfully, delete old attachments
+                if (!empty($uploadedFileNames) && !empty($originalItem->attachment)) {
+                    $this->deleteOldAttachmentFiles($originalItem->attachment);
+                }
             }
 
             $itemComment = isset($comments[$assetNum]) ? trim($comments[$assetNum]) : '';
@@ -189,25 +230,31 @@ class Attachment extends BaseController
                     $assetNum,
                     $formData,
                     $itemComment,
-                    [$itemForForm], // Pass as single item in array
+                    [$itemForForm],
                     $createdBy
                 );
-                
-                // DO NOT add form to uploadedFileNames - it's saved separately
-                // The report will find it by searching for form_{assetNum}_*.html pattern
                 
             } catch (\Exception $e) {
                 log_message('error', "Failed to generate form for {$assetNum}: " . $e->getMessage());
             }
 
-            // Only save user-uploaded files to database, NOT the generated HTML form
-            $attachmentPath = !empty($uploadedFileNames)
-                ? implode(',', $uploadedFileNames)
-                : ($originalItem->attachment ?? null);
+            // Determine attachment value to save in database
+            // For special categories with no new files: set to NULL (delete old)
+            // For items with new files: use new files
+            // For non-special categories: must have files (already validated above)
+            if (!empty($uploadedFileNames)) {
+                $attachmentPath = implode(',', $uploadedFileNames);
+            } elseif ($isSpecial && !$hasNewFiles) {
+                // Special category with no new files: clear attachment
+                $attachmentPath = null;
+            } else {
+                // Keep existing attachment (shouldn't happen due to validation, but safe fallback)
+                $attachmentPath = $originalItem->attachment ?? null;
+            }
             
             $updateData = [
                 'usage_status_id' => $targetStatus->id,
-                'note'            => !empty($itemComment) ? $itemComment : 'تم الترجيع',
+                'note'            => $itemComment,
                 'attachment'      => $attachmentPath,
                 'updated_at'      => date('Y-m-d H:i:s'),
                 'created_by'      => $createdBy 

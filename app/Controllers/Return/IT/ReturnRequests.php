@@ -281,159 +281,175 @@ class ReturnRequests extends BaseController
     }
 
     public function generateTechnicalReport()
-    {
-        if (!$this->request->isAJAX()) {
-            return $this->response->setJSON(['success' => false, 'message' => 'طلب غير صالح']);
-        }
+{
+    if (!$this->request->isAJAX()) {
+        return $this->response->setJSON(['success' => false, 'message' => 'طلب غير صالح']);
+    }
 
-        $assetNum = $this->request->getPost('asset_num');
-        $citySerialNum = $this->request->getPost('city_serial_num');
-        $ministrySerialNum = $this->request->getPost('ministry_serial_num');
-        $notes = $this->request->getPost('notes');
+    $assetNum = $this->request->getPost('asset_num');
+    $citySerialNum = $this->request->getPost('city_serial_num');
+    $ministrySerialNum = $this->request->getPost('ministry_serial_num');
+    $notes = $this->request->getPost('notes');
 
-        // Validate mandatory notes field
-        if (empty(trim($notes))) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'يجب ملء حقل وصف الحالة - هذا الحقل إلزامي'
-            ]);
-        }
+    // Validate mandatory notes field
+    if (empty(trim($notes))) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'يجب ملء حقل وصف الحالة - هذا الحقل إلزامي'
+        ]);
+    }
 
-        // Get item order details - use asObject() to get object
-        $itemOrder = $this->itemOrderModel
-            ->select('item_order.*, items.name as item_name, 
-                      COALESCE(employee.name, users.name) AS employee_name,
-                      COALESCE(employee.emp_dept, users.user_dept) AS department')
-            ->join('items', 'items.id = item_order.item_id', 'left')
-            ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
-            ->join('users', 'users.user_id = item_order.created_by', 'left')
-            ->where('item_order.asset_num', $assetNum)
-            ->asObject()
-            ->first();
+    // Get item order details - use asObject() to get object
+    $itemOrder = $this->itemOrderModel
+        ->select('item_order.*, items.name as item_name, 
+                  COALESCE(employee.name, users.name) AS employee_name,
+                  COALESCE(employee.emp_dept, users.user_dept) AS department')
+        ->join('items', 'items.id = item_order.item_id', 'left')
+        ->join('employee', 'employee.emp_id = item_order.created_by', 'left')
+        ->join('users', 'users.user_id = item_order.created_by', 'left')
+        ->where('item_order.asset_num', $assetNum)
+        ->asObject()
+        ->first();
 
-        if (!$itemOrder) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'لم يتم العثور على الأصل'
-            ]);
-        }
+    if (!$itemOrder) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'لم يتم العثور على الأصل'
+        ]);
+    }
 
-        // Get current user info
-        $handledBy = $this->getCurrentUserId();
-        if (!$handledBy) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'لم يتم العثور على معلومات المستخدم الحالي'
-            ]);
-        }
+    // Get current user info
+    $handledBy = $this->getCurrentUserId();
+    if (!$handledBy) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'لم يتم العثور على معلومات المستخدم الحالي'
+        ]);
+    }
 
-        // Get handler name - use asObject()
-        $handler = $this->employeeModel->where('emp_id', $handledBy)->asObject()->first();
-        if (!$handler) {
-            $handler = $this->userModel->where('user_id', $handledBy)->asObject()->first();
-        }
-        
-        $handlerName = $handler ? $handler->name : 'غير محدد';
+    // Get handler name - use asObject()
+    $handler = $this->employeeModel->where('emp_id', $handledBy)->asObject()->first();
+    if (!$handler) {
+        $handler = $this->userModel->where('user_id', $handledBy)->asObject()->first();
+    }
+    
+    $handlerName = $handler ? $handler->name : 'غير محدد';
 
-        // Generate HTML report
-        $htmlContent = $this->generateHTMLForm([
-            'asset_num' => $assetNum,
-            'serial_num' => $itemOrder->serial_num,
-            'item_name' => $itemOrder->item_name,
-            'employee_name' => $itemOrder->employee_name,
-            'department' => $itemOrder->department,
-            'city_serial_num' => $citySerialNum,
-            'ministry_serial_num' => $ministrySerialNum,
-            'notes' => $notes,
-            'created_by' => $itemOrder->created_by,
+    // Generate HTML report
+    $htmlContent = $this->generateHTMLForm([
+        'asset_num' => $assetNum,
+        'serial_num' => $itemOrder->serial_num,
+        'item_name' => $itemOrder->item_name,
+        'employee_name' => $itemOrder->employee_name,
+        'department' => $itemOrder->department,
+        'city_serial_num' => $citySerialNum,
+        'ministry_serial_num' => $ministrySerialNum,
+        'notes' => $notes,
+        'created_by' => $itemOrder->created_by,
+        'handled_by' => $handledBy,
+        'handler_name' => $handlerName,
+        'date' => date('Y-m-d')
+    ]);
+
+    // Save to evaluation_attachments folder
+    $uploadPath = WRITEPATH . 'uploads/evaluation_attachments/';
+    if (!is_dir($uploadPath)) {
+        mkdir($uploadPath, 0755, true);
+        log_message('info', "Created directory: {$uploadPath}");
+    }
+
+    $fileName = 'technical_report_' . $assetNum . '_' . time() . '.html';
+    $filePath = $uploadPath . $fileName;
+    
+    if (!file_put_contents($filePath, $htmlContent)) {
+        log_message('error', "Failed to save file: {$filePath}");
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'فشل حفظ التقرير'
+        ]);
+    }
+
+    log_message('info', "Technical report saved successfully: {$filePath}");
+
+    // Start transaction
+    $db = \Config\Database::connect();
+    $db->transStart();
+
+    try {
+        // Insert into evaluation table
+        $evaluationModel = new EvaluationModel();
+        $evaluationData = [
+            'item_order_id' => $itemOrder->item_order_id,
             'handled_by' => $handledBy,
-            'handler_name' => $handlerName,
-            'date' => date('Y-m-d')
+            'notes' => $notes,
+            'attachment' => $fileName,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+        
+        $evaluationId = $evaluationModel->insert($evaluationData);
+        log_message('info', "Evaluation record created with ID: {$evaluationId}");
+
+        // Update item_order usage_status_id to 2 (رجيع)
+        $this->itemOrderModel->update($itemOrder->item_order_id, [
+            'usage_status_id' => 2,
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+        log_message('info', "Item order {$itemOrder->item_order_id} updated to status 2");
+
+        // Add to history
+        $historyModel = new HistoryModel();
+        $historyModel->insert([
+            'item_order_id' => $itemOrder->item_order_id,
+            'usage_status_id' => 2,
+            'handled_by' => $handledBy,
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
+        log_message('info', "History record created for item_order_id: {$itemOrder->item_order_id}");
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            log_message('error', "Transaction failed");
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'فشل حفظ البيانات'
+            ]);
+        }
+
+        // ✅ NEW: Send email notification to super_warehouse
+        // Load the Email controller
+        $emailController = new \App\Controllers\Return\Email();
+        
+        // Send IT completion notification to super_warehouse
+        $emailSent = $emailController->sendITCompletionNotification(
+            [$itemOrder->item_order_id], 
+            $notes
+        );
+        
+        if ($emailSent) {
+            log_message('info', "Email notification sent to super_warehouse for asset: {$assetNum}");
+        } else {
+            log_message('warning', "Failed to send email notification to super_warehouse for asset: {$assetNum}");
+        }
+
+        $reportUrl = base_url('return/it/returnrequests/serveEvaluationReport/' . $evaluationId);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'تم إنشاء التقرير الفني بنجاح وتحديث حالة الأصل إلى "رجيع" وإرسال إشعار للمستودع',
+            'evaluation_id' => $evaluationId,
+            'report_url' => $reportUrl
         ]);
 
-        // Save to evaluation_attachments folder
-        $uploadPath = WRITEPATH . 'uploads/evaluation_attachments/';
-        if (!is_dir($uploadPath)) {
-            mkdir($uploadPath, 0755, true);
-            log_message('info', "Created directory: {$uploadPath}");
-        }
-
-        $fileName = 'technical_report_' . $assetNum . '_' . time() . '.html';
-        $filePath = $uploadPath . $fileName;
-        
-        if (!file_put_contents($filePath, $htmlContent)) {
-            log_message('error', "Failed to save file: {$filePath}");
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'فشل حفظ التقرير'
-            ]);
-        }
-
-        log_message('info', "Technical report saved successfully: {$filePath}");
-
-        // Start transaction
-        $db = \Config\Database::connect();
-        $db->transStart();
-
-        try {
-            // Insert into evaluation table
-            $evaluationModel = new EvaluationModel();
-            $evaluationData = [
-                'item_order_id' => $itemOrder->item_order_id,
-                'handled_by' => $handledBy,
-                'notes' => $notes,
-                'attachment' => $fileName,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
-            ];
-            
-            $evaluationId = $evaluationModel->insert($evaluationData);
-            log_message('info', "Evaluation record created with ID: {$evaluationId}");
-
-            // Update item_order usage_status_id to 2 (رجيع)
-            $this->itemOrderModel->update($itemOrder->item_order_id, [
-                'usage_status_id' => 2,
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
-            log_message('info', "Item order {$itemOrder->item_order_id} updated to status 2");
-
-            // Add to history
-            $historyModel = new HistoryModel();
-            $historyModel->insert([
-                'item_order_id' => $itemOrder->item_order_id,
-                'usage_status_id' => 2,
-                'handled_by' => $handledBy,
-                'created_at' => date('Y-m-d H:i:s')
-            ]);
-            log_message('info', "History record created for item_order_id: {$itemOrder->item_order_id}");
-
-            $db->transComplete();
-
-            if ($db->transStatus() === false) {
-                log_message('error', "Transaction failed");
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'فشل حفظ البيانات'
-                ]);
-            }
-
-            $reportUrl = base_url('return/it/returnrequests/serveEvaluationReport/' . $evaluationId);
-
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'تم إنشاء التقرير الفني بنجاح وتحديث حالة الأصل إلى "رجيع"',
-                'evaluation_id' => $evaluationId,
-                'report_url' => $reportUrl
-            ]);
-
-        } catch (\Exception $e) {
-            log_message('error', 'Technical Report Error: ' . $e->getMessage());
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'حدث خطأ: ' . $e->getMessage()
-            ]);
-        }
+    } catch (\Exception $e) {
+        log_message('error', 'Technical Report Error: ' . $e->getMessage());
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'حدث خطأ: ' . $e->getMessage()
+        ]);
     }
+}
 
     private function generateHTMLForm($data)
     {
