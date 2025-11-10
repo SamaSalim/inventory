@@ -297,9 +297,9 @@ public function orderDetails($id)
 // transferView - عرض صفحة تحويل العهدة
 public function transferView($orderId = null)
 {
-        if (!session()->get('isLoggedIn')) {
-            throw new AuthenticationException();
-        }
+    if (!session()->get('isLoggedIn')) {
+        throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
+    }
 
     $itemOrderModel = new \App\Models\ItemOrderModel();
     
@@ -423,6 +423,10 @@ public function transferView($orderId = null)
         'has_available_items' => $hasAvailableItems // ✅ متغير جديد للتحكم في العرض
     ]);
 }
+
+
+
+
 
 //  processTransfer - معالجة طلب التحويل
 public function processTransfer()
