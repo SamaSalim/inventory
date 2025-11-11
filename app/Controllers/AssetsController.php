@@ -499,7 +499,7 @@ public function transferView($itemOrderId = null)
     }
 
     // ✅ التحقق من حالة الصنف - لازم يكون قابل للتحويل
-    if (in_array($itemOrder->usage_status_id, [2, 3])) {
+    if (in_array($itemOrder->usage_status_id, [2, 3, 7])) {
         $statusName = $itemOrder->usage_status_id == 2 ? 'رجيع' : 'قيد التحويل';
         return redirect()->back()->with('error', "الصنف في حالة '{$statusName}' ولا يمكن تحويله");
     }
@@ -507,7 +507,7 @@ public function transferView($itemOrderId = null)
     // ✅ جلب فقط الأصناف التي يملكها المستخدم الحالي من نفس الطلب
     $items = $itemOrderModel
         ->where('order_id', $orderId)
-        ->whereNotIn('usage_status_id', [2, 3]) // استبعاد: رجيع وقيد التحويل
+        ->whereNotIn('usage_status_id', [2, 3,7]) //   استبعاد: رجيع وقيد التحويل و قيد التقيم
         ->findAll();
 
     // ✅ فلترة الأصناف: نعرض فقط الأصناف اللي بعهدة المستخدم الحالي
@@ -798,7 +798,7 @@ public function processTransfer()
                 // ✅ التحقق من حالة الصنف
                 // 1 = جديد, 4 = معاد صرفه, 6 = مستعمل (يمكن تحويلهم)
                 // 2 = رجيع, 3 = قيد التحويل (لا يمكن تحويلهم)
-                if (in_array($currentItem->usage_status_id, [2, 3])) {
+                if (in_array($currentItem->usage_status_id, [2, 3, 7])) {
                     $statusName = $currentItem->usage_status_id == 2 ? 'رجيع' : 'قيد التحويل';
                     $failedTransfers[] = [
                         'item_order_id' => $itemOrderId,
