@@ -678,57 +678,149 @@
             updateTransferButton();
         }
 
+        // function submitTransfer() {
+        //     const note = document.getElementById('transferNote').value;
+
+        //     // ✅ التحقق من المستخدم المستلم فقط
+        //     if (!selectedToUser) {
+        //         showAlert('warning', 'يرجى اختيار المستخدم المستلم');
+        //         return;
+        //     }
+
+        //     if (selectedItems.length === 0) {
+        //         showAlert('warning', 'لم يتم تحديد أي أصول');
+        //         return;
+        //     }
+
+        //     // ✅ إرسال currentUserId بدلاً من selectedFromUser
+        //     const transferData = {
+        //         items: selectedItems.map(item => item.id),
+        //         from_user_id: currentUserId,
+        //         to_user_id: selectedToUser,
+        //         note: note
+        //     };
+
+        //     fetch('<?= base_url('AssetsController/processTransfer') ?>', {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //             },
+        //             body: JSON.stringify(transferData)
+        //         })
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             if (data.success) {
+        //                 showAlert('success', 'تم إنشاء طلب التحويل بنجاح. في انتظار قبول المستلم.');
+        //                 closeTransferModal();
+
+        //                 selectedItems.forEach(item => {
+        //                     const card = document.querySelector(`.item-card[data-item-order-id="${item.id}"]`);
+        //                     if (card) {
+        //                         card.style.animation = 'fadeOut 0.3s ease';
+        //                         setTimeout(() => card.remove(), 300);
+        //                     }
+        //                 });
+        //             } else {
+        //                 showAlert('danger', 'حدث خطأ: ' + (data.message || 'فشل التحويل'));
+        //             }
+        //         })
+        //         .catch(error => {
+        //             showAlert('danger', 'حدث خطأ في الاتصال بالخادم');
+        //             console.error('Error:', error);
+        //         });
+        // }
+
         function submitTransfer() {
-            const note = document.getElementById('transferNote').value;
+    const note = document.getElementById('transferNote').value;
 
-            // ✅ التحقق من المستخدم المستلم فقط
-            if (!selectedToUser) {
-                showAlert('warning', 'يرجى اختيار المستخدم المستلم');
-                return;
+    // ✅ التحقق من المستخدم المستلم فقط
+    if (!selectedToUser) {
+        showAlert('warning', 'يرجى اختيار المستخدم المستلم');
+        return;
+    }
+
+    if (selectedItems.length === 0) {
+        showAlert('warning', 'لم يتم تحديد أي أصول');
+        return;
+    }
+
+    // ✅ تحويل الـ IDs إلى أرقام صحيحة
+    const itemIds = selectedItems.map(item => parseInt(item.id));
+    
+    console.log('Selected Items:', selectedItems); // ✅ للتأكد
+    console.log('Item IDs:', itemIds); // ✅ للتأكد
+    console.log('From User:', currentUserId); // ✅ للتأكد
+    console.log('To User:', selectedToUser); // ✅ للتأكد
+
+    // ✅ إرسال البيانات بالاسم الصحيح
+    const transferData = {
+        item_order_ids: itemIds, // ✅ تغيير من items إلى item_order_ids
+        from_user_id: currentUserId,
+        to_user_id: selectedToUser,
+        note: note
+    };
+
+    console.log('Transfer Data:', transferData); // ✅ للتأكد من البيانات قبل الإرسال
+
+    fetch('<?= base_url('AssetsController/processTransfer') ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(transferData)
+        })
+        .then(response => {
+            console.log('Response Status:', response.status); // ✅
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response Data:', data); // ✅
+            
+            if (data.success) {
+                showAlert('success', data.message || 'تم إنشاء طلب التحويل بنجاح');
+                
+                // ✅ عرض تفاصيل إضافية
+                if (data.failed_count > 0) {
+                    let failedMsg = 'الأصناف الفاشلة:\n';
+                    data.failed_items.forEach(item => {
+                        failedMsg += `- ${item.item_name || 'صنف غير معروف'}: ${item.reason}\n`;
+                    });
+                    console.warn(failedMsg);
+                    showAlert('warning', failedMsg);
+                }
+                
+                closeTransferModal();
+
+                // إزالة العناصر الناجحة من الواجهة
+                if (data.successful_items) {
+                    data.successful_items.forEach(successItem => {
+                        const card = document.querySelector(`.item-card[data-item-order-id="${successItem.item_order_id}"]`);
+                        if (card) {
+                            card.style.animation = 'fadeOut 0.3s ease';
+                            setTimeout(() => card.remove(), 300);
+                        }
+                    });
+                }
+                
+                // تحديث الصفحة بعد 2 ثانية
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+                
+            } else {
+                showAlert('danger', 'حدث خطأ: ' + (data.message || 'فشل التحويل'));
+                
+                // ✅ عرض debug info إذا كان موجود
+                if (data.debug) {
+                    console.error('Debug Info:', data.debug);
+                }
             }
-
-            if (selectedItems.length === 0) {
-                showAlert('warning', 'لم يتم تحديد أي أصول');
-                return;
-            }
-
-            // ✅ إرسال currentUserId بدلاً من selectedFromUser
-            const transferData = {
-                items: selectedItems.map(item => item.id),
-                from_user_id: currentUserId,
-                to_user_id: selectedToUser,
-                note: note
-            };
-
-            fetch('<?= base_url('AssetsController/processTransfer') ?>', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(transferData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showAlert('success', 'تم إنشاء طلب التحويل بنجاح. في انتظار قبول المستلم.');
-                        closeTransferModal();
-
-                        selectedItems.forEach(item => {
-                            const card = document.querySelector(`.item-card[data-item-order-id="${item.id}"]`);
-                            if (card) {
-                                card.style.animation = 'fadeOut 0.3s ease';
-                                setTimeout(() => card.remove(), 300);
-                            }
-                        });
-                    } else {
-                        showAlert('danger', 'حدث خطأ: ' + (data.message || 'فشل التحويل'));
-                    }
-                })
-                .catch(error => {
-                    showAlert('danger', 'حدث خطأ في الاتصال بالخادم');
-                    console.error('Error:', error);
-                });
-        }
+        })
+        .catch(error => {
+            showAlert('danger', 'حدث خطأ في الاتصال بالخادم');
+            console.error('Error:', error);
+        });
+}
 
         function showAlert(type, message) {
             const alertContainer = document.getElementById('alertContainer');

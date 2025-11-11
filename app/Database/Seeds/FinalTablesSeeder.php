@@ -304,7 +304,7 @@ class FinalTablesSeeder extends Seeder
                 'name'     => 'حميدة اختر',
                 'emp_dept' => 'العهد',
                 'emp_ext'  => 5678,
-                'email'    => 'hmd@example.com',
+                'email'    => 'hmoo5599@gmail.com',
                 'password' => password_hash('123457', PASSWORD_DEFAULT),
             ],
             [
@@ -397,7 +397,7 @@ class FinalTablesSeeder extends Seeder
                 'name'     => 'حميدة اختر',
                 'user_dept' => 'العهد',
                 'user_ext'  => 5678,
-                'email'    => 'hmd@example.com',
+                'email'    => 'hmoo5599@gmail.com',
                 'password' => password_hash('123457', PASSWORD_DEFAULT),
             ],
             [
