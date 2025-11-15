@@ -171,60 +171,60 @@ class AssetsController extends BaseController
 
     // InventoryController.php
 
-    private function getWarehouseStats(): array
-    {
-        // إجمالي الكميات المدخلة للنظام (المخزون التاريخي)
-        $totalQuantityResult = $this->itemOrderModel->selectSum('quantity')->first();
-        $totalReceipts = $totalQuantityResult ? (int)$totalQuantityResult->quantity : 0;
-        
-        // 1. الأصناف المتوفرة (الأصناف التي لم يتم تعميدها بعد)
-        $availableItems = $this->itemOrderModel
-            ->join('order', 'order.order_id = item_order.order_id', 'left')
-            // استبعاد الأصناف التي حالة الطلب الرئيسي لها 'مقبول' (2)
-            ->where('order.order_status_id !=', 2) 
-            ->countAllResults();
-        
-        // 2. عدد الإدخالات (الأصناف المُعمّدة/المحولة بنجاح)
-        $totalEntries = $this->itemOrderModel
-            ->join('order', 'order.order_id = item_order.order_id')
-            ->where('order.order_status_id', 2) // مقبول
-            ->countAllResults();
-        
-        // 3. عدد أصناف الرجيع
-        $returnedItemsCount = $this->itemOrderModel
-            ->where('usage_status_id', 2) // 2 = مرجع
-            ->countAllResults();
-        
-        // 4. التصنيف الأكثر شيوعًا
-        $topCategoryResult = $this->itemOrderModel
-            ->select('items.minor_category_id, minor_category.name, COUNT(*) as count')
-            ->join('items', 'items.id = item_order.item_id')
-            ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-            ->groupBy('items.minor_category_id')
-            ->orderBy('count', 'DESC')
-            ->first();
-        
-        $topCategory = $topCategoryResult ? $topCategoryResult->name : 'غير محدد';
-        
-        // 5. آخر إدخال
-        $lastEntry = $this->itemOrderModel
-            ->select('item_order.created_at, items.name')
-            ->join('items', 'items.id = item_order.item_id', 'left')
-            ->orderBy('item_order.created_at', 'DESC')
-            ->first();
-        
-        return [
-            'total_receipts' => $totalReceipts,
-            'available_items' => $availableItems, 
-            'total_entries' => $totalEntries, 
-            'returned_items' => $returnedItemsCount,
-            'top_category' => $topCategory,
-            'last_entry' => $lastEntry ? [
-                'item' => $lastEntry->name ?? 'غير محدد', 
-                'date' => date('Y-m-d H:i', strtotime($lastEntry->created_at))
-            ] : null
-        ];
-    }
+private function getWarehouseStats(): array
+{
+    // إجمالي الكميات المدخلة للنظام (المخزون التاريخي)
+    $totalQuantityResult = $this->itemOrderModel->selectSum('quantity')->first();
+    $totalReceipts = $totalQuantityResult ? (int)$totalQuantityResult->quantity : 0;
+    
+    // 1. الأصناف المتوفرة (الأصناف التي لم يتم تعميدها بعد)
+    $availableItems = $this->itemOrderModel
+        ->join('order', 'order.order_id = item_order.order_id', 'left')
+        ->where('order.order_status_id !=', 2) 
+        ->countAllResults();
+    
+    // 2. عدد الإدخالات (الأصناف المُعمّدة/المحولة بنجاح)
+    $totalEntries = $this->itemOrderModel
+        ->join('order', 'order.order_id = item_order.order_id')
+        ->where('order.order_status_id', 2)
+        ->countAllResults();
+    
+    // 3. عدد أصناف الرجيع - من جدول history
+    $historyModel = new \App\Models\HistoryModel();
+    $returnedItemsCount = $historyModel
+        ->where('usage_status_id', 2) // 2 = مرجع
+        ->countAllResults();
+    
+    // 4. التصنيف الأكثر شيوعًا
+    $topCategoryResult = $this->itemOrderModel
+        ->select('items.minor_category_id, minor_category.name, COUNT(*) as count')
+        ->join('items', 'items.id = item_order.item_id')
+        ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+        ->groupBy('items.minor_category_id')
+        ->orderBy('count', 'DESC')
+        ->first();
+    
+    $topCategory = $topCategoryResult ? $topCategoryResult->name : 'غير محدد';
+    
+    // 5. آخر إدخال
+    $lastEntry = $this->itemOrderModel
+        ->select('item_order.created_at, items.name')
+        ->join('items', 'items.id = item_order.item_id', 'left')
+        ->orderBy('item_order.created_at', 'DESC')
+        ->first();
+    
+    return [
+        'total_receipts' => $totalReceipts,
+        'available_items' => $availableItems, 
+        'total_entries' => $totalEntries, 
+        'returned_items' => $returnedItemsCount,
+        'top_category' => $topCategory,
+        'last_entry' => $lastEntry ? [
+            'item' => $lastEntry->name ?? 'غير محدد', 
+            'date' => date('Y-m-d H:i', strtotime($lastEntry->created_at))
+        ] : null
+    ];
+}
 
 public function orderDetails($id)
 {

@@ -86,13 +86,50 @@
             font-size: 14px;
         }
 
+        /* Report Button Styling - Matching view-btn style */
+        .report-btn {
+            padding: 6px 14px;
+            border-radius: 16px;
+            border: 2px solid #3ac0c3;
+            color: #3ac0c3;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: white;
+        }
+
+        .report-btn:not(:disabled):hover {
+            background: linear-gradient(135deg, #3ac0c3, #2aa8ab);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(58, 192, 195, 0.25);
+        }
+
+        .report-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: #ccc;
+            color: #999;
+        }
+
+        .report-btn i {
+            width: 12px;
+            height: 12px;
+        }
+
         /* Print Styles */
         @media print {
             .filters-section,
             .filter-btn,
             .user-info,
             .sidebar,
-            .action-buttons {
+            .action-buttons,
+            .report-btn {
                 display: none !important;
             }
             
@@ -413,6 +450,7 @@
                             <th>آخر عملية</th>
                             <th>تاريخ آخر عملية</th>
                             <th>حالة الطلب</th>
+                            <th>التقارير</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -466,11 +504,26 @@
                                             <?= esc($statusName) ?>
                                         </span>
                                     </td>
+                                    <td>
+                                        <?php if ($operation->operation_type == 'return'): ?>
+                                            <button 
+                                                class="report-btn" 
+                                                onclick="printReturnReport('<?= esc($operation->asset_number) ?>')"
+                                                title="طباعة نموذج الإرجاع">
+                                                <i class="fas fa-print btn-icon"></i>
+                                                طباعة النموذج
+                                            </button>
+                                        <?php else: ?>
+                                            <span class="text-muted" style="font-size: 11px;">
+                                                <i class="fas fa-minus-circle"></i> غير متاح
+                                            </span>
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="5" class="text-center">لا توجد بيانات متاحة</td>
+                                <td colspan="6" class="text-center">لا توجد بيانات متاحة</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -521,104 +574,24 @@
             return acceptedCount;
         }
         
-        // Unified print function that handles different operation types
-        window.printReport = function () {
-            if (isPrinting) {
-                console.log('Already printing...');
+        // NEW: Function to print individual return report
+        window.printReturnReport = function(assetNumber) {
+            if (!assetNumber) {
+                showAlert('⚠️ رقم الأصل غير متوفر');
                 return;
             }
             
-            const operationTypeElement = document.getElementById('operationTypeSelect');
-            const operationType = operationTypeElement?.value || (isSuperWarehouse ? 'return' : '');
-            const toUserIdInput = document.getElementById('toUserIdInput');
-            const toUserId = toUserIdInput?.value.trim();
-            
-            // For super_warehouse, operation type is always 'return'
-            if (isSuperWarehouse && operationType !== 'return') {
-                showAlert('⚠️ صلاحيتك محددة لطباعة عمليات الإرجاع فقط');
-                return;
-            }
-            
-            // Validate operation type for regular users (not super_warehouse)
-            if (!isSuperWarehouse && !operationType) {
-                showAlert('⚠️ يرجى تحديد نوع العملية أولاً للطباعة');
-                return;
-            }
-
-            // Validate to_user_id for regular assets users only (super_assets and super_warehouse can leave it empty)
-            if (!isSuperWarehouse && isAssetsRole && !toUserId) {
-                showAlert('⚠️ يجب إدخال الرقم الوظيفي قبل الطباعة\nالرقم الوظيفي مطلوب لتصفية وطباعة العمليات المرتبطة بشخص محدد.');
-                if (toUserIdInput) {
-                    toUserIdInput.classList.add('required-field');
-                    toUserIdInput.focus();
-                }
-                return;
-            }
-
-            // CRITICAL CHECK: Verify there are accepted items for the selected operation type
-            if (operationType === 'return' || operationType === 'new') {
-                const acceptedCount = countAcceptedItems(operationType);
-                
-                if (acceptedCount === 0) {
-                    const operationNameAr = operationType === 'return' ? 'إرجاع' : 'مباشرة';
-                    const statusNote = operationType === 'return' 
-                        ? 'يجب أن تكون حالة الإرجاع "مقبول" لطباعة النموذج.' 
-                        : 'يجب أن تكون حالة الطلب "مقبول" لطباعة النموذج.';
-                    
-                    showAlert(`⚠️ لا توجد عمليات ${operationNameAr} مقبولة للطباعة حالياً\n${statusNote}\nالعمليات "قيد الانتظار" أو "مرفوض" لا يمكن طباعتها.`);
-                    return;
-                }
-                
-                console.log(`Found ${acceptedCount} accepted ${operationType} items for printing`);
-            }
-
-            // Remove required field styling if it was added
-            if (toUserIdInput) {
-                toUserIdInput.classList.remove('required-field');
-            }
-
-            isPrinting = true;
-
-            // Build common filter parameters
-            const params = new URLSearchParams({
-                asset_number: document.getElementById('assetNumberInput')?.value || '',
-                item_name: document.getElementById('itemNameInput')?.value || '',
-                date_from: document.getElementById('dateFromInput')?.value || '',
-                date_to: document.getElementById('dateToInput')?.value || '',
-                returned_by: toUserId || ''
-            });
-
-            // Determine which report URL to use based on operation type
-            let url;
-            switch(operationType) {
-                case 'return':
-                    url = '<?= site_url("reports/returnreport") ?>?' + params.toString();
-                    break;
-                case 'new':
-                    url = '<?= site_url("reports/directordersreport") ?>?' + params.toString();
-                    break;
-                case 'transfer':
-                    url = '<?= site_url("reports/transferreport") ?>?' + params.toString();
-                    break;
-                default:
-                    showAlert('⚠️ نوع العملية غير مدعوم للطباعة');
-                    isPrinting = false;
-                    return;
-            }
-            
-            console.log('Print URL:', url);
-            console.log('To User ID:', toUserId);
-            console.log('User Role:', userRole);
+            const url = '<?= site_url("AssetsHistory/printReturnReport") ?>/' + encodeURIComponent(assetNumber);
             
             // Remove existing iframe if any
-            const existingIframe = document.getElementById('printIframe');
+            const existingIframe = document.getElementById('returnReportIframe');
             if (existingIframe) {
                 existingIframe.remove();
             }
             
             // Create hidden iframe for printing
             const iframe = document.createElement('iframe');
-            iframe.id = 'printIframe';
+            iframe.id = 'returnReportIframe';
             iframe.style.position = 'absolute';
             iframe.style.width = '0';
             iframe.style.height = '0';
@@ -630,9 +603,6 @@
                 try {
                     setTimeout(function() {
                         iframe.contentWindow.print();
-                        setTimeout(function() {
-                            isPrinting = false;
-                        }, 1000);
                     }, 500);
                 } catch (e) {
                     console.error('Print error:', e);
@@ -720,3 +690,4 @@
     </script>
 
 </body>
+</html>

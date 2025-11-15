@@ -33,29 +33,28 @@ class UserController extends BaseController
     private function checkAuth()
     {
         if (!session()->get('isLoggedIn')) {
-            throw new AuthenticationException();
+            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
         }
     }
 
     /**
      * عرض الطلبات المحولة للمستخدم الحالي
      */
-    public function dashboard(): string
-    {
-        if (!session()->get('isLoggedIn')) {
-            throw new AuthenticationException();
-        }
-        $isEmployee = session()->get('isEmployee');
-        $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id');
-        $currentUserId = $account_id;
+public function dashboard(): string
+{
+    $this->checkAuth();
 
-        $transferItemsModel = new TransferItemsModel();
-        $historyModel = new \App\Models\HistoryModel();
+    $isEmployee = session()->get('isEmployee');
+    $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id');
+    $currentUserId = $account_id;
 
-        $myOrders = $transferItemsModel
-            ->distinct()
-            ->select(
-                'transfer_items.transfer_item_id,
+    $transferItemsModel = new TransferItemsModel();
+    $historyModel = new \App\Models\HistoryModel(); 
+
+    $myOrders = $transferItemsModel
+        ->distinct()
+        ->select(
+            'transfer_items.transfer_item_id,
              transfer_items.created_at,
              transfer_items.item_order_id,
              transfer_items.is_opened, 
@@ -67,34 +66,34 @@ class UserController extends BaseController
              from_user.user_dept AS from_user_dept,
              usage_status.usage_status AS usage_status_name,
              order_status.status AS order_status_name'
-            )
-            ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
-            ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
-            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-            ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
-            ->where('transfer_items.to_user_id', $currentUserId)
-            ->where('item_order.usage_status_id !=', 2) // exclude returned items
-            ->where('transfer_items.order_status_id', 1) // pending only
-            ->orderBy('transfer_items.created_at', 'DESC')
-            ->findAll();
+        )
+        ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+        ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+        ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
+        ->where('transfer_items.to_user_id', $currentUserId)
+        ->where('item_order.usage_status_id !=', 2) // exclude returned items
+        ->where('transfer_items.order_status_id', 1) // pending only
+        ->orderBy('transfer_items.created_at', 'DESC')
+        ->findAll();
 
-        foreach ($myOrders as &$order) {
-            if ($order->usage_status_id == 1) {
-                $hasReturn = $historyModel
-                    ->where('item_order_id', $order->item_order_id)
-                    ->where('usage_status_id', 2)
-                    ->first();
+    foreach ($myOrders as &$order) {
+        if ($order->usage_status_id == 1) {
+            $hasReturn = $historyModel
+                ->where('item_order_id', $order->item_order_id)
+                ->where('usage_status_id', 2)
+                ->first();
 
-                if ($hasReturn) {
-                    $order->usage_status_name = 'معاد صرفه';
-                }
+            if ($hasReturn) {
+                $order->usage_status_name = 'معاد صرفه';
             }
         }
-        unset($order);
-        return view('user/userView', [
-            'orders' => $myOrders
-        ]);
     }
+    unset($order); 
+    return view('user/userView', [
+        'orders' => $myOrders
+    ]);
+}
 
 
     private function getWarehouseStats(): array
@@ -125,7 +124,7 @@ class UserController extends BaseController
             ->orderBy('item_order.created_at', 'DESC')
             ->first();
 
-
+            
 
         return [
             'total_receipts' => $totalReceipts,
@@ -146,7 +145,7 @@ class UserController extends BaseController
     public function getTransferDetails($transferId)
     {
         if (!session()->get('isLoggedIn')) {
-            throw new AuthenticationException();
+            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
         }
 
  $isEmployee = session()->get('isEmployee');
@@ -200,17 +199,17 @@ class UserController extends BaseController
         $historyModel = new \App\Models\HistoryModel();
 
         foreach ($items as &$item) {
-            if ($item->usage_status_name === 'جديد') {
-                $hasReturnHistory = $historyModel
-                    ->where('item_order_id', $item->item_order_id)
-                    ->where('usage_status_id', 2)
-                    ->first();
+    if ($item->usage_status_name === 'جديد') {
+        $hasReturnHistory = $historyModel
+            ->where('item_order_id', $item->item_order_id)
+            ->where('usage_status_id', 2)
+            ->first();
 
-                if ($hasReturnHistory) {
-                    $item->usage_status_name = 'معاد صرفه';
-                }
-            }
+        if ($hasReturnHistory) {
+            $item->usage_status_name = 'معاد صرفه';
         }
+    }
+}
 
 
         return $this->response->setJSON(['success' => true, 'data' => $transfer, 'items' => $items]);

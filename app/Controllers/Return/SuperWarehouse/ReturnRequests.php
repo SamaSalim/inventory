@@ -29,7 +29,6 @@ class ReturnRequests extends BaseController
 
     public function index(): string
     {
-        // DEBUG: Log all session data
         log_message('debug', '=== SESSION DEBUG ===');
         log_message('debug', 'All session data: ' . json_encode(session()->get()));
         log_message('debug', 'emp_id: ' . (session()->get('emp_id') ?? 'NULL'));
@@ -49,7 +48,6 @@ class ReturnRequests extends BaseController
             'date_to' => $this->request->getGet('date_to')
         ];
 
-        // First, get the latest evaluation for each item_order_id using a subquery
         $db = \Config\Database::connect();
         $subquery = $db->table('evaluation e1')
             ->select('e1.item_order_id, e1.attachment, e1.created_at')
@@ -154,7 +152,6 @@ class ReturnRequests extends BaseController
     {
         log_message('info', "=== Serving Attachment for Asset: {$assetNum} ===");
         
-        // First, try to get the latest attachment from evaluation table
         $db = \Config\Database::connect();
         $builder = $db->table('evaluation');
         $builder->select('evaluation.attachment, evaluation.created_at')
@@ -176,7 +173,6 @@ class ReturnRequests extends BaseController
             log_message('info', "Attachment found in evaluation table: {$attachment}");
             log_message('info', "Evaluation created at: {$evaluationResult->created_at}");
         } else {
-            // If not found in evaluation, get from item_order
             $item = $this->itemOrderModel
                 ->select('attachment')
                 ->where('asset_num', $assetNum)
@@ -195,14 +191,12 @@ class ReturnRequests extends BaseController
             return $this->response->setStatusCode(404)->setBody('❌ لا يوجد مرفق لهذا الأصل');
         }
 
-        // Handle comma-separated filenames and get the latest one
         $filenames = array_map('trim', explode(',', $attachment));
         $latestFile = end($filenames);
         
         log_message('info', "All filenames: " . implode(', ', $filenames));
         log_message('info', "Latest file to serve: {$latestFile}");
         
-        // Check possible paths
         $possiblePaths = [
             WRITEPATH . 'uploads/evaluation_attachments/' . $latestFile,
             WRITEPATH . 'uploads/return_attachments/' . $latestFile,
@@ -251,14 +245,11 @@ class ReturnRequests extends BaseController
 
     private function getCurrentUserId()
     {
-        // Get all session data for debugging
         $sessionData = session()->get();
         
-        // Log everything
         log_message('debug', '=== getCurrentUserId() DEBUG ===');
         log_message('debug', 'Full session: ' . json_encode($sessionData));
         
-        // Try different possible session key names
         $possibleKeys = ['emp_id', 'user_id', 'id', 'employee_id', 'userId', 'empId'];
         
         foreach ($possibleKeys as $key) {
@@ -277,9 +268,69 @@ class ReturnRequests extends BaseController
         return null;
     }
 
+    /**
+     * NEW METHOD: Update the return form HTML file with warehouse handler info
+     */
+    private function updateReturnFormWithHandler($assetNum, $handlerName, $handlerDate)
+    {
+        $uploadPath = WRITEPATH . 'uploads/return_attachments/';
+        $pattern = $uploadPath . 'form_' . $assetNum . '_*.html';
+        $files = glob($pattern);
+        
+        if (empty($files)) {
+            log_message('warning', "No form found for asset {$assetNum} to update");
+            return false;
+        }
+        
+        // Sort by modification time and get the latest file
+        usort($files, function($a, $b) {
+            return filemtime($b) - filemtime($a);
+        });
+        
+        $latestForm = $files[0];
+        log_message('info', "Updating form: {$latestForm}");
+        
+        // Read the HTML content
+        $htmlContent = file_get_contents($latestForm);
+        
+        if ($htmlContent === false) {
+            log_message('error', "Failed to read form file: {$latestForm}");
+            return false;
+        }
+        
+        // Update the warehouse handler section
+        // Find and replace the empty signature line with actual data
+        $patterns = [
+            // Update warehouse handler name
+            '/<td>\s*<div class="signature-title-cell">المستلم \/ أمين \/ مأمور المستودع<\/div>\s*<div class="signature-fields">\s*الاسم:\s*<span class="signature-line"><\/span>/s' 
+            => '<td>
+                    <div class="signature-title-cell">المستلم / أمين / مأمور المستودع</div>
+                    <div class="signature-fields">
+                        الاسم: <span class="signature-value">' . htmlspecialchars($handlerName, ENT_QUOTES, 'UTF-8') . '</span>',
+            
+            // Update warehouse handler date in the same section
+            '/(<div class="signature-title-cell">المستلم \/ أمين \/ مأمور المستودع<\/div>\s*<div class="signature-fields">.*?التاريخ:\s*)<span class="signature-line"><\/span>/s'
+            => '$1<span class="signature-value">' . htmlspecialchars($handlerDate, ENT_QUOTES, 'UTF-8') . '</span>'
+        ];
+        
+        foreach ($patterns as $pattern => $replacement) {
+            $htmlContent = preg_replace($pattern, $replacement, $htmlContent);
+        }
+        
+        // Write the updated content back to the file
+        $result = file_put_contents($latestForm, $htmlContent);
+        
+        if ($result === false) {
+            log_message('error', "Failed to write updated form file: {$latestForm}");
+            return false;
+        }
+        
+        log_message('info', "Successfully updated form for asset {$assetNum} with handler: {$handlerName}");
+        return true;
+    }
+
     public function acceptReturn($itemOrderId)
     {
-        // DEBUG: Log session at start
         log_message('debug', '=== ACCEPT RETURN START ===');
         log_message('debug', 'Item Order ID: ' . $itemOrderId);
         log_message('debug', 'Session data: ' . json_encode(session()->get()));
@@ -290,11 +341,24 @@ class ReturnRequests extends BaseController
         
         if (!$currentUserId) {
             log_message('error', 'Accept Return: No user ID found in session');
-            
-            // Return detailed error with session info for debugging
             $sessionInfo = json_encode(session()->get());
             return redirect()->back()->with('error', '❌ فشل في تحديد المستخدم الحالي. بيانات الجلسة: ' . $sessionInfo);
         }
+
+        // Get handler name
+        $handlerEmployee = $this->employeeModel->where('emp_id', $currentUserId)->first();
+        $handlerUser = $this->userModel->where('user_id', $currentUserId)->first();
+        $handlerName = $handlerEmployee->name ?? $handlerUser->name ?? 'غير معروف';
+        $handlerDate = date('Y-m-d');
+
+        // Get asset number for this item_order_id
+        $itemOrder = $this->itemOrderModel->find($itemOrderId);
+        if (!$itemOrder) {
+            log_message('error', 'Item order not found: ' . $itemOrderId);
+            return redirect()->back()->with('error', '❌ الطلب غير موجود');
+        }
+        
+        $assetNum = $itemOrder->asset_num;
 
         $updateData = [
             'usage_status_id' => 4,
@@ -312,6 +376,15 @@ class ReturnRequests extends BaseController
         }
 
         log_message('info', 'Item order updated successfully');
+
+        // Update the return form with handler information
+        $formUpdateResult = $this->updateReturnFormWithHandler($assetNum, $handlerName, $handlerDate);
+        
+        if ($formUpdateResult) {
+            log_message('info', "Return form updated successfully for asset: {$assetNum}");
+        } else {
+            log_message('warning', "Failed to update return form for asset: {$assetNum}");
+        }
 
         $historyModel = new HistoryModel();
         $historyData = [
@@ -334,12 +407,11 @@ class ReturnRequests extends BaseController
         log_message('info', "Return accepted successfully. Item Order ID: {$itemOrderId}, User: {$currentUserId}");
         log_message('debug', '=== ACCEPT RETURN END ===');
         
-        return redirect()->back()->with('success', 'تم قبول الإرجاع بنجاح');
+        return redirect()->back()->with('success', 'تم قبول الإرجاع بنجاح وتحديث النموذج');
     }
 
     public function rejectReturn($itemOrderId)
     {
-        // DEBUG: Log session at start
         log_message('debug', '=== REJECT RETURN START ===');
         log_message('debug', 'Item Order ID: ' . $itemOrderId);
         log_message('debug', 'Session data: ' . json_encode(session()->get()));
@@ -350,11 +422,24 @@ class ReturnRequests extends BaseController
         
         if (!$currentUserId) {
             log_message('error', 'Reject Return: No user ID found in session');
-            
-            // Return detailed error with session info for debugging
             $sessionInfo = json_encode(session()->get());
             return redirect()->back()->with('error', '❌ فشل في تحديد المستخدم الحالي. بيانات الجلسة: ' . $sessionInfo);
         }
+
+        // Get handler name
+        $handlerEmployee = $this->employeeModel->where('emp_id', $currentUserId)->first();
+        $handlerUser = $this->userModel->where('user_id', $currentUserId)->first();
+        $handlerName = $handlerEmployee->name ?? $handlerUser->name ?? 'غير معروف';
+        $handlerDate = date('Y-m-d');
+
+        // Get asset number for this item_order_id
+        $itemOrder = $this->itemOrderModel->find($itemOrderId);
+        if (!$itemOrder) {
+            log_message('error', 'Item order not found: ' . $itemOrderId);
+            return redirect()->back()->with('error', '❌ الطلب غير موجود');
+        }
+        
+        $assetNum = $itemOrder->asset_num;
 
         $updateData = [
             'usage_status_id' => 5,
@@ -372,6 +457,15 @@ class ReturnRequests extends BaseController
         }
 
         log_message('info', 'Item order updated successfully');
+
+        // Update the return form with handler information (even for rejection)
+        $formUpdateResult = $this->updateReturnFormWithHandler($assetNum, $handlerName . ' (مرفوض)', $handlerDate);
+        
+        if ($formUpdateResult) {
+            log_message('info', "Return form updated successfully for asset: {$assetNum}");
+        } else {
+            log_message('warning', "Failed to update return form for asset: {$assetNum}");
+        }
 
         $historyModel = new HistoryModel();
         $historyData = [
@@ -394,6 +488,6 @@ class ReturnRequests extends BaseController
         log_message('info', "Return rejected successfully. Item Order ID: {$itemOrderId}, User: {$currentUserId}");
         log_message('debug', '=== REJECT RETURN END ===');
         
-        return redirect()->back()->with('warning', 'تم رفض الإرجاع');
+        return redirect()->back()->with('warning', 'تم رفض الإرجاع وتحديث النموذج');
     }
 }
