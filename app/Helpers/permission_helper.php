@@ -122,9 +122,20 @@ if (!function_exists('canReject')) {
 if (!function_exists('canTransfer')) {
     function canTransfer()
     {
+        //  أي مستخدم مسجل دخول يقدر يحول عهدته الخاصة
+        return session()->get('isLoggedIn');
+    }
+}
+
+//   التحقق من صلاحية تحويل عهد الآخرين
+if (!function_exists('canTransferAnyAsset')) {
+    function canTransferAnyAsset()
+    {
+        //  فقط super_assets يقدر يحول عهد أي شخص
         return isSuperAssets();
     }
 }
+
 
 if (!function_exists('canReturn')) {
     function canReturn()

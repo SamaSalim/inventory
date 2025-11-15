@@ -678,58 +678,6 @@
             updateTransferButton();
         }
 
-        // function submitTransfer() {
-        //     const note = document.getElementById('transferNote').value;
-
-        //     // ✅ التحقق من المستخدم المستلم فقط
-        //     if (!selectedToUser) {
-        //         showAlert('warning', 'يرجى اختيار المستخدم المستلم');
-        //         return;
-        //     }
-
-        //     if (selectedItems.length === 0) {
-        //         showAlert('warning', 'لم يتم تحديد أي أصول');
-        //         return;
-        //     }
-
-        //     // ✅ إرسال currentUserId بدلاً من selectedFromUser
-        //     const transferData = {
-        //         items: selectedItems.map(item => item.id),
-        //         from_user_id: currentUserId,
-        //         to_user_id: selectedToUser,
-        //         note: note
-        //     };
-
-        //     fetch('<?= base_url('AssetsController/processTransfer') ?>', {
-        //             method: 'POST',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //             },
-        //             body: JSON.stringify(transferData)
-        //         })
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             if (data.success) {
-        //                 showAlert('success', 'تم إنشاء طلب التحويل بنجاح. في انتظار قبول المستلم.');
-        //                 closeTransferModal();
-
-        //                 selectedItems.forEach(item => {
-        //                     const card = document.querySelector(`.item-card[data-item-order-id="${item.id}"]`);
-        //                     if (card) {
-        //                         card.style.animation = 'fadeOut 0.3s ease';
-        //                         setTimeout(() => card.remove(), 300);
-        //                     }
-        //                 });
-        //             } else {
-        //                 showAlert('danger', 'حدث خطأ: ' + (data.message || 'فشل التحويل'));
-        //             }
-        //         })
-        //         .catch(error => {
-        //             showAlert('danger', 'حدث خطأ في الاتصال بالخادم');
-        //             console.error('Error:', error);
-        //         });
-        // }
-
         function submitTransfer() {
     const note = document.getElementById('transferNote').value;
 

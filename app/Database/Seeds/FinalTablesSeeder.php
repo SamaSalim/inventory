@@ -401,6 +401,14 @@ class FinalTablesSeeder extends Seeder
                 'password' => password_hash('123457', PASSWORD_DEFAULT),
             ],
             [
+                'user_id'   => '1004',
+                'name'     => 'سما سالم',
+                'user_dept' => 'العهد',
+                'user_ext'   => 1110,
+                'email'    => 'sama@example.com',
+                'password' => password_hash('123459', PASSWORD_DEFAULT),
+            ],
+            [
                 'user_id'   => '1006',
                 'name'     => ' ليالي العلياني',
                 'user_dept' => 'المستودعات',

@@ -393,7 +393,11 @@ public function respondToTransfer()
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
             
-            $orderModel->update($orderId, ['order_status_id' => 3]);
+            // $orderModel->update($orderId, ['order_status_id' => 3]);
+            // ✅ فقط نغير order_status_id إذا كان هذا أول رفض (رفض الطلب الأساسي من المستودع)
+            if ($previousAcceptedTransfers == 0) {
+                $orderModel->update($orderId, ['order_status_id' => 3]);
+            }
         }
 
         $orderModel->transComplete();
