@@ -216,17 +216,14 @@ public function dashboard(): string
     }
 
     /**
-     * قبول أو رفض طلب العهدة
-     */
+ * قبول أو رفض طلب العهدة
+ */
 public function respondToTransfer()
 {
     $this->response->setContentType('application/json');
 
     if (!session()->get('isLoggedIn')) {
-        return $this->response->setJSON([
-            'success' => false,
-            'message' => 'يجب تسجيل الدخول أولاً'
-        ]);
+        throw new AuthenticationException();
     }
 
     $json = $this->request->getJSON();
@@ -253,7 +250,7 @@ public function respondToTransfer()
         $itemOrderModel = $this->itemOrderModel;
         $orderModel = $this->orderModel;
         $historyModel = new \App\Models\HistoryModel();
-        
+
         $transfer = $transferModel->find($transferId);
 
         if (!$transfer) {
@@ -267,8 +264,6 @@ public function respondToTransfer()
         $isEmployee = session()->get('isEmployee');
         $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id');
         $currentUserId = $account_id;
-        
-
 
         if ($transfer->order_status_id != 1) {
             $statusText = $transfer->order_status_id == 2 ? 'مقبول' : 'مرفوض';
@@ -296,7 +291,7 @@ public function respondToTransfer()
                 'message' => 'فشل تحديث حالة الطلب'
             ]);
         }
-        
+
         $itemOrder = $itemOrderModel->find($transfer->item_order_id);
         $itemOrderId = $itemOrder->item_order_id ?? null;
         $orderId = $itemOrder->order_id ?? null;
@@ -324,19 +319,32 @@ public function respondToTransfer()
         }
 
         if ($action === 'accept') {
-            // ✅ تحديث حالة الاستخدام فقط إذا تم تحويل العهدة من قبل شخص آخر
+            // ✅ جلب كل التحويلات المقبولة السابقة لهذا الصنف (قبل هذا التحويل)
             $previousTransfers = $transferModel
                 ->where('item_order_id', $itemOrderId)
-                ->where('order_status_id', 2) // تم قبول التحويل
-                ->findAll();
+                ->where('order_status_id', 2) // مقبول
+                ->where('transfer_item_id !=', $transferId) // استثناء التحويل الحالي
+                ->countAllResults();
 
-            if (count($previousTransfers) > 1) {
-                // هناك مستخدم سابق قبل هذا التحويل → نغير الحالة إلى مستعمل
-                $itemOrderModel->update($itemOrderId, [
-                    'usage_status_id' => 6, // مستعمل
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
+            // تحديد الحالة الصحيحة بناءً على تاريخ الصنف
+            if ($previousTransfers > 0) {
+                // الصنف كان محول من قبل → مستعمل
+                $newUsageStatus = 6;
+            } else {
+                // أول تحويل → نتحقق من تاريخه
+                $wasReturned = $historyModel
+                    ->where('item_order_id', $itemOrderId)
+                    ->where('usage_status_id', 2) // رجيع
+                    ->first();
+                
+                $newUsageStatus = $wasReturned ? 4 : 1; // معاد صرفه : جديد
             }
+
+            // ✅ تحديث حالة الصنف من "تحويل" إلى الحالة المناسبة
+            $itemOrderModel->update($itemOrderId, [
+                'usage_status_id' => $newUsageStatus,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
 
             // ✅ التحقق من أن جميع التحويلات في نفس الطلب تم قبولها
             $allTransferItems = $transferModel
@@ -356,37 +364,43 @@ public function respondToTransfer()
                 $orderModel->update($orderId, ['order_status_id' => 2]);
             }
         } else {
-            // ✅ في حال الرفض
-            $orderModel->update($orderId, ['order_status_id' => 3]);
-
-            // ✅ جلب جميع الأصناف المرتبطة بهذا الطلب
-            $relatedItems = $itemOrderModel
-                ->where('order_id', $orderId)
-                ->findAll();
-
-            foreach ($relatedItems as $item) {
-                if ($item->usage_status_id == 1) {
-                    $hasReturn = $historyModel
-                        ->where('item_order_id', $item->item_order_id)
-                        ->where('usage_status_id', 2)
-                        ->first();
-
-                    if ($hasReturn) {
-                        $itemOrderModel->update($item->item_order_id, [
-                            'usage_status_id' => 4,
-                            'updated_at' => date('Y-m-d H:i:s')
-                        ]);
-                    }
-                }
+            // ✅ في حال الرفض - إرجاع حالة الصنف حسب حالته السابقة
+            
+            // التحقق من وجود تحويلات سابقة مقبولة لهذا الصنف
+            $previousAcceptedTransfers = $transferModel
+                ->where('item_order_id', $itemOrderId)
+                ->where('order_status_id', 2) // مقبول
+                ->where('transfer_item_id !=', $transferId) // استثناء التحويل الحالي
+                ->countAllResults();
+            
+            if ($previousAcceptedTransfers > 0) {
+                // كان محول من قبل → مستعمل
+                $usageStatusId = 6;
+            } else {
+                // لم يتم تحويله من قبل → نتحقق من التاريخ
+                $wasReturned = $historyModel
+                    ->where('item_order_id', $itemOrderId)
+                    ->where('usage_status_id', 2) // رجيع
+                    ->first();
+                
+                $usageStatusId = $wasReturned ? 4 : 1; // معاد صرفه : جديد
             }
+            
+            // ✅ تحديث حالة الصنف من "تحويل" إلى الحالة المناسبة
+            $itemOrderModel->update($itemOrderId, [
+                'usage_status_id' => $usageStatusId,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+            
+            $orderModel->update($orderId, ['order_status_id' => 3]);
         }
 
         $orderModel->transComplete();
-        
+
         if ($orderModel->transStatus() === FALSE) {
             throw new \Exception('فشل في المعاملة الكلية.');
         }
-        
+
         $message = ($action === 'accept')
             ? 'تم قبول الطلب بنجاح. العهدة الآن في عهدتك'
             : 'تم رفض الطلب. العهدة ستبقى مع المُرسل';
@@ -395,7 +409,6 @@ public function respondToTransfer()
             'success' => true,
             'message' => $message
         ]);
-
     } catch (\Exception $e) {
         log_message('error', 'Transfer Response Error: ' . $e->getMessage());
 
@@ -460,39 +473,39 @@ public function respondToTransfer()
         }
     }
 
-public function userView2(): string
+     public function userView2(): string
 {
-    $this->checkAuth();
-
- $isEmployee = session()->get('isEmployee');
-    $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id');
-    $currentUserId = $account_id;   
+    if (!session()->get('isLoggedIn')) {
+        throw new AuthenticationException();
+    }
+    $currentUserId = session()->get('isEmployee') ? session()->get('employee_id') : session()->get('user_id');
 
     $transferItemsModel = $this->transferItemsModel;
     $historyModel = new \App\Models\HistoryModel();
 
+    // ✅ جلب التحويلات المقبولة - مع التأكد أن المستخدم هو آخر مستلم
     $transferItems = $transferItemsModel
         ->select(
             'transfer_items.transfer_item_id AS id,
-         transfer_items.created_at,
-         transfer_items.item_order_id,
-         transfer_items.is_opened,
-         transfer_items.order_status_id AS transfer_order_status_id,
-         item_order.asset_num,
-         item_order.serial_num,
-         item_order.model_num AS model,
-         item_order.brand,
-         item_order.old_asset_num,
-         item_order.assets_type,
-         item_order.usage_status_id,
-         items.name AS item_name,
-         minor_category.name AS minor_category_name,
-         major_category.name AS major_category_name,
-         from_user.name AS from_user_name,
-         from_user.user_dept AS from_user_dept,
-         usage_status.usage_status AS usage_status_name,
-         order_status.status AS order_status_name,
-         "transfer_items" AS source_table'
+             transfer_items.created_at,
+             transfer_items.item_order_id,
+             transfer_items.is_opened,
+             transfer_items.order_status_id AS transfer_order_status_id,
+             item_order.asset_num,
+             item_order.serial_num,
+             item_order.model_num AS model,
+             item_order.brand,
+             item_order.old_asset_num,
+             item_order.assets_type,
+             item_order.usage_status_id,
+             items.name AS item_name,
+             minor_category.name AS minor_category_name,
+             major_category.name AS major_category_name,
+             from_user.name AS from_user_name,
+             from_user.user_dept AS from_user_dept,
+             usage_status.usage_status AS usage_status_name,
+             order_status.status AS order_status_name,
+             "transfer_items" AS source_table'
         )
         ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
         ->join('items', 'items.id = item_order.item_id', 'left')
@@ -503,8 +516,8 @@ public function userView2(): string
         ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
         ->where('transfer_items.to_user_id', $currentUserId)
         ->where('transfer_items.order_status_id', 2) // Only accepted transfers
-        ->whereNotIn('item_order.usage_status_id', [2, 4,7]) // Exclude returned (2) and reissued (4)
-        ->groupBy('transfer_items.transfer_item_id')
+        ->whereNotIn('item_order.usage_status_id', [2, 3]) // Exclude returned and in-transfer
+        ->groupBy('transfer_items.item_order_id')
         ->orderBy('transfer_items.created_at', 'ASC')
         ->findAll();
 
@@ -513,25 +526,25 @@ public function userView2(): string
     $orders = $orderModel
         ->select(
             'order.order_id AS id,
-         order.created_at,
-         order.to_user_id,
-         order.order_status_id,
-         order_status.status AS order_status_name,
-         usage_status.usage_status AS usage_status_name,
-         from_user.name AS from_user_name,
-         from_user.user_dept AS from_user_dept,
-         item_order.asset_num,
-         item_order.serial_num,
-         item_order.model_num AS model,
-         item_order.brand,
-         item_order.old_asset_num,
-         item_order.assets_type,
-         item_order.item_order_id,
-         item_order.usage_status_id,
-         items.name AS item_name,
-         minor_category.name AS minor_category_name,
-         major_category.name AS major_category_name,
-         "orders" AS source_table'
+             order.created_at,
+             order.to_user_id,
+             order.order_status_id,
+             order_status.status AS order_status_name,
+             usage_status.usage_status AS usage_status_name,
+             from_user.name AS from_user_name,
+             from_user.user_dept AS from_user_dept,
+             item_order.asset_num,
+             item_order.serial_num,
+             item_order.model_num AS model,
+             item_order.brand,
+             item_order.old_asset_num,
+             item_order.assets_type,
+             item_order.item_order_id,
+             item_order.usage_status_id,
+             items.name AS item_name,
+             minor_category.name AS minor_category_name,
+             major_category.name AS major_category_name,
+             "orders" AS source_table'
         )
         ->join('item_order', 'item_order.order_id = order.order_id', 'left')
         ->join('items', 'items.id = item_order.item_id', 'left')
@@ -542,7 +555,7 @@ public function userView2(): string
         ->join('order_status', 'order_status.id = order.order_status_id', 'left')
         ->where('order.to_user_id', $currentUserId)
         ->where('order.order_status_id', 2) // Only accepted orders
-        ->whereNotIn('item_order.usage_status_id', [2, 4,7]) // Exclude returned (2) and reissued (4)
+        ->whereNotIn('item_order.usage_status_id', [2, 3]) // Exclude returned and in-transfer
         ->groupBy('item_order.item_order_id')
         ->orderBy('order.created_at', 'ASC')
         ->findAll();
@@ -550,17 +563,28 @@ public function userView2(): string
     $combinedItems = [];
     $assetNums = [];
 
-    // Process orders first
+    // ✅ معالجة الطلبات المباشرة أولاً
     foreach ($orders as $order) {
         $assetNum = $order->asset_num;
         $key = $order->item_order_id ?? $assetNum;
 
         if (!isset($assetNums[$key])) {
+            // ✅ التحقق: هل تم تحويل هذا الصنف؟
+            $latestTransfer = $transferItemsModel
+                ->where('item_order_id', $order->item_order_id)
+                ->where('order_status_id', 2) // مقبول
+                ->orderBy('created_at', 'DESC')
+                ->first();
+
+            // ✅ إذا تم تحويله لشخص آخر، لا نعرضه هنا
+            if ($latestTransfer && $latestTransfer->to_user_id != $currentUserId) {
+                continue;
+            }
+
             // Initialize reissued flag
             $order->is_reissued = false;
-            
+
             // Check if item has usage_status_id = 1 (new) and has a history of being returned (usage_status_id = 2)
-            // This means the item was returned before and now reissued
             if ($order->usage_status_id == 1) {
                 $returnHistoryExists = $historyModel
                     ->where('item_order_id', $order->item_order_id)
@@ -572,44 +596,54 @@ public function userView2(): string
                     $order->usage_status_name = 'معاد صرفه';
                 }
             }
-            
+
             // Check if usage_status_id = 5, then override order status to "مرفوض"
             if ($order->usage_status_id == 5) {
                 $order->order_status_name = 'مرفوض';
             }
-            
+
             $combinedItems[] = $order;
             $assetNums[$key] = true;
         }
     }
 
-    // Process transfer items
+    // ✅ معالجة التحويلات
     foreach ($transferItems as $transfer) {
         $assetNum = $transfer->asset_num;
         $key = $transfer->item_order_id ?? $assetNum;
 
         if (!isset($assetNums[$key])) {
+            // ✅ التحقق: هل المستخدم الحالي هو آخر مستلم؟
+            $latestTransfer = $transferItemsModel
+                ->where('item_order_id', $transfer->item_order_id)
+                ->where('order_status_id', 2) // مقبول
+                ->orderBy('created_at', 'DESC')
+                ->first();
+
+            // ✅ إذا لم يكن آخر مستلم، لا نعرض العهدة
+            if (!$latestTransfer || $latestTransfer->to_user_id != $currentUserId) {
+                continue;
+            }
+
             // Initialize reissued flag
             $transfer->is_reissued = false;
-            
 
             if ($transfer->usage_status_id == 1) {
                 $returnHistoryExists = $historyModel
                     ->where('item_order_id', $transfer->item_order_id)
                     ->where('usage_status_id', 2)
                     ->first();
-                
+
                 if ($returnHistoryExists) {
                     $transfer->is_reissued = true;
                     $transfer->usage_status_name = 'معاد صرفه';
                 }
             }
-            
 
             if ($transfer->usage_status_id == 5) {
                 $transfer->order_status_name = 'مرفوض';
             }
-            
+
             $combinedItems[] = $transfer;
             $assetNums[$key] = true;
         }

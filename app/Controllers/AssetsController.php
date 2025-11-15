@@ -295,38 +295,150 @@ public function orderDetails($id)
 }
 
 // transferView - عرض صفحة تحويل العهدة
-public function transferView($orderId = null)
+// public function transferView($orderId = null)
+// {
+//     if (!session()->get('isLoggedIn')) {
+//         throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
+//     }
+
+//     $itemOrderModel = new \App\Models\ItemOrderModel();
+    
+//     $itemOrderId = null;
+//     $actualOrderId = null;
+    
+//     // دعم 3 طرق لاستقبال البيانات
+//     if ($orderId !== null) {
+//         $itemOrder = $itemOrderModel->where('order_id', $orderId)->first();
+//         if ($itemOrder) {
+//             $itemOrderId = $itemOrder->item_order_id;
+//             $actualOrderId = $orderId;
+//         } else {
+//             $itemOrderId = $orderId;
+//         }
+//     } elseif ($this->request->getGet('item_order_id')) {
+//         $itemOrderId = $this->request->getGet('item_order_id');
+//     } elseif ($this->request->getGet('order_id')) {
+//         $actualOrderId = $this->request->getGet('order_id');
+//         $itemOrder = $itemOrderModel->where('order_id', $actualOrderId)->first();
+//         if ($itemOrder) {
+//             $itemOrderId = $itemOrder->item_order_id;
+//         }
+//     }
+    
+//     if (!$itemOrderId) {
+//         return redirect()->back()->with('error', 'معرف العنصر مطلوب');
+//     }
+
+//     $itemModel = new \App\Models\ItemModel();
+//     $minorCatModel = new \App\Models\MinorCategoryModel();
+//     $majorCatModel = new \App\Models\MajorCategoryModel();
+//     $usageStatusModel = new \App\Models\UsageStatusModel();
+//     $userModel = new \App\Models\UserModel();
+//     $orderModel = new \App\Models\OrderModel();
+//     $transferItemsModel = new \App\Models\TransferItemsModel();
+    
+//     $currentUserId = session()->get('isEmployee') ? session()->get('employee_id') : session()->get('user_id');
+    
+//     // جلب الـ item_order
+//     $itemOrder = $itemOrderModel->find($itemOrderId);
+    
+//     if (!$itemOrder) {
+//         throw new \Exception('العهدة غير موجودة');
+//     }
+    
+//     // استخدام order_id من الـ item_order إذا لم يكن موجود
+//     if (!$actualOrderId) {
+//         $actualOrderId = $itemOrder->order_id;
+//     }
+    
+//     $order = null;
+//     $currentUser = null;
+//     $actualOwnerId = null;
+
+//     // البحث عن صاحب العهدة الحالي
+//     $transferItem = $transferItemsModel
+//         ->where('item_order_id', $itemOrderId)
+//         ->where('order_status_id', 2)
+//         ->orderBy('created_at', 'DESC')
+//         ->first();
+    
+//     if ($transferItem) {
+//         $actualOwnerId = $transferItem->to_user_id;
+//         $currentUser = $userModel->where('user_id', $actualOwnerId)->first();
+//     }
+    
+//     if (!$currentUser && $actualOrderId) {
+//         $order = $orderModel->find($actualOrderId);
+        
+//         if ($order && $order->to_user_id) {
+//             $actualOwnerId = $order->to_user_id;
+//             $currentUser = $userModel->where('user_id', $actualOwnerId)->first();
+//         }
+//     }
+    
+//     if (!$currentUser) {
+//         throw new \Exception('لا يمكن تحديد صاحب العهدة الحالي');
+//     }
+
+//     // التحقق من الصلاحية
+//     $isOwner = ($actualOwnerId == $currentUserId);
+//     $canTransferOthers = canTransfer();
+    
+//     if (!$isOwner && !$canTransferOthers) {
+//         return redirect()->back()->with('error', 'ليس لديك صلاحية تحويل هذه العهدة');
+//     }
+
+//     // ✅ جلب كل الأصناف المتاحة للتحويل من نفس الطلب
+//     $items = $itemOrderModel
+//         ->where('order_id', $actualOrderId)
+//         ->whereNotIn('usage_status_id', [2, 3])
+//         ->findAll();
+
+//     // ✅ إزالة شرط منع الدخول وإضافة متغير لحالة الأصناف
+//     $hasAvailableItems = !empty($items);
+
+//     // ✅ معالجة بيانات الأصناف فقط إذا كانت موجودة
+//     if ($hasAvailableItems) {
+//         foreach ($items as $item) {
+//             $itemData = $itemModel->find($item->item_id);
+//             $minor = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
+//             $major = $minor ? $majorCatModel->find($minor->major_category_id) : null;
+
+//             $item->item_name = $itemData->name ?? 'غير معروف';
+//             $item->minor_category_name = $minor->name ?? 'غير معروف';
+//             $item->major_category_name = $major->name ?? 'غير معروف';
+//             $item->usage_status_name = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
+//         }
+//     }
+
+//     // جلب جميع المستخدمين ماعدا صاحب العهدة الحالي
+//     $users = $userModel->where('user_id !=', $actualOwnerId)->findAll();
+
+//     return view('assets/transfer_order', [
+//         'items' => $items, // ✅ سيكون array فارغ إذا لم توجد أصناف
+//         'users' => $users,
+//         'order_id' => $actualOrderId,
+//         'order' => $order,
+//         'current_user' => $currentUser,
+//         'has_available_items' => $hasAvailableItems // ✅ متغير جديد للتحكم في العرض
+//     ]);
+// }
+
+public function transferView($itemOrderId = null)
 {
-        if (!session()->get('isLoggedIn')) {
-            throw new AuthenticationException();
-        }
+    if (!session()->get('isLoggedIn')) {
+        throw new \CodeIgniter\Shield\Exceptions\AuthenticationException();
+    }
 
     $itemOrderModel = new \App\Models\ItemOrderModel();
     
-    $itemOrderId = null;
-    $actualOrderId = null;
-    
-    // دعم 3 طرق لاستقبال البيانات
-    if ($orderId !== null) {
-        $itemOrder = $itemOrderModel->where('order_id', $orderId)->first();
-        if ($itemOrder) {
-            $itemOrderId = $itemOrder->item_order_id;
-            $actualOrderId = $orderId;
-        } else {
-            $itemOrderId = $orderId;
-        }
-    } elseif ($this->request->getGet('item_order_id')) {
+    // ✅ دعم استقبال item_order_id من الـ URL أو من GET parameter
+    if (!$itemOrderId) {
         $itemOrderId = $this->request->getGet('item_order_id');
-    } elseif ($this->request->getGet('order_id')) {
-        $actualOrderId = $this->request->getGet('order_id');
-        $itemOrder = $itemOrderModel->where('order_id', $actualOrderId)->first();
-        if ($itemOrder) {
-            $itemOrderId = $itemOrder->item_order_id;
-        }
     }
     
     if (!$itemOrderId) {
-        return redirect()->back()->with('error', 'معرف العنصر مطلوب');
+        return redirect()->back()->with('error', 'معرف الصنف مطلوب');
     }
 
     $itemModel = new \App\Models\ItemModel();
@@ -339,36 +451,34 @@ public function transferView($orderId = null)
     
     $currentUserId = session()->get('isEmployee') ? session()->get('employee_id') : session()->get('user_id');
     
-    // جلب الـ item_order
+    // ✅ جلب الصنف المحدد فقط
     $itemOrder = $itemOrderModel->find($itemOrderId);
     
     if (!$itemOrder) {
-        throw new \Exception('العهدة غير موجودة');
+        return redirect()->back()->with('error', 'الصنف غير موجود');
     }
     
-    // استخدام order_id من الـ item_order إذا لم يكن موجود
-    if (!$actualOrderId) {
-        $actualOrderId = $itemOrder->order_id;
-    }
+    $orderId = $itemOrder->order_id;
     
-    $order = null;
-    $currentUser = null;
-    $actualOwnerId = null;
-
-    // البحث عن صاحب العهدة الحالي
+    // ✅ البحث عن صاحب العهدة الحالي لهذا الصنف المحدد
     $transferItem = $transferItemsModel
         ->where('item_order_id', $itemOrderId)
-        ->where('order_status_id', 2)
+        ->where('order_status_id', 2) // مقبول
         ->orderBy('created_at', 'DESC')
         ->first();
     
+    $actualOwnerId = null;
+    $currentUser = null;
+    
     if ($transferItem) {
+        // ✅ صاحب العهدة من آخر تحويل مقبول
         $actualOwnerId = $transferItem->to_user_id;
         $currentUser = $userModel->where('user_id', $actualOwnerId)->first();
     }
     
-    if (!$currentUser && $actualOrderId) {
-        $order = $orderModel->find($actualOrderId);
+    // ✅ إذا ما كان في تحويل، نجيب من Order الأساسي
+    if (!$currentUser) {
+        $order = $orderModel->find($orderId);
         
         if ($order && $order->to_user_id) {
             $actualOwnerId = $order->to_user_id;
@@ -377,10 +487,10 @@ public function transferView($orderId = null)
     }
     
     if (!$currentUser) {
-        throw new \Exception('لا يمكن تحديد صاحب العهدة الحالي');
+        return redirect()->back()->with('error', 'لا يمكن تحديد صاحب العهدة الحالي');
     }
 
-    // التحقق من الصلاحية
+    // ✅ التحقق من الصلاحية - يجب أن يكون المستخدم الحالي هو صاحب هذا الصنف
     $isOwner = ($actualOwnerId == $currentUserId);
     $canTransferOthers = canTransfer();
     
@@ -388,43 +498,216 @@ public function transferView($orderId = null)
         return redirect()->back()->with('error', 'ليس لديك صلاحية تحويل هذه العهدة');
     }
 
-    // ✅ جلب كل الأصناف المتاحة للتحويل من نفس الطلب
+    // ✅ التحقق من حالة الصنف - لازم يكون قابل للتحويل
+    if (in_array($itemOrder->usage_status_id, [2, 3, 7])) {
+        $statusName = $itemOrder->usage_status_id == 2 ? 'رجيع' : 'قيد التحويل';
+        return redirect()->back()->with('error', "الصنف في حالة '{$statusName}' ولا يمكن تحويله");
+    }
+
+    // ✅ جلب فقط الأصناف التي يملكها المستخدم الحالي من نفس الطلب
     $items = $itemOrderModel
-        ->where('order_id', $actualOrderId)
-        ->whereNotIn('usage_status_id', [2, 3])
+        ->where('order_id', $orderId)
+        ->whereNotIn('usage_status_id', [2, 3,7]) //   استبعاد: رجيع وقيد التحويل و قيد التقيم
         ->findAll();
 
-    // ✅ إزالة شرط منع الدخول وإضافة متغير لحالة الأصناف
-    $hasAvailableItems = !empty($items);
-
-    // ✅ معالجة بيانات الأصناف فقط إذا كانت موجودة
-    if ($hasAvailableItems) {
-        foreach ($items as $item) {
-            $itemData = $itemModel->find($item->item_id);
-            $minor = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
-            $major = $minor ? $majorCatModel->find($minor->major_category_id) : null;
-
-            $item->item_name = $itemData->name ?? 'غير معروف';
-            $item->minor_category_name = $minor->name ?? 'غير معروف';
-            $item->major_category_name = $major->name ?? 'غير معروف';
-            $item->usage_status_name = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
+    // ✅ فلترة الأصناف: نعرض فقط الأصناف اللي بعهدة المستخدم الحالي
+    $filteredItems = [];
+    foreach ($items as $item) {
+        // التحقق من آخر تحويل مقبول لهذا الصنف
+        $lastTransfer = $transferItemsModel
+            ->where('item_order_id', $item->item_order_id)
+            ->where('order_status_id', 2) // مقبول
+            ->orderBy('created_at', 'DESC')
+            ->first();
+        
+        // ✅ نعرض الصنف فقط إذا:
+        // 1. كان هناك تحويل والمستلم هو المستخدم الحالي
+        // 2. أو لا يوجد تحويل والطلب الأصلي باسم المستخدم الحالي
+        if (($lastTransfer && $lastTransfer->to_user_id == $currentUserId) || 
+            (!$lastTransfer && $actualOwnerId == $currentUserId)) {
+            $filteredItems[] = $item;
         }
     }
 
-    // جلب جميع المستخدمين ماعدا صاحب العهدة الحالي
+    $items = $filteredItems;
+
+    // ✅ معالجة بيانات كل الأصناف
+    foreach ($items as $item) {
+        $itemData = $itemModel->find($item->item_id);
+        $minor = $itemData ? $minorCatModel->find($itemData->minor_category_id) : null;
+        $major = $minor ? $majorCatModel->find($minor->major_category_id) : null;
+
+        $item->item_name = $itemData->name ?? 'غير معروف';
+        $item->minor_category_name = $minor->name ?? 'غير معروف';
+        $item->major_category_name = $major->name ?? 'غير معروف';
+        $item->usage_status_name = $usageStatusModel->find($item->usage_status_id)->usage_status ?? 'غير معروف';
+        
+        // ✅ تحديد الصنف المحدد (الذي تم الضغط عليه)
+        if ($item->item_order_id == $itemOrderId) {
+            $item->is_selected = true;
+        }
+    }
+
+    // ✅ جلب جميع المستخدمين ماعدا صاحب العهدة الحالي
     $users = $userModel->where('user_id !=', $actualOwnerId)->findAll();
 
     return view('assets/transfer_order', [
-        'items' => $items, // ✅ سيكون array فارغ إذا لم توجد أصناف
+        'items' => $items, // ✅ فقط الأصناف التي يملكها المستخدم الحالي
+        'selected_item_id' => $itemOrderId, // ✅ الصنف المحدد
         'users' => $users,
-        'order_id' => $actualOrderId,
-        'order' => $order,
         'current_user' => $currentUser,
-        'has_available_items' => $hasAvailableItems // ✅ متغير جديد للتحكم في العرض
+        'has_available_items' => !empty($items)
     ]);
 }
 
+
+
 //  processTransfer - معالجة طلب التحويل
+// public function processTransfer()
+// {
+//     if (!session()->get('isLoggedIn')) {
+//         return $this->response->setJSON([
+//             'success' => false,
+//             'message' => 'يجب تسجيل الدخول أولاً'
+//         ]);
+//     }
+
+//     $json = $this->request->getJSON();
+    
+//     if (!$json) {
+//         return $this->response->setJSON([
+//             'success' => false,
+//             'message' => 'بيانات غير صحيحة'
+//         ]);
+//     }
+
+//     $itemOrderIds = $json->items ?? [];
+//     $fromUserId = $json->from_user_id ?? null;
+//     $toUserId = $json->to_user_id ?? null;
+//     $note = $json->note ?? '';
+
+//     // التحقق من البيانات
+//     if (empty($itemOrderIds) || !$fromUserId || !$toUserId) {
+//         return $this->response->setJSON([
+//             'success' => false,
+//             'message' => 'جميع الحقول مطلوبة'
+//         ]);
+//     }
+
+//     if ($fromUserId === $toUserId) {
+//         return $this->response->setJSON([
+//             'success' => false,
+//             'message' => 'لا يمكن التحويل لنفس الشخص'
+//         ]);
+//     }
+
+//     try {
+//         $itemOrderModel = new \App\Models\ItemOrderModel();
+//         $transferItemsModel = new \App\Models\TransferItemsModel();
+//         $userModel = new \App\Models\UserModel();
+
+//         // Get user details for email
+//         $fromUser = $userModel->where('user_id', $fromUserId)->first();
+//         $toUser = $userModel->where('user_id', $toUserId)->first();
+
+//         if (!$fromUser || !$toUser) {
+//             return $this->response->setJSON([
+//                 'success' => false,
+//                 'message' => 'المستخدم غير موجود'
+//             ]);
+//         }
+
+//         // Get items details for email
+//         $itemsDetails = [];
+//         $firstItemOrderId = null;
+        
+//         // ✅ معالجة كل صنف بشكل منفصل حسب item_order_id
+//         foreach ($itemOrderIds as $itemOrderId) {
+//             if ($firstItemOrderId === null) {
+//                 $firstItemOrderId = $itemOrderId;
+//             }
+            
+//             // ✅ جلب الصنف المحدد بناءً على item_order_id
+//             $currentItem = $itemOrderModel
+//                 ->select('item_order.*, items.name as item_name')
+//                 ->join('items', 'items.id = item_order.item_id')
+//                 ->where('item_order.item_order_id', $itemOrderId)
+//                 ->first();
+//             if (!$currentItem) {
+//                 log_message('warning', "Item order {$itemOrderId} not found");
+//                 continue;
+//             }
+
+//             // ✅ التحقق من حالة هذا الصنف بالتحديد (item_order_id)
+//             // 1 = جديد, 4 = معاد صرفة (يمكن تحويلهم)
+//             // 2 = رجيع, 3 = تحويل (لا يمكن تحويلهم)
+//             if (in_array($currentItem->usage_status_id, [2, 3])) {
+//                 $statusName = $currentItem->usage_status_id == 2 ? 'رجيع' : 'قيد التحويل';
+//                 return $this->response->setJSON([
+//                     'success' => false,
+//                     'message' => "الصنف '{$currentItem->item_name}' في حالة '{$statusName}' ولا يمكن تحويله"
+//                 ]);
+//             }
+
+
+//             // ✅ التحقق من عدم وجود طلب تحويل قيد الانتظار لهذا الصنف بالتحديد
+//             // $existingTransfer = $transferItemsModel
+//             //     ->where('item_order_id', $itemOrderId) // ✅ التحقق من item_order_id المحدد
+//             //     ->where('order_status_id', 1) // قيد الانتظار
+//             //     ->first();
+            
+//             // if ($existingTransfer) {
+//             //     return $this->response->setJSON([
+//             //         'success' => false,
+//             //         'message' => "الصنف '{$currentItem->item_name}' لديه طلب تحويل قيد الانتظار بالفعل"
+//             //     ]);
+//             // }
+
+//             $itemsDetails[] = $currentItem;
+
+//             // ✅ تحديث حالة هذا الصنف بالتحديد إلى "تحويل" (3)
+//             $itemOrderModel->update($itemOrderId, [ // ✅ تحديث item_order_id المحدد
+//                 'usage_status_id' => 3, // تحويل
+//                 'updated_at' => date('Y-m-d H:i:s')
+//             ]);
+
+            
+
+//             // ✅ إضافة سجل في جدول transfer_items لهذا الصنف
+//             $transferData = [
+//                 'item_order_id' => $itemOrderId, // ✅ ربط بـ item_order_id المحدد
+//                 'from_user_id' => $fromUserId,
+//                 'to_user_id' => $toUserId,
+//                 'order_status_id' => 1, // قيد الانتظار
+//                 'note' => $note,
+//                 'created_at' => date('Y-m-d H:i:s'),
+//                 'updated_at' => date('Y-m-d H:i:s')
+//             ];
+
+//             $transferItemsModel->insert($transferData);
+//         }
+
+//         // Send email notification
+//         if (!empty($itemsDetails)) {
+//             $this->sendTransferEmail($toUser, $fromUser, $itemsDetails, $note, $firstItemOrderId);
+//         }
+
+//         return $this->response->setJSON([
+//             'success' => true,
+//             'message' => 'تم إنشاء طلب التحويل بنجاح'
+//         ]);
+
+//     } catch (\Exception $e) {
+//         log_message('error', 'Transfer Error: ' . $e->getMessage());
+        
+//         return $this->response->setJSON([
+//             'success' => false,
+//             'message' => 'حدث خطأ: ' . $e->getMessage()
+//         ]);
+//     }
+// }
+
+
 public function processTransfer()
 {
     if (!session()->get('isLoggedIn')) {
@@ -443,16 +726,24 @@ public function processTransfer()
         ]);
     }
 
-    $itemOrderIds = $json->items ?? [];
+    // ✅ استقبال array من item_order_ids
+    $itemOrderIds = $json->item_order_ids ?? [];
     $fromUserId = $json->from_user_id ?? null;
     $toUserId = $json->to_user_id ?? null;
     $note = $json->note ?? '';
 
-    // التحقق من البيانات
-    if (empty($itemOrderIds) || !$fromUserId || !$toUserId) {
+    // التحقق من البيانات الأساسية
+    if (empty($itemOrderIds) || !is_array($itemOrderIds)) {
         return $this->response->setJSON([
             'success' => false,
-            'message' => 'جميع الحقول مطلوبة'
+            'message' => 'يجب اختيار صنف واحد على الأقل'
+        ]);
+    }
+
+    if (!$fromUserId || !$toUserId) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'بيانات المستخدم مطلوبة'
         ]);
     }
 
@@ -468,7 +759,7 @@ public function processTransfer()
         $transferItemsModel = new \App\Models\TransferItemsModel();
         $userModel = new \App\Models\UserModel();
 
-        // Get user details for email
+        // ✅ التحقق من المستخدمين
         $fromUser = $userModel->where('user_id', $fromUserId)->first();
         $toUser = $userModel->where('user_id', $toUserId)->first();
 
@@ -479,96 +770,164 @@ public function processTransfer()
             ]);
         }
 
-        // Get items details for email
-        $itemsDetails = [];
-        $firstItemOrderId = null;
-        
-        // ✅ معالجة كل صنف بشكل منفصل حسب item_order_id
+        // ✅ بدء المعاملة
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        $successfulTransfers = [];
+        $failedTransfers = [];
+
+        // ✅ معالجة كل صنف بشكل منفصل
         foreach ($itemOrderIds as $itemOrderId) {
-            if ($firstItemOrderId === null) {
-                $firstItemOrderId = $itemOrderId;
-            }
-            
-            // ✅ جلب الصنف المحدد بناءً على item_order_id
-            $currentItem = $itemOrderModel
-                ->select('item_order.*, items.name as item_name')
-                ->join('items', 'items.id = item_order.item_id')
-                ->where('item_order.item_order_id', $itemOrderId)
-                ->first();
-            if (!$currentItem) {
-                log_message('warning', "Item order {$itemOrderId} not found");
-                continue;
-            }
+            try {
+                // ✅ جلب الصنف المحدد
+                $currentItem = $itemOrderModel
+                    ->select('item_order.*, items.name as item_name')
+                    ->join('items', 'items.id = item_order.item_id')
+                    ->where('item_order.item_order_id', $itemOrderId)
+                    ->first();
 
-            // ✅ التحقق من حالة هذا الصنف بالتحديد (item_order_id)
-            // 1 = جديد, 4 = معاد صرفة (يمكن تحويلهم)
-            // 2 = رجيع, 3 = تحويل (لا يمكن تحويلهم)
-            if (in_array($currentItem->usage_status_id, [2, 3])) {
-                $statusName = $currentItem->usage_status_id == 2 ? 'رجيع' : 'قيد التحويل';
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => "الصنف '{$currentItem->item_name}' في حالة '{$statusName}' ولا يمكن تحويله"
+                if (!$currentItem) {
+                    $failedTransfers[] = [
+                        'item_order_id' => $itemOrderId,
+                        'reason' => 'الصنف غير موجود'
+                    ];
+                    continue;
+                }
+
+                // ✅ التحقق من حالة الصنف
+                // 1 = جديد, 4 = معاد صرفه, 6 = مستعمل (يمكن تحويلهم)
+                // 2 = رجيع, 3 = قيد التحويل (لا يمكن تحويلهم)
+                if (in_array($currentItem->usage_status_id, [2, 3, 7])) {
+                    $statusName = $currentItem->usage_status_id == 2 ? 'رجيع' : 'قيد التحويل';
+                    $failedTransfers[] = [
+                        'item_order_id' => $itemOrderId,
+                        'item_name' => $currentItem->item_name,
+                        'reason' => "الصنف في حالة '{$statusName}' ولا يمكن تحويله"
+                    ];
+                    continue;
+                }
+
+                // ✅ التحقق من وجود تحويل قيد الانتظار (اختياري - يمكنك إزالته)
+                $existingPendingTransfer = $transferItemsModel
+                    ->where('item_order_id', $itemOrderId)
+                    ->where('order_status_id', 1) // قيد الانتظار
+                    ->first();
+                
+                if ($existingPendingTransfer) {
+                    $failedTransfers[] = [
+                        'item_order_id' => $itemOrderId,
+                        'item_name' => $currentItem->item_name,
+                        'reason' => 'يوجد طلب تحويل قيد الانتظار بالفعل'
+                    ];
+                    continue;
+                }
+
+                // ✅ تحديث حالة الصنف إلى "قيد التحويل" (3)
+                $updated = $itemOrderModel->update($itemOrderId, [
+                    'usage_status_id' => 3,
+                    'updated_at' => date('Y-m-d H:i:s')
                 ]);
+
+                if (!$updated) {
+                    $failedTransfers[] = [
+                        'item_order_id' => $itemOrderId,
+                        'item_name' => $currentItem->item_name,
+                        'reason' => 'فشل في تحديث حالة الصنف'
+                    ];
+                    continue;
+                }
+
+                // ✅ إضافة سجل في جدول transfer_items
+                $transferData = [
+                    'item_order_id' => $itemOrderId,
+                    'from_user_id' => $fromUserId,
+                    'to_user_id' => $toUserId,
+                    'order_status_id' => 1, // قيد الانتظار
+                    'note' => $note,
+                    'is_opened' => 0,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ];
+
+                $transferId = $transferItemsModel->insert($transferData);
+
+                if (!$transferId) {
+                    $failedTransfers[] = [
+                        'item_order_id' => $itemOrderId,
+                        'item_name' => $currentItem->item_name,
+                        'reason' => 'فشل في إنشاء سجل التحويل'
+                    ];
+                    continue;
+                }
+
+                // ✅ نجح التحويل
+                $successfulTransfers[] = [
+                    'item_order_id' => $itemOrderId,
+                    'item_name' => $currentItem->item_name,
+                    'asset_num' => $currentItem->asset_num,
+                    'serial_num' => $currentItem->serial_num
+                ];
+
+            } catch (\Exception $e) {
+                log_message('error', "Transfer failed for item {$itemOrderId}: " . $e->getMessage());
+                $failedTransfers[] = [
+                    'item_order_id' => $itemOrderId,
+                    'reason' => 'خطأ في المعالجة: ' . $e->getMessage()
+                ];
             }
+        }
 
+        // ✅ إنهاء المعاملة
+        $db->transComplete();
 
-            // ✅ التحقق من عدم وجود طلب تحويل قيد الانتظار لهذا الصنف بالتحديد
-            // $existingTransfer = $transferItemsModel
-            //     ->where('item_order_id', $itemOrderId) // ✅ التحقق من item_order_id المحدد
-            //     ->where('order_status_id', 1) // قيد الانتظار
-            //     ->first();
-            
-            // if ($existingTransfer) {
-            //     return $this->response->setJSON([
-            //         'success' => false,
-            //         'message' => "الصنف '{$currentItem->item_name}' لديه طلب تحويل قيد الانتظار بالفعل"
-            //     ]);
-            // }
-
-            $itemsDetails[] = $currentItem;
-
-            // ✅ تحديث حالة هذا الصنف بالتحديد إلى "تحويل" (3)
-            $itemOrderModel->update($itemOrderId, [ // ✅ تحديث item_order_id المحدد
-                'usage_status_id' => 3, // تحويل
-                'updated_at' => date('Y-m-d H:i:s')
+        if ($db->transStatus() === false) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'فشلت عملية التحويل'
             ]);
-
-            
-
-            // ✅ إضافة سجل في جدول transfer_items لهذا الصنف
-            $transferData = [
-                'item_order_id' => $itemOrderId, // ✅ ربط بـ item_order_id المحدد
-                'from_user_id' => $fromUserId,
-                'to_user_id' => $toUserId,
-                'order_status_id' => 1, // قيد الانتظار
-                'note' => $note,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
-            ];
-
-            $transferItemsModel->insert($transferData);
         }
 
-        // Send email notification
-        if (!empty($itemsDetails)) {
-            $this->sendTransferEmail($toUser, $fromUser, $itemsDetails, $note, $firstItemOrderId);
+        // ✅ إعداد الرد النهائي
+        $response = [
+            'success' => !empty($successfulTransfers),
+            'successful_count' => count($successfulTransfers),
+            'failed_count' => count($failedTransfers),
+            'successful_items' => $successfulTransfers,
+            'failed_items' => $failedTransfers
+        ];
+
+        // ✅ رسالة توضيحية
+        if (!empty($successfulTransfers) && empty($failedTransfers)) {
+            $response['message'] = 'تم تحويل جميع الأصناف بنجاح (' . count($successfulTransfers) . ' صنف)';
+        } elseif (!empty($successfulTransfers) && !empty($failedTransfers)) {
+            $response['message'] = 'تم تحويل ' . count($successfulTransfers) . ' صنف بنجاح، وفشل ' . count($failedTransfers) . ' صنف';
+        } else {
+            $response['message'] = 'فشل تحويل جميع الأصناف';
+            $response['success'] = false;
         }
 
-        return $this->response->setJSON([
-            'success' => true,
-            'message' => 'تم إنشاء طلب التحويل بنجاح'
-        ]);
+        // ✅ إرسال إيميل فقط للأصناف الناجحة (اختياري)
+        if (!empty($successfulTransfers)) {
+            try {
+                $this->sendTransferEmail($toUser, $fromUser, $successfulTransfers, $note, $successfulTransfers[0]['item_order_id']);
+            } catch (\Exception $e) {
+                log_message('error', 'Email sending failed: ' . $e->getMessage());
+                // لا نوقف العملية إذا فشل الإيميل
+            }
+        }
+
+        return $this->response->setJSON($response);
 
     } catch (\Exception $e) {
         log_message('error', 'Transfer Error: ' . $e->getMessage());
         
         return $this->response->setJSON([
             'success' => false,
-            'message' => 'حدث خطأ: ' . $e->getMessage()
+            'message' => 'حدث خطأ في عملية التحويل: ' . $e->getMessage()
         ]);
     }
 }
-
 
 private function sendTransferEmail($toUser, $fromUser, $itemsDetails, $note, $orderId)
 {
