@@ -33,29 +33,28 @@ class UserController extends BaseController
     private function checkAuth()
     {
         if (!session()->get('isLoggedIn')) {
-            throw new AuthenticationException();
+            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
         }
     }
 
     /**
      * عرض الطلبات المحولة للمستخدم الحالي
      */
-    public function dashboard(): string
-    {
-        if (!session()->get('isLoggedIn')) {
-            throw new AuthenticationException();
-        }
-        $isEmployee = session()->get('isEmployee');
-        $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id');
-        $currentUserId = $account_id;
+public function dashboard(): string
+{
+    $this->checkAuth();
 
-        $transferItemsModel = new TransferItemsModel();
-        $historyModel = new \App\Models\HistoryModel();
+    $isEmployee = session()->get('isEmployee');
+    $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id');
+    $currentUserId = $account_id;
 
-        $myOrders = $transferItemsModel
-            ->distinct()
-            ->select(
-                'transfer_items.transfer_item_id,
+    $transferItemsModel = new TransferItemsModel();
+    $historyModel = new \App\Models\HistoryModel(); 
+
+    $myOrders = $transferItemsModel
+        ->distinct()
+        ->select(
+            'transfer_items.transfer_item_id,
              transfer_items.created_at,
              transfer_items.item_order_id,
              transfer_items.is_opened, 
@@ -67,34 +66,34 @@ class UserController extends BaseController
              from_user.user_dept AS from_user_dept,
              usage_status.usage_status AS usage_status_name,
              order_status.status AS order_status_name'
-            )
-            ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
-            ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
-            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-            ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
-            ->where('transfer_items.to_user_id', $currentUserId)
-            ->where('item_order.usage_status_id !=', 2) // exclude returned items
-            ->where('transfer_items.order_status_id', 1) // pending only
-            ->orderBy('transfer_items.created_at', 'DESC')
-            ->findAll();
+        )
+        ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+        ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+        ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
+        ->where('transfer_items.to_user_id', $currentUserId)
+        ->where('item_order.usage_status_id !=', 2) // exclude returned items
+        ->where('transfer_items.order_status_id', 1) // pending only
+        ->orderBy('transfer_items.created_at', 'DESC')
+        ->findAll();
 
-        foreach ($myOrders as &$order) {
-            if ($order->usage_status_id == 1) {
-                $hasReturn = $historyModel
-                    ->where('item_order_id', $order->item_order_id)
-                    ->where('usage_status_id', 2)
-                    ->first();
+    foreach ($myOrders as &$order) {
+        if ($order->usage_status_id == 1) {
+            $hasReturn = $historyModel
+                ->where('item_order_id', $order->item_order_id)
+                ->where('usage_status_id', 2)
+                ->first();
 
-                if ($hasReturn) {
-                    $order->usage_status_name = 'معاد صرفه';
-                }
+            if ($hasReturn) {
+                $order->usage_status_name = 'معاد صرفه';
             }
         }
-        unset($order);
-        return view('user/userView', [
-            'orders' => $myOrders
-        ]);
     }
+    unset($order); 
+    return view('user/userView', [
+        'orders' => $myOrders
+    ]);
+}
 
 
     private function getWarehouseStats(): array
@@ -125,7 +124,7 @@ class UserController extends BaseController
             ->orderBy('item_order.created_at', 'DESC')
             ->first();
 
-
+            
 
         return [
             'total_receipts' => $totalReceipts,
@@ -146,7 +145,7 @@ class UserController extends BaseController
     public function getTransferDetails($transferId)
     {
         if (!session()->get('isLoggedIn')) {
-            throw new AuthenticationException();
+            return redirect()->to('/login')->with('error', 'يجب تسجيل الدخول أولاً');
         }
 
  $isEmployee = session()->get('isEmployee');
@@ -200,17 +199,17 @@ class UserController extends BaseController
         $historyModel = new \App\Models\HistoryModel();
 
         foreach ($items as &$item) {
-            if ($item->usage_status_name === 'جديد') {
-                $hasReturnHistory = $historyModel
-                    ->where('item_order_id', $item->item_order_id)
-                    ->where('usage_status_id', 2)
-                    ->first();
+    if ($item->usage_status_name === 'جديد') {
+        $hasReturnHistory = $historyModel
+            ->where('item_order_id', $item->item_order_id)
+            ->where('usage_status_id', 2)
+            ->first();
 
-                if ($hasReturnHistory) {
-                    $item->usage_status_name = 'معاد صرفه';
-                }
-            }
+        if ($hasReturnHistory) {
+            $item->usage_status_name = 'معاد صرفه';
         }
+    }
+}
 
 
         return $this->response->setJSON(['success' => true, 'data' => $transfer, 'items' => $items]);
@@ -219,189 +218,193 @@ class UserController extends BaseController
     /**
      * قبول أو رفض طلب العهدة
      */
-    public function respondToTransfer()
-    {
-        $this->response->setContentType('application/json');
+public function respondToTransfer()
+{
+    $this->response->setContentType('application/json');
 
-        if (!session()->get('isLoggedIn')) {
-            throw new AuthenticationException();
-        }
+    if (!session()->get('isLoggedIn')) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'يجب تسجيل الدخول أولاً'
+        ]);
+    }
 
-        $json = $this->request->getJSON();
+    $json = $this->request->getJSON();
 
-        if (!$json) {
+    if (!$json) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'بيانات غير صحيحة'
+        ]);
+    }
+
+    $transferId = $json->transfer_id ?? null;
+    $action = $json->action ?? null;
+
+    if (!$transferId || !$action) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'البيانات المطلوبة غير مكتملة'
+        ]);
+    }
+
+    try {
+        $transferModel = $this->transferItemsModel;
+        $itemOrderModel = $this->itemOrderModel;
+        $orderModel = $this->orderModel;
+        $historyModel = new \App\Models\HistoryModel();
+        
+        $transfer = $transferModel->find($transferId);
+
+        if (!$transfer) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'بيانات غير صحيحة'
+                'message' => 'الطلب غير موجود'
             ]);
         }
 
-        $transferId = $json->transfer_id ?? null;
-        $action = $json->action ?? null;
+        // ✅ التحقق من صلاحية المستخدم
+        $isEmployee = session()->get('isEmployee');
+        $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id');
+        $currentUserId = $account_id;
+        
 
-        if (!$transferId || !$action) {
+
+        if ($transfer->order_status_id != 1) {
+            $statusText = $transfer->order_status_id == 2 ? 'مقبول' : 'مرفوض';
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'البيانات المطلوبة غير مكتملة'
+                'message' => 'هذا الطلب ' . $statusText . ' مسبقاً'
             ]);
         }
 
-        try {
-            $transferModel = $this->transferItemsModel;
-            $itemOrderModel = $this->itemOrderModel;
-            $orderModel = $this->orderModel;
-            $historyModel = new \App\Models\HistoryModel();
+        $orderStatusId = ($action === 'accept') ? 2 : 3;
+        $historyUsageStatusId = ($action === 'accept') ? 4 : 5;
 
-            $transfer = $transferModel->find($transferId);
+        $orderModel->transStart();
 
-            if (!$transfer) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'الطلب غير موجود'
-                ]);
-            }
+        // ✅ تحديث حالة التحويل
+        $updated = $transferModel->update($transferId, [
+            'order_status_id' => $orderStatusId,
+            'updated_at' => date('Y-m-d H:i:s'),
+            'received_at' => ($action === 'accept') ? date('Y-m-d H:i:s') : null,
+        ]);
 
-            // ✅ التحقق من صلاحية المستخدم
-            $isEmployee = session()->get('isEmployee');
-            $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id');
-            $currentUserId = $account_id;
-
-
-
-            if ($transfer->order_status_id != 1) {
-                $statusText = $transfer->order_status_id == 2 ? 'مقبول' : 'مرفوض';
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'هذا الطلب ' . $statusText . ' مسبقاً'
-                ]);
-            }
-
-            $orderStatusId = ($action === 'accept') ? 2 : 3;
-            $historyUsageStatusId = ($action === 'accept') ? 4 : 5;
-
-            $orderModel->transStart();
-
-            // ✅ تحديث حالة التحويل
-            $updated = $transferModel->update($transferId, [
-                'order_status_id' => $orderStatusId,
-                'updated_at' => date('Y-m-d H:i:s'),
-                'received_at' => ($action === 'accept') ? date('Y-m-d H:i:s') : null,
+        if (!$updated) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'فشل تحديث حالة الطلب'
             ]);
+        }
+        
+        $itemOrder = $itemOrderModel->find($transfer->item_order_id);
+        $itemOrderId = $itemOrder->item_order_id ?? null;
+        $orderId = $itemOrder->order_id ?? null;
 
-            if (!$updated) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'فشل تحديث حالة الطلب'
+        if (!$orderId) {
+            throw new \Exception('فشل تحديد الطلب الرئيسي');
+        }
+
+        // ✅ جلب جميع الأصناف المرتبطة بهذا الطلب
+        $allOrderItems = $itemOrderModel->where('order_id', $orderId)->findAll();
+
+        // ✅ إضافة سجل في جدول history لكل صنف
+        foreach ($allOrderItems as $orderItem) {
+            $historyData = [
+                'item_order_id' => $orderItem->item_order_id,
+                'usage_status_id' => $historyUsageStatusId,
+                'handled_by' => $currentUserId
+            ];
+
+            $historyInserted = $historyModel->insert($historyData);
+
+            if (!$historyInserted) {
+                throw new \Exception('فشل في إضافة سجل التاريخ للصنف: ' . $orderItem->item_order_id);
+            }
+        }
+
+        if ($action === 'accept') {
+            // ✅ تحديث حالة الاستخدام فقط إذا تم تحويل العهدة من قبل شخص آخر
+            $previousTransfers = $transferModel
+                ->where('item_order_id', $itemOrderId)
+                ->where('order_status_id', 2) // تم قبول التحويل
+                ->findAll();
+
+            if (count($previousTransfers) > 1) {
+                // هناك مستخدم سابق قبل هذا التحويل → نغير الحالة إلى مستعمل
+                $itemOrderModel->update($itemOrderId, [
+                    'usage_status_id' => 6, // مستعمل
+                    'updated_at' => date('Y-m-d H:i:s')
                 ]);
             }
 
-            $itemOrder = $itemOrderModel->find($transfer->item_order_id);
-            $itemOrderId = $itemOrder->item_order_id ?? null;
-            $orderId = $itemOrder->order_id ?? null;
+            // ✅ التحقق من أن جميع التحويلات في نفس الطلب تم قبولها
+            $allTransferItems = $transferModel
+                ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id')
+                ->where('item_order.order_id', $orderId)
+                ->findAll();
 
-            if (!$orderId) {
-                throw new \Exception('فشل تحديد الطلب الرئيسي');
+            $allAccepted = true;
+            foreach ($allTransferItems as $item) {
+                if ($item->order_status_id != 2) {
+                    $allAccepted = false;
+                    break;
+                }
             }
+
+            if ($allAccepted) {
+                $orderModel->update($orderId, ['order_status_id' => 2]);
+            }
+        } else {
+            // ✅ في حال الرفض
+            $orderModel->update($orderId, ['order_status_id' => 3]);
 
             // ✅ جلب جميع الأصناف المرتبطة بهذا الطلب
-            $allOrderItems = $itemOrderModel->where('order_id', $orderId)->findAll();
+            $relatedItems = $itemOrderModel
+                ->where('order_id', $orderId)
+                ->findAll();
 
-            // ✅ إضافة سجل في جدول history لكل صنف
-            foreach ($allOrderItems as $orderItem) {
-                $historyData = [
-                    'item_order_id' => $orderItem->item_order_id,
-                    'usage_status_id' => $historyUsageStatusId,
-                    'handled_by' => $currentUserId
-                ];
+            foreach ($relatedItems as $item) {
+                if ($item->usage_status_id == 1) {
+                    $hasReturn = $historyModel
+                        ->where('item_order_id', $item->item_order_id)
+                        ->where('usage_status_id', 2)
+                        ->first();
 
-                $historyInserted = $historyModel->insert($historyData);
-
-                if (!$historyInserted) {
-                    throw new \Exception('فشل في إضافة سجل التاريخ للصنف: ' . $orderItem->item_order_id);
-                }
-            }
-
-            if ($action === 'accept') {
-                // ✅ تحديث حالة الاستخدام فقط إذا تم تحويل العهدة من قبل شخص آخر
-                $previousTransfers = $transferModel
-                    ->where('item_order_id', $itemOrderId)
-                    ->where('order_status_id', 2) // تم قبول التحويل
-                    ->findAll();
-
-                if (count($previousTransfers) > 1) {
-                    // هناك مستخدم سابق قبل هذا التحويل → نغير الحالة إلى مستعمل
-                    $itemOrderModel->update($itemOrderId, [
-                        'usage_status_id' => 6, // مستعمل
-                        'updated_at' => date('Y-m-d H:i:s')
-                    ]);
-                }
-
-                // ✅ التحقق من أن جميع التحويلات في نفس الطلب تم قبولها
-                $allTransferItems = $transferModel
-                    ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id')
-                    ->where('item_order.order_id', $orderId)
-                    ->findAll();
-
-                $allAccepted = true;
-                foreach ($allTransferItems as $item) {
-                    if ($item->order_status_id != 2) {
-                        $allAccepted = false;
-                        break;
-                    }
-                }
-
-                if ($allAccepted) {
-                    $orderModel->update($orderId, ['order_status_id' => 2]);
-                }
-            } else {
-                // ✅ في حال الرفض
-                $orderModel->update($orderId, ['order_status_id' => 3]);
-
-                // ✅ جلب جميع الأصناف المرتبطة بهذا الطلب
-                $relatedItems = $itemOrderModel
-                    ->where('order_id', $orderId)
-                    ->findAll();
-
-                foreach ($relatedItems as $item) {
-                    if ($item->usage_status_id == 1) {
-                        $hasReturn = $historyModel
-                            ->where('item_order_id', $item->item_order_id)
-                            ->where('usage_status_id', 2)
-                            ->first();
-
-                        if ($hasReturn) {
-                            $itemOrderModel->update($item->item_order_id, [
-                                'usage_status_id' => 4,
-                                'updated_at' => date('Y-m-d H:i:s')
-                            ]);
-                        }
+                    if ($hasReturn) {
+                        $itemOrderModel->update($item->item_order_id, [
+                            'usage_status_id' => 4,
+                            'updated_at' => date('Y-m-d H:i:s')
+                        ]);
                     }
                 }
             }
-
-            $orderModel->transComplete();
-
-            if ($orderModel->transStatus() === FALSE) {
-                throw new \Exception('فشل في المعاملة الكلية.');
-            }
-
-            $message = ($action === 'accept')
-                ? 'تم قبول الطلب بنجاح. العهدة الآن في عهدتك'
-                : 'تم رفض الطلب. العهدة ستبقى مع المُرسل';
-
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => $message
-            ]);
-        } catch (\Exception $e) {
-            log_message('error', 'Transfer Response Error: ' . $e->getMessage());
-
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'حدث خطأ: ' . $e->getMessage()
-            ]);
         }
+
+        $orderModel->transComplete();
+        
+        if ($orderModel->transStatus() === FALSE) {
+            throw new \Exception('فشل في المعاملة الكلية.');
+        }
+        
+        $message = ($action === 'accept')
+            ? 'تم قبول الطلب بنجاح. العهدة الآن في عهدتك'
+            : 'تم رفض الطلب. العهدة ستبقى مع المُرسل';
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => $message
+        ]);
+
+    } catch (\Exception $e) {
+        log_message('error', 'Transfer Response Error: ' . $e->getMessage());
+
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'حدث خطأ: ' . $e->getMessage()
+        ]);
     }
+}
     /**
      * تعليم أن الطلب قد تم فتحه (is_opened = 1)
      */
@@ -457,19 +460,20 @@ class UserController extends BaseController
         }
     }
 
-    public function userView2(): string
-    {
-        if (!session()->get('isLoggedIn')) {
-            throw new AuthenticationException();
-        }
-        $currentUserId = session()->get('isEmployee') ? session()->get('employee_id') : session()->get('user_id');
+public function userView2(): string
+{
+    $this->checkAuth();
 
-        $transferItemsModel = $this->transferItemsModel;
-        $historyModel = new \App\Models\HistoryModel();
+ $isEmployee = session()->get('isEmployee');
+    $account_id = $isEmployee ? session()->get('employee_id') : session()->get('user_id');
+    $currentUserId = $account_id;   
 
-        $transferItems = $transferItemsModel
-            ->select(
-                'transfer_items.transfer_item_id AS id,
+    $transferItemsModel = $this->transferItemsModel;
+    $historyModel = new \App\Models\HistoryModel();
+
+    $transferItems = $transferItemsModel
+        ->select(
+            'transfer_items.transfer_item_id AS id,
          transfer_items.created_at,
          transfer_items.item_order_id,
          transfer_items.is_opened,
@@ -489,26 +493,26 @@ class UserController extends BaseController
          usage_status.usage_status AS usage_status_name,
          order_status.status AS order_status_name,
          "transfer_items" AS source_table'
-            )
-            ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
-            ->join('items', 'items.id = item_order.item_id', 'left')
-            ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-            ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
-            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-            ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
-            ->where('transfer_items.to_user_id', $currentUserId)
-            ->where('transfer_items.order_status_id', 2) // Only accepted transfers
-            ->whereNotIn('item_order.usage_status_id', [2, 4,7]) // Exclude returned (2) and reissued (4)
-            ->groupBy('transfer_items.item_order_id')
-            ->orderBy('transfer_items.created_at', 'ASC')
-            ->findAll();
+        )
+        ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
+        ->join('items', 'items.id = item_order.item_id', 'left')
+        ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+        ->join('users AS from_user', 'from_user.user_id = transfer_items.from_user_id', 'left')
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+        ->join('order_status', 'order_status.id = transfer_items.order_status_id', 'left')
+        ->where('transfer_items.to_user_id', $currentUserId)
+        ->where('transfer_items.order_status_id', 2) // Only accepted transfers
+        ->whereNotIn('item_order.usage_status_id', [2, 4,7]) // Exclude returned (2) and reissued (4)
+        ->groupBy('transfer_items.transfer_item_id')
+        ->orderBy('transfer_items.created_at', 'ASC')
+        ->findAll();
 
-        $orderModel = $this->orderModel;
+    $orderModel = $this->orderModel;
 
-        $orders = $orderModel
-            ->select(
-                'order.order_id AS id,
+    $orders = $orderModel
+        ->select(
+            'order.order_id AS id,
          order.created_at,
          order.to_user_id,
          order.order_status_id,
@@ -528,93 +532,93 @@ class UserController extends BaseController
          minor_category.name AS minor_category_name,
          major_category.name AS major_category_name,
          "orders" AS source_table'
-            )
-            ->join('item_order', 'item_order.order_id = order.order_id', 'left')
-            ->join('items', 'items.id = item_order.item_id', 'left')
-            ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
-            ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
-            ->join('users AS from_user', 'from_user.user_id = order.from_user_id', 'left')
-            ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
-            ->join('order_status', 'order_status.id = order.order_status_id', 'left')
-            ->where('order.to_user_id', $currentUserId)
-            ->where('order.order_status_id', 2) // Only accepted orders
-            ->whereNotIn('item_order.usage_status_id', [2, 4,7]) // Exclude returned (2) and reissued (4)
-            ->groupBy('item_order.item_order_id')
-            ->orderBy('order.created_at', 'ASC')
-            ->findAll();
+        )
+        ->join('item_order', 'item_order.order_id = order.order_id', 'left')
+        ->join('items', 'items.id = item_order.item_id', 'left')
+        ->join('minor_category', 'minor_category.id = items.minor_category_id', 'left')
+        ->join('major_category', 'major_category.id = minor_category.major_category_id', 'left')
+        ->join('users AS from_user', 'from_user.user_id = order.from_user_id', 'left')
+        ->join('usage_status', 'usage_status.id = item_order.usage_status_id', 'left')
+        ->join('order_status', 'order_status.id = order.order_status_id', 'left')
+        ->where('order.to_user_id', $currentUserId)
+        ->where('order.order_status_id', 2) // Only accepted orders
+        ->whereNotIn('item_order.usage_status_id', [2, 4,7]) // Exclude returned (2) and reissued (4)
+        ->groupBy('item_order.item_order_id')
+        ->orderBy('order.created_at', 'ASC')
+        ->findAll();
 
-        $combinedItems = [];
-        $assetNums = [];
+    $combinedItems = [];
+    $assetNums = [];
 
-        // Process orders first
-        foreach ($orders as $order) {
-            $assetNum = $order->asset_num;
-            $key = $order->item_order_id ?? $assetNum;
+    // Process orders first
+    foreach ($orders as $order) {
+        $assetNum = $order->asset_num;
+        $key = $order->item_order_id ?? $assetNum;
 
-            if (!isset($assetNums[$key])) {
-                // Initialize reissued flag
-                $order->is_reissued = false;
+        if (!isset($assetNums[$key])) {
+            // Initialize reissued flag
+            $order->is_reissued = false;
+            
+            // Check if item has usage_status_id = 1 (new) and has a history of being returned (usage_status_id = 2)
+            // This means the item was returned before and now reissued
+            if ($order->usage_status_id == 1) {
+                $returnHistoryExists = $historyModel
+                    ->where('item_order_id', $order->item_order_id)
+                    ->where('usage_status_id', 2) // Check for returned status in history
+                    ->first();
 
-                // Check if item has usage_status_id = 1 (new) and has a history of being returned (usage_status_id = 2)
-                // This means the item was returned before and now reissued
-                if ($order->usage_status_id == 1) {
-                    $returnHistoryExists = $historyModel
-                        ->where('item_order_id', $order->item_order_id)
-                        ->where('usage_status_id', 2) // Check for returned status in history
-                        ->first();
-
-                    if ($returnHistoryExists) {
-                        $order->is_reissued = true;
-                        $order->usage_status_name = 'معاد صرفه';
-                    }
+                if ($returnHistoryExists) {
+                    $order->is_reissued = true;
+                    $order->usage_status_name = 'معاد صرفه';
                 }
-
-                // Check if usage_status_id = 5, then override order status to "مرفوض"
-                if ($order->usage_status_id == 5) {
-                    $order->order_status_name = 'مرفوض';
-                }
-
-                $combinedItems[] = $order;
-                $assetNums[$key] = true;
             }
-        }
-
-        // Process transfer items
-        foreach ($transferItems as $transfer) {
-            $assetNum = $transfer->asset_num;
-            $key = $transfer->item_order_id ?? $assetNum;
-
-            if (!isset($assetNums[$key])) {
-                // Initialize reissued flag
-                $transfer->is_reissued = false;
-
-
-                if ($transfer->usage_status_id == 1) {
-                    $returnHistoryExists = $historyModel
-                        ->where('item_order_id', $transfer->item_order_id)
-                        ->where('usage_status_id', 2)
-                        ->first();
-
-                    if ($returnHistoryExists) {
-                        $transfer->is_reissued = true;
-                        $transfer->usage_status_name = 'معاد صرفه';
-                    }
-                }
-
-
-                if ($transfer->usage_status_id == 5) {
-                    $transfer->order_status_name = 'مرفوض';
-                }
-
-                $combinedItems[] = $transfer;
-                $assetNums[$key] = true;
+            
+            // Check if usage_status_id = 5, then override order status to "مرفوض"
+            if ($order->usage_status_id == 5) {
+                $order->order_status_name = 'مرفوض';
             }
+            
+            $combinedItems[] = $order;
+            $assetNums[$key] = true;
         }
-
-        $filteredOrders = array_values($combinedItems);
-
-        return view('user/userView2', [
-            'orders' => $filteredOrders
-        ]);
     }
+
+    // Process transfer items
+    foreach ($transferItems as $transfer) {
+        $assetNum = $transfer->asset_num;
+        $key = $transfer->item_order_id ?? $assetNum;
+
+        if (!isset($assetNums[$key])) {
+            // Initialize reissued flag
+            $transfer->is_reissued = false;
+            
+
+            if ($transfer->usage_status_id == 1) {
+                $returnHistoryExists = $historyModel
+                    ->where('item_order_id', $transfer->item_order_id)
+                    ->where('usage_status_id', 2)
+                    ->first();
+                
+                if ($returnHistoryExists) {
+                    $transfer->is_reissued = true;
+                    $transfer->usage_status_name = 'معاد صرفه';
+                }
+            }
+            
+
+            if ($transfer->usage_status_id == 5) {
+                $transfer->order_status_name = 'مرفوض';
+            }
+            
+            $combinedItems[] = $transfer;
+            $assetNums[$key] = true;
+        }
+    }
+
+    $filteredOrders = array_values($combinedItems);
+
+    return view('user/userView2', [
+        'orders' => $filteredOrders
+    ]);
+}
 }

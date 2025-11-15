@@ -8,6 +8,7 @@ use App\Models\TransferItemsModel;
 use App\Models\HistoryModel;
 use App\Models\EmployeeModel;
 use App\Models\UserModel;
+use App\Models\EvaluationModel;
 use App\Exceptions\AuthenticationException;
 use CodeIgniter\HTTP\ResponseInterface;
 
@@ -368,6 +369,91 @@ class AssetsHistory extends BaseController
         }
     }
 
+    public function printReturnReport($assetNum = null): ResponseInterface
+    {
+        if (!session()->get('isLoggedIn')) {
+            throw new AuthenticationException();
+        }
+
+        if (!$assetNum) {
+            return redirect()->back()->with('error', 'رقم الأصل مطلوب');
+        }
+
+        // Get item_order_id for this asset
+        $itemOrderModel = new ItemOrderModel();
+        $assetInfo = $itemOrderModel->where('asset_num', $assetNum)->first();
+        
+        if (!$assetInfo) {
+            return redirect()->back()->with('error', 'الأصل غير موجود');
+        }
+
+        // Check for evaluation notes - Get the most recent one
+        $evaluationModel = new EvaluationModel();
+        $evaluation = $evaluationModel
+            ->where('item_order_id', $assetInfo->item_order_id)
+            ->orderBy('created_at', 'DESC')
+            ->first();
+        
+        $technicianNotes = isset($evaluation['notes']) ? trim($evaluation['notes']) : null;
+
+        // Define uploads path
+        $uploadsPath = WRITEPATH . 'uploads/return_attachments/';
+        
+        // Search for HTML files matching this asset number
+        $files = glob($uploadsPath . 'form_' . $assetNum . '_*.html');
+        
+        if (empty($files)) {
+            return redirect()->back()->with('error', 'لم يتم العثور على تقرير الإرجاع لهذا الأصل');
+        }
+        
+        // Get the most recent file
+        usort($files, function($a, $b) {
+            return filemtime($b) - filemtime($a);
+        });
+        
+        $htmlFile = $files[0];
+        $htmlContent = file_get_contents($htmlFile);
+        
+        // If technician notes exist, inject them into the HTML
+        if (!empty($technicianNotes)) {
+            // Create the notes section with proper spacing and thinner border
+            $notesSection = '
+        
+        <table style="width: 100%; margin-top: 30px; margin-bottom: 20px; border-collapse: collapse; page-break-inside: avoid;">
+            <tr>
+                <td style="border: 1px solid #000; padding: 12px; background-color: #e0e0e0; font-weight: bold; text-align: right;">
+                    ملاحظات الفني
+                </td>
+            </tr>
+            <tr>
+                <td style="border: none; padding: 15px 0; min-height: 80px; vertical-align: top; background-color: transparent; text-align: right; line-height: 1.8;">
+                    ' . nl2br(htmlspecialchars($technicianNotes, ENT_QUOTES, 'UTF-8')) . '
+                </td>
+            </tr>
+        </table>';
+ 
+            // Find the "المستلم / أمين المستودع" table and insert notes after it
+            $searchPattern = '/<table[^>]*>.*?المستلم.*?أمين.*?المستودع.*?<\/table>/s';
+            
+            if (preg_match($searchPattern, $htmlContent, $matches, PREG_OFFSET_CAPTURE)) {
+                // Insert right after the matched table
+                $insertPosition = $matches[0][1] + strlen($matches[0][0]);
+                $htmlContent = substr_replace($htmlContent, $notesSection, $insertPosition, 0);
+            } else {
+                // Fallback: try to find by the pink warning box and insert before it
+                $warningPattern = '/<table[^>]*background-color:\s*#f8d7da[^>]*>.*?<\/table>/s';
+                if (preg_match($warningPattern, $htmlContent, $matches, PREG_OFFSET_CAPTURE)) {
+                    $insertPosition = $matches[0][1];
+                    $htmlContent = substr_replace($htmlContent, $notesSection, $insertPosition, 0);
+                }
+            }
+        }
+        
+        return $this->response
+            ->setContentType('text/html')
+            ->setBody($htmlContent);
+    }
+
     public function assetsHistory(): string
     {
         if (!session()->get('isLoggedIn')) {
@@ -483,7 +569,7 @@ class AssetsHistory extends BaseController
             // Join for person who is RETURNING the asset (to_user_id from order table)
             ->join('employee as returner_employee', 'returner_employee.emp_id = order.to_user_id', 'left')
             ->join('users as returner_user', 'returner_user.user_id = order.to_user_id', 'left')
-            ->whereIn('item_order.usage_status_id', [2, 4, 5]);
+            ->whereIn('item_order.usage_status_id', [2, 4, 5, 7]);
 
         if (!empty($filters['asset_number'])) $returnsQuery->like('item_order.asset_num', $filters['asset_number']);
         if (!empty($filters['item_name'])) $returnsQuery->like('items.name', $filters['item_name']);
