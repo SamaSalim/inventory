@@ -501,6 +501,23 @@
                 </div>
             </div>
 
+            <!-- ✅ حقل الموقع الجديد -->
+            <div class="form-group">
+                <label for="toLocationInput">الموقع (المبنى - الطابق - القسم - الغرفة):</label>
+                <div class="search-select-container">
+                    <input
+                        type="text"
+                        id="toLocationInput"
+                        class="search-select-input"
+                        placeholder="ابحث عن الموقع..."
+                        autocomplete="off"
+                        oninput="filterLocations()"
+                        onfocus="showLocationDropdown()">
+                    <span class="search-icon">📍</span>
+                    <div id="toLocationDropdown" class="search-dropdown"></div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label for="transferNote">ملاحظات التحويل:</label>
                 <textarea id="transferNote" placeholder="أضف ملاحظات حول سبب التحويل أو حالة الأصول..."></textarea>
@@ -514,279 +531,297 @@
     </div>
 
     <script>
-        // ✅ تعريف المستخدم الحالي من PHP
-        const currentUserId = "<?= esc($current_user->user_id) ?>";
-        const currentUserName = "<?= esc($current_user->name) ?>";
+    // ✅ تعريف المتغيرات
+    const currentUserId = "<?= esc($current_user->user_id) ?>";
+    const currentUserName = "<?= esc($current_user->name) ?>";
 
-        // Users data from PHP (بدون المستخدم الحالي)
-        const usersData = <?= json_encode(array_map(function ($user) {
-                                return [
-                                    'user_id' => $user->user_id,
-                                    'name' => $user->name,
-                                    'dept' => $user->user_dept ?? ''
-                                ];
-                            }, $users)) ?>;
+    const usersData = <?= json_encode(array_map(function ($user) {
+                            return [
+                                'user_id' => $user->user_id,
+                                'name' => $user->name,
+                                'dept' => $user->user_dept ?? ''
+                            ];
+                        }, $users)) ?>;
 
-        let selectedToUser = null;
-        let selectedItems = [];
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.search-select-container')) {
-                document.querySelectorAll('.search-dropdown').forEach(d => d.classList.remove('show'));
-            }
-        });
-
-        function showDropdown(type) {
-            const dropdown = document.getElementById(type + 'UserDropdown');
-            filterUsers(type);
-            dropdown.classList.add('show');
-        }
-
-        function filterUsers(type) {
-            const input = document.getElementById(type + 'UserInput');
-            const dropdown = document.getElementById(type + 'UserDropdown');
-            const searchTerm = input.value.toLowerCase().trim();
-
-            const filteredUsers = usersData.filter(user => {
-                const nameMatch = user.name.toLowerCase().includes(searchTerm);
-                const deptMatch = user.dept.toLowerCase().includes(searchTerm);
-                const idMatch = user.user_id.toLowerCase().includes(searchTerm);
-                return nameMatch || deptMatch || idMatch;
-            });
-
-            if (filteredUsers.length === 0) {
-                dropdown.innerHTML = '<div class="no-results">لا توجد نتائج</div>';
-            } else {
-                dropdown.innerHTML = filteredUsers.map(user => `
-                    <div class="search-dropdown-item" onclick="selectUser('${type}', '${user.user_id}', '${user.name}', '${user.dept}')">
-                        <span class="user-name">${user.name}</span>
-                        <span class="user-dept">القسم: ${user.dept || 'غير محدد'} | ID: ${user.user_id}</span>
-                    </div>
-                `).join('');
-            }
-
-            dropdown.classList.add('show');
-        }
-
-        function selectUser(type, userId, userName, dept) {
-            const input = document.getElementById(type + 'UserInput');
-            const dropdown = document.getElementById(type + 'UserDropdown');
-
-            input.value = `${userName} (${dept || 'بدون قسم'})`;
-            dropdown.classList.remove('show');
-
-            if (type === 'to') {
-                selectedToUser = userId;
-            }
-        }
-
-        function updateSelection() {
-            selectedItems = [];
-            const checkboxes = document.querySelectorAll('.item-checkbox:checked');
-
-            checkboxes.forEach(cb => {
-                const card = cb.closest('.item-card');
-                const itemOrderId = card.getAttribute('data-item-order-id');
-                const name = card.querySelector('.item-name').textContent;
-
-                selectedItems.push({
-                    id: itemOrderId,
-                    name: name
-                });
-                card.classList.add('selected');
-            });
-
-            document.querySelectorAll('.item-card').forEach(c => {
-                if (!c.querySelector('.item-checkbox').checked) c.classList.remove('selected');
-            });
-
-            updateMasterCheckbox();
-            updateTransferButton();
-        }
-
-        function updateTransferButton() {
-            const bar = document.getElementById('bulkActionsBar');
-            const counter = document.getElementById('selectedCount');
-
-            counter.textContent = selectedItems.length;
-
-            if (selectedItems.length > 0) {
-                bar.classList.add('show');
-            } else {
-                bar.classList.remove('show');
-            }
-        }
-
-        function clearAllSelections() {
-            document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = false);
-            document.querySelectorAll('.item-card').forEach(c => c.classList.remove('selected'));
-            document.getElementById('masterCheckbox').checked = false;
-            selectedItems = [];
-            updateTransferButton();
-        }
-
-        function toggleAllSelection() {
-            const master = document.getElementById('masterCheckbox');
-            document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = master.checked);
-            updateSelection();
-        }
-
-        function updateMasterCheckbox() {
-            const master = document.getElementById('masterCheckbox');
-            const all = document.querySelectorAll('.item-checkbox');
-            const checked = document.querySelectorAll('.item-checkbox:checked');
-
-            if (all.length === 0 || checked.length === 0) {
-                master.checked = false;
-                master.indeterminate = false;
-            } else if (checked.length === all.length) {
-                master.checked = true;
-                master.indeterminate = false;
-            } else {
-                master.checked = false;
-                master.indeterminate = true;
-            }
-        }
-
-        function showTransferModal() {
-            const modal = document.getElementById('transferModal');
-            const list = document.getElementById('selectedItemsList');
-
-            list.innerHTML = '<strong>الأصول المحددة:</strong><br>' +
-                selectedItems.map((item, i) => `${i + 1}. ${item.name}`).join('<br>');
-
-            // ✅ إعادة تعيين حقل "إلى" فقط
-            selectedToUser = null;
-            document.getElementById('toUserInput').value = '';
-            document.getElementById('transferNote').value = '';
-
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('show'), 10);
-        }
-
-        function closeTransferModal() {
-            const modal = document.getElementById('transferModal');
-            modal.classList.remove('show');
-            setTimeout(() => modal.style.display = 'none', 300);
-
-            document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = false);
-            document.querySelectorAll('.item-card').forEach(c => c.classList.remove('selected'));
-            document.querySelectorAll('.search-dropdown').forEach(d => d.classList.remove('show'));
-            selectedItems = [];
-            updateMasterCheckbox();
-            updateTransferButton();
-        }
-
-        function submitTransfer() {
-    const note = document.getElementById('transferNote').value;
-
-    // ✅ التحقق من المستخدم المستلم فقط
-    if (!selectedToUser) {
-        showAlert('warning', 'يرجى اختيار المستخدم المستلم');
-        return;
-    }
-
-    if (selectedItems.length === 0) {
-        showAlert('warning', 'لم يتم تحديد أي أصول');
-        return;
-    }
-
-    // ✅ تحويل الـ IDs إلى أرقام صحيحة
-    const itemIds = selectedItems.map(item => parseInt(item.id));
+    const locationsData = <?= json_encode($locations ?? []) ?>;
     
-    console.log('Selected Items:', selectedItems); // ✅ للتأكد
-    console.log('Item IDs:', itemIds); // ✅ للتأكد
-    console.log('From User:', currentUserId); // ✅ للتأكد
-    console.log('To User:', selectedToUser); // ✅ للتأكد
+    let selectedToUser = null;
+    let selectedLocation = null;
+    let selectedItems = [];
 
-    // ✅ إرسال البيانات بالاسم الصحيح
-    const transferData = {
-        item_order_ids: itemIds, // ✅ تغيير من items إلى item_order_ids
-        from_user_id: currentUserId,
-        to_user_id: selectedToUser,
-        note: note
-    };
-
-    console.log('Transfer Data:', transferData); // ✅ للتأكد من البيانات قبل الإرسال
-
-    fetch('<?= base_url('AssetsController/processTransfer') ?>', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(transferData)
-        })
-        .then(response => {
-            console.log('Response Status:', response.status); // ✅
-            return response.json();
-        })
-        .then(data => {
-            console.log('Response Data:', data); // ✅
-            
-            if (data.success) {
-                showAlert('success', data.message || 'تم إنشاء طلب التحويل بنجاح');
-                
-                // ✅ عرض تفاصيل إضافية
-                if (data.failed_count > 0) {
-                    let failedMsg = 'الأصناف الفاشلة:\n';
-                    data.failed_items.forEach(item => {
-                        failedMsg += `- ${item.item_name || 'صنف غير معروف'}: ${item.reason}\n`;
-                    });
-                    console.warn(failedMsg);
-                    showAlert('warning', failedMsg);
-                }
-                
-                closeTransferModal();
-
-                // إزالة العناصر الناجحة من الواجهة
-                if (data.successful_items) {
-                    data.successful_items.forEach(successItem => {
-                        const card = document.querySelector(`.item-card[data-item-order-id="${successItem.item_order_id}"]`);
-                        if (card) {
-                            card.style.animation = 'fadeOut 0.3s ease';
-                            setTimeout(() => card.remove(), 300);
-                        }
-                    });
-                }
-                
-                // تحديث الصفحة بعد 2 ثانية
-                setTimeout(() => {
-                    location.reload();
-                }, 2000);
-                
-            } else {
-                showAlert('danger', 'حدث خطأ: ' + (data.message || 'فشل التحويل'));
-                
-                // ✅ عرض debug info إذا كان موجود
-                if (data.debug) {
-                    console.error('Debug Info:', data.debug);
-                }
-            }
-        })
-        .catch(error => {
-            showAlert('danger', 'حدث خطأ في الاتصال بالخادم');
-            console.error('Error:', error);
-        });
-}
-
-        function showAlert(type, message) {
-            const alertContainer = document.getElementById('alertContainer');
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-
-            const icon = type === 'success' ? '✓' : type === 'danger' ? '✕' : '⚠';
-            alertDiv.innerHTML = `<strong>${icon}</strong> ${message}`;
-
-            alertContainer.appendChild(alertDiv);
-            setTimeout(() => alertDiv.classList.add('show'), 10);
-
-            setTimeout(() => {
-                alertDiv.classList.remove('show');
-                setTimeout(() => alertDiv.remove(), 300);
-            }, 5000);
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-select-container')) {
+            document.querySelectorAll('.search-dropdown').forEach(d => d.classList.remove('show'));
         }
-    </script>
+    });
+
+    // ✅ دوال المستخدمين
+    function showDropdown(type) {
+        const dropdown = document.getElementById(type + 'UserDropdown');
+        filterUsers(type);
+        dropdown.classList.add('show');
+    }
+
+    function filterUsers(type) {
+        const input = document.getElementById(type + 'UserInput');
+        const dropdown = document.getElementById(type + 'UserDropdown');
+        const searchTerm = input.value.toLowerCase().trim();
+
+        const filteredUsers = usersData.filter(user => {
+            const nameMatch = user.name.toLowerCase().includes(searchTerm);
+            const deptMatch = user.dept.toLowerCase().includes(searchTerm);
+            const idMatch = user.user_id.toLowerCase().includes(searchTerm);
+            return nameMatch || deptMatch || idMatch;
+        });
+
+        if (filteredUsers.length === 0) {
+            dropdown.innerHTML = '<div class="no-results">لا توجد نتائج</div>';
+        } else {
+            dropdown.innerHTML = filteredUsers.map(user => `
+                <div class="search-dropdown-item" onclick="selectUser('${type}', '${user.user_id}', '${user.name}', '${user.dept}')">
+                    <span class="user-name">${user.name}</span>
+                    <span class="user-dept">القسم: ${user.dept || 'غير محدد'} | ID: ${user.user_id}</span>
+                </div>
+            `).join('');
+        }
+
+        dropdown.classList.add('show');
+    }
+
+    function selectUser(type, userId, userName, dept) {
+        const input = document.getElementById(type + 'UserInput');
+        const dropdown = document.getElementById(type + 'UserDropdown');
+
+        input.value = `${userName} (${dept || 'بدون قسم'})`;
+        dropdown.classList.remove('show');
+
+        if (type === 'to') {
+            selectedToUser = userId;
+        }
+    }
+
+    // ✅ دوال المواقع
+    function showLocationDropdown() {
+        filterLocations();
+        document.getElementById('toLocationDropdown').classList.add('show');
+    }
+
+    function filterLocations() {
+        const input = document.getElementById('toLocationInput');
+        const dropdown = document.getElementById('toLocationDropdown');
+        const searchTerm = input.value.toLowerCase().trim();
+
+        const filteredLocations = locationsData.filter(loc => {
+            return loc.full_location.toLowerCase().includes(searchTerm) ||
+                   loc.building_code.toLowerCase().includes(searchTerm) ||
+                   loc.room_code.toLowerCase().includes(searchTerm);
+        });
+
+        if (filteredLocations.length === 0) {
+            dropdown.innerHTML = '<div class="no-results">لا توجد نتائج</div>';
+        } else {
+            dropdown.innerHTML = filteredLocations.map(loc => `
+                <div class="search-dropdown-item" onclick="selectLocation(${loc.room_id}, '${loc.full_location}')">
+                    <span class="user-name">${loc.full_location}</span>
+                </div>
+            `).join('');
+        }
+
+        dropdown.classList.add('show');
+    }
+
+    function selectLocation(roomId, fullLocation) {
+        const input = document.getElementById('toLocationInput');
+        const dropdown = document.getElementById('toLocationDropdown');
+
+        input.value = fullLocation;
+        selectedLocation = roomId;
+        dropdown.classList.remove('show');
+    }
+
+    // ✅ دوال التحديد
+    function updateSelection() {
+        selectedItems = [];
+        const checkboxes = document.querySelectorAll('.item-checkbox:checked');
+
+        checkboxes.forEach(cb => {
+            const card = cb.closest('.item-card');
+            const itemOrderId = card.getAttribute('data-item-order-id');
+            const name = card.querySelector('.item-name').textContent;
+
+            selectedItems.push({
+                id: itemOrderId,
+                name: name
+            });
+            card.classList.add('selected');
+        });
+
+        document.querySelectorAll('.item-card').forEach(c => {
+            if (!c.querySelector('.item-checkbox').checked) c.classList.remove('selected');
+        });
+
+        updateMasterCheckbox();
+        updateTransferButton();
+    }
+
+    function updateTransferButton() {
+        const bar = document.getElementById('bulkActionsBar');
+        const counter = document.getElementById('selectedCount');
+
+        counter.textContent = selectedItems.length;
+
+        if (selectedItems.length > 0) {
+            bar.classList.add('show');
+        } else {
+            bar.classList.remove('show');
+        }
+    }
+
+    function clearAllSelections() {
+        document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.item-card').forEach(c => c.classList.remove('selected'));
+        document.getElementById('masterCheckbox').checked = false;
+        selectedItems = [];
+        updateTransferButton();
+    }
+
+    function toggleAllSelection() {
+        const master = document.getElementById('masterCheckbox');
+        document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = master.checked);
+        updateSelection();
+    }
+
+    function updateMasterCheckbox() {
+        const master = document.getElementById('masterCheckbox');
+        const all = document.querySelectorAll('.item-checkbox');
+        const checked = document.querySelectorAll('.item-checkbox:checked');
+
+        if (all.length === 0 || checked.length === 0) {
+            master.checked = false;
+            master.indeterminate = false;
+        } else if (checked.length === all.length) {
+            master.checked = true;
+            master.indeterminate = false;
+        } else {
+            master.checked = false;
+            master.indeterminate = true;
+        }
+    }
+
+    // ✅ دوال Modal
+    function showTransferModal() {
+        const modal = document.getElementById('transferModal');
+        const list = document.getElementById('selectedItemsList');
+
+        list.innerHTML = '<strong>الأصول المحددة:</strong><br>' +
+            selectedItems.map((item, i) => `${i + 1}. ${item.name}`).join('<br>');
+
+        selectedToUser = null;
+        selectedLocation = null;
+        document.getElementById('toUserInput').value = '';
+        document.getElementById('toLocationInput').value = '';
+        document.getElementById('transferNote').value = '';
+
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+    }
+
+    function closeTransferModal() {
+        const modal = document.getElementById('transferModal');
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = 'none', 300);
+
+        document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.item-card').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.search-dropdown').forEach(d => d.classList.remove('show'));
+        selectedItems = [];
+        updateMasterCheckbox();
+        updateTransferButton();
+    }
+
+    // ✅ دالة التحويل
+    function submitTransfer() {
+        const note = document.getElementById('transferNote').value;
+
+        if (!selectedToUser) {
+            showAlert('warning', 'يرجى اختيار المستخدم المستلم');
+            return;
+        }
+
+        if (!selectedLocation) {
+            showAlert('warning', 'يرجى اختيار موقع المستخدم المستلم');
+            return;
+        }
+
+        if (selectedItems.length === 0) {
+            showAlert('warning', 'لم يتم تحديد أي أصول');
+            return;
+        }
+
+        const itemIds = selectedItems.map(item => parseInt(item.id));
+        
+        const transferData = {
+            item_order_ids: itemIds,
+            from_user_id: currentUserId,
+            to_user_id: selectedToUser,
+            to_room_id: selectedLocation,
+            note: note
+        };
+
+        console.log('Transfer Data:', transferData);
+
+        fetch('<?= base_url('AssetsController/processTransfer') ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(transferData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('success', data.message || 'تم إنشاء طلب التحويل بنجاح');
+                    closeTransferModal();
+
+                    if (data.successful_items) {
+                        data.successful_items.forEach(successItem => {
+                            const card = document.querySelector(`.item-card[data-item-order-id="${successItem.item_order_id}"]`);
+                            if (card) {
+                                card.style.animation = 'fadeOut 0.3s ease';
+                                setTimeout(() => card.remove(), 300);
+                            }
+                        });
+                    }
+                    
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showAlert('danger', 'حدث خطأ: ' + (data.message || 'فشل التحويل'));
+                }
+            })
+            .catch(error => {
+                showAlert('danger', 'حدث خطأ في الاتصال بالخادم');
+                console.error('Error:', error);
+            });
+    }
+
+    function showAlert(type, message) {
+        const alertContainer = document.getElementById('alertContainer');
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type}`;
+
+        const icon = type === 'success' ? '✓' : type === 'danger' ? '✕' : '⚠';
+        alertDiv.innerHTML = `<strong>${icon}</strong> ${message}`;
+
+        alertContainer.appendChild(alertDiv);
+        setTimeout(() => alertDiv.classList.add('show'), 10);
+
+        setTimeout(() => {
+            alertDiv.classList.remove('show');
+            setTimeout(() => alertDiv.remove(), 300);
+        }, 5000);
+    }
+</script>
 </body>
 
 </html>

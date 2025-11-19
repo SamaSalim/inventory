@@ -340,9 +340,40 @@ public function transferView($identifier = null)
     $majorCatModel = new \App\Models\MajorCategoryModel();
     $usageStatusModel = new \App\Models\UsageStatusModel();
     $userModel = new \App\Models\UserModel();
+    $buildingModel = new \App\Models\BuildingModel();
+    $floorModel = new \App\Models\FloorModel();
+    $sectionModel = new \App\Models\SectionModel();
+    $roomModel = new \App\Models\RoomModel();
     $orderModel = new \App\Models\OrderModel();
     $transferItemsModel = new \App\Models\TransferItemsModel();
-    
+
+    // جلب جميع المواقع بشكل hierarchical
+    $buildings = $buildingModel->findAll();
+    $locations = [];
+
+    foreach ($buildings as $building) {
+        $floors = $floorModel->where('building_id', $building->id)->findAll();
+        
+        foreach ($floors as $floor) {
+            $sections = $sectionModel->where('floor_id', $floor->id)->findAll();
+            
+            foreach ($sections as $section) {
+                $rooms = $roomModel->where('section_id', $section->id)->findAll();
+                
+                foreach ($rooms as $room) {
+                    $locations[] = [
+                        'room_id' => $room->id,
+                        'full_location' => "{$building->code} - {$floor->code} - {$section->code} - {$room->code}",
+                        'building_code' => $building->code,
+                        'floor_code' => $floor->code,
+                        'section_code' => $section->code,
+                        'room_code' => $room->code
+                    ];
+                }
+            }
+        }
+    }
+
     $currentUserId = session()->get('isEmployee') ? session()->get('employee_id') : session()->get('user_id');
     
     //  التحقق من صلاحية super_assets
@@ -474,7 +505,8 @@ public function transferView($identifier = null)
         'users' => $users,
         'current_user' => $currentUser,
         'has_available_items' => !empty($items),
-        'can_transfer_any' => $canTransferAny
+        'can_transfer_any' => $canTransferAny,
+        'locations' => $locations
     ]);
 }
 
@@ -501,6 +533,7 @@ public function processTransfer()
     $itemOrderIds = $json->item_order_ids ?? [];
     $fromUserId = $json->from_user_id ?? null;
     $toUserId = $json->to_user_id ?? null;
+    $toRoomId = $json->to_room_id ?? null;
     $note = $json->note ?? '';
 
     // التحقق من البيانات الأساسية
@@ -515,6 +548,13 @@ public function processTransfer()
         return $this->response->setJSON([
             'success' => false,
             'message' => 'بيانات المستخدم مطلوبة'
+        ]);
+    }
+
+     if (!$toRoomId) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'يرجى اختيار موقع المستخدم المستلم'
         ]);
     }
 
@@ -620,6 +660,7 @@ public function processTransfer()
                 //  تحديث حالة الصنف إلى "قيد التحويل" (3)
                 $updated = $itemOrderModel->update($itemOrderId, [
                     'usage_status_id' => 3,
+                    'room_id' => $toRoomId,
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
 
