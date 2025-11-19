@@ -514,13 +514,19 @@
                                                 طباعة النموذج
                                             </button>
                                         <?php elseif ($operation->operation_type == 'transfer'): ?>
-                                            <button 
-                                                class="report-btn" 
-                                                onclick="printTransferReport('<?= esc($operation->asset_number) ?>')"
-                                                title="طباعة نموذج التحويل">
-                                                <i class="fas fa-print btn-icon"></i>
-                                                طباعة النموذج
-                                            </button>
+                                            <?php if (isset($operation->order_status_name) && str_contains($operation->order_status_name, 'مقبول')): ?>
+                                                <button 
+                                                    class="report-btn" 
+                                                    onclick="printTransferReport('<?= esc($operation->asset_number) ?>')"
+                                                    title="طباعة نموذج التحويل">
+                                                    <i class="fas fa-print btn-icon"></i>
+                                                    طباعة النموذج
+                                                </button>
+                                            <?php else: ?>
+                                                <span class="text-muted" style="font-size: 11px;">
+                                                    <i class="fas fa-clock"></i> في انتظار القبول
+                                                </span>
+                                            <?php endif; ?>
                                         <?php else: ?>
                                             <span class="text-muted" style="font-size: 11px;">
                                                 <i class="fas fa-minus-circle"></i> غير متاح

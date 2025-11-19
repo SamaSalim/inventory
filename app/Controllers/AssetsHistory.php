@@ -526,9 +526,9 @@ class AssetsHistory extends BaseController
         if ($userRole !== 'super_warehouse') {
             $transfersQuery = $transferItemsModel
                 ->select('item_order.asset_num as asset_number, items.name as item_name,
-                      transfer_items.created_at as last_operation_date, item_order.item_order_id as id,
-                      item_order.order_id, order_status.status as order_status_name,
-                      transfer_items.to_user_id')
+                    transfer_items.created_at as last_operation_date, item_order.item_order_id as id,
+                    item_order.order_id, order_status.status as order_status_name,
+                    transfer_items.to_user_id, transfer_items.from_user_id')
                 ->join('item_order', 'item_order.item_order_id = transfer_items.item_order_id', 'left')
                 ->join('items', 'items.id = item_order.item_id', 'left')
                 ->join('order', 'order.order_id = item_order.order_id', 'left')
@@ -544,8 +544,13 @@ class AssetsHistory extends BaseController
                     ->orLike('items.name', $filters['search'])
                     ->groupEnd();
             }
+            
+            // BIDIRECTIONAL SEARCH: Show transfers for BOTH sender and receiver
             if (!empty($filters['to_user_id'])) {
-                $transfersQuery->where('transfer_items.to_user_id', $filters['to_user_id']);
+                $transfersQuery->groupStart()
+                    ->where('transfer_items.to_user_id', $filters['to_user_id'])  // المستلم
+                    ->orWhere('transfer_items.from_user_id', $filters['to_user_id'])  // المرسل
+                    ->groupEnd();
             }
 
             $transfers = $transfersQuery->orderBy('transfer_items.created_at', 'DESC')->findAll();
