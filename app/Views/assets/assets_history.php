@@ -705,7 +705,7 @@ window.printTransferReport = function(assetNumber) {
         return;
     }
     
-    const url = '<?= site_url("AssetsHistory/printSingleTransfer") ?>/' + encodeURIComponent(assetNumber);
+    const url = '<?= site_url("Reports/TransferReport/printSingleTransfer") ?>/' + encodeURIComponent(assetNumber);
     
     // Remove existing iframe if any
     const existingIframe = document.getElementById('transferReportIframe');
