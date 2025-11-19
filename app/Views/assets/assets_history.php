@@ -513,6 +513,14 @@
                                                 <i class="fas fa-print btn-icon"></i>
                                                 طباعة النموذج
                                             </button>
+                                        <?php elseif ($operation->operation_type == 'transfer'): ?>
+                                            <button 
+                                                class="report-btn" 
+                                                onclick="printTransferReport('<?= esc($operation->asset_number) ?>')"
+                                                title="طباعة نموذج التحويل">
+                                                <i class="fas fa-print btn-icon"></i>
+                                                طباعة النموذج
+                                            </button>
                                         <?php else: ?>
                                             <span class="text-muted" style="font-size: 11px;">
                                                 <i class="fas fa-minus-circle"></i> غير متاح
@@ -688,6 +696,48 @@
         }
     });
     </script>
+
+<script>
+// Function to print individual transfer report
+window.printTransferReport = function(assetNumber) {
+    if (!assetNumber) {
+        alert('⚠️ رقم الأصل غير متوفر');
+        return;
+    }
+    
+    const url = '<?= site_url("AssetsHistory/printSingleTransfer") ?>/' + encodeURIComponent(assetNumber);
+    
+    // Remove existing iframe if any
+    const existingIframe = document.getElementById('transferReportIframe');
+    if (existingIframe) {
+        existingIframe.remove();
+    }
+    
+    // Create hidden iframe for printing
+    const iframe = document.createElement('iframe');
+    iframe.id = 'transferReportIframe';
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+    iframe.style.visibility = 'hidden';
+    iframe.style.left = '-9999px';
+    
+    iframe.addEventListener('load', function() {
+        try {
+            setTimeout(function() {
+                iframe.contentWindow.print();
+            }, 500);
+        } catch (e) {
+            console.error('Print error:', e);
+            alert('⚠️ حدث خطأ أثناء الطباعة. يرجى المحاولة مرة أخرى.');
+        }
+    }, { once: true });
+    
+    document.body.appendChild(iframe);
+    iframe.src = url;
+};
+</script>
 
 </body>
 </html>
